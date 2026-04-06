@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polynomials — Animated Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+  }
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 55% 40% at 20% 10%, rgba(245,158,11,.04) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 80% 85%, rgba(129,140,248,.03) 0%, transparent 55%);
+  }
+
+  header { text-align:center; padding:1.8rem 1rem 1.2rem; border-bottom:1px solid var(--border); }
+  header h1 {
+    font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:900;
+    color:var(--amber);
+  }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.73rem; margin-top:.3rem; }
+
+  /* ── nav tabs ── */
+  .tab-nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.45rem; padding:1.1rem 1rem .5rem; }
+  .tab-nav button {
+    font-family:'Playfair Display',serif; font-weight:700; font-size:.78rem;
+    padding:.42rem 1.05rem; border-radius:4px;
+    border:1px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .22s;
+  }
+  .tab-nav button:hover { color:var(--text); border-color:#2a3f5a; }
+  .tab-nav button.a-typ  { border-color:var(--indigo); color:var(--indigo); background:rgba(129,140,248,.08); }
+  .tab-nav button.a-grp  { border-color:var(--teal);   color:var(--teal);   background:rgba(45,212,191,.08); }
+  .tab-nav button.a-qdr  { border-color:var(--amber);  color:var(--amber);  background:rgba(245,158,11,.08); }
+  .tab-nav button.a-cub  { border-color:var(--purple);  color:var(--purple); background:rgba(217,70,239,.08); }
+  .tab-nav button.a-div  { border-color:var(--blue);   color:var(--blue);   background:rgba(56,189,248,.08); }
+
+  main { max-width:860px; margin:0 auto; padding:1rem 1rem 4rem; }
+  section { display:none; animation:fadeUp .35s ease; }
+  section.vis { display:block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .sec-title {
+    font-family:'Playfair Display',serif; font-size:1.35rem; font-weight:900;
+    margin-bottom:1.1rem; display:flex; align-items:center; gap:.5rem;
+  }
+
+  /* ── cards ── */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:.85rem; margin-bottom:1.2rem; }
+  .card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.1rem; transition:transform .18s, box-shadow .18s;
+  }
+  .card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.55); }
+  .card h3 { font-family:'Playfair Display',serif; font-size:.95rem; font-weight:700; margin-bottom:.5rem; }
+  .card p, .card li { font-size:.82rem; color:var(--muted); line-height:1.7; }
+  .card ul { padding-left:1.1rem; }
+  .tag { display:inline-block; font-size:.63rem; font-family:'DM Mono',monospace;
+    padding:.1rem .48rem; border-radius:3px; margin-bottom:.45rem; }
+
+  /* ── math box ── */
+  .mbox {
+    background:var(--card2); border:1px solid var(--border); border-radius:10px;
+    padding:.85rem 1.1rem; margin-bottom:.9rem;
+    font-family:'DM Mono',monospace; font-size:.83rem; line-height:1.8;
+  }
+  .mbox .label { font-family:'Playfair Display',serif; font-size:.75rem; color:var(--muted); margin-bottom:.35rem; }
+  .mbox .formula { font-size:1.05rem; color:var(--amber); font-weight:500; }
+  .mbox .sub { font-size:.76rem; color:var(--muted); margin-top:.3rem; }
+
+  /* ── polynomial type cards ── */
+  .poly-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.8rem; margin-bottom:1rem; }
+  .poly-card {
+    border-radius:12px; padding:1.1rem; border:1px solid; border-left-width:4px;
+    transition:transform .2s; background:var(--card);
+  }
+  .poly-card:hover { transform:translateY(-2px); }
+  .poly-card .pc-degree { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:.35rem; }
+  .poly-card .pc-name { font-family:'Playfair Display',serif; font-weight:700; font-size:1rem; margin-bottom:.3rem; }
+  .poly-card .pc-form { font-family:'DM Mono',monospace; font-size:.8rem; margin:.35rem 0; }
+  .poly-card p { font-size:.78rem; color:var(--muted); line-height:1.6; }
+  .poly-card .pc-ex { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); margin-top:.4rem; }
+
+  /* ── graph visualiser ── */
+  .graph-wrap {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.1rem; margin-bottom:1rem;
+  }
+  .graph-wrap h3 { font-family:'Playfair Display',serif; font-weight:700; margin-bottom:.8rem; font-size:.95rem; }
+  .graph-tabs { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.8rem; }
+  .gtab {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    padding:.28rem .75rem; border-radius:4px; border:1px solid var(--border);
+    background:var(--card2); color:var(--muted); cursor:pointer; transition:all .2s;
+  }
+  .gtab.act { border-color:var(--teal); color:var(--teal); background:rgba(45,212,191,.08); }
+  .canvas-wrap { position:relative; width:100%; height:220px; border-radius:8px; overflow:hidden; background:var(--card2); border:1px solid var(--border); }
+  canvas.graph-canvas { width:100%; height:100%; display:block; }
+  .graph-desc { font-size:.8rem; color:var(--muted); margin-top:.7rem; line-height:1.7; font-family:'DM Mono',monospace; }
+  .zeroes-display { font-size:.78rem; margin-top:.4rem; }
+
+  /* ── formula table ── */
+  .formula-table { width:100%; border-collapse:collapse; margin-bottom:1rem; font-size:.82rem; }
+  .formula-table th {
+    background:var(--card2); color:var(--text);
+    font-family:'Playfair Display',serif; font-weight:700;
+    padding:.6rem .8rem; border:1px solid var(--border); text-align:left;
+  }
+  .formula-table td {
+    padding:.55rem .8rem; border:1px solid var(--border);
+    vertical-align:top; line-height:1.55; color:var(--muted);
+  }
+  .formula-table tr:hover td { background:rgba(245,158,11,.03); }
+  .formula-table td:first-child { color:var(--amber); font-weight:700; font-family:'DM Mono',monospace; font-size:.76rem; }
+
+  /* ── worked example ── */
+  .worked {
+    background:rgba(56,189,248,.04); border:1px solid rgba(56,189,248,.15); border-radius:10px;
+    padding:.9rem 1.1rem; margin-bottom:.9rem;
+  }
+  .worked h3 { font-family:'Playfair Display',serif; font-weight:700; color:var(--blue); margin-bottom:.5rem; font-size:.88rem; }
+  .worked .w-steps { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--text); line-height:2; }
+  .worked .w-ans { color:var(--green); font-weight:700; margin-top:.3rem; font-size:.82rem; }
+  .worked .w-note { color:var(--muted); font-size:.76rem; margin-top:.25rem; }
+
+  /* ── tip ── */
+  .tip {
+    background:rgba(245,158,11,.05); border-left:3px solid var(--amber);
+    border-radius:0 8px 8px 0; padding:.5rem .9rem;
+    font-size:.78rem; color:var(--amber); margin:.6rem 0 .9rem;
+  }
+
+  /* ── info-block ── */
+  .info-block {
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.85rem 1.1rem; margin-bottom:.9rem;
+  }
+  .info-block h3 { font-family:'Playfair Display',serif; font-weight:700; margin-bottom:.5rem; font-size:.92rem; }
+  .info-block p, .info-block li { font-size:.82rem; color:var(--muted); line-height:1.7; }
+  .info-block ul { padding-left:1.1rem; }
+
+  /* ── proof box ── */
+  .proof-box {
+    background:rgba(217,70,239,.04); border:1px solid rgba(217,70,239,.2); border-left:4px solid var(--purple);
+    border-radius:0 10px 10px 0; padding:.9rem 1.1rem; margin-bottom:.9rem;
+  }
+  .proof-box h3 { font-family:'Playfair Display',serif; font-weight:700; color:var(--purple); margin-bottom:.5rem; font-size:.92rem; }
+  .proof-box .p-step { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--text); line-height:1.9; }
+  .proof-box .qed { text-align:right; font-family:'DM Mono',monospace; font-size:.76rem; color:var(--purple); margin-top:.4rem; }
+
+  /* ── relation cards ── */
+  .rel-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.8rem; margin-bottom:1rem; }
+  .rel-card {
+    border-radius:12px; padding:1.1rem; border:1px solid;
+    background:var(--card2); transition:transform .2s;
+  }
+  .rel-card:hover { transform:translateY(-2px); }
+  .rel-card .rc-label { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:.4rem; }
+  .rel-card .rc-formula { font-family:'DM Mono',monospace; font-size:1rem; font-weight:500; margin:.3rem 0; }
+  .rel-card p { font-size:.78rem; color:var(--muted); line-height:1.6; }
+
+  /* ── long division stepper ── */
+  .stepper-box {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.2rem; margin-bottom:1rem;
+  }
+  .stepper-box h3 { font-family:'Playfair Display',serif; font-weight:700; margin-bottom:.8rem; }
+  .step-input-row { display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:.9rem; align-items:flex-end; }
+  .input-group { display:flex; flex-direction:column; gap:.25rem; flex:1; min-width:120px; }
+  .input-group label { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); letter-spacing:.5px; }
+  .step-input-row input {
+    width:100%;
+    background:var(--card2); border:1px solid var(--border); border-radius:6px;
+    padding:.45rem .7rem; color:var(--text); font-family:'DM Mono',monospace; font-size:.88rem;
+    outline:none; transition:border-color .2s;
+  }
+  .step-input-row input:focus { border-color:var(--blue); }
+  .calc-btn {
+    font-family:'Playfair Display',serif; font-weight:700; font-size:.8rem;
+    padding:.5rem 1.2rem; border-radius:4px; border:1px solid var(--blue);
+    background:rgba(56,189,248,.1); color:var(--blue); cursor:pointer; transition:all .2s; white-space:nowrap;
+  }
+  .calc-btn:hover { background:rgba(56,189,248,.2); }
+  .div-steps { display:flex; flex-direction:column; gap:.4rem; margin-top:.5rem; }
+  .div-row {
+    font-family:'DM Mono',monospace; font-size:.82rem;
+    background:var(--card2); border:1px solid var(--border); border-radius:7px;
+    padding:.5rem .85rem; animation:fadeUp .3s ease;
+    display:flex; align-items:flex-start; gap:.6rem;
+  }
+  .div-row .dr-num { color:var(--muted); min-width:22px; font-size:.7rem; flex-shrink:0; margin-top:2px; }
+  .div-row .dr-content { flex:1; line-height:1.7; }
+  .div-row .dr-note { font-size:.7rem; color:var(--teal); margin-left:auto; flex-shrink:0; }
+  .div-row.final { border-color:var(--blue); background:rgba(56,189,248,.05); }
+  .div-row.verify-ok { border-color:var(--green); background:rgba(34,197,94,.05); }
+  .div-result {
+    background:var(--card2); border:1px solid var(--border); border-radius:8px;
+    padding:.7rem 1rem; margin-top:.6rem;
+    font-family:'DM Mono',monospace; font-size:.82rem; line-height:1.9;
+  }
+
+  /* ── steps timeline ── */
+  .steps { position:relative; padding-left:2rem; margin-bottom:1rem; }
+  .steps::before {
+    content:''; position:absolute; left:.6rem; top:0; bottom:0;
+    width:2px; border-radius:2px;
+    background:linear-gradient(to bottom, var(--indigo), var(--teal), var(--amber), var(--purple), var(--blue));
+  }
+  .step-item {
+    position:relative; margin-bottom:.85rem;
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.75rem 1rem;
+  }
+  .step-item::before {
+    content:''; position:absolute; left:-1.5rem; top:50%; transform:translateY(-50%);
+    width:10px; height:10px; border-radius:50%;
+    background:var(--bg); border:2px solid currentColor;
+  }
+  .step-item .s-label { font-family:'DM Mono',monospace; font-size:.67rem; margin-bottom:.28rem; }
+  .step-item .s-title { font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; margin-bottom:.22rem; }
+  .step-item .s-body  { font-size:.8rem; color:var(--muted); line-height:1.6; }
+
+  /* ---- learnr site-nav ---- */
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Polynomials</h1>
+  <p>Class X &middot; Mathematics Ch.2 &middot; Interactive Diagrams &amp; Explanations</p>
+</header>
+
+<div class="tab-nav">
+  <button class="a-typ" onclick="show('typ',this,'a-typ')">&#128202; Types</button>
+  <button onclick="show('grp',this,'a-grp')">&#128200; Graphs &amp; Zeroes</button>
+  <button onclick="show('qdr',this,'a-qdr')">&#9082; Quadratic Relations</button>
+  <button onclick="show('cub',this,'a-cub')">&#127919; Cubic Relations</button>
+  <button onclick="show('div',this,'a-div')">&#10135; Division Algorithm</button>
+</div>
+
+<main>
+
+<!-- ═══════════════ TYPES ═══════════════ -->
+<section id="sec-typ" class="vis">
+  <div class="sec-title" style="color:var(--indigo)">&#128202; Types of Polynomials</div>
+
+  <div class="mbox">
+    <div class="label">General Form</div>
+    <div class="formula">p(x) = aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₁x + a₀ &nbsp; (aₙ ≠ 0)</div>
+    <div class="sub">n = degree (non-negative integer) &nbsp;·&nbsp; aₙ = leading coefficient &nbsp;·&nbsp; a₀ = constant term</div>
+  </div>
+
+  <div class="poly-grid">
+    <div class="poly-card" style="border-color:rgba(34,197,94,.4)">
+      <div class="pc-degree" style="color:var(--green)">Degree 0</div>
+      <div class="pc-name" style="color:var(--green)">Constant Polynomial</div>
+      <div class="pc-form" style="color:var(--green)">p(x) = k &nbsp; (k ≠ 0)</div>
+      <p>A non-zero constant. Graph is a horizontal line that never crosses the x-axis.</p>
+      <div class="pc-ex">e.g. p(x) = 7, p(x) = −3</div>
+      <p style="margin-top:.4rem"><strong style="color:var(--text)">Zeroes:</strong> None</p>
+    </div>
+    <div class="poly-card" style="border-color:rgba(56,189,248,.4)">
+      <div class="pc-degree" style="color:var(--blue)">Degree 1</div>
+      <div class="pc-name" style="color:var(--blue)">Linear Polynomial</div>
+      <div class="pc-form" style="color:var(--blue)">p(x) = ax + b &nbsp; (a ≠ 0)</div>
+      <p>Graph is a straight line. Always crosses x-axis at exactly one point.</p>
+      <div class="pc-ex">e.g. 2x + 3, 5x − 10</div>
+      <p style="margin-top:.4rem"><strong style="color:var(--text)">Zero:</strong> x = −b/a &nbsp; (exactly 1)</p>
+    </div>
+    <div class="poly-card" style="border-color:rgba(245,158,11,.4)">
+      <div class="pc-degree" style="color:var(--amber)">Degree 2</div>
+      <div class="pc-name" style="color:var(--amber)">Quadratic Polynomial</div>
+      <div class="pc-form" style="color:var(--amber)">p(x) = ax² + bx + c &nbsp; (a ≠ 0)</div>
+      <p>Graph is a parabola. Opens up if a > 0, down if a &lt; 0.</p>
+      <div class="pc-ex">e.g. x² − 5x + 6, 2x² + x − 1</div>
+      <p style="margin-top:.4rem"><strong style="color:var(--text)">Zeroes:</strong> 0, 1 or 2</p>
+    </div>
+    <div class="poly-card" style="border-color:rgba(217,70,239,.4)">
+      <div class="pc-degree" style="color:var(--purple)">Degree 3</div>
+      <div class="pc-name" style="color:var(--purple)">Cubic Polynomial</div>
+      <div class="pc-form" style="color:var(--purple)">p(x) = ax³+bx²+cx+d &nbsp; (a ≠ 0)</div>
+      <p>S-shaped curve. Always has at least one real zero (cubic always crosses x-axis).</p>
+      <div class="pc-ex">e.g. x³ − 6x² + 11x − 6</div>
+      <p style="margin-top:.4rem"><strong style="color:var(--text)">Zeroes:</strong> 1, 2 or 3</p>
+    </div>
+  </div>
+
+  <div class="info-block">
+    <h3 style="color:var(--indigo)">&#128161; Degree Rules to Remember</h3>
+    <ul>
+      <li>The <strong style="color:var(--text)">degree</strong> is the highest power of x with a non-zero coefficient.</li>
+      <li>A polynomial of degree <em>n</em> has <strong style="color:var(--text)">at most <em>n</em> zeroes</strong>.</li>
+      <li>The <strong style="color:var(--text)">zero polynomial</strong> (p(x) = 0) has no defined degree.</li>
+      <li>Every real number is a zero of the zero polynomial.</li>
+      <li><strong style="color:var(--text)">Binomial</strong> = 2 terms &nbsp;·&nbsp; <strong style="color:var(--text)">Trinomial</strong> = 3 terms &nbsp;·&nbsp; <strong style="color:var(--text)">Monomial</strong> = 1 term</li>
+    </ul>
+  </div>
+
+  <div class="tip">&#128161; Quick check: Is 1/(x+1) a polynomial? NO — polynomials cannot have variables in the denominator. Is √x a polynomial? NO — powers must be whole numbers.</div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(245,158,11,.12);color:var(--amber)">Value of Polynomial</div>
+      <h3>Evaluating p(x) at x = k</h3>
+      <p>Substitute x = k into p(x) to find p(k).<br>Example: p(x) = x² − 3x + 2<br>p(0) = 0 − 0 + 2 = 2<br>p(1) = 1 − 3 + 2 = 0 ← zero!<br>p(2) = 4 − 6 + 2 = 0 ← zero!<br>p(3) = 9 − 9 + 2 = 2</p>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(129,140,248,.12);color:var(--indigo)">Identifying Degree</div>
+      <h3>Find degree of composite expressions</h3>
+      <p>5x³ − 2x + 1 → degree <strong style="color:var(--text)">3</strong><br>3x²y + 2xy² → <em>not a polynomial in one variable</em><br>(x+1)(x²−x+1) → expand = x³+1, degree <strong style="color:var(--text)">3</strong><br>7 → degree <strong style="color:var(--text)">0</strong> (constant)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ GRAPHS & ZEROES ═══════════════ -->
+<section id="sec-grp">
+  <div class="sec-title" style="color:var(--teal)">&#128200; Graphs &amp; Zeroes of Polynomials</div>
+
+  <div class="mbox">
+    <div class="label">Core Principle</div>
+    <div class="formula">Zero of p(x) = x-intercept of the graph y = p(x)</div>
+    <div class="sub">The number of x-intercepts tells you the number of zeroes. The shape of the graph reveals the type of polynomial.</div>
+  </div>
+
+  <div class="graph-wrap">
+    <h3 style="color:var(--teal)">&#127914; Interactive Graph Explorer</h3>
+    <div class="graph-tabs">
+      <button class="gtab act" onclick="setGraph('q2',this)">Quadratic: 2 zeroes</button>
+      <button class="gtab" onclick="setGraph('q1',this)">Quadratic: 1 zero</button>
+      <button class="gtab" onclick="setGraph('q0',this)">Quadratic: 0 zeroes</button>
+      <button class="gtab" onclick="setGraph('lin',this)">Linear</button>
+      <button class="gtab" onclick="setGraph('cub',this)">Cubic</button>
+    </div>
+    <div class="canvas-wrap"><canvas id="graphCanvas" class="graph-canvas"></canvas></div>
+    <div class="graph-desc" id="graphDesc"></div>
+    <div class="zeroes-display" id="zeroesDisplay"></div>
+  </div>
+
+  <div class="steps">
+    <div class="step-item" style="color:var(--teal)">
+      <div class="s-label" style="color:var(--teal)">RULE 01</div>
+      <div class="s-title">Linear polynomial → exactly 1 zero</div>
+      <div class="s-body">The graph of y = ax + b is a straight line. It always crosses the x-axis exactly once at x = −b/a. So a linear polynomial always has exactly one zero.</div>
+    </div>
+    <div class="step-item" style="color:var(--amber)">
+      <div class="s-label" style="color:var(--amber)">RULE 02</div>
+      <div class="s-title">Quadratic polynomial → 0, 1 or 2 zeroes</div>
+      <div class="s-body">The graph is a parabola. If it cuts the x-axis at 2 points → 2 distinct zeroes. If it just touches → 1 repeated zero. If it doesn't touch → no real zeroes. Use discriminant b²−4ac to determine which case.</div>
+    </div>
+    <div class="step-item" style="color:var(--purple)">
+      <div class="s-label" style="color:var(--purple)">RULE 03</div>
+      <div class="s-title">Cubic polynomial → always at least 1 zero</div>
+      <div class="s-body">The S-shaped cubic graph MUST cross the x-axis at least once. So a cubic polynomial always has at least 1 real zero. It may have 1, 2 or 3 zeroes depending on its shape.</div>
+    </div>
+    <div class="step-item" style="color:var(--indigo)">
+      <div class="s-label" style="color:var(--indigo)">RULE 04</div>
+      <div class="s-title">Max zeroes = degree of polynomial</div>
+      <div class="s-body">A polynomial of degree n can have AT MOST n real zeroes. This is the fundamental theorem behind all the rules above. It also means a degree 4 polynomial can have 0, 1, 2, 3 or 4 zeroes.</div>
+    </div>
+  </div>
+
+  <div class="tip">&#127919; Exam tip: If asked "how many zeroes can a polynomial of degree n have?" → Answer: "at most n zeroes". If asked "how many zeroes does a linear polynomial have?" → Always exactly 1.</div>
+</section>
+
+<!-- ═══════════════ QUADRATIC RELATIONS ═══════════════ -->
+<section id="sec-qdr">
+  <div class="sec-title" style="color:var(--amber)">&#9082; Quadratic — Zeroes &amp; Coefficient Relations</div>
+
+  <div class="mbox">
+    <div class="label">For p(x) = ax² + bx + c &nbsp; with zeroes α and β</div>
+    <div class="formula">α + β = −b/a &nbsp;&nbsp;&nbsp; αβ = c/a</div>
+    <div class="sub">These hold for ANY quadratic, even without finding α and β explicitly. Derived from Vieta's formulas.</div>
+  </div>
+
+  <div class="rel-cards">
+    <div class="rel-card" style="border-color:rgba(245,158,11,.35)">
+      <div class="rc-label" style="color:var(--amber)">Sum of Zeroes</div>
+      <div class="rc-formula" style="color:var(--amber)">α + β = −b/a</div>
+      <p>= −(coefficient of x) ÷ (coefficient of x²)<br>The NEGATIVE sign is critical! Many students write +b/a by mistake.</p>
+    </div>
+    <div class="rel-card" style="border-color:rgba(245,158,11,.2)">
+      <div class="rc-label" style="color:var(--amber)">Product of Zeroes</div>
+      <div class="rc-formula" style="color:var(--amber)">αβ = c/a</div>
+      <p>= (constant term) ÷ (coefficient of x²)<br>No negative sign here — just c/a directly.</p>
+    </div>
+    <div class="rel-card" style="border-color:rgba(56,189,248,.3)">
+      <div class="rc-label" style="color:var(--blue)">Forming Polynomial</div>
+      <div class="rc-formula" style="color:var(--blue)">x² − (S)x + (P)</div>
+      <p>Given sum S and product P of zeroes, the quadratic is x² − Sx + P (or any non-zero scalar multiple).</p>
+    </div>
+  </div>
+
+  <div class="proof-box">
+    <h3>Derivation of the Formulas</h3>
+    <div class="p-step">
+If α and β are the zeroes of ax² + bx + c:<br>
+&nbsp;&nbsp;⇒ &nbsp; ax² + bx + c &nbsp; = &nbsp; a(x − α)(x − β)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &nbsp; a[x² − (α+β)x + αβ]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &nbsp; ax² − a(α+β)x + a·αβ<br><br>
+Comparing coefficients of x: &nbsp; b = −a(α+β) &nbsp; ⇒ &nbsp; <span style="color:var(--amber)">α+β = −b/a</span><br>
+Comparing constant terms: &nbsp;&nbsp;&nbsp;&nbsp; c = a·αβ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⇒ &nbsp; <span style="color:var(--amber)">αβ = c/a</span>
+    </div>
+    <div class="qed">Q.E.D. ■</div>
+  </div>
+
+  <div class="worked">
+    <h3>&#128221; Worked Example 1 — Find sum and product of zeroes</h3>
+    <div class="w-steps">
+p(x) = 6x² − 7x − 3 &nbsp; (a = 6, b = −7, c = −3)<br>
+α + β = −b/a = −(−7)/6 = <span style="color:var(--amber)">7/6</span><br>
+αβ &nbsp;&nbsp;&nbsp;&nbsp; = c/a &nbsp; = −3/6 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = <span style="color:var(--amber)">−1/2</span><br><br>
+Verification: zeroes of 6x²−7x−3 = 0 are x = 3/2 and x = −1/3<br>
+Sum &nbsp;= 3/2 + (−1/3) = 9/6 − 2/6 = 7/6 ✓<br>
+Product = 3/2 × (−1/3) = −3/6 = −1/2 ✓
+    </div>
+    <div class="w-ans">Both formulas verified successfully.</div>
+  </div>
+
+  <div class="worked">
+    <h3>&#128221; Worked Example 2 — Form a quadratic from given zeroes</h3>
+    <div class="w-steps">
+Given zeroes: α = 2 + √3 &nbsp; and &nbsp; β = 2 − √3<br><br>
+Sum &nbsp;= (2+√3) + (2−√3) = <span style="color:var(--amber)">4</span><br>
+Product = (2+√3)(2−√3) = 4 − 3 = <span style="color:var(--amber)">1</span><br><br>
+Required polynomial: x² − (sum)x + (product)<br>
+= x² − 4x + 1
+    </div>
+    <div class="w-ans">Quadratic: x² − 4x + 1</div>
+    <div class="w-note">Note: (2+√3)(2−√3) uses the identity (a+b)(a−b) = a²−b²</div>
+  </div>
+
+  <div class="worked">
+    <h3>&#128221; Worked Example 3 — Find k using zero condition</h3>
+    <div class="w-steps">
+One zero of p(x) = 3x² − kx + 4 is 2. Find k and the other zero.<br><br>
+Since 2 is a zero: p(2) = 0<br>
+3(4) − k(2) + 4 = 0 &nbsp; ⇒ &nbsp; 12 − 2k + 4 = 0 &nbsp; ⇒ &nbsp; 2k = 16 &nbsp; ⇒ &nbsp; <span style="color:var(--amber)">k = 8</span><br><br>
+So p(x) = 3x² − 8x + 4. &nbsp; Other zero β:<br>
+α + β = 8/3 &nbsp; ⇒ &nbsp; 2 + β = 8/3 &nbsp; ⇒ &nbsp; β = 8/3 − 2 = <span style="color:var(--amber)">2/3</span>
+    </div>
+    <div class="w-ans">k = 8, zeroes are 2 and 2/3</div>
+  </div>
+
+  <table class="formula-table">
+    <tr><th>Identity</th><th>Formula in terms of α+β and αβ</th><th>Use case</th></tr>
+    <tr><td>α² + β²</td><td>(α+β)² − 2αβ</td><td>Very common in board exams</td></tr>
+    <tr><td>(α−β)²</td><td>(α+β)² − 4αβ</td><td>Finding individual zeroes</td></tr>
+    <tr><td>α³ + β³</td><td>(α+β)³ − 3αβ(α+β)</td><td>Higher order questions</td></tr>
+    <tr><td>1/α + 1/β</td><td>(α+β) / αβ</td><td>Common in 2-mark questions</td></tr>
+    <tr><td>α/β + β/α</td><td>(α²+β²) / αβ = [(α+β)²−2αβ] / αβ</td><td>Requires both steps above</td></tr>
+  </table>
+
+  <div class="tip">&#128161; Sign trick: "Sum = Minus b over a, Product = Plus c over a". Always check: if both zeroes are positive, product and sum are both positive.</div>
+</section>
+
+<!-- ═══════════════ CUBIC RELATIONS ═══════════════ -->
+<section id="sec-cub">
+  <div class="sec-title" style="color:var(--purple)">&#127919; Cubic — Zeroes &amp; Coefficient Relations</div>
+
+  <div class="mbox">
+    <div class="label">For p(x) = ax³ + bx² + cx + d &nbsp; with zeroes α, β, γ</div>
+    <div class="formula">α+β+γ = −b/a &nbsp;&nbsp; αβ+βγ+γα = c/a &nbsp;&nbsp; αβγ = −d/a</div>
+    <div class="sub">Note the sign pattern: −b/a, +c/a, −d/a (alternates). This mirrors the expansion of (x−α)(x−β)(x−γ).</div>
+  </div>
+
+  <div class="rel-cards">
+    <div class="rel-card" style="border-color:rgba(217,70,239,.35)">
+      <div class="rc-label" style="color:var(--purple)">Sum (1 at a time)</div>
+      <div class="rc-formula" style="color:var(--purple)">α+β+γ = −b/a</div>
+      <p>Sum of all three zeroes. The sign is NEGATIVE (−b/a), same pattern as the quadratic sum formula.</p>
+    </div>
+    <div class="rel-card" style="border-color:rgba(217,70,239,.25)">
+      <div class="rc-label" style="color:var(--purple)">Sum of Pairs (2 at a time)</div>
+      <div class="rc-formula" style="color:var(--purple)">αβ+βγ+γα = c/a</div>
+      <p>Take all possible pairs: αβ, βγ, γα and add them. Sign is POSITIVE (+c/a).</p>
+    </div>
+    <div class="rel-card" style="border-color:rgba(217,70,239,.15)">
+      <div class="rc-label" style="color:var(--purple)">Product (3 at a time)</div>
+      <div class="rc-formula" style="color:var(--purple)">αβγ = −d/a</div>
+      <p>Product of ALL three zeroes. Sign is NEGATIVE (−d/a). Most commonly forgotten!</p>
+    </div>
+  </div>
+
+  <div class="proof-box">
+    <h3>Derivation for Cubic</h3>
+    <div class="p-step">
+ax³ + bx² + cx + d  =  a(x−α)(x−β)(x−γ)<br><br>
+Expanding (x−α)(x−β)(x−γ):<br>
+= x³ − (α+β+γ)x² + (αβ+βγ+γα)x − αβγ<br><br>
+So: ax³ + bx² + cx + d = a·x³ − a(α+β+γ)x² + a(αβ+βγ+γα)x − a·αβγ<br><br>
+Comparing x² terms: &nbsp; b = −a(α+β+γ) &nbsp;&nbsp; ⇒ &nbsp; <span style="color:var(--purple)">α+β+γ = −b/a</span><br>
+Comparing x terms: &nbsp;&nbsp; c = a(αβ+βγ+γα) ⇒ &nbsp; <span style="color:var(--purple)">αβ+βγ+γα = c/a</span><br>
+Comparing constants: &nbsp; d = −a·αβγ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⇒ &nbsp; <span style="color:var(--purple)">αβγ = −d/a</span>
+    </div>
+    <div class="qed">Q.E.D. ■</div>
+  </div>
+
+  <div class="worked">
+    <h3>&#128221; Worked Example 1 — Verify relations for a cubic</h3>
+    <div class="w-steps">
+p(x) = x³ − 6x² + 11x − 6 &nbsp; (a=1, b=−6, c=11, d=−6)<br>
+Zeroes: α=1, β=2, γ=3<br><br>
+Sum: 1+2+3 = 6 &nbsp;&nbsp; −b/a = −(−6)/1 = <span style="color:var(--purple)">6 ✓</span><br>
+Pairs: 1×2+2×3+3×1 = 2+6+3 = 11 &nbsp;&nbsp; c/a = 11/1 = <span style="color:var(--purple)">11 ✓</span><br>
+Product: 1×2×3 = 6 &nbsp;&nbsp; −d/a = −(−6)/1 = <span style="color:var(--purple)">6 ✓</span>
+    </div>
+    <div class="w-ans">All three relations verified.</div>
+  </div>
+
+  <div class="worked">
+    <h3>&#128221; Worked Example 2 — Find all zeroes given one zero</h3>
+    <div class="w-steps">
+p(x) = 2x³ + x² − 5x + 2. One zero is 1/2. Find all zeroes.<br><br>
+<span style="color:var(--muted)">Divide p(x) by (x − 1/2), or equivalently by (2x − 1):</span><br>
+2x³ + x² − 5x + 2 = (2x − 1)(x² + x − 2)<br><br>
+Factor the quotient: x² + x − 2 = (x+2)(x−1)<br><br>
+So zeroes: 1/2, −2, 1<br><br>
+Verify with relations (a=2, b=1, c=−5, d=2):<br>
+Sum: 1/2+(−2)+1 = −1/2 &nbsp; = −b/a = −1/2 <span style="color:var(--purple)">✓</span><br>
+Product: (1/2)(−2)(1) = −1 = −d/a = −2/2 = −1 <span style="color:var(--purple)">✓</span>
+    </div>
+    <div class="w-ans">All zeroes: 1/2, −2, and 1</div>
+  </div>
+
+  <div class="tip">&#128161; Memory aid for the sign pattern:<br>"Sum: Minus, Pairs: Plus, Product: Minus" → &nbsp; −b/a, +c/a, −d/a</div>
+</section>
+
+<!-- ═══════════════ DIVISION ALGORITHM ═══════════════ -->
+<section id="sec-div">
+  <div class="sec-title" style="color:var(--blue)">&#10135; Division Algorithm for Polynomials</div>
+
+  <div class="mbox">
+    <div class="label">Division Algorithm (Theorem)</div>
+    <div class="formula">p(x) = g(x) · q(x) + r(x)</div>
+    <div class="sub">For any polynomials p(x) [dividend] and g(x) [divisor, g(x) ≠ 0], there exist unique polynomials q(x) [quotient] and r(x) [remainder] such that r(x) = 0 OR deg(r) &lt; deg(g).</div>
+  </div>
+
+  <div class="stepper-box">
+    <h3 style="color:var(--blue)">&#9998; Interactive Polynomial Division</h3>
+    <p style="font-size:.78rem;color:var(--muted);margin-bottom:.8rem;font-family:'DM Mono',monospace;">Divide ax² + bx + c &nbsp; by &nbsp; (x + d). Enter the coefficients below.</p>
+    <div class="step-input-row">
+      <div class="input-group">
+        <label>a (x² coeff)</label>
+        <input type="number" id="coef-a" value="1">
+      </div>
+      <div class="input-group">
+        <label>b (x coeff)</label>
+        <input type="number" id="coef-b" value="7">
+      </div>
+      <div class="input-group">
+        <label>c (constant)</label>
+        <input type="number" id="coef-c" value="10">
+      </div>
+      <div class="input-group">
+        <label>d (in x+d)</label>
+        <input type="number" id="coef-d" value="2">
+      </div>
+      <button class="calc-btn" onclick="runDivision()">Divide &#10140;</button>
+    </div>
+    <div id="div-steps" class="div-steps"></div>
+    <div id="div-result" class="div-result" style="display:none"></div>
+  </div>
+
+  <div class="steps">
+    <div class="step-item" style="color:var(--blue)">
+      <div class="s-label" style="color:var(--blue)">STEP 01</div>
+      <div class="s-title">Arrange in descending order of degree</div>
+      <div class="s-body">Write both dividend and divisor with powers of x in decreasing order. Insert missing terms with coefficient 0 as placeholders. Example: x³ + 2 should be written as x³ + 0·x² + 0·x + 2.</div>
+    </div>
+    <div class="step-item" style="color:var(--teal)">
+      <div class="s-label" style="color:var(--teal)">STEP 02</div>
+      <div class="s-title">Divide leading term of dividend by leading term of divisor</div>
+      <div class="s-body">This gives the first term of the quotient. Multiply the whole divisor by this term. Subtract from the dividend. This is exactly like integer long division.</div>
+    </div>
+    <div class="step-item" style="color:var(--amber)">
+      <div class="s-label" style="color:var(--amber)">STEP 03</div>
+      <div class="s-title">Bring down the next term and repeat</div>
+      <div class="s-body">After subtraction, bring down the next term of the dividend. Repeat step 2. Continue until the degree of the remainder is less than the degree of the divisor.</div>
+    </div>
+    <div class="step-item" style="color:var(--green)">
+      <div class="s-label" style="color:var(--green)">STEP 04</div>
+      <div class="s-title">Verify: p(x) = g(x)·q(x) + r(x)</div>
+      <div class="s-body">Multiply divisor × quotient, then add remainder. The result must equal the original dividend. Also check: degree(remainder) &lt; degree(divisor).</div>
+    </div>
+  </div>
+
+  <div class="worked">
+    <h3>&#128221; Worked Example — Finding remaining zeroes</h3>
+    <div class="w-steps">
+p(x) = x³ − 3x² − x + 3. &nbsp; Given: one zero is x = 3. Find all zeroes.<br><br>
+Since 3 is a zero, (x − 3) is a factor. Divide p(x) by (x − 3):<br><br>
+x³ − 3x² − x + 3 &nbsp; ÷ &nbsp; (x − 3):<br>
+→ &nbsp; x³ ÷ x = x² &nbsp; ... multiply: x²(x−3) = x³−3x² &nbsp; ... subtract: −x+3<br>
+→ &nbsp; −x ÷ x = −1 &nbsp; ... multiply: −1(x−3) = −x+3 &nbsp; ... subtract: 0<br><br>
+Quotient = x² − 1 = (x−1)(x+1)<br><br>
+All zeroes: <span style="color:var(--blue)">x = 3, x = 1, x = −1</span>
+    </div>
+    <div class="w-ans">The three zeroes are 3, 1 and −1.</div>
+    <div class="w-note">Verification: (−b/a) = −(−3)/1 = 3 = 3+1+(−1) ✓ &nbsp;|&nbsp; −d/a = −3/1... wait d=3, so −d/a = −3 = 3×1×(−1) ✓</div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(56,189,248,.12);color:var(--blue)">Application</div>
+      <h3>When to use the Division Algorithm</h3>
+      <ul>
+        <li>Finding all zeroes when one or two zeroes are given</li>
+        <li>Checking if g(x) is a factor of p(x) (remainder = 0)</li>
+        <li>Expressing a polynomial in factored form</li>
+        <li>Finding the quotient and remainder in exam problems</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(34,197,94,.12);color:var(--green)">Quick Check</div>
+      <h3>Factor Theorem</h3>
+      <p>x − a is a factor of p(x) ⟺ p(a) = 0<br><br>Equivalently: a is a zero of p(x) iff (x−a) divides p(x) with zero remainder.<br><br>This makes it easy to check whether a given value is a zero: just substitute!</p>
+    </div>
+  </div>
+
+  <div class="tip">&#128161; CBSE Exam tip: In 3-mark division problems, always write the full verification step p(x) = g(x)·q(x) + r(x) — examiners award 1 mark specifically for this check.</div>
+</section>
+
+</main>
+
+<script>
+// ── Tab switching ──
+function show(id, btn, cls) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('vis'));
+  document.getElementById('sec-' + id).classList.add('vis');
+  document.querySelectorAll('.tab-nav button').forEach(b => b.className = '');
+  btn.classList.add(cls);
+}
+
+// ── Graph Explorer ──
+const graphCanvas = document.getElementById('graphCanvas');
+const gCtx = graphCanvas.getContext('2d');
+let currentGraphType = 'q2';
+
+const GRAPH_CONFIGS = {
+  q2: {
+    fn: x => x*x - 5*x + 6,
+    desc: 'y = x² − 5x + 6 (a = 1 > 0, opens upward)\nParabola cuts the x-axis at TWO points → 2 distinct real zeroes.',
+    zeroes: 'Zeroes: x = 2 and x = 3',
+    color: '#f59e0b',
+    xRange: [-1, 6], yRange: [-2, 8]
+  },
+  q1: {
+    fn: x => x*x - 4*x + 4,
+    desc: 'y = x² − 4x + 4 = (x−2)² (a = 1 > 0, opens upward)\nParabola TOUCHES the x-axis at exactly ONE point (vertex) → 1 repeated zero.',
+    zeroes: 'Zero: x = 2 (repeated, multiplicity 2)',
+    color: '#2dd4bf',
+    xRange: [-1, 5], yRange: [-1, 6]
+  },
+  q0: {
+    fn: x => x*x + 1,
+    desc: 'y = x² + 1 (a = 1 > 0, opens upward)\nParabola is ENTIRELY ABOVE the x-axis → NO real zeroes. Discriminant = 0 − 4 = −4 < 0.',
+    zeroes: 'Zeroes: None (no real zeroes)',
+    color: '#f43f5e',
+    xRange: [-3, 3], yRange: [-0.5, 6]
+  },
+  lin: {
+    fn: x => 2*x - 3,
+    desc: 'y = 2x − 3 (linear, degree 1)\nStraight line — crosses x-axis at exactly ONE point.',
+    zeroes: 'Zero: x = 3/2 = 1.5',
+    color: '#818cf8',
+    xRange: [-1, 4], yRange: [-4, 4]
+  },
+  cub: {
+    fn: x => x*x*x - 3*x*x - x + 3,
+    desc: 'y = x³ − 3x² − x + 3 (cubic, degree 3)\nS-shaped curve crosses the x-axis at THREE points → 3 distinct real zeroes.',
+    zeroes: 'Zeroes: x = −1, x = 1, x = 3',
+    color: '#d946ef',
+    xRange: [-2, 4.5], yRange: [-6, 8]
+  }
+};
+
+function setGraph(type, btn) {
+  document.querySelectorAll('.gtab').forEach(b => b.classList.remove('act'));
+  btn.classList.add('act');
+  currentGraphType = type;
+  drawGraph();
+}
+
+function drawGraph() {
+  const cfg = GRAPH_CONFIGS[currentGraphType];
+  const W = graphCanvas.offsetWidth * window.devicePixelRatio;
+  const H = graphCanvas.offsetHeight * window.devicePixelRatio;
+  graphCanvas.width = W;
+  graphCanvas.height = H;
+  const ctx = gCtx;
+
+  const pad = { l: 40, r: 20, t: 16, b: 36 };
+  const pw = W - pad.l - pad.r;
+  const ph = H - pad.t - pad.b;
+
+  const [x0, x1] = cfg.xRange;
+  const [y0, y1] = cfg.yRange;
+
+  function toCanvas(x, y) {
+    return [
+      pad.l + (x - x0) / (x1 - x0) * pw,
+      pad.t + (1 - (y - y0) / (y1 - y0)) * ph
+    ];
+  }
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  ctx.fillStyle = '#0f1c30';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(56,189,248,.08)';
+  ctx.lineWidth = 1;
+  for (let x = Math.ceil(x0); x <= x1; x++) {
+    const [cx] = toCanvas(x, 0);
+    ctx.beginPath(); ctx.moveTo(cx, pad.t); ctx.lineTo(cx, pad.t+ph); ctx.stroke();
+  }
+  for (let y = Math.ceil(y0); y <= y1; y++) {
+    const [, cy] = toCanvas(0, y);
+    ctx.beginPath(); ctx.moveTo(pad.l, cy); ctx.lineTo(pad.l+pw, cy); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(204,228,255,.25)';
+  ctx.lineWidth = 1.5;
+  const [axL] = toCanvas(x0, 0), [axR] = toCanvas(x1, 0);
+  const [ayB] = toCanvas(0, y0), [ayT] = toCanvas(0, y1);
+  const [, axY] = toCanvas(0, 0);
+  const [axX] = toCanvas(0, 0);
+  ctx.beginPath(); ctx.moveTo(pad.l, axY); ctx.lineTo(pad.l+pw, axY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(axX, pad.t); ctx.lineTo(axX, pad.t+ph); ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle = 'rgba(74,104,144,.9)';
+  ctx.font = `${11*window.devicePixelRatio}px DM Mono,monospace`;
+  ctx.textAlign = 'center';
+  for (let x = Math.ceil(x0); x <= x1; x++) {
+    if (x === 0) continue;
+    const [cx] = toCanvas(x, 0);
+    ctx.fillText(x, cx, axY + 16 * window.devicePixelRatio);
+  }
+  ctx.textAlign = 'right';
+  for (let y = Math.ceil(y0); y <= y1; y++) {
+    if (y === 0) continue;
+    const [, cy] = toCanvas(0, y);
+    ctx.fillText(y, axX - 4, cy + 4);
+  }
+
+  // Plot curve
+  ctx.strokeStyle = cfg.color;
+  ctx.lineWidth = 2.5;
+  ctx.shadowColor = cfg.color;
+  ctx.shadowBlur = 8;
+  ctx.beginPath();
+  let first = true;
+  const steps = 400;
+  for (let i = 0; i <= steps; i++) {
+    const x = x0 + (x1 - x0) * i / steps;
+    const y = cfg.fn(x);
+    const [cx, cy] = toCanvas(x, y);
+    if (y < y0 - 0.5 || y > y1 + 0.5) { first = true; continue; }
+    if (first) { ctx.moveTo(cx, cy); first = false; }
+    else ctx.lineTo(cx, cy);
+  }
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Mark zeroes
+  const zeroTests = [];
+  for (let i = 0; i < 400; i++) {
+    const x = x0 + (x1 - x0) * i / 400;
+    const xn = x0 + (x1 - x0) * (i+1) / 400;
+    if (cfg.fn(x) * cfg.fn(xn) <= 0) {
+      let lo = x, hi = xn;
+      for (let j = 0; j < 40; j++) {
+        const mid = (lo+hi)/2;
+        if (cfg.fn(lo) * cfg.fn(mid) <= 0) hi = mid; else lo = mid;
+      }
+      const z = (lo+hi)/2;
+      if (!zeroTests.some(zz => Math.abs(zz-z) < 0.05)) zeroTests.push(z);
+    }
+  }
+  zeroTests.forEach(z => {
+    const [cx, cy] = toCanvas(z, 0);
+    ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2);
+    ctx.fillStyle = cfg.color; ctx.fill();
+    ctx.strokeStyle = '#040810'; ctx.lineWidth = 1.5; ctx.stroke();
+  });
+
+  document.getElementById('graphDesc').textContent = cfg.desc;
+  document.getElementById('zeroesDisplay').innerHTML = `<span style="color:${cfg.color};font-family:'DM Mono',monospace;font-size:.78rem">${cfg.zeroes}</span>`;
+}
+
+// ── Polynomial Division Calculator ──
+function polyToStr(a, b, c, sign) {
+  // sign = +1 for positive, represents: a*x^2 + b*x + c
+  const parts = [];
+  if (a !== 0) parts.push(`${a === 1 ? '' : a === -1 ? '-' : a}x²`);
+  if (b !== 0) {
+    if (b > 0 && parts.length) parts.push(`+ ${b === 1 ? '' : b}x`);
+    else if (b < 0) parts.push(`− ${Math.abs(b) === 1 ? '' : Math.abs(b)}x`);
+    else parts.push(`${b}x`);
+  }
+  if (c !== 0) {
+    if (c > 0 && parts.length) parts.push(`+ ${c}`);
+    else if (c < 0) parts.push(`− ${Math.abs(c)}`);
+    else parts.push(`${c}`);
+  }
+  return parts.join(' ') || '0';
+}
+
+function runDivision() {
+  const a = parseFloat(document.getElementById('coef-a').value) || 0;
+  const b = parseFloat(document.getElementById('coef-b').value) || 0;
+  const c = parseFloat(document.getElementById('coef-c').value) || 0;
+  const d = parseFloat(document.getElementById('coef-d').value) || 0;
+
+  // Dividing ax² + bx + c by (x + d)
+  // Step 1: ax² / x = ax → multiply: ax(x+d) = ax² + adx → subtract: (b-ad)x + c
+  const q1 = a;
+  const rem1 = b - a * d;  // coefficient of x after first subtraction
+  // Step 2: rem1·x / x = rem1 → multiply: rem1(x+d) = rem1·x + rem1·d → subtract: c - rem1·d
+  const q2 = rem1;
+  const rem2 = c - rem1 * d;  // final remainder (constant)
+
+  const divStr = `${d >= 0 ? '(x + ' + d + ')' : '(x − ' + Math.abs(d) + ')'}`;
+  const dividendStr = polyToStr(a, b, c);
+  const q1Str = q1 !== 0 ? (q1 === 1 ? '' : q1 === -1 ? '−' : q1) + 'x' : '';
+  const q2Str = q2 !== 0 ? (q2 > 0 && q1Str ? `+ ${q2 === 1 ? '' : q2}` : `${q2 === -1 ? '−' : q2}`) : '';
+  const quotientStr = [q1Str, q2Str].filter(Boolean).join(' ') || '0';
+
+  const steps = document.getElementById('div-steps');
+  const result = document.getElementById('div-result');
+  steps.innerHTML = '';
+  result.style.display = 'none';
+
+  const rows = [
+    { num: '1', content: `Divide leading term: <span style="color:var(--amber)">${a === 1 ? '' : a}x² ÷ x = ${a === 1 ? '' : a}x</span>`, note: '1st term of quotient' },
+    { num: '2', content: `Multiply: <span style="color:var(--amber)">${a === 1 ? '' : a}x × ${divStr} = ${a === 1 ? '' : a}x² + ${a*d}x</span>`, note: '' },
+    { num: '3', content: `Subtract: (${dividendStr}) − (${a === 1 ? '' : a}x² + ${a*d}x) = <span style="color:var(--teal)">${rem1 >= 0 ? rem1 : '('+rem1+')'}x ${c >= 0 ? '+ ' + c : '− ' + Math.abs(c)}</span>`, note: 'new dividend' },
+    { num: '4', content: `Divide leading term: <span style="color:var(--amber)">${rem1}x ÷ x = ${rem1}</span>`, note: '2nd term of quotient' },
+    { num: '5', content: `Multiply: <span style="color:var(--amber)">${rem1} × ${divStr} = ${rem1}x + ${rem1 * d}</span>`, note: '' },
+    { num: '6', content: `Subtract: (${rem1}x ${c >= 0 ? '+ ' + c : '− ' + Math.abs(c)}) − (${rem1}x + ${rem1*d}) = <span style="color:${rem2 === 0 ? 'var(--green)' : 'var(--red)'}">${rem2}</span>`, note: rem2 === 0 ? 'remainder = 0 ✓' : 'remainder ≠ 0' },
+  ];
+
+  rows.forEach((r, i) => {
+    const div = document.createElement('div');
+    div.className = 'div-row' + (i === rows.length-1 ? ' final' : '');
+    div.style.animationDelay = (i * 0.08) + 's';
+    div.innerHTML = `<span class="dr-num">${r.num}</span><span class="dr-content">${r.content}</span>${r.note ? `<span class="dr-note">${r.note}</span>` : ''}`;
+    steps.appendChild(div);
+  });
+
+  // Verification row
+  const verDiv = document.createElement('div');
+  const checkStr = `${a}x² + ${a*d + rem1}x + ${rem1*d + rem2}`;
+  const ok = (a*d + rem1) === b && (rem1*d + rem2) === c;
+  verDiv.className = 'div-row verify-ok';
+  verDiv.style.animationDelay = '0.5s';
+  verDiv.innerHTML = `<span class="dr-num">✓</span><span class="dr-content" style="color:var(--green)">Verify: ${divStr} × (${quotientStr}) + ${rem2} = ${dividendStr} &nbsp; ${ok ? '✓' : '✗'}</span><span class="dr-note" style="color:var(--green)">verified</span>`;
+  steps.appendChild(verDiv);
+
+  result.style.display = 'block';
+  result.innerHTML = `<span style="color:var(--muted)">Quotient &nbsp; q(x) = </span><span style="color:var(--blue)">${quotientStr}</span><br><span style="color:var(--muted)">Remainder r(x) = </span><span style="color:${rem2 === 0 ? 'var(--green)' : 'var(--red)'}">${rem2}</span>${rem2 === 0 ? `<br><span style="color:var(--muted);font-size:.75rem">${divStr} is a factor of (${dividendStr})</span>` : `<br><span style="color:var(--muted);font-size:.75rem">deg(r) = 0 &lt; deg(divisor) = 1 &nbsp; ✓</span>`}`;
+}
+
+// ── Init ──
+window.addEventListener('load', () => {
+  drawGraph();
+  runDivision();
+});
+window.addEventListener('resize', drawGraph);
+</script>
+</body>
+</html>

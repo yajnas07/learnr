@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Polynomials</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; padding:1.2rem; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 50% 30% at 10% 5%, rgba(245,158,11,.04) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 30% at 90% 90%, rgba(129,140,248,.03) 0%, transparent 50%); }
+
+  header { text-align:center; padding:.8rem 0 1.4rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:900;
+    color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:.9rem; max-width:1100px; margin:0 auto; }
+  .panel { background:var(--card); border-radius:12px; border:1px solid var(--border); overflow:hidden; }
+  .panel-head { display:flex; align-items:center; gap:.55rem; padding:.75rem 1rem;
+    border-bottom:1px solid var(--border); font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; }
+  .panel-body { padding:.8rem 1rem; }
+
+  .ph-typ  .panel-head { background:rgba(129,140,248,.08); color:var(--indigo); }
+  .ph-zer  .panel-head { background:rgba(45,212,191,.08);  color:var(--teal); }
+  .ph-qdr  .panel-head { background:rgba(245,158,11,.08);  color:var(--amber); }
+  .ph-cub  .panel-head { background:rgba(217,70,239,.08);  color:var(--purple); }
+  .ph-div  .panel-head { background:rgba(56,189,248,.08);  color:var(--blue); }
+  .ph-fml  .panel-head { background:rgba(34,197,94,.08);   color:var(--green); }
+  .ph-mem  .panel-head { background:rgba(217,70,239,.06);  color:#c084fc; }
+  .ph-cmp  .panel-head { background:rgba(100,116,139,.08); color:#94a3b8; }
+
+  table { width:100%; border-collapse:collapse; font-size:.78rem; }
+  th { font-family:'DM Mono',monospace; font-size:.67rem; padding:.45rem .6rem;
+    background:var(--card2); color:var(--muted); text-align:left; }
+  td { padding:.4rem .6rem; border-top:1px solid var(--border); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:rgba(255,255,255,.015); }
+  .hl { color:var(--amber); font-family:'DM Mono',monospace; font-size:.75rem; }
+  .te { color:var(--teal); } .am { color:var(--amber); } .bl { color:var(--blue); }
+  .gr { color:var(--green); } .re { color:var(--red); } .in { color:var(--indigo); }
+  .pu { color:var(--purple); }
+
+  .fact { display:flex; gap:.5rem; font-size:.8rem; padding:.3rem 0;
+    line-height:1.55; border-top:1px solid var(--border); }
+  .fact:first-child { border-top:none; }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  .formula-block { background:var(--card2); border-radius:8px; padding:.65rem .9rem; margin:.4rem 0; }
+  .formula-block .f-label { font-family:'DM Mono',monospace; font-size:.63rem; color:var(--muted); margin-bottom:.25rem; }
+  .formula-block .f-eq { font-family:'DM Mono',monospace; font-size:.9rem; color:var(--amber); font-weight:500; line-height:1.6; }
+  .formula-block .f-note { font-size:.72rem; color:var(--muted); margin-top:.2rem; line-height:1.5; }
+
+  .proof-step { display:flex; gap:.55rem; align-items:flex-start; padding:.3rem 0; border-top:1px solid var(--border); font-size:.78rem; line-height:1.55; }
+  .proof-step:first-child { border-top:none; }
+  .ps-num { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); min-width:18px; margin-top:.05rem; }
+
+  .trick { background:var(--card2); border-radius:8px; padding:.55rem .75rem; margin:.35rem 0; font-size:.78rem; }
+  .trick strong { color:var(--amber); font-family:'Playfair Display',serif; font-size:.85rem; }
+  .trick p { color:var(--muted); font-size:.72rem; margin-top:.15rem; }
+
+  .hbox { border-left:3px solid; border-radius:0 6px 6px 0; padding:.5rem .75rem;
+    margin:.4rem 0; font-size:.78rem; line-height:1.6; }
+  .hbox strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.15rem; font-size:.85rem; }
+
+  .span2 { grid-column:1/-1; }
+  @media(max-width:620px){ .span2 { grid-column:1; } }
+
+  /* ---- learnr site-nav ---- */
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>📋 Cheat Sheet</h1>
+  <p>Polynomials · Mathematics Ch.2 · Class X CBSE · Quick Revision</p>
+</header>
+
+<div class="grid">
+
+  <!-- ── Types of Polynomials ── -->
+  <div class="panel ph-typ">
+    <div class="panel-head">📐 Types of Polynomials</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Type</th><th>Degree</th><th>General Form</th><th>Max Zeroes</th></tr>
+        <tr><td class="in">Constant</td><td>0</td><td>k (k ≠ 0)</td><td class="te">0</td></tr>
+        <tr><td class="in">Linear</td><td>1</td><td>ax + b</td><td class="te">1</td></tr>
+        <tr><td class="in">Quadratic</td><td>2</td><td>ax² + bx + c</td><td class="te">2</td></tr>
+        <tr><td class="in">Cubic</td><td>3</td><td>ax³ + bx² + cx + d</td><td class="te">3</td></tr>
+        <tr><td class="in">Biquadratic</td><td>4</td><td>ax⁴ + bx³ + cx² + dx + e</td><td class="te">4</td></tr>
+      </table>
+      <div class="hbox" style="border-color:var(--indigo);margin-top:.6rem">
+        <strong style="color:var(--indigo)">Key Rule</strong>
+        A polynomial of degree <em>n</em> has <strong>at most n real zeroes</strong>. The leading coefficient a ≠ 0.
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--indigo)"></div><span><strong>Zero polynomial:</strong> p(x) = 0. Every real number is a zero; its degree is undefined.</span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Value at x = k:</strong> Substitute x = k into p(x). If p(k) = 0, then k is a <strong>zero</strong> of p(x).</span></div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><span><strong>Degree of product:</strong> deg[p(x) × q(x)] = deg p(x) + deg q(x).</span></div>
+    </div>
+  </div>
+
+  <!-- ── Zeroes & Graphs ── -->
+  <div class="panel ph-zer">
+    <div class="panel-head">📈 Zeroes &amp; Graphical Interpretation</div>
+    <div class="panel-body">
+      <div class="hbox" style="border-color:var(--teal)">
+        <strong style="color:var(--teal)">Definition</strong>
+        k is a zero of p(x) if <strong>p(k) = 0</strong>. Geometrically, zeroes are the <em>x-coordinates of the points where the graph crosses or touches the x-axis</em>.
+      </div>
+      <table style="margin-top:.5rem">
+        <tr><th>Polynomial</th><th>Graph Shape</th><th>Possible Zeroes</th></tr>
+        <tr><td class="in">Linear: ax + b</td><td>Straight line</td><td class="te">Exactly 1</td></tr>
+        <tr><td class="in">Quadratic: ax² + bx + c</td><td>Parabola</td><td class="te">0, 1, or 2</td></tr>
+        <tr><td class="in">Cubic: ax³ + …</td><td>S-shaped curve</td><td class="te">1, 2, or 3</td></tr>
+      </table>
+      <div class="fact" style="margin-top:.4rem"><div class="dot" style="background:var(--teal)"></div><span><strong>a &gt; 0 (quadratic):</strong> parabola opens upward ∪. &nbsp;<strong>a &lt; 0:</strong> opens downward ∩.</span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span>Graph <strong>crosses</strong> x-axis → zero with odd multiplicity (simple root).</span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span>Graph only <strong>touches</strong> x-axis (does not cross) → zero with even multiplicity (repeated root).</span></div>
+    </div>
+  </div>
+
+  <!-- ── Quadratic Relations ── -->
+  <div class="panel ph-qdr">
+    <div class="panel-head">🔷 Quadratic: Relationship of Zeroes</div>
+    <div class="panel-body">
+      <div class="hbox" style="border-color:var(--amber)">
+        <strong style="color:var(--amber)">For p(x) = ax² + bx + c &nbsp; (a ≠ 0)</strong>
+        Let α and β be the two zeroes. Then:
+      </div>
+      <div class="formula-block">
+        <div class="f-label">SUM OF ZEROES</div>
+        <div class="f-eq">α + β = −b/a = − (coeff. of x) / (coeff. of x²)</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">PRODUCT OF ZEROES</div>
+        <div class="f-eq">αβ = c/a = (constant term) / (coeff. of x²)</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">FORMING A QUADRATIC FROM ZEROES</div>
+        <div class="f-eq">p(x) = x² − (α+β)x + αβ</div>
+        <div class="f-note">Or: k[x² − (Sum)x + Product] for any non-zero constant k.</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Example:</strong> p(x) = 2x² − 5x + 3 → α+β = 5/2, αβ = 3/2.</span></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><span><strong>Identity:</strong> α² + β² = (α+β)² − 2αβ = (Sum)² − 2(Product)</span></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><span><strong>Identity:</strong> (α − β)² = (α+β)² − 4αβ = (Sum)² − 4(Product)</span></div>
+    </div>
+  </div>
+
+  <!-- ── Cubic Relations ── -->
+  <div class="panel ph-cub">
+    <div class="panel-head">🔮 Cubic: Relationship of Zeroes</div>
+    <div class="panel-body">
+      <div class="hbox" style="border-color:var(--purple)">
+        <strong style="color:var(--purple)">For p(x) = ax³ + bx² + cx + d &nbsp; (a ≠ 0)</strong>
+        Let α, β, γ be the three zeroes. Then:
+      </div>
+      <div class="formula-block">
+        <div class="f-label">SUM OF ZEROES</div>
+        <div class="f-eq">α + β + γ = −b/a</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">SUM OF PRODUCTS OF PAIRS</div>
+        <div class="f-eq">αβ + βγ + γα = c/a</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">PRODUCT OF ZEROES</div>
+        <div class="f-eq">αβγ = −d/a</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><span><strong>Sign pattern — alternate:</strong> −b/a, +c/a, −d/a. Starts with minus.</span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Example:</strong> x³ − 6x² + 11x − 6 → α+β+γ = 6, αβ+βγ+γα = 11, αβγ = 6. (Zeroes: 1, 2, 3.)</span></div>
+    </div>
+  </div>
+
+  <!-- ── Division Algorithm ── -->
+  <div class="panel ph-div">
+    <div class="panel-head">➗ Division Algorithm for Polynomials</div>
+    <div class="panel-body">
+      <div class="hbox" style="border-color:var(--blue)">
+        <strong style="color:var(--blue)">Theorem (Division Algorithm)</strong>
+        If p(x) and g(x) are polynomials with g(x) ≠ 0, then there exist unique polynomials q(x) and r(x) such that:
+      </div>
+      <div class="formula-block">
+        <div class="f-label">DIVISION ALGORITHM</div>
+        <div class="f-eq">p(x) = g(x) × q(x) + r(x)</div>
+        <div class="f-note">where deg r(x) &lt; deg g(x), or r(x) = 0.<br>p = Dividend, g = Divisor, q = Quotient, r = Remainder.</div>
+      </div>
+      <div class="proof-step"><div class="ps-num">▸</div><div>Verify given zeroes — divide out the known factor and solve the resulting polynomial.</div></div>
+      <div class="proof-step"><div class="ps-num">▸</div><div>Find remaining zeroes of a cubic when one zero is known: divide p(x) by (x − α).</div></div>
+      <div class="proof-step"><div class="ps-num">▸</div><div>Find quotient and remainder when dividing one polynomial by another.</div></div>
+      <div class="fact" style="margin-top:.2rem"><div class="dot" style="background:var(--blue)"></div><span><strong>Example:</strong> Divide 3x³+x²+2x+5 by x²+2x+1 → q(x) = 3x−5, r(x) = 9x+10.</span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span>If zero α is known → divide by (x−α) → get quadratic → solve for two more zeroes.</span></div>
+    </div>
+  </div>
+
+  <!-- ── Key Identities ── -->
+  <div class="panel ph-fml">
+    <div class="panel-head">🧮 Key Identities &amp; Derived Expressions</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Expression</th><th>Formula (in terms of S = α+β, P = αβ)</th></tr>
+        <tr><td>α² + β²</td><td class="gr">S² − 2P</td></tr>
+        <tr><td>(α − β)²</td><td class="gr">S² − 4P</td></tr>
+        <tr><td>|α − β|</td><td class="gr">√(S² − 4P)</td></tr>
+        <tr><td>α³ + β³</td><td class="gr">S³ − 3PS = S(S² − 3P)</td></tr>
+        <tr><td>α³ − β³</td><td class="gr">(α−β)(α²+αβ+β²) = (α−β)(S²−P)</td></tr>
+        <tr><td>α²β + αβ²</td><td class="gr">P · S</td></tr>
+        <tr><td>1/α + 1/β</td><td class="gr">S / P</td></tr>
+        <tr><td>α² + β² + γ²</td><td class="gr">(α+β+γ)² − 2(αβ+βγ+γα)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Quadratic Worked Examples ── -->
+  <div class="panel ph-qdr">
+    <div class="panel-head">✏️ Quadratic — Worked Examples</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Find zeroes of x² − 3x − 10</strong><br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          Factorise: (x−5)(x+2) = 0 → zeroes: <span class="am">5 and −2</span><br>
+          Verify: S = 5+(−2) = 3 = 3/1 ✓ &nbsp;&nbsp; P = 5×(−2) = −10 = −10/1 ✓
+        </span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Form quadratic with zeroes 2+√3 and 2−√3</strong><br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          Sum = 4 &nbsp;&nbsp; Product = (2+√3)(2−√3) = 4−3 = 1<br>
+          p(x) = <span class="am">x² − 4x + 1</span>
+        </span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>If α+β = 5, αβ = 6 → find α²+β² and 1/α+1/β</strong><br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          α²+β² = 25 − 12 = <span class="am">13</span> &nbsp;&nbsp;&nbsp; 1/α+1/β = 5/6
+        </span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Reciprocal zeroes: if αβ = 1</strong><br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          If zeroes are α and 1/α, then αβ = 1 = c/a ⟹ c = a.<br>
+          e.g. 5x²+13x+5 → c = a = 5 ✓
+        </span></span></div>
+    </div>
+  </div>
+
+  <!-- ── Cubic Worked Example ── -->
+  <div class="panel ph-cub">
+    <div class="panel-head">✏️ Cubic — Worked Example</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><span><strong>p(x) = x³ − 4x² + 5x − 2, one zero = 1</strong><br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          α = 1, so α+β+γ = 4 → β+γ = 3<br>
+          αβγ = 2 → βγ = 2<br>
+          Quadratic for β, γ: t² − 3t + 2 = 0 → (t−1)(t−2) = 0<br>
+          All zeroes: <span class="pu">1, 1, 2</span>
+        </span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><span><strong>Alternate: use Division</strong><br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          Divide p(x) by (x−1) → quotient = x²−3x+2<br>
+          Solve x²−3x+2 = (x−1)(x−2) = 0 → zeroes: <span class="pu">1, 1, 2</span>
+        </span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><span><strong>Zeroes in AP: a−d, a, a+d</strong><br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          Sum = 3a = −b/a → find a first.<br>
+          Sum of pairs = 3a² − d² = c/a → find d.
+        </span></span></div>
+    </div>
+  </div>
+
+  <!-- ── Methods Comparison ── -->
+  <div class="panel ph-cmp span2">
+    <div class="panel-head">🔄 Methods Comparison</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Task</th><th>Best Method</th><th>Steps / Formula</th></tr>
+        <tr><td>Find zeroes of quadratic</td><td class="am">Factorisation</td><td>Split middle term; equate each factor to 0</td></tr>
+        <tr><td>Verify zeroes of quadratic</td><td class="te">Vieta's Formulas</td><td>Check α+β = −b/a AND αβ = c/a</td></tr>
+        <tr><td>Form quadratic from zeroes</td><td class="in">Sum & Product</td><td>x² − (Sum)x + Product</td></tr>
+        <tr><td>Find all zeroes of cubic</td><td class="bl">Divide by known factor</td><td>Divide p(x) by (x−α) → quadratic → solve</td></tr>
+        <tr><td>Divide polynomials</td><td class="gr">Polynomial Long Division</td><td>p(x) = g(x)·q(x) + r(x); ensure deg r &lt; deg g</td></tr>
+        <tr><td>Find k when remainder given</td><td class="re">Long division + compare</td><td>Divide and equate remainder coefficients</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Memory Tricks ── -->
+  <div class="panel ph-mem span2">
+    <div class="panel-head">🧠 Memory Tricks &amp; Mnemonics</div>
+    <div class="panel-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.5rem">
+      <div class="trick">
+        <strong>Quadratic signs: "Minus, Plus"</strong>
+        <p>α+β = <em>−b/a</em> (minus sign before b). αβ = <em>+c/a</em> (plus, no sign change). Never mix them up!</p>
+      </div>
+      <div class="trick">
+        <strong>Cubic signs: "−, +, −"</strong>
+        <p>α+β+γ = −b/a, αβ+βγ+γα = +c/a, αβγ = −d/a. Signs alternate starting with minus. Think: −b, +c, −d.</p>
+      </div>
+      <div class="trick">
+        <strong>Form Quadratic: "minus Sum, plus Product"</strong>
+        <p>x² − (Sum)x + (Product). The sum gets a minus sign; the product gets a plus sign.</p>
+      </div>
+      <div class="trick">
+        <strong>α²+β² = "Square minus Twice"</strong>
+        <p>(α+β)² − 2αβ. Square the sum, then subtract twice the product. Very common board question.</p>
+      </div>
+      <div class="trick">
+        <strong>Division Algorithm: "DQGR"</strong>
+        <p>Dividend = Divisor × Quotient + Remainder. p(x) = g(x)·q(x) + r(x). Always verify by expanding.</p>
+      </div>
+      <div class="trick">
+        <strong>Graph touches → Repeated zero</strong>
+        <p>If the parabola only touches the x-axis (tangent), the discriminant b²−4ac = 0 and the zero is a <em>double root</em>.</p>
+      </div>
+      <div class="trick">
+        <strong>Finding other cubic zeroes</strong>
+        <p>Given α: use sum/product to get β+γ and βγ. Solve t²−(β+γ)t+βγ = 0. OR simply divide by (x−α).</p>
+      </div>
+      <div class="trick">
+        <strong>Quadratic Formula (Discriminant check)</strong>
+        <p>x = [−b ± √(b²−4ac)] / 2a. &nbsp; D&gt;0: 2 distinct zeroes. &nbsp; D=0: 1 repeated. &nbsp; D&lt;0: no real zeroes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Quick Reference ── -->
+  <div class="panel ph-fml span2">
+    <div class="panel-head">📊 Quick Reference — All Vieta Formulas</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Polynomial</th><th>Zeroes</th><th>Sum (−b/a)</th><th>Sum of Pairs (c/a)</th><th>Product</th></tr>
+        <tr><td class="in">ax + b</td><td class="te">α = −b/a</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td class="am">ax² + bx + c</td><td class="am">α, β</td><td class="am">α+β = −b/a</td><td class="am">—</td><td class="am">αβ = c/a</td></tr>
+        <tr><td class="pu">ax³ + bx² + cx + d</td><td class="pu">α, β, γ</td><td class="pu">α+β+γ = −b/a</td><td class="pu">αβ+βγ+γα = c/a</td><td class="pu">αβγ = −d/a</td></tr>
+      </table>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.8rem">
+        <div class="hbox" style="border-color:var(--amber)">
+          <strong style="color:var(--amber)">Quadratic Discriminant</strong>
+          D = b² − 4ac. Two distinct zeros: D &gt; 0. Equal (repeated): D = 0. No real zeros: D &lt; 0.
+        </div>
+        <div class="hbox" style="border-color:var(--blue)">
+          <strong style="color:var(--blue)">Division Algorithm Check</strong>
+          Always verify: expand g(x)·q(x)+r(x) and confirm it equals p(x). Also verify deg(r) &lt; deg(g).
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

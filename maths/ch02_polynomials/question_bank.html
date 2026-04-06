@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Polynomials</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+    --correct:#22c55e; --wrong:#ef4444;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 40% at 50% 0%, rgba(245,158,11,.04) 0%, transparent 60%); }
+
+  header { text-align:center; padding:1.8rem 1rem 1rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2rem); font-weight:900; color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .dash { display:flex; justify-content:center; gap:.9rem; flex-wrap:wrap; padding:.8rem 1rem 1.2rem; }
+  .dcard { background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.6rem 1.2rem; text-align:center; min-width:84px; }
+  .dval { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; }
+  .dlbl { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-top:.1rem; }
+
+  nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.45rem; padding:0 1rem 1.2rem; }
+  nav button { font-family:'Playfair Display',serif; font-weight:700; font-size:.76rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  nav button:hover { color:var(--text); }
+  nav button.active { border-color:var(--amber); color:var(--amber); background:rgba(245,158,11,.08); }
+
+  main { max-width:800px; margin:0 auto; padding:0 1rem 4rem; }
+
+  .q-card { background:var(--card); border:1px solid var(--border); border-radius:14px;
+    margin-bottom:1rem; overflow:hidden; transition:box-shadow .2s;
+    animation:slideIn .3s ease both; }
+  .q-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.5); }
+  @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .q-header { display:flex; align-items:flex-start; gap:.7rem; padding:1rem 1.1rem .7rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:.68rem; min-width:28px; height:28px;
+    border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .q-text { font-family:'Playfair Display',serif; font-size:.92rem; font-weight:700; line-height:1.45; flex:1; }
+  .q-meta { display:flex; gap:.35rem; flex-wrap:wrap; padding:0 1.1rem .7rem 4rem; }
+
+  .badge { font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .48rem; border-radius:2px; }
+  .b-mcq    { background:rgba(56,189,248,.12);  color:var(--blue); }
+  .b-short  { background:rgba(34,197,94,.12);   color:var(--green); }
+  .b-long   { background:rgba(245,158,11,.12);  color:var(--amber); }
+  .b-assert { background:rgba(129,140,248,.12); color:var(--indigo); }
+  .b-1m { background:rgba(148,163,184,.08); color:#94a3b8; }
+  .b-2m { background:rgba(245,158,11,.1);   color:#fde68a; }
+  .b-3m { background:rgba(249,115,22,.1);   color:#fed7aa; }
+  .b-5m { background:rgba(239,68,68,.12);   color:#fca5a5; }
+
+  .strip-typ { border-left:4px solid var(--indigo); }
+  .strip-zer { border-left:4px solid var(--teal); }
+  .strip-qdr { border-left:4px solid var(--amber); }
+  .strip-cub { border-left:4px solid var(--purple); }
+  .strip-div { border-left:4px solid var(--blue); }
+  .strip-gen { border-left:4px solid #64748b; }
+
+  .mcq-body { padding:0 1.1rem .6rem; }
+  .mcq-opts { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; margin-bottom:.5rem; }
+  @media(max-width:480px){ .mcq-opts { grid-template-columns:1fr; } }
+  .opt-btn { display:flex; align-items:center; gap:.55rem; background:var(--card2);
+    border:1.5px solid var(--border); border-radius:8px; padding:.55rem .75rem;
+    cursor:pointer; transition:all .16s; text-align:left; color:var(--text);
+    font-family:'Lato',sans-serif; font-size:.82rem; font-weight:600; }
+  .opt-btn:hover:not(:disabled) { border-color:#2a4a6a; background:#0f2035; }
+  .opt-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); min-width:18px; }
+  .opt-btn.correct { border-color:var(--correct); background:rgba(34,197,94,.1); color:#4ade80; }
+  .opt-btn.wrong   { border-color:var(--wrong);   background:rgba(239,68,68,.08); color:#fca5a5; }
+  .feedback { font-size:.76rem; font-family:'DM Mono',monospace; padding:.35rem .7rem;
+    border-radius:6px; margin:.25rem 0 .5rem; display:none; }
+  .feedback.correct { background:rgba(34,197,94,.08);  color:#4ade80; display:block; }
+  .feedback.wrong   { background:rgba(239,68,68,.08); color:#f87171; display:block; }
+
+  .ans-reveal { overflow:hidden; max-height:0; transition:max-height .38s ease; }
+  .ans-reveal.open { max-height:1200px; }
+  .ans-body { padding:.75rem 1.1rem 1rem; border-top:1px solid var(--border); }
+  .ans-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--green); margin-bottom:.4rem; }
+  .ans-text { font-size:.84rem; color:var(--text); line-height:1.75; }
+  .ans-text strong { color:var(--amber); }
+  .ans-text em { color:var(--teal); font-style:normal; }
+  .ans-mono { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--teal);
+    background:rgba(45,212,191,.06); border:1px solid rgba(45,212,191,.12);
+    border-radius:6px; padding:.5rem .75rem; margin:.4rem 0; line-height:1.8; }
+  .tip { font-size:.74rem; color:var(--amber); background:rgba(245,158,11,.06);
+    border-left:3px solid var(--amber); border-radius:0 6px 6px 0;
+    padding:.38rem .65rem; margin-top:.5rem; }
+
+  .show-btn { display:inline-flex; align-items:center; gap:.35rem; font-family:'Playfair Display',serif;
+    font-weight:700; font-size:.74rem; padding:.38rem .9rem; border-radius:3px;
+    border:1px solid var(--border); background:transparent; color:var(--muted);
+    cursor:pointer; transition:all .18s; margin:.15rem 0 .7rem 1.1rem; }
+  .show-btn:hover { color:var(--text); border-color:#2a4a6a; }
+  .show-btn.active { color:var(--green); border-color:var(--green); background:rgba(34,197,94,.06); }
+
+  .reset-bar { text-align:center; padding:1rem; }
+  .reset-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.82rem;
+    padding:.55rem 1.6rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .reset-btn:hover { border-color:var(--red); color:var(--red); }
+
+  /* ---- learnr site-nav ---- */
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Polynomials · Mathematics Ch.2 · Class X CBSE · 30 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dcard"><div class="dval">30</div><div class="dlbl">Total</div></div>
+  <div class="dcard"><div class="dval" id="d-att" style="color:var(--amber)">0</div><div class="dlbl">Attempted</div></div>
+  <div class="dcard"><div class="dval" id="d-cor" style="color:var(--correct)">0</div><div class="dlbl">Correct</div></div>
+  <div class="dcard"><div class="dval" id="d-sc" style="color:var(--indigo)">0%</div><div class="dlbl">Score</div></div>
+</div>
+
+<nav>
+  <button class="active" onclick="filter('all',this)">All (30)</button>
+  <button onclick="filter('mcq',this)">MCQ</button>
+  <button onclick="filter('short',this)">Short Answer</button>
+  <button onclick="filter('long',this)">Long Answer</button>
+  <button onclick="filter('assert',this)">Assertion–Reason</button>
+</nav>
+
+<main id="qlist"></main>
+<div class="reset-bar"><button class="reset-btn" onclick="resetAll()">↺ Reset All</button></div>
+
+<script>
+const Q = [
+  // ── MCQ ──
+  {id:1,type:'mcq',topic:'typ',marks:1,
+   q:'The degree of the polynomial (x + 1)(x − 2)(2x + 3) is:',
+   opts:['2','3','4','1'],
+   ans:1,
+   explain:'Expanding (x+1)(x−2)(2x+3): the highest-degree term comes from x × x × 2x = 2x³. So the degree is 3.'},
+
+  {id:2,type:'mcq',topic:'zer',marks:1,
+   q:'The zero of the linear polynomial p(x) = 2x + 1 is:',
+   opts:['1/2','−1/2','2','−2'],
+   ans:1,
+   explain:'Set p(x) = 0: 2x + 1 = 0 → x = −1/2. A linear polynomial always has exactly one zero.'},
+
+  {id:3,type:'mcq',topic:'qdr',marks:1,
+   q:'The sum of the zeroes of the polynomial 3x² − x − 4 is:',
+   opts:['1/3','−1/3','4/3','−4/3'],
+   ans:0,
+   explain:'Sum of zeroes = −b/a. Here a = 3, b = −1. Sum = −(−1)/3 = 1/3.'},
+
+  {id:4,type:'mcq',topic:'qdr',marks:1,
+   q:'If α and β are the zeroes of x² + x − 6, the value of αβ is:',
+   opts:['6','−6','1','−1'],
+   ans:1,
+   explain:'Product of zeroes = c/a. Here c = −6, a = 1. So αβ = −6. (Zeroes are 2 and −3: (2)(−3) = −6 ✓)'},
+
+  {id:5,type:'mcq',topic:'qdr',marks:1,
+   q:'If α and β are the zeroes of 2x² − 5x + 3, then (1/α + 1/β) equals:',
+   opts:['5/3','3/5','5/2','2/5'],
+   ans:0,
+   explain:'1/α + 1/β = (α+β)/(αβ). From 2x²−5x+3: α+β = 5/2, αβ = 3/2. So (5/2)÷(3/2) = 5/3.'},
+
+  {id:6,type:'mcq',topic:'zer',marks:1,
+   q:'The graph of a quadratic polynomial touches the x-axis at exactly one point. The number of distinct zeroes of this polynomial is:',
+   opts:['0','1','2','3'],
+   ans:1,
+   explain:'When the parabola only touches (is tangent to) the x-axis at one point, the polynomial has exactly 1 zero — a repeated double root. This happens when the discriminant b²−4ac = 0.'},
+
+  {id:7,type:'mcq',topic:'qdr',marks:1,
+   q:'A quadratic polynomial whose sum of zeroes is −3 and product of zeroes is 2 is:',
+   opts:['x² − 3x + 2','x² + 3x + 2','x² + 3x − 2','x² − 3x − 2'],
+   ans:1,
+   explain:'p(x) = x² − (Sum)x + Product = x² − (−3)x + 2 = x² + 3x + 2. Verify: zeroes −1 and −2 give Sum = −3 ✓, Product = 2 ✓.'},
+
+  {id:8,type:'mcq',topic:'div',marks:1,
+   q:'On dividing x³ − 3x² + x + 2 by g(x), the quotient is (x − 2) and the remainder is (−2x + 4). Then g(x) is:',
+   opts:['x − 2','x² − x + 1','x² + x − 1','x² − x − 1'],
+   ans:1,
+   explain:'g(x) = [p(x) − r(x)] ÷ q(x). p(x)−r(x) = x³−3x²+x+2−(−2x+4) = x³−3x²+3x−2. Dividing by (x−2): (x−2)(x²−x+1) = x³−3x²+3x−2 ✓. So g(x) = x²−x+1.'},
+
+  {id:9,type:'mcq',topic:'cub',marks:1,
+   q:'If α, β, γ are the zeroes of p(x) = x³ − 3x, then α + β + γ equals:',
+   opts:['3','0','−3','1'],
+   ans:1,
+   explain:'p(x) = x³ + 0·x² − 3x + 0. Coefficient of x² is 0. Sum of zeroes = −b/a = −0/1 = 0.'},
+
+  {id:10,type:'mcq',topic:'qdr',marks:1,
+   q:'If one zero of the polynomial (k − 1)x² + kx + 1 is −3, the value of k is:',
+   opts:['4/3','3/4','3','−3'],
+   ans:0,
+   explain:'Substitute x = −3: (k−1)(9) + k(−3) + 1 = 0 → 9k−9−3k+1 = 0 → 6k = 8 → k = 4/3.'},
+
+  // ── ASSERTION-REASON ──
+  {id:11,type:'assert',topic:'zer',marks:1,
+   q:'Assertion (A): A quadratic polynomial can have at most 2 zeroes.\nReason (R): The graph of a quadratic polynomial (parabola) can intersect or touch the x-axis at most 2 times.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true. R correctly explains A — real zeroes correspond to x-intercepts, and a parabola can have at most 2 such intersections.'},
+
+  {id:12,type:'assert',topic:'qdr',marks:1,
+   q:'Assertion (A): If α and β are the zeroes of x² − 5x + 6, then α + β = 5 and αβ = 6.\nReason (R): For p(x) = ax² + bx + c, sum of zeroes = −b/a and product of zeroes = c/a.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true. For x²−5x+6 (a=1, b=−5, c=6): α+β = 5 ✓, αβ = 6 ✓. R (Vieta\'s formulas) directly explains why A is true.'},
+
+  {id:13,type:'assert',topic:'div',marks:1,
+   q:'Assertion (A): When a polynomial p(x) is divided by g(x), the degree of remainder r(x) must be strictly less than the degree of g(x).\nReason (R): This constraint ensures the quotient and remainder are unique.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both A and R are true. The Division Algorithm requires deg(r) < deg(g). This constraint is precisely what guarantees the uniqueness of q(x) and r(x). R correctly explains A.'},
+
+  {id:14,type:'assert',topic:'cub',marks:1,
+   q:'Assertion (A): The zeroes of x³ + 3x² − x − 3 are −3, 1, and −1.\nReason (R): For ax³ + bx² + cx + d, the sum of zeroes equals −b/a.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:1,
+   explain:'Both A and R are true (−3+1+(−1) = −3 = −3/1 ✓). However R alone does not prove A — we cannot determine all three exact zeroes from the sum formula alone. The zeroes were found by factorisation. So R is true but NOT the correct explanation of A.'},
+
+  // ── SHORT ANSWER ──
+  {id:15,type:'short',topic:'qdr',marks:2,
+   q:'Find the zeroes of p(x) = x² − 2√2 x. Verify using sum and product of zeroes.',
+   ans:'Factorising:\np(x) = x(x − 2√2)\np(x) = 0  ⟹  x = 0  or  x = 2√2\n\nZeroes: α = 0,  β = 2√2\n\nVerification (a=1, b=−2√2, c=0):\nSum: α + β = 0 + 2√2 = 2√2  =  −b/a = 2√2 ✓\nProduct: αβ = 0 × 2√2 = 0  =  c/a = 0 ✓',
+   tip:'First factorise by taking the common factor x. Then verify sum = −b/a and product = c/a.'},
+
+  {id:16,type:'short',topic:'qdr',marks:2,
+   q:'Find the zeroes of p(s) = 4s² − 4s + 1. Verify the relationship between zeroes and coefficients.',
+   ans:'Factorising:\n4s² − 4s + 1 = (2s − 1)²\n(2s − 1)² = 0  ⟹  s = 1/2  (double/repeated zero)\n\nZeroes: α = β = 1/2\n\nVerification (a=4, b=−4, c=1):\nSum: α+β = 1/2+1/2 = 1  =  −b/a = 4/4 = 1 ✓\nProduct: αβ = 1/2×1/2 = 1/4  =  c/a = 1/4 ✓',
+   tip:'A perfect square trinomial gives a repeated zero. The verification formulas still hold.'},
+
+  {id:17,type:'short',topic:'qdr',marks:2,
+   q:'Find a quadratic polynomial whose zeroes are (3 + √5)/2 and (3 − √5)/2.',
+   ans:'Sum of zeroes:\nα + β = (3+√5)/2 + (3−√5)/2 = 6/2 = 3\n\nProduct of zeroes:\nαβ = [(3+√5)/2] × [(3−√5)/2] = (9−5)/4 = 4/4 = 1\n\nRequired polynomial:\np(x) = x² − (Sum)x + Product\np(x) = x² − 3x + 1',
+   tip:'Conjugate pairs: use (a+b)(a−b) = a²−b² for the product. No need to find actual decimal values.'},
+
+  {id:18,type:'short',topic:'cub',marks:3,
+   q:'Verify that 3, −1, and −1/3 are the zeroes of p(x) = 3x³ − 5x² − 11x − 3. Also verify the three Vieta relations.',
+   ans:'Verification by substitution:\np(3)   = 3(27)−5(9)−11(3)−3   = 81−45−33−3 = 0 ✓\np(−1)  = 3(−1)−5(1)−11(−1)−3 = −3−5+11−3 = 0 ✓\np(−1/3)= 3(−1/27)−5(1/9)+11/3−3 = −1/9−5/9+33/9−27/9 = 0 ✓\n\nLet α=3, β=−1, γ=−1/3. Here a=3, b=−5, c=−11, d=−3.\n\nSum: α+β+γ = 3−1−1/3 = 5/3  =  −b/a = 5/3 ✓\nSum of pairs: αβ+βγ+γα = −3+1/3−1 = −11/3  =  c/a = −11/3 ✓\nProduct: αβγ = 3×(−1)×(−1/3) = 1  =  −d/a = 3/3 = 1 ✓',
+   tip:'3-mark question requires all three substitutions AND all three Vieta relations checked. Show each step clearly.'},
+
+  {id:19,type:'short',topic:'qdr',marks:3,
+   q:'If α and β are the zeroes of x² − 6x + a, and 3α + 2β = 20, find the value of a.',
+   ans:'From x² − 6x + a:\nα + β = 6  (sum of zeroes)\nαβ = a    (product of zeroes)\n\nGiven: 3α + 2β = 20  …(i)\nAlso: α + β = 6  ⟹  β = 6 − α  …(ii)\n\nSubstitute (ii) into (i):\n3α + 2(6 − α) = 20\n3α + 12 − 2α = 20\nα = 8\nβ = 6 − 8 = −2\n\na = αβ = 8 × (−2) = −16',
+   tip:'Two equations in α and β: use the sum equation to express β in terms of α, then substitute into the given condition.'},
+
+  {id:20,type:'short',topic:'cub',marks:3,
+   q:'Find all zeroes of p(x) = 2x³ + x² − 6x − 3, given that √3 is one zero.',
+   ans:'Verify: p(√3) = 2(3√3)+3−6√3−3 = 6√3−6√3 = 0 ✓\n\nCheck if −√3 is also a zero:\np(−√3) = 2(−3√3)+3+6√3−3 = −6√3+6√3 = 0 ✓\n\n∴ (x − √3)(x + √3) = (x² − 3) is a factor.\n\nDivide p(x) by (x² − 3):\n2x³ + x² − 6x − 3 = (x² − 3)(2x + 1)\nVerify: (x²−3)(2x+1) = 2x³+x²−6x−3 ✓\n\nSolving 2x + 1 = 0  ⟹  x = −1/2\n\nAll zeroes: √3,  −√3,  −1/2',
+   tip:'When one irrational zero is √k, always check if −√k is also a zero. If yes, factor out (x²−k) directly.'},
+
+  {id:21,type:'short',topic:'div',marks:3,
+   q:'On dividing x³ − 3x² + x + 2 by a polynomial g(x), the quotient is (x − 2) and the remainder is (−2x + 4). Find g(x).',
+   ans:'By the Division Algorithm:\np(x) = g(x) × q(x) + r(x)\n∴ g(x) = [p(x) − r(x)] ÷ q(x)\n\np(x) − r(x) = (x³−3x²+x+2) − (−2x+4)\n             = x³ − 3x² + 3x − 2\n\nDivide (x³ − 3x² + 3x − 2) by (x − 2):\n(x−2)(x²−x+1) = x³−x²+x−2x²+2x−2 = x³−3x²+3x−2 ✓\n\n∴ g(x) = x² − x + 1',
+   tip:'Rearrange the Division Algorithm: g = (p−r)/q. Compute p−r first, then perform polynomial long division by q.'},
+
+  {id:22,type:'short',topic:'qdr',marks:2,
+   q:'If one zero of the polynomial 5x² + 13x + k is the reciprocal of the other zero, find the value of k.',
+   ans:'Let the two zeroes be α and 1/α.\n\nProduct of zeroes = α × (1/α) = 1\n\nFrom 5x² + 13x + k:\nProduct = c/a = k/5\n\nSo: k/5 = 1  ⟹  k = 5\n\nVerification: 5x²+13x+5 has product = 1 ✓',
+   tip:'Key insight: product of reciprocal zeroes is always 1. Set c/a = 1 and solve for k.'},
+
+  {id:23,type:'short',topic:'qdr',marks:3,
+   q:'If α and β are the zeroes of x² − x − 2, find a polynomial whose zeroes are (2α + 1) and (2β + 1).',
+   ans:'From x² − x − 2: α+β = 1, αβ = −2\n\nNew zeroes: 2α+1 and 2β+1\n\nNew Sum = (2α+1) + (2β+1) = 2(α+β) + 2 = 2(1) + 2 = 4\n\nNew Product = (2α+1)(2β+1)\n= 4αβ + 2α + 2β + 1\n= 4αβ + 2(α+β) + 1\n= 4(−2) + 2(1) + 1\n= −8 + 2 + 1 = −5\n\nRequired polynomial:\np(x) = x² − 4x − 5',
+   tip:'Express the new sum and product purely in terms of (α+β) and αβ — do not solve for α, β individually.'},
+
+  {id:24,type:'short',topic:'cub',marks:3,
+   q:'Find the remaining zero of x³ + 3x² − 5x − 15, given that √5 and −√5 are two of its zeroes.',
+   ans:'Since √5 and −√5 are zeroes:\n(x − √5)(x + √5) = (x² − 5) is a factor.\n\nDivide x³ + 3x² − 5x − 15 by (x² − 5):\nx³+3x²−5x−15 = (x²−5)(x+3)\nVerify: (x²−5)(x+3) = x³+3x²−5x−15 ✓\n\nSolving x + 3 = 0  ⟹  x = −3\n\nThird zero: −3\nAll zeroes: √5,  −√5,  −3',
+   tip:'Two conjugate irrational zeroes always allow you to factor out (x²−k). The remaining factor will be linear or quadratic.'},
+
+  // ── LONG ANSWER ──
+  {id:25,type:'long',topic:'div',marks:5,
+   q:'Find all zeroes of the polynomial 2x⁴ + 7x³ − 19x² − 14x + 30, given that √2 and −√2 are two of its zeroes.',
+   ans:'Since √2 and −√2 are zeroes:\n(x − √2)(x + √2) = x² − 2 is a factor.\n\nDivide 2x⁴ + 7x³ − 19x² − 14x + 30 by (x² − 2):\n\nStep 1: 2x⁴ ÷ x² = 2x²\n  2x²(x²−2) = 2x⁴ − 4x²\n  Subtract: 7x³ − 15x² − 14x + 30\n\nStep 2: 7x³ ÷ x² = 7x\n  7x(x²−2) = 7x³ − 14x\n  Subtract: −15x² + 0x + 30\n\nStep 3: −15x² ÷ x² = −15\n  −15(x²−2) = −15x² + 30\n  Subtract: 0 (remainder = 0)\n\n∴ 2x⁴+7x³−19x²−14x+30 = (x²−2)(2x²+7x−15)\nVerify: (x²−2)(2x²+7x−15)\n= 2x⁴+7x³−15x²−4x²−14x+30 = 2x⁴+7x³−19x²−14x+30 ✓\n\nNow solve 2x² + 7x − 15 = 0:\nx = [−7 ± √(49 + 120)] / 4 = [−7 ± √169] / 4 = [−7 ± 13] / 4\n\nx = (−7+13)/4 = 6/4 = 3/2\nor x = (−7−13)/4 = −20/4 = −5\n\nAll four zeroes: √2,  −√2,  3/2,  −5',
+   tip:'5-mark steps: (1) form quadratic factor from given zeroes, (2) full long division with all steps, (3) verify, (4) solve remaining quadratic using formula, (5) state all zeroes clearly.'},
+
+  {id:26,type:'long',topic:'cub',marks:5,
+   q:'Find all zeroes of x³ + 3x² − x − 3, given that −3 is one zero. Verify your answer using all three Vieta\'s formulas.',
+   ans:'Verification: p(−3) = −27+27+3−3 = 0 ✓. So (x + 3) is a factor.\n\nDivide x³ + 3x² − x − 3 by (x + 3):\nx³+3x²−x−3 = (x+3)(x²−1) = (x+3)(x−1)(x+1)\nVerify: (x+3)(x−1)(x+1) = (x+3)(x²−1) = x³+3x²−x−3 ✓\n\nAll zeroes: −3,  1,  −1\n\nVerification using Vieta\'s Formulas for x³ + 3x² − x − 3 (a=1, b=3, c=−1, d=−3):\n\nSum: α+β+γ = −3+1+(−1) = −3  =  −b/a = −3/1 = −3 ✓\n\nSum of pairs:\nαβ+βγ+γα = (−3)(1)+(1)(−1)+(−1)(−3)\n= −3 − 1 + 3 = −1  =  c/a = −1/1 = −1 ✓\n\nProduct:\nαβγ = (−3)(1)(−1) = 3  =  −d/a = −(−3)/1 = 3 ✓',
+   tip:'5-mark answer: verify the given zero by substitution, perform full division, factorise the resulting quadratic, state all zeroes, then verify all three Vieta relations explicitly.'},
+
+  {id:27,type:'long',topic:'qdr',marks:5,
+   q:'If α and β are the zeroes of p(x) = x² − 4x + 3, find the values of:\n(a) α² + β²     (b) 1/α + 1/β     (c) α²β + αβ²     (d) α³ + β³',
+   ans:'From x² − 4x + 3:  α + β = 4,  αβ = 3\n\n(a) α² + β² = (α+β)² − 2αβ\n   = 16 − 6 = 10\n\n(b) 1/α + 1/β = (α+β) / (αβ)\n   = 4/3\n\n(c) α²β + αβ² = αβ(α + β)\n   = 3 × 4 = 12\n\n(d) α³ + β³ = (α+β)³ − 3αβ(α+β)\n   = 64 − 3(3)(4)\n   = 64 − 36 = 28\n\nAlternate for (d):\nα³+β³ = (α+β)(α²−αβ+β²)\n= (α+β)[(α²+β²) − αβ]\n= 4 × [10 − 3] = 4 × 7 = 28 ✓',
+   tip:'All four parts use only α+β = 4 and αβ = 3. Never find the actual values of α and β separately for this type of problem.'},
+
+  {id:28,type:'long',topic:'div',marks:5,
+   q:'If the polynomial x⁴ − 6x³ + 16x² − 25x + 10 is divided by (x² − 2x + k), the remainder is (x + a). Find the values of k and a.',
+   ans:'Dividing x⁴−6x³+16x²−25x+10 by (x²−2x+k):\n\nStep 1: x⁴ ÷ x² = x²\n  x²(x²−2x+k) = x⁴ − 2x³ + kx²\n  Subtract: −4x³ + (16−k)x² − 25x + 10\n\nStep 2: −4x³ ÷ x² = −4x\n  −4x(x²−2x+k) = −4x³ + 8x² − 4kx\n  Subtract: (8−k)x² + (4k−25)x + 10\n\nStep 3: (8−k)x² ÷ x² = (8−k)\n  (8−k)(x²−2x+k) = (8−k)x² − 2(8−k)x + k(8−k)\n  Subtract: [4k−25 + 2(8−k)]x + [10 − k(8−k)]\n          = (2k−9)x + (k²−8k+10)\n\nRemainder = (2k−9)x + (k²−8k+10)\n\nGiven remainder = (x + a), so:\nCoefficient of x: 2k − 9 = 1  ⟹  k = 5\nConstant: a = k² − 8k + 10 = 25 − 40 + 10 = −5\n\nAnswer: k = 5,  a = −5',
+   tip:'Show all long-division steps explicitly. After completing the division, equate coefficients of x and the constant term in the remainder separately to get two equations in k.'},
+
+  // ── SHORT ANSWER (continued) ──
+  {id:29,type:'short',topic:'qdr',marks:3,
+   q:'Find the zeroes of 6x² − 7x − 3 and verify the relationship between zeroes and coefficients.',
+   ans:'Factorise 6x² − 7x − 3:\nFind two numbers with product = 6×(−3) = −18 and sum = −7.\nNumbers: −9 and +2.\n6x²−9x+2x−3 = 3x(2x−3)+1(2x−3) = (3x+1)(2x−3)\n\nZeroes: 3x+1=0 → x = −1/3\n        2x−3=0 → x = 3/2\n\nVerification (a=6, b=−7, c=−3):\nSum: −1/3 + 3/2 = −2/6 + 9/6 = 7/6  =  −b/a = 7/6 ✓\nProduct: (−1/3)(3/2) = −1/2  =  c/a = −3/6 = −1/2 ✓',
+   tip:'Split the middle term: find two numbers with product = ac and sum = b. Always simplify fractions for the verification.'},
+
+  {id:30,type:'short',topic:'cub',marks:3,
+   q:'The zeroes of the cubic polynomial x³ − 12x² + 44x − 48 are in arithmetic progression. Find all three zeroes.',
+   ans:'Let the three zeroes in AP be: a−d,  a,  a+d.\n\nSum of zeroes = (a−d) + a + (a+d) = 3a\nFrom Vieta: α+β+γ = 12\n∴ 3a = 12  ⟹  a = 4\n\nSum of products of pairs:\n(a−d)a + a(a+d) + (a−d)(a+d)\n= (a²−ad) + (a²+ad) + (a²−d²)\n= 3a² − d² = 44\n3(16) − d² = 44  ⟹  d² = 4  ⟹  d = 2\n\nVerify using product:\n(a−d)·a·(a+d) = 2 × 4 × 6 = 48  =  −d/a ✓\n\nThe three zeroes: a−d = 2,  a = 4,  a+d = 6',
+   tip:'For zeroes in AP, always use a−d, a, a+d. The sum simplifies to 3a, making it easy to find a first. Then use sum-of-pairs to find d.'},
+];
+
+const state = {};
+let currentFilter = 'all';
+
+const topicStrip = {typ:'strip-typ',zer:'strip-zer',qdr:'strip-qdr',cub:'strip-cub',div:'strip-div',gen:'strip-gen'};
+const topicBg    = {typ:'rgba(129,140,248,.1)',zer:'rgba(45,212,191,.1)',qdr:'rgba(245,158,11,.1)',cub:'rgba(217,70,239,.1)',div:'rgba(56,189,248,.1)',gen:'rgba(100,116,139,.1)'};
+const topicCol   = {typ:'#818cf8',zer:'#2dd4bf',qdr:'#f59e0b',cub:'#d946ef',div:'#38bdf8',gen:'#94a3b8'};
+const typeBadge  = {mcq:'b-mcq MCQ',short:'b-short Short Answer',long:'b-long Long Answer',assert:'b-assert Assertion–Reason'};
+const markBadge  = m => { const c={1:'b-1m',2:'b-2m',3:'b-3m',5:'b-5m'}[m]||'b-1m'; return `<span class="badge ${c}">${m} mark${m>1?'s':''}</span>`; };
+
+function getVisible() { return currentFilter==='all'?Q:Q.filter(q=>q.type===currentFilter); }
+
+function filter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function renderMCQ(q) {
+  const s=state[q.id]||{}; const done=s.chosen!==undefined;
+  return `<div class="mcq-body">
+    <div class="mcq-opts">
+      ${q.opts.map((o,i)=>{
+        let cls='';
+        if(done){ if(i===q.ans)cls='correct'; else if(i===s.chosen&&i!==q.ans)cls='wrong'; }
+        return `<button class="opt-btn ${cls}" onclick="chooseMCQ(${q.id},${i})" ${done?'disabled':''}>
+          <span class="opt-lbl">${String.fromCharCode(65+i)}</span>${o}</button>`;
+      }).join('')}
+    </div>
+    ${done?`<div class="feedback ${s.chosen===q.ans?'correct':'wrong'}">
+      ${s.chosen===q.ans?'✓ Correct!':'✗ Incorrect — correct answer: '+String.fromCharCode(65+q.ans)}</div>
+      <div class="ans-body" style="border-top:1px solid var(--border);padding:.6rem 0 .3rem">
+        <div class="ans-lbl">💡 Explanation</div>
+        <div class="ans-text">${q.explain}</div>
+      </div>`:''}
+  </div>`;
+}
+
+function renderShortLong(q) {
+  const s=state[q.id]||{}; const open=s.open;
+  const ansHtml=`<div class="ans-lbl">✅ Model Answer</div>
+    <div class="ans-mono">${(q.ans||'').replace(/\n/g,'<br>')}</div>
+    ${q.tip?`<div class="tip">🎯 Exam tip: ${q.tip}</div>`:''}`;
+  return `<button class="show-btn ${open?'active':''}" onclick="toggleAns(${q.id})">
+    ${open?'▲ Hide Answer':'▼ Show Model Answer'}
+  </button>
+  <div class="ans-reveal ${open?'open':''}">
+    <div class="ans-body">${ansHtml}</div>
+  </div>`;
+}
+
+function render() {
+  const list=getVisible(); const el=document.getElementById('qlist');
+  el.innerHTML=list.map((q,i)=>{
+    const tb=typeBadge[q.type].split(' ');
+    return `<div class="q-card ${topicStrip[q.topic]||'strip-gen'}" id="qcard-${q.id}">
+      <div class="q-header">
+        <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+        <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>
+        ${markBadge(q.marks)}
+      </div>
+      ${q.type==='mcq'||q.type==='assert'?renderMCQ(q):renderShortLong(q)}
+    </div>`;
+  }).join('');
+}
+
+function chooseMCQ(id,idx) {
+  const q=Q.find(x=>x.id===id); if(!q||state[id]?.chosen!==undefined)return;
+  if(!state[id])state[id]={};
+  state[id].chosen=idx;
+  updateDash();
+  const visible=getVisible(), i=visible.findIndex(x=>x.id===id);
+  const tb=typeBadge[q.type].split(' ');
+  const newHtml=`<div class="q-card ${topicStrip[q.topic]||'strip-gen'}" id="qcard-${id}">
+    <div class="q-header">
+      <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+      <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="q-meta"><span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>${markBadge(q.marks)}</div>
+    ${renderMCQ(q)}
+  </div>`;
+  const el=document.getElementById('qcard-'+id);
+  const tmp=document.createElement('div'); tmp.innerHTML=newHtml;
+  el.replaceWith(tmp.firstElementChild);
+}
+
+function toggleAns(id) {
+  if(!state[id])state[id]={};
+  state[id].open=!state[id].open;
+  if(!state[id].viewed){state[id].viewed=true;updateDash();}
+  const btn=document.querySelector(`#qcard-${id} .show-btn`);
+  const rev=document.querySelector(`#qcard-${id} .ans-reveal`);
+  if(btn&&rev){
+    const open=state[id].open;
+    btn.classList.toggle('active',open);
+    btn.textContent=open?'▲ Hide Answer':'▼ Show Model Answer';
+    rev.classList.toggle('open',open);
+  }
+}
+
+function updateDash() {
+  const att=Object.keys(state).length;
+  const cor=Q.filter(q=>state[q.id]?.chosen===q.ans).length;
+  const mcqTotal=Q.filter(q=>q.type==='mcq'||q.type==='assert').length;
+  document.getElementById('d-att').textContent=att;
+  document.getElementById('d-cor').textContent=cor;
+  document.getElementById('d-sc').textContent=mcqTotal>0?Math.round((cor/mcqTotal)*100)+'%':'—';
+}
+
+function resetAll(){for(const k in state)delete state[k];updateDash();render();}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Polynomials</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#040810; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(4,8,16,.92) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#f59e0b; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#3a5a78; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #1a2d45; background:rgba(4,10,20,.85);
+  color:#3a5a78; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#f59e0b; color:#f59e0b; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#0a1422; border:1px solid #1e3550;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:300px; font-size:.8rem; color:#9cc0e0;
+  line-height:1.65; display:none;
+  box-shadow:0 8px 28px rgba(0,0,0,.85);
+}
+#tooltip strong {
+  font-family:'Playfair Display',serif; display:block;
+  margin-bottom:.3rem; color:#f59e0b; font-size:.9rem;
+}
+
+  /* ---- learnr site-nav ---- */
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:fixed; top:0; left:0; right:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<div id="ui">
+  <div>
+    <h1>Polynomials</h1>
+    <p>Class X · Mathematics Ch.2 — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2 + 20;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Poly-\nnomials',
+  x:0, y:0, r:62, color:'#050e1c', stroke:'#f59e0b', textColor:'#f59e0b', fontSize:14
+};
+
+const BRANCHES = [
+  // ── 1. Types of Polynomials (indigo) ──
+  {
+    id:'tp', label:'Types of\nPolynomials', x:-318, y:-210, r:46,
+    color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'Polynomials are classified by their degree — the highest power of the variable.\nGeneral form: aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₁x + a₀\nwhere aₙ ≠ 0 and all coefficients are real numbers.\nDegree determines the maximum number of zeroes a polynomial can have.',
+    children:[
+      { id:'t1', label:'Linear\nPolynomial', x:-505, y:-335, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Degree 1 → p(x) = ax + b  (a ≠ 0)\nGraph: straight line — always crosses x-axis exactly once.\nNumber of zeroes: exactly 1\nZero: x = −b/a\nExamples:\n• 2x + 3 → zero at x = −3/2\n• 5x − 10 → zero at x = 2\n• x + 7 → zero at x = −7\nEvery linear polynomial has exactly one zero.' },
+      { id:'t2', label:'Quadratic\nPolynomial', x:-555, y:-190, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Degree 2 → p(x) = ax² + bx + c  (a ≠ 0)\nGraph: PARABOLA — opens upward if a > 0, downward if a < 0\nNumber of zeroes: 0, 1 or 2\nZeroes depend on the discriminant b²−4ac:\n• b²−4ac > 0 → 2 distinct zeroes (parabola cuts x-axis twice)\n• b²−4ac = 0 → 1 repeated zero (parabola touches x-axis)\n• b²−4ac < 0 → no real zeroes (parabola misses x-axis)\nExamples: x²−5x+6, x²−4, x²+1' },
+      { id:'t3', label:'Cubic\nPolynomial', x:-505, y:-60, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Degree 3 → p(x) = ax³ + bx² + cx + d  (a ≠ 0)\nGraph: S-shaped cubic curve\nNumber of zeroes: 1, 2 or 3 (always at least one real zero)\nExamples:\n• x³ − 6x² + 11x − 6 → zeroes: 1, 2, 3\n• x³ − x² − x + 1 → zeroes: −1, 1, 1\n• x³ + 1 → zero: −1 (only real zero)\nA cubic always has at least one real root.' },
+      { id:'t4', label:'Degree &\nLeading Coeff', x:-310, y:-378, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Degree: highest power of x with non-zero coefficient.\nLeading coefficient: coefficient of the highest power.\nExamples:\n• 5x³ − 2x + 1 → degree 3, leading coeff = 5\n• −3x² + x − 7 → degree 2, leading coeff = −3\n• 7 → degree 0 (constant polynomial)\n• 0 → zero polynomial (degree undefined)\nKey rule: max zeroes ≤ degree of polynomial.' },
+    ]
+  },
+  // ── 2. Zeroes & Graphs (teal) ──
+  {
+    id:'zg', label:'Zeroes &\nGraphs', x:-318, y:210, r:46,
+    color:'#001418', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:'The zero of a polynomial p(x) is a value of x for which p(x) = 0.\nGeometrically: zeroes are the x-coordinates where the graph crosses (or touches) the x-axis.\nThis is the central link between algebra and geometry in this chapter.',
+    children:[
+      { id:'z1', label:'Zero of a\nPolynomial', x:-510, y:120, r:34, color:'#001418', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Definition: k is a zero of p(x) if p(k) = 0.\nExample: p(x) = x² − 3x + 2\nCheck x = 1: p(1) = 1 − 3 + 2 = 0 ✓ → 1 is a zero\nCheck x = 2: p(2) = 4 − 6 + 2 = 0 ✓ → 2 is a zero\nCheck x = 3: p(3) = 9 − 9 + 2 = 2 ≠ 0 → NOT a zero\nImportant: a zero of p(x) is a root of the equation p(x) = 0.' },
+      { id:'z2', label:'Parabola\nShapes', x:-550, y:250, r:34, color:'#001418', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'For quadratic p(x) = ax² + bx + c:\nIf a > 0: parabola opens UPWARD (U-shape)\n  → minimum value at vertex\nIf a < 0: parabola opens DOWNWARD (∩-shape)\n  → maximum value at vertex\nVertex x-coordinate = −b/(2a)\nThe vertex is the turning point of the parabola.\nSymmetry: the parabola is symmetric about the vertical line x = −b/(2a).' },
+      { id:'z3', label:'Number of\nZeroes', x:-455, y:385, r:34, color:'#001418', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Max number of zeroes = degree of polynomial\nLinear (degree 1): exactly 1 zero\nQuadratic (degree 2): 0, 1 or 2 zeroes\nCubic (degree 3): 1, 2 or 3 zeroes\nGraphical test:\n→ Count the number of times the graph crosses/touches the x-axis.\n→ Each crossing = 2 distinct zeroes (if it crosses)\n→ Each touching = 1 repeated zero\nA cubic MUST have at least 1 real zero.' },
+      { id:'z4', label:'Graph &\nX-intercepts', x:-298, y:-398, r:34, color:'#001418', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'x-intercepts of the graph y = p(x) are exactly the zeroes of p(x).\nVisual patterns for quadratic:\n• Cuts x-axis at 2 points → 2 distinct real zeroes\n• Tangent to x-axis (touches, does not cross) → 1 repeated zero\n• Does not touch x-axis → no real zeroes\nFor cubic: the graph always crosses the x-axis at least once,\nso a cubic polynomial ALWAYS has at least one real zero.' },
+    ]
+  },
+  // ── 3. Quadratic Zeroes Relations (amber) ──
+  {
+    id:'qr', label:'Quadratic\nα, β\nRelations', x:318, y:-210, r:46,
+    color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'For a quadratic polynomial p(x) = ax² + bx + c with zeroes α and β:\nSum of zeroes: α + β = −b/a\nProduct of zeroes: αβ = c/a\nThese relationships hold even WITHOUT finding the actual zeroes!\nThey are derived directly from Vieta\'s formulas.',
+    children:[
+      { id:'q1', label:'Sum of\nZeroes α+β', x:-503, y:-335, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'For ax² + bx + c (zeroes α, β):\nα + β = −b/a = −(coefficient of x) / (coefficient of x²)\nDerivation: if α, β are zeroes\nax² + bx + c = a(x − α)(x − β)\n= a[x² − (α+β)x + αβ]\nComparing: b = −a(α+β) → α+β = −b/a\nExample: x² − 5x + 6 (a=1, b=−5, c=6)\nα+β = −(−5)/1 = 5 ✓ (zeroes are 2 and 3, sum = 5)' },
+      { id:'q2', label:'Product of\nZeroes αβ', x:-545, y:-192, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'For ax² + bx + c (zeroes α, β):\nαβ = c/a = constant term / coefficient of x²\nDerivation: from a[x² − (α+β)x + αβ]\nComparing constant: c = a·αβ → αβ = c/a\nExample: x² − 5x + 6 (a=1, b=−5, c=6)\nαβ = 6/1 = 6 ✓ (zeroes are 2 and 3, product = 6)\nAnother: 3x² + 5x − 2 (a=3, c=−2)\nαβ = −2/3' },
+      { id:'q3', label:'Form Poly\nfrom Zeroes', x:510, y:-120, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'Given zeroes α and β, the quadratic polynomial is:\nx² − (α+β)x + αβ = 0\nor more generally: k[x² − (α+β)x + αβ] for any k ≠ 0\nSteps:\n1. Find sum S = α + β\n2. Find product P = αβ\n3. Write: x² − Sx + P\nExample: zeroes are 3 and −4\nS = 3 + (−4) = −1, P = 3×(−4) = −12\nPolynomial: x² − (−1)x + (−12) = x² + x − 12' },
+      { id:'q4', label:'Key\nIdentities', x:317, y:-381, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'Useful identities using α+β and αβ:\n(α−β)² = (α+β)² − 4αβ\nα² + β² = (α+β)² − 2αβ\nα³ + β³ = (α+β)³ − 3αβ(α+β)\nα² − β² = (α+β)(α−β)\n1/α + 1/β = (α+β)/(αβ)\nα/β + β/α = (α²+β²)/(αβ)\nThese are frequently tested in board exams!\nAlways express answers in terms of sum and product.' },
+    ]
+  },
+  // ── 4. Cubic Zeroes Relations (purple) ──
+  {
+    id:'cr', label:'Cubic\nα, β, γ\nRelations', x:0, y:-300, r:46,
+    color:'#130018', stroke:'#d946ef', textColor:'#f0abfc',
+    info:'For cubic p(x) = ax³ + bx² + cx + d with zeroes α, β, γ:\nThree relations connect coefficients to zeroes:\n(1) Sum: α+β+γ = −b/a\n(2) Sum of products of pairs: αβ+βγ+γα = c/a\n(3) Product: αβγ = −d/a\nThese follow from: ax³+bx²+cx+d = a(x−α)(x−β)(x−γ)',
+    children:[
+      { id:'c1', label:'Sum\nα+β+γ', x:-182, y:-432, r:33, color:'#130018', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'Sum of all three zeroes:\nα + β + γ = −b/a\n= −(coefficient of x²) / (coefficient of x³)\nExample: p(x) = x³ − 6x² + 11x − 6 (a=1, b=−6)\nα+β+γ = −(−6)/1 = 6\nActual zeroes: 1, 2, 3 → sum = 1+2+3 = 6 ✓\nAnother: 2x³ + x² − 5x + 2 (a=2, b=1)\nα+β+γ = −1/2' },
+      { id:'c2', label:'Sum of Pairs\nαβ+βγ+γα', x:0, y:-462, r:33, color:'#130018', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'Sum of products taken two at a time:\nαβ + βγ + γα = c/a\n= (coefficient of x) / (coefficient of x³)\nExample: x³ − 6x² + 11x − 6 (a=1, c=11)\nαβ+βγ+γα = 11/1 = 11\nZeroes 1,2,3: 1×2 + 2×3 + 3×1 = 2+6+3 = 11 ✓\nThis is always c/a regardless of the degree 3 polynomial.' },
+      { id:'c3', label:'Product\nαβγ', x:182, y:-432, r:33, color:'#130018', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'Product of all three zeroes:\nαβγ = −d/a\n= −(constant term) / (coefficient of x³)\nExample: x³ − 6x² + 11x − 6 (a=1, d=−6)\nαβγ = −(−6)/1 = 6\nZeroes 1,2,3: 1×2×3 = 6 ✓\nNote the NEGATIVE sign for the product formula!\nAnother: 2x³ + x² − 5x + 2 (a=2, d=2)\nαβγ = −2/2 = −1' },
+    ]
+  },
+  // ── 5. Division Algorithm (blue) ──
+  {
+    id:'da', label:'Division\nAlgorithm', x:0, y:300, r:46,
+    color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+    info:'Division Algorithm for Polynomials:\nFor polynomials p(x) and g(x) with g(x) ≠ 0:\np(x) = g(x) × q(x) + r(x)\nwhere r(x) = 0 OR degree of r(x) < degree of g(x)\np(x) = dividend, g(x) = divisor, q(x) = quotient, r(x) = remainder\nThis is analogous to the division algorithm for integers.',
+    children:[
+      { id:'d1', label:'Theorem\nStatement', x:-508, y:118, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'For any two polynomials p(x) and g(x), g(x) ≠ 0:\n∃ unique q(x) and r(x) such that:\np(x) = g(x) × q(x) + r(x)\nConditions:\n• r(x) = 0 (divides exactly), OR\n• degree(r) < degree(g)\nThis guarantees unique quotient and remainder.\nAnalogy: 17 = 3×5 + 2 (integer division)\n→ x³+1 = (x+1)(x²−x+1) + 0 (polynomial division)' },
+      { id:'d2', label:'Finding a\nZero via Division', x:-537, y:245, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'If one zero α of p(x) is known:\n→ Divide p(x) by (x − α)\n→ Remainder = 0 (since α is a zero)\n→ Quotient q(x) has the other zeroes\nExample: p(x) = x³ − 3x² − x + 3, zero = 3\nDivide by (x − 3):\nQuotient = x² − 1 = (x−1)(x+1)\n∴ all zeroes: 3, 1, −1\nUse this to find all zeroes when one is given.' },
+      { id:'d3', label:'Verification\nMethod', x:-448, y:385, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'After long division, always verify:\np(x) = g(x) × q(x) + r(x)\nMultiply divisor × quotient, then add remainder.\nResult should equal the original dividend.\nCheck degrees:\n• degree(dividend) = degree(divisor) + degree(quotient)\n• degree(remainder) < degree(divisor)\nExample check: if p(x)=x²+3x+2, g(x)=x+1\nq(x)=x+2, r(x)=0\nVerify: (x+1)(x+2)+0 = x²+3x+2 ✓' },
+      { id:'d4', label:'Finding\nQuotient/Remainder', x:-295, y:400, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Long division procedure:\n1. Divide leading term of dividend by leading term of divisor → first term of quotient\n2. Multiply divisor × this term and subtract\n3. Bring down next term, repeat\n4. Stop when remainder degree < divisor degree\nExample: Divide x² + 7x + 10 by (x + 2)\nStep 1: x² ÷ x = x → multiply: x(x+2) = x²+2x\nStep 2: Subtract: 5x+10 → 5x÷x = 5\nStep 3: 5(x+2) = 5x+10 → remainder = 0\n∴ q(x) = x+5, r(x) = 0' },
+    ]
+  },
+  // ── 6. Exam Strategy & Key Formulas (green) ──
+  {
+    id:'es', label:'Key\nFormulas &\nTips', x:318, y:210, r:46,
+    color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+    info:'Summary of the most important formulas and exam tips for Polynomials.\nThe chapter typically contributes 2–4 marks in CBSE boards.\nFocus on: forming polynomials from given zeroes, finding zeroes when one is given, and verifying using Vieta\'s formulas.',
+    children:[
+      { id:'e1', label:'Quadratic\nFormula Sheet', x:512, y:118, r:34, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'For ax² + bx + c, zeroes α and β:\nα + β = −b/a  ← remember: NEGATIVE b over a\nαβ = c/a  ← POSITIVE c over a\nForming polynomial: x² − (sum)x + (product)\nDerived identities:\n• α² + β² = (α+β)² − 2αβ\n• (α−β)² = (α+β)² − 4αβ\n• 1/α + 1/β = (α+β)/(αβ)\nMemory trick: "Sum is −b/a, Product is c/a"' },
+      { id:'e2', label:'Cubic\nFormula Sheet', x:545, y:245, r:34, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'For ax³ + bx² + cx + d, zeroes α, β, γ:\nα+β+γ = −b/a\nαβ+βγ+γα = c/a\nαβγ = −d/a  ← note the NEGATIVE sign!\nMemory pattern:\n• Sum of 1 at a time = −b/a\n• Sum of 2 at a time = c/a\n• Sum of 3 at a time (product) = −d/a\nSign pattern: −, +, − for the right-hand sides.' },
+      { id:'e3', label:'Common\nMistakes', x:470, y:380, r:34, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Top exam errors in Polynomials:\n1. Forgetting the − sign in α+β = −b/a (not +b/a)\n2. Using product = −c/a instead of +c/a\n3. Forgetting αβγ = −d/a for cubic (not +d/a)\n4. Not verifying the formed polynomial actually has those zeroes\n5. Confusing "zero of polynomial" with "zero polynomial"\n6. Writing quadratic with a fraction — always multiply out to clear fractions\n7. Not checking degree after long division' },
+      { id:'e4', label:'Board Exam\nQuestion Types', x:305, y:395, r:34, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Frequently asked question types:\n1. "Find the zeroes of the quadratic and verify the relationship" (2 marks)\n2. "If α, β are zeroes of ax²+bx+c, find α²+β²" (1 mark)\n3. "Form a quadratic with zeroes 2+√3 and 2−√3" (1 mark)\n4. "Divide p(x) by g(x) and find q(x) and r(x)" (3 marks)\n5. "One zero of cubic is 1, find all zeroes using division" (3 marks)\n6. Find k if a given polynomial has a given zero (2 marks)' },
+    ]
+  },
+];
+
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+function getNode(id) { return allNodes.find(n => n.id===id); }
+
+// ── pan / zoom ──
+canvas.addEventListener('mousedown', e => {
+  dragging=true;
+  dragStart={x:e.clientX,y:e.clientY};
+  dragOrigin={x:ox,y:oy};
+  canvas.style.cursor='grabbing';
+});
+canvas.addEventListener('mousemove', e => {
+  if(dragging){
+    ox = dragOrigin.x+(e.clientX-dragStart.x);
+    oy = dragOrigin.y+(e.clientY-dragStart.y);
+    draw(); return;
+  }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n => {
+    const dx=mx-n.x, dy=my-n.y;
+    if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n;
+  });
+  if(found && found.info){
+    tip.style.display='block';
+    const tx = e.clientX+14, ty = Math.min(e.clientY-10, window.innerHeight-240);
+    tip.style.left = (tx+280>window.innerWidth ? e.clientX-310 : tx)+'px';
+    tip.style.top = ty+'px';
+    tip.innerHTML = `<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {
+    tip.style.display='none';
+    canvas.style.cursor='grab';
+  }
+});
+canvas.addEventListener('mouseup', () => { dragging=false; canvas.style.cursor='grab'; });
+canvas.addEventListener('mouseleave', () => { dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  zoomAt(e.deltaY<0?1.1:0.91, e.clientX, e.clientY);
+}, {passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart', e => {
+  if(e.touches.length===1){
+    dragging=true;
+    dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+    dragOrigin={x:ox,y:oy};
+  }
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if(e.touches.length===1&&dragging){
+    ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);
+    oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);
+    draw();
+  }
+  if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){
+      const cx=(e.touches[0].clientX+e.touches[1].clientX)/2;
+      const cy=(e.touches[0].clientY+e.touches[1].clientY)/2;
+      zoomAt(d/lastTouchDist,cx,cy);
+    }
+    lastTouchDist=d;
+  }
+}, {passive:false});
+canvas.addEventListener('touchend', () => { dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){
+  const prev=scale;
+  scale=Math.max(.2,Math.min(3,scale*f));
+  ox=cx-(cx-ox)*(scale/prev);
+  oy=cy-(cy-oy)*(scale/prev);
+  draw();
+}
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+20; draw(); }
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  // faint grid
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(129,140,248,.03)';
+  ctx.lineWidth=1;
+  for(let x=-1600;x<1600;x+=70){ ctx.beginPath(); ctx.moveTo(x,-1600); ctx.lineTo(x,1600); ctx.stroke(); }
+  for(let y=-1600;y<1600;y+=70){ ctx.beginPath(); ctx.moveTo(-1600,y); ctx.lineTo(1600,y); ctx.stroke(); }
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+
+  // edges
+  allEdges.forEach(e => {
+    const a=getNode(e.from), b=getNode(e.to);
+    if(!a||!b) return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0, a.stroke+'66');
+    grd.addColorStop(1, b.stroke+'22');
+    const cx=(a.x+b.x)/2+(b.y-a.y)*.15;
+    const cy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n => {
+    // glow
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?45:22;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    // border ring
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    // inner ring for center only
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-8,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'33'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    // label text
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=n.id==='c'?14:12;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>
