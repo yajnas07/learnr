@@ -1,57 +1,206 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Class X CBSE Study Portal</title>
+<title>learnr — Free CBSE Class X Study Portal</title>
+<meta name="description" content="learnr.in — Free CBSE Class X study material: Mind Maps, Animated Diagrams, Cheat Sheets, Flashcards and Question Banks for Maths, Science and Social Science.">
+<meta property="og:title" content="learnr — Free CBSE Class X Study Portal">
+<meta property="og:description" content="Maths · Science · Social Science — Mind Maps, Flashcards, Question Banks and more, completely free.">
+<meta property="og:url" content="https://learnr.in">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://learnr.in">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#07101f; --card:#111d2e; --card2:#162235;
     --border:#1a2d45; --text:#dde6f5; --muted:#5a7a9a;
     --science:#10b981; --maths:#f59e0b; --sst:#a855f7;
+    --gold:#e8a020; --gold2:#f0b84a;
   }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; min-height:100vh; }
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; min-height:100vh; overflow-x:hidden; }
 
-  body::before {
-    content:''; position:fixed; inset:0; pointer-events:none;
-    background:
-      radial-gradient(ellipse 55% 40% at 15% 15%, rgba(16,185,129,.06) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 85% 80%, rgba(168,85,247,.05) 0%, transparent 60%),
-      radial-gradient(ellipse 45% 35% at 80% 15%, rgba(245,158,11,.05) 0%, transparent 55%);
+  /* NAV */
+  .nav {
+    position:fixed; top:0; left:0; right:0; z-index:9000;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.55rem 2rem;
+    background:rgba(7,16,31,.85); backdrop-filter:blur(18px);
+    border-bottom:1px solid rgba(26,45,69,.7);
+    transition:box-shadow .3s;
   }
-
-  /* ── header ── */
-  header {
-    text-align:center; padding:2.5rem 1rem 1.5rem; position:relative;
+  .nav.scrolled { box-shadow:0 4px 28px rgba(0,0,0,.5); }
+  .nav-logo img { height:30px; width:auto; display:block; }
+  .nav-links { display:flex; align-items:center; gap:1.8rem; }
+  .nav-links a {
+    font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted);
+    text-decoration:none; transition:color .2s;
+  }
+  .nav-links a:hover { color:var(--text); }
+  .nav-cta {
+    font-family:'Syne',sans-serif; font-weight:800; font-size:.75rem;
+    padding:.38rem 1.1rem; border-radius:99px;
+    background:var(--gold); color:#07101f; text-decoration:none; transition:all .2s;
+  }
+  .nav-cta:hover { background:var(--gold2); transform:translateY(-1px); box-shadow:0 4px 16px rgba(232,160,32,.35); }
+  .nav-hamburger { display:none; background:none; border:none; cursor:pointer; flex-direction:column; gap:5px; padding:4px; }
+  .nav-hamburger span { display:block; width:20px; height:2px; background:var(--muted); border-radius:2px; transition:all .3s; }
+  .mobile-menu {
+    display:none; position:fixed; top:55px; left:0; right:0; z-index:8999;
+    background:rgba(7,16,31,.97); backdrop-filter:blur(18px);
     border-bottom:1px solid var(--border);
+    padding:1.2rem 2rem; flex-direction:column; gap:1rem;
   }
-  .logo { font-size:2.8rem; margin-bottom:.5rem; }
-  header h1 {
-    font-family:'Syne',sans-serif; font-size:clamp(1.6rem,4vw,2.6rem); font-weight:800;
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a { font-family:'DM Mono',monospace; font-size:.82rem; color:var(--muted); text-decoration:none; }
+  .mobile-menu a:hover { color:var(--text); }
+
+  /* HERO */
+  .hero {
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:8rem 1.5rem 5rem; text-align:center; position:relative; overflow:hidden;
+  }
+  .hero::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 50% at 15% 20%, rgba(16,185,129,.07) 0%, transparent 60%),
+      radial-gradient(ellipse 55% 45% at 85% 75%, rgba(168,85,247,.06) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 35% at 80% 10%, rgba(245,158,11,.05) 0%, transparent 55%);
+  }
+  .hero-orb {
+    position:absolute; border-radius:50%; filter:blur(72px); pointer-events:none;
+    animation:float 10s ease-in-out infinite;
+  }
+  .orb1 { width:480px; height:480px; background:rgba(16,185,129,.07);  top:-130px; left:-160px; animation-delay:0s; }
+  .orb2 { width:380px; height:380px; background:rgba(168,85,247,.06);  bottom:-90px; right:-110px; animation-delay:-4s; }
+  .orb3 { width:240px; height:240px; background:rgba(232,160,32,.07);  top:38%; left:65%; animation-delay:-7s; }
+  @keyframes float { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-22px) scale(1.04)} }
+
+  .hero-badge {
+    position:relative; z-index:1;
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--gold);
+    background:rgba(232,160,32,.09); border:1px solid rgba(232,160,32,.28);
+    padding:.32rem .95rem; border-radius:99px; margin-bottom:2rem;
+    animation:fadeUp .5s ease both;
+  }
+  .badge-dot { width:7px; height:7px; border-radius:50%; background:var(--gold2); animation:blink 2s ease infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  .hero-logo {
+    position:relative; z-index:1;
+    width:min(400px,78vw); margin:0 auto 1.8rem;
+    animation:fadeUp .6s .1s ease both;
+    filter:drop-shadow(0 10px 36px rgba(232,160,32,.24));
+  }
+
+  .hero-tagline {
+    position:relative; z-index:1;
+    font-family:'Syne',sans-serif; font-weight:800;
+    font-size:clamp(2rem,5.5vw,4rem); line-height:1.1; letter-spacing:-2px;
+    margin-bottom:1.1rem; animation:fadeUp .7s .2s ease both;
+  }
+  .hero-tagline em {
+    font-style:normal;
     background:linear-gradient(135deg,#10b981,#f59e0b,#a855f7);
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    letter-spacing:-.5px;
   }
-  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.78rem; margin-top:.4rem; }
+  .hero-sub {
+    position:relative; z-index:1;
+    font-size:clamp(.9rem,1.8vw,1.05rem); color:var(--muted);
+    max-width:510px; margin:0 auto 2.2rem; line-height:1.8;
+    animation:fadeUp .7s .3s ease both;
+  }
+  .hero-actions {
+    position:relative; z-index:1;
+    display:flex; gap:.8rem; flex-wrap:wrap; justify-content:center;
+    animation:fadeUp .7s .4s ease both;
+  }
+  .btn-primary {
+    font-family:'Syne',sans-serif; font-weight:800; font-size:.9rem;
+    padding:.78rem 2rem; border-radius:99px;
+    background:linear-gradient(135deg,var(--gold),var(--gold2));
+    color:#07101f; text-decoration:none;
+    transition:all .2s; display:inline-flex; align-items:center; gap:.45rem;
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(232,160,32,.38); }
+  .btn-secondary {
+    font-family:'Syne',sans-serif; font-weight:800; font-size:.9rem;
+    padding:.78rem 2rem; border-radius:99px;
+    background:transparent; color:var(--text);
+    border:1.5px solid var(--border); text-decoration:none;
+    transition:all .2s; display:inline-flex; align-items:center; gap:.45rem;
+  }
+  .btn-secondary:hover { border-color:var(--muted); background:rgba(255,255,255,.04); }
 
-  /* ── stats bar ── */
-  .stats {
-    display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;
-    padding:1.2rem 1rem; border-bottom:1px solid var(--border);
+  .hero-stats {
+    position:relative; z-index:1;
+    display:flex; gap:2.8rem; flex-wrap:wrap; justify-content:center;
+    margin-top:3.5rem; padding-top:2.5rem;
+    border-top:1px solid var(--border);
+    animation:fadeUp .7s .5s ease both;
   }
-  .stat {
-    background:var(--card); border:1px solid var(--border); border-radius:12px;
-    padding:.6rem 1.2rem; text-align:center; min-width:90px;
-  }
-  .stat-val { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; }
-  .stat-lbl { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); margin-top:.1rem; }
+  .hstat { text-align:center; }
+  .hstat-val { font-family:'Syne',sans-serif; font-weight:800; font-size:2.1rem; line-height:1; }
+  .hstat-lbl { font-family:'DM Mono',monospace; font-size:.64rem; color:var(--muted); margin-top:.3rem; letter-spacing:.5px; }
 
-  /* ── subject tabs ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+
+  /* MARQUEE */
+  .marquee-strip {
+    background:var(--card); border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    overflow:hidden; padding:.78rem 0;
+  }
+  .marquee-track {
+    display:inline-flex; gap:3rem; white-space:nowrap;
+    animation:marquee 30s linear infinite;
+  }
+  .marquee-strip:hover .marquee-track { animation-play-state:paused; }
+  .mq-item {
+    font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted);
+    display:inline-flex; align-items:center; gap:.45rem;
+  }
+  .mq-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+  /* SECTION SHARED */
+  .section-inner { max-width:1060px; margin:0 auto; padding:5rem 1.5rem; }
+  .section-label {
+    font-family:'DM Mono',monospace; font-size:.68rem; font-weight:500;
+    letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:.6rem;
+  }
+  .section-title {
+    font-family:'Syne',sans-serif; font-weight:800;
+    font-size:clamp(1.7rem,3.5vw,2.6rem); line-height:1.1; letter-spacing:-1px; margin-bottom:.9rem;
+  }
+  .section-sub { font-size:.92rem; color:var(--muted); max-width:460px; line-height:1.8; }
+  .reveal { opacity:0; transform:translateY(22px); transition:opacity .65s ease, transform .65s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* MATERIALS */
+  .materials-section { background:var(--card); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .mat-grid {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:1px; background:var(--border); border-radius:16px; overflow:hidden; margin-top:3rem;
+  }
+  .mat-card {
+    background:var(--card2); padding:1.8rem 1.5rem;
+    display:flex; flex-direction:column; gap:.6rem; transition:background .25s;
+  }
+  .mat-card:hover { background:rgba(232,160,32,.07); }
+  .mat-card-icon { font-size:1.75rem; }
+  .mat-card-name { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; }
+  .mat-card-desc { font-size:.8rem; color:var(--muted); line-height:1.7; }
+  .mat-card-tag { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--gold); letter-spacing:.5px; margin-top:auto; padding-top:.5rem; }
+
+  /* CHAPTERS */
+  .chapters-section { background:var(--bg); }
   .subj-tabs {
-    display:flex; justify-content:center; gap:.5rem; flex-wrap:wrap;
-    padding:1.5rem 1rem .5rem;
+    display:flex; justify-content:center; gap:.5rem; flex-wrap:wrap; margin:2rem 0 1.5rem;
   }
   .subj-tab {
     font-family:'Syne',sans-serif; font-weight:800; font-size:.82rem;
@@ -63,73 +212,41 @@
   .subj-tab.active-mat { border-color:var(--maths);   color:var(--maths);   background:rgba(245,158,11,.08); }
   .subj-tab.active-sst { border-color:var(--sst);     color:var(--sst);     background:rgba(168,85,247,.08); }
 
-  /* ── main grid ── */
-  main { max-width:1000px; margin:0 auto; padding:1rem 1rem 4rem; }
-
   .subject-section { display:none; }
   .subject-section.visible { display:block; }
-
   .section-header {
-    display:flex; align-items:center; gap:.7rem;
-    margin:1rem 0 1rem; padding:.6rem .8rem;
-    border-radius:12px; border:1px solid var(--border);
-    background:var(--card);
+    display:flex; align-items:center; gap:.7rem; margin:0 0 .8rem;
+    padding:.6rem .8rem; border-radius:12px; border:1px solid var(--border); background:var(--card);
   }
   .section-header h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.05rem; }
   .section-header p  { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); margin-top:.15rem; }
   .s-icon { font-size:1.5rem; }
 
-  /* ── chapter card ── */
   .chapter {
     background:var(--card); border:1px solid var(--border);
-    border-radius:16px; margin-bottom:1rem; overflow:hidden;
-    transition:box-shadow .2s;
+    border-radius:16px; margin-bottom:.8rem; overflow:hidden; transition:box-shadow .2s;
   }
   .chapter:hover { box-shadow:0 6px 24px rgba(0,0,0,.4); }
-
-  .ch-header {
-    display:flex; align-items:center; gap:.8rem;
-    padding:.9rem 1.1rem; cursor:pointer; user-select:none;
-  }
+  .ch-header { display:flex; align-items:center; gap:.8rem; padding:.9rem 1.1rem; cursor:pointer; user-select:none; }
   .ch-num {
     font-family:'DM Mono',monospace; font-size:.68rem; font-weight:500;
-    min-width:32px; height:32px; border-radius:8px; display:flex;
-    align-items:center; justify-content:center; flex-shrink:0;
+    min-width:32px; height:32px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
   .ch-info { flex:1; }
   .ch-name { font-family:'Syne',sans-serif; font-weight:800; font-size:.95rem; }
   .ch-tags { display:flex; gap:.3rem; flex-wrap:wrap; margin-top:.3rem; }
-  .ch-tag {
-    font-size:.62rem; font-family:'DM Mono',monospace;
-    padding:.12rem .45rem; border-radius:99px; border:1px solid var(--border);
-    color:var(--muted);
-  }
+  .ch-tag { font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .45rem; border-radius:99px; border:1px solid var(--border); color:var(--muted); }
   .ch-arrow { font-size:.85rem; color:var(--muted); transition:transform .25s; flex-shrink:0; }
   .chapter.open .ch-arrow { transform:rotate(90deg); }
+  .ch-status { font-size:.65rem; font-family:'DM Mono',monospace; padding:.15rem .55rem; border-radius:99px; flex-shrink:0; }
+  .status-done { background:rgba(16,185,129,.12); color:#34d399; border:1px solid rgba(16,185,129,.2); }
+  .status-wip  { background:rgba(245,158,11,.12);  color:#fbbf24; border:1px solid rgba(245,158,11,.2); }
+  .status-soon { background:rgba(100,116,139,.1);  color:#64748b; border:1px solid var(--border); }
+  .ch-body { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.4,0,.2,1); border-top:0 solid var(--border); }
+  .chapter.open .ch-body { max-height:500px; border-top:1px solid var(--border); }
 
-  /* status badge */
-  .ch-status {
-    font-size:.65rem; font-family:'DM Mono',monospace;
-    padding:.15rem .55rem; border-radius:99px; flex-shrink:0;
-  }
-  .status-done   { background:rgba(16,185,129,.12); color:#34d399; border:1px solid rgba(16,185,129,.2); }
-  .status-wip    { background:rgba(245,158,11,.12);  color:#fbbf24; border:1px solid rgba(245,158,11,.2); }
-  .status-soon   { background:rgba(100,116,139,.1);  color:#64748b; border:1px solid var(--border); }
-
-  /* ── material links ── */
-  .ch-body {
-    max-height:0; overflow:hidden;
-    transition:max-height .35s cubic-bezier(.4,0,.2,1);
-    border-top:0px solid var(--border);
-  }
-  .chapter.open .ch-body {
-    max-height:500px;
-    border-top:1px solid var(--border);
-  }
-  .material-grid {
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-    gap:.5rem; padding:.9rem 1rem;
-  }
+  .material-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.5rem; padding:.9rem 1rem; }
   .mat-link {
     display:flex; flex-direction:column; align-items:center; gap:.3rem;
     padding:.7rem .5rem; border-radius:12px; border:1px solid var(--border);
@@ -142,409 +259,389 @@
   .mat-name { font-family:'Syne',sans-serif; font-weight:700; font-size:.72rem; }
   .mat-type { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--muted); }
 
-  /* ── coming soon section ── */
   .coming-soon {
     background:var(--card); border:1px dashed var(--border);
     border-radius:16px; padding:1.5rem; text-align:center;
-    color:var(--muted); font-family:'DM Mono',monospace; font-size:.82rem;
-    margin-bottom:1rem;
+    color:var(--muted); font-family:'DM Mono',monospace; font-size:.82rem; margin-bottom:.8rem;
   }
   .coming-soon strong { color:var(--text); font-family:'Syne',sans-serif; font-size:.9rem; display:block; margin-bottom:.3rem; }
 
-  /* ── how to use ── */
-  .how-to {
-    background:var(--card); border:1px solid var(--border);
-    border-radius:16px; padding:1.2rem 1.4rem; margin-bottom:1.5rem;
-  }
-  .how-to h3 { font-family:'Syne',sans-serif; font-weight:800; font-size:.9rem; margin-bottom:.7rem; color:var(--text); }
-  .how-step { display:flex; gap:.7rem; align-items:flex-start; margin-bottom:.5rem; font-size:.82rem; }
-  .step-num {
-    font-family:'DM Mono',monospace; font-size:.68rem; font-weight:500;
-    min-width:22px; height:22px; border-radius:6px; background:var(--card2);
-    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
-    flex-shrink:0; margin-top:1px; color:var(--muted);
-  }
-  .how-step p { color:var(--muted); line-height:1.5; }
-  .how-step p strong { color:var(--text); }
+  /* HOW IT WORKS */
+  .how-section { background:var(--card); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .how-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:2.5rem; margin-top:3rem; }
+  .how-step { display:flex; flex-direction:column; gap:.65rem; }
+  .how-num { font-family:'Syne',sans-serif; font-weight:800; font-size:3rem; color:rgba(232,160,32,.22); line-height:1; }
+  .how-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; }
+  .how-desc { font-size:.83rem; color:var(--muted); line-height:1.8; }
 
-  /* ── footer ── */
-  footer {
-    text-align:center; padding:1.5rem; font-family:'DM Mono',monospace;
-    font-size:.68rem; color:var(--muted); border-top:1px solid var(--border);
+  /* QUOTE */
+  .quote-section { background:var(--card2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .quote-inner { max-width:740px; margin:0 auto; padding:5rem 1.5rem; text-align:center; }
+  blockquote {
+    font-family:'Syne',sans-serif; font-weight:700;
+    font-size:clamp(1.2rem,2.8vw,1.75rem); line-height:1.6; color:var(--text); margin-bottom:1.2rem;
   }
+  blockquote::before { content:'\201C'; color:var(--gold); }
+  blockquote::after  { content:'\201D'; color:var(--gold); }
+  .quote-src { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
 
-  @media(max-width:480px) {
+  /* FOOTER */
+  footer { background:var(--card); border-top:1px solid var(--border); padding:3rem 1.5rem; text-align:center; }
+  .footer-inner { max-width:1060px; margin:0 auto; }
+  .footer-logo { height:42px; width:auto; display:block; margin:0 auto 1.1rem; opacity:.8; }
+  .footer-links { display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:.8rem; }
+  .footer-link { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted); text-decoration:none; transition:color .2s; }
+  .footer-link:hover { color:var(--text); }
+  .footer-copy { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); }
+  .footer-copy a { color:var(--gold); text-decoration:none; }
+  .footer-copy a:hover { text-decoration:underline; }
+
+  /* RESPONSIVE */
+  @media(max-width:768px) {
+    .nav-links { display:none; }
+    .nav-hamburger { display:flex; }
+    .mat-grid { grid-template-columns:1fr 1fr; }
+  }
+  @media(max-width:520px) {
+    .mat-grid { grid-template-columns:1fr; }
     .material-grid { grid-template-columns:repeat(3,1fr); }
+    .section-inner { padding:3.5rem 1.2rem; }
+    .hero-stats { gap:1.5rem; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">📚</div>
-  <h1>Class X · CBSE Study Portal</h1>
-  <p>Maths &nbsp;·&nbsp; Science &nbsp;·&nbsp; Social Science &nbsp;·&nbsp; All chapters in one place</p>
-</header>
-
-<!-- stats -->
-<div class="stats">
-  <div class="stat"><div class="stat-val" style="color:var(--science)">5</div><div class="stat-lbl">Chapters</div></div>
-  <div class="stat"><div class="stat-val" style="color:var(--maths)">26</div><div class="stat-lbl">Materials</div></div>
-  <div class="stat"><div class="stat-val" style="color:var(--sst)">3</div><div class="stat-lbl">Subjects</div></div>
-  <div class="stat"><div class="stat-val" style="color:#60a5fa">∞</div><div class="stat-lbl">More Coming</div></div>
+<!-- FIXED NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo"><img src="logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <div class="nav-links">
+    <a href="#materials">Materials</a>
+    <a href="#chapters">Chapters</a>
+    <a href="#how">How it works</a>
+    <a href="#chapters" class="nav-cta">Explore Now &#8594;</a>
+  </div>
+  <button class="nav-hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#materials" onclick="toggleMenu()">Materials</a>
+  <a href="#chapters"  onclick="toggleMenu()">Chapters</a>
+  <a href="#how"       onclick="toggleMenu()">How it works</a>
+  <a href="#chapters"  onclick="toggleMenu()" style="color:var(--gold)">Explore Now &#8594;</a>
 </div>
 
-<!-- subject tabs -->
-<div class="subj-tabs">
-  <button class="subj-tab active-sci" onclick="showSubject('sci',this)">🔬 Science</button>
-  <button class="subj-tab" onclick="showSubject('mat',this)">📐 Maths</button>
-  <button class="subj-tab" onclick="showSubject('sst',this)">🌍 Social Science</button>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-orb orb1"></div>
+  <div class="hero-orb orb2"></div>
+  <div class="hero-orb orb3"></div>
+
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    Free for every Class&nbsp;X student
+  </div>
+
+  <img src="logos/learnr-colored-dark.svg" alt="learnr" class="hero-logo">
+
+  <h1 class="hero-tagline">
+    Study smarter,<br>not <em>harder</em>
+  </h1>
+  <p class="hero-sub">
+    Interactive mind maps, animated diagrams, flashcards, virtual labs and question banks &mdash; fully aligned to the CBSE Class&nbsp;X curriculum. Free, forever.
+  </p>
+  <div class="hero-actions">
+    <a href="#chapters" class="btn-primary">Explore Chapters &#8594;</a>
+    <a href="#materials" class="btn-secondary">What&rsquo;s included</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hstat">
+      <div class="hstat-val" style="color:var(--science)">5</div>
+      <div class="hstat-lbl">Chapters Ready</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val" style="color:var(--maths)">26</div>
+      <div class="hstat-lbl">Study Materials</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val" style="color:var(--sst)">3</div>
+      <div class="hstat-lbl">Subjects</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val" style="color:var(--gold)">100%</div>
+      <div class="hstat-lbl">Free &amp; Forever</div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Acids, Bases &amp; Salts</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Life Processes</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Light &amp; Refraction</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Electricity</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Chemical Reactions</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Real Numbers</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Polynomials</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Quadratic Equations</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Trigonometry</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Statistics</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Nationalism in India</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Rise of Nationalism in Europe</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Power Sharing</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Federalism</span>
+    <!-- duplicate for seamless loop -->
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Acids, Bases &amp; Salts</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Life Processes</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Light &amp; Refraction</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Electricity</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Chemical Reactions</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Real Numbers</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Polynomials</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Quadratic Equations</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Trigonometry</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Statistics</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Nationalism in India</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Rise of Nationalism in Europe</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Power Sharing</span>
+    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Federalism</span>
+  </div>
 </div>
 
-<main>
-
-  <!-- ═══ HOW TO USE ═══ -->
-  <div class="how-to">
-    <h3>💡 How to use this portal</h3>
-    <div class="how-step"><div class="step-num">1</div><p>Make sure this <strong>index.html</strong> and all the subject folders are in the same folder on your device.</p></div>
-    <div class="how-step"><div class="step-num">2</div><p>Click a <strong>chapter below</strong> to expand it, then click any material to open it.</p></div>
-    <div class="how-step"><div class="step-num">3</div><p>Use your browser's <strong>back button</strong> to return to this page after viewing any material.</p></div>
-    <div class="how-step"><div class="step-num">4</div><p>Everything works <strong>offline</strong> — no internet needed after downloading the folder.</p></div>
-  </div>
-
-  <!-- ═══ SCIENCE ═══ -->
-  <div class="subject-section visible" id="sec-sci">
-    <div class="section-header">
-      <div class="s-icon">🔬</div>
-      <div>
-        <h2 style="color:var(--science)">Science</h2>
-        <p>Physics · Chemistry · Biology</p>
-      </div>
+<!-- WHAT YOU GET -->
+<section class="materials-section" id="materials">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">What you get</div>
+      <h2 class="section-title">Six ways to<br>master every topic</h2>
+      <p class="section-sub">Each chapter ships with a complete set of interactive materials built to make concepts stick &mdash; and to prepare you for the CBSE board exam.</p>
     </div>
-
-    <!-- Ch 2: Acids Bases Salts — DONE -->
-    <div class="chapter open" id="ch-acids">
-      <div class="ch-header" onclick="toggleChapter('ch-acids')">
-        <div class="ch-num" style="background:rgba(16,185,129,.12);color:#34d399">Ch.2</div>
-        <div class="ch-info">
-          <div class="ch-name">Acids, Bases &amp; Salts</div>
-          <div class="ch-tags">
-            <span class="ch-tag">Chemistry</span>
-            <span class="ch-tag">pH Scale</span>
-            <span class="ch-tag">Neutralisation</span>
-            <span class="ch-tag">Salts</span>
-          </div>
-        </div>
-        <span class="ch-status status-done">✓ Complete</span>
-        <span class="ch-arrow">▶</span>
-      </div>
-      <div class="ch-body">
-        <div class="material-grid">
-          <a class="mat-link" href="science/ch02_acids/mindmap.html">
-            <div class="mat-icon">🧠</div>
-            <div class="mat-name">Mind Map</div>
-            <div class="mat-type">Visual web</div>
-          </a>
-          <a class="mat-link" href="science/ch02_acids/animated_diagram.html">
-            <div class="mat-icon">⚗️</div>
-            <div class="mat-name">Animated Diagram</div>
-            <div class="mat-type">Interactive</div>
-          </a>
-          <a class="mat-link" href="science/ch02_acids/cheatsheet.html">
-            <div class="mat-icon">📋</div>
-            <div class="mat-name">Cheat Sheet</div>
-            <div class="mat-type">Formulas</div>
-          </a>
-          <a class="mat-link" href="science/ch02_acids/flashcards.html">
-            <div class="mat-icon">🃏</div>
-            <div class="mat-name">Flashcards</div>
-            <div class="mat-type">40 cards</div>
-          </a>
-          <a class="mat-link" href="science/ch02_acids/question_bank.html">
-            <div class="mat-icon">📝</div>
-            <div class="mat-name">Question Bank</div>
-            <div class="mat-type">30 questions</div>
-          </a>
-          <a class="mat-link" href="science/ch02_acids/virtual_lab.html">
-            <div class="mat-icon">🔬</div>
-            <div class="mat-name">Virtual Lab</div>
-            <div class="mat-type">Mix chemicals</div>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Upcoming Science chapters -->
-    <div class="chapter" id="ch-light">
-      <div class="ch-header" onclick="toggleChapter('ch-light')">
-        <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.10</div>
-        <div class="ch-info">
-          <div class="ch-name">Light — Reflection &amp; Refraction</div>
-          <div class="ch-tags"><span class="ch-tag">Physics</span><span class="ch-tag">Optics</span><span class="ch-tag">Lenses</span></div>
-        </div>
-        <span class="ch-status status-soon">Coming soon</span>
-        <span class="ch-arrow">▶</span>
-      </div>
-      <div class="ch-body">
-        <div class="material-grid">
-          <div class="mat-link disabled"><div class="mat-icon">🧠</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">⚗️</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">📋</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">🃏</div><div class="mat-name">Flashcards</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">📝</div><div class="mat-name">Question Bank</div><div class="mat-type">Coming soon</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="chapter" id="ch-elec">
-      <div class="ch-header" onclick="toggleChapter('ch-elec')">
-        <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.12</div>
-        <div class="ch-info">
-          <div class="ch-name">Electricity</div>
-          <div class="ch-tags"><span class="ch-tag">Physics</span><span class="ch-tag">Circuits</span><span class="ch-tag">Ohm's Law</span></div>
-        </div>
-        <span class="ch-status status-soon">Coming soon</span>
-        <span class="ch-arrow">▶</span>
-      </div>
-      <div class="ch-body">
-        <div class="material-grid">
-          <div class="mat-link disabled"><div class="mat-icon">🧠</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">⚗️</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">📋</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">🃏</div><div class="mat-name">Flashcards</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">📝</div><div class="mat-name">Question Bank</div><div class="mat-type">Coming soon</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="chapter open" id="ch-life">
-      <div class="ch-header" onclick="toggleChapter('ch-life')">
-        <div class="ch-num" style="background:rgba(16,185,129,.12);color:#34d399">Ch.6</div>
-        <div class="ch-info">
-          <div class="ch-name">Life Processes</div>
-          <div class="ch-tags"><span class="ch-tag">Biology</span><span class="ch-tag">Nutrition</span><span class="ch-tag">Respiration</span><span class="ch-tag">Transport</span><span class="ch-tag">Excretion</span></div>
-        </div>
-        <span class="ch-status status-done">✓ Complete</span>
-        <span class="ch-arrow">▶</span>
-      </div>
-      <div class="ch-body">
-        <div class="material-grid">
-          <a class="mat-link" href="science/ch06_life_processes/mindmap.html">
-            <div class="mat-icon">🧠</div>
-            <div class="mat-name">Mind Map</div>
-            <div class="mat-type">Visual web</div>
-          </a>
-          <a class="mat-link" href="science/ch06_life_processes/animated_diagram.html">
-            <div class="mat-icon">🔬</div>
-            <div class="mat-name">Animated Diagram</div>
-            <div class="mat-type">Interactive</div>
-          </a>
-          <a class="mat-link" href="science/ch06_life_processes/cheatsheet.html"><div class="mat-icon">📋</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Quick reference</div></a>
-          <a class="mat-link" href="science/ch06_life_processes/flashcards.html"><div class="mat-icon">🃏</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards</div></a>
-          <a class="mat-link" href="science/ch06_life_processes/question_bank.html"><div class="mat-icon">📝</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions</div></a>
-        </div>
-      </div>
+    <div class="mat-grid reveal">
+      <div class="mat-card"><div class="mat-card-icon">&#129504;</div><div class="mat-card-name">Mind Maps</div><div class="mat-card-desc">Pan &amp; zoom through interconnected concept webs. Hover nodes to reveal detailed explanations and examples.</div><div class="mat-card-tag">INTERACTIVE &middot; VISUAL</div></div>
+      <div class="mat-card"><div class="mat-card-icon">&#9879;&#65039;</div><div class="mat-card-name">Animated Diagrams</div><div class="mat-card-desc">Tabbed diagrams with step-by-step animations, cause-effect flows, comparison tables and clickable timelines.</div><div class="mat-card-tag">ANIMATED &middot; TABBED</div></div>
+      <div class="mat-card"><div class="mat-card-icon">&#128203;</div><div class="mat-card-name">Cheat Sheets</div><div class="mat-card-desc">Dense, beautifully organised quick-reference panels &mdash; formulas, tables, key terms and exam memory tricks.</div><div class="mat-card-tag">REFERENCE &middot; EXAM READY</div></div>
+      <div class="mat-card"><div class="mat-card-icon">&#127183;</div><div class="mat-card-name">Flashcard Decks</div><div class="mat-card-desc">Flip cards with category filters, mark-as-known tracking, date badges and keyboard shortcuts.</div><div class="mat-card-tag">SPACED REPETITION</div></div>
+      <div class="mat-card"><div class="mat-card-icon">&#128221;</div><div class="mat-card-name">Question Banks</div><div class="mat-card-desc">MCQ, Assertion-Reason, Short and Long answer questions with model answers and CBSE board tips.</div><div class="mat-card-tag">CBSE PATTERN &middot; SCORED</div></div>
+      <div class="mat-card"><div class="mat-card-icon">&#128300;</div><div class="mat-card-name">Virtual Labs</div><div class="mat-card-desc">Select reagents, mix chemicals and watch animated reactions with observations &mdash; safe, browser-based.</div><div class="mat-card-tag">SCIENCE ONLY &middot; ANIMATED</div></div>
     </div>
   </div>
+</section>
 
-  <!-- ═══ MATHS ═══ -->
-  <div class="subject-section" id="sec-mat">
-    <div class="section-header">
-      <div class="s-icon">📐</div>
-      <div>
-        <h2 style="color:var(--maths)">Mathematics</h2>
-        <p>Algebra · Geometry · Trigonometry · Statistics</p>
-      </div>
-    </div>
-    <!-- Ch 1: Real Numbers — IN PROGRESS -->
-    <div class="chapter open" id="ch-real">
-      <div class="ch-header" onclick="toggleChapter('ch-real')">
-        <div class="ch-num" style="background:rgba(245,158,11,.12);color:#fbbf24">Ch.1</div>
-        <div class="ch-info">
-          <div class="ch-name">Real Numbers</div>
-          <div class="ch-tags">
-            <span class="ch-tag">Euclid's Algorithm</span>
-            <span class="ch-tag">FTA</span>
-            <span class="ch-tag">HCF &amp; LCM</span>
-            <span class="ch-tag">Irrational Numbers</span>
-          </div>
-        </div>
-        <span class="ch-status status-done">✓ Complete</span>
-        <span class="ch-arrow">▶</span>
-      </div>
-      <div class="ch-body">
-        <div class="material-grid">
-          <a class="mat-link" href="maths/ch01_real_numbers/mindmap.html">
-            <div class="mat-icon">🧠</div>
-            <div class="mat-name">Mind Map</div>
-            <div class="mat-type">Visual web</div>
-          </a>
-          <a class="mat-link" href="maths/ch01_real_numbers/animated_diagram.html">
-            <div class="mat-icon">📐</div>
-            <div class="mat-name">Animated Diagram</div>
-            <div class="mat-type">Interactive</div>
-          </a>
-          <a class="mat-link" href="maths/ch01_real_numbers/cheatsheet.html">
-            <div class="mat-icon">📋</div>
-            <div class="mat-name">Cheat Sheet</div>
-            <div class="mat-type">Quick revision</div>
-          </a>
-          <a class="mat-link" href="maths/ch01_real_numbers/flashcards.html">
-            <div class="mat-icon">🃏</div>
-            <div class="mat-name">Flashcards</div>
-            <div class="mat-type">40 cards</div>
-          </a>
-          <a class="mat-link" href="maths/ch01_real_numbers/question_bank.html">
-            <div class="mat-icon">📝</div>
-            <div class="mat-name">Question Bank</div>
-            <div class="mat-type">30 questions</div>
-          </a>
-        </div>
-      </div>
+<!-- BROWSE CHAPTERS -->
+<section class="chapters-section" id="chapters">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Browse content</div>
+      <h2 class="section-title">Chapters available now</h2>
+      <p class="section-sub">Select a subject, then expand any chapter to access all its study materials. More chapters added regularly.</p>
     </div>
 
-    <div class="coming-soon" style="margin-top:.8rem">
-      <strong>More Maths chapters coming soon!</strong>
-      Polynomials, Quadratic Equations, Triangles, Trigonometry, Statistics and more.
+    <div class="subj-tabs">
+      <button class="subj-tab active-sci" onclick="showSubject('sci',this)">&#128300; Science</button>
+      <button class="subj-tab" onclick="showSubject('mat',this)">&#128208; Maths</button>
+      <button class="subj-tab" onclick="showSubject('sst',this)">&#127758; Social Science</button>
+    </div>
+
+    <!-- SCIENCE -->
+    <div class="subject-section visible" id="sec-sci">
+      <div class="section-header">
+        <div class="s-icon">&#128300;</div>
+        <div><h2 style="color:var(--science)">Science</h2><p>Physics &middot; Chemistry &middot; Biology</p></div>
+      </div>
+      <div class="chapter open" id="ch-acids">
+        <div class="ch-header" onclick="toggleChapter('ch-acids')">
+          <div class="ch-num" style="background:rgba(16,185,129,.12);color:#34d399">Ch.2</div>
+          <div class="ch-info"><div class="ch-name">Acids, Bases &amp; Salts</div><div class="ch-tags"><span class="ch-tag">Chemistry</span><span class="ch-tag">pH Scale</span><span class="ch-tag">Neutralisation</span><span class="ch-tag">Salts</span></div></div>
+          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <a class="mat-link" href="science/ch02_acids/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
+          <a class="mat-link" href="science/ch02_acids/animated_diagram.html"><div class="mat-icon">&#9879;&#65039;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive</div></a>
+          <a class="mat-link" href="science/ch02_acids/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Formulas</div></a>
+          <a class="mat-link" href="science/ch02_acids/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards</div></a>
+          <a class="mat-link" href="science/ch02_acids/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions</div></a>
+          <a class="mat-link" href="science/ch02_acids/virtual_lab.html"><div class="mat-icon">&#128300;</div><div class="mat-name">Virtual Lab</div><div class="mat-type">Mix chemicals</div></a>
+        </div></div>
+      </div>
+      <div class="chapter open" id="ch-life">
+        <div class="ch-header" onclick="toggleChapter('ch-life')">
+          <div class="ch-num" style="background:rgba(16,185,129,.12);color:#34d399">Ch.6</div>
+          <div class="ch-info"><div class="ch-name">Life Processes</div><div class="ch-tags"><span class="ch-tag">Biology</span><span class="ch-tag">Nutrition</span><span class="ch-tag">Respiration</span><span class="ch-tag">Transport</span><span class="ch-tag">Excretion</span></div></div>
+          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <a class="mat-link" href="science/ch06_life_processes/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
+          <a class="mat-link" href="science/ch06_life_processes/animated_diagram.html"><div class="mat-icon">&#128300;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive</div></a>
+          <a class="mat-link" href="science/ch06_life_processes/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Quick reference</div></a>
+          <a class="mat-link" href="science/ch06_life_processes/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards</div></a>
+          <a class="mat-link" href="science/ch06_life_processes/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions</div></a>
+        </div></div>
+      </div>
+      <div class="chapter" id="ch-light">
+        <div class="ch-header" onclick="toggleChapter('ch-light')">
+          <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.10</div>
+          <div class="ch-info"><div class="ch-name">Light &mdash; Reflection &amp; Refraction</div><div class="ch-tags"><span class="ch-tag">Physics</span><span class="ch-tag">Optics</span><span class="ch-tag">Lenses</span></div></div>
+          <span class="ch-status status-soon">Coming soon</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <div class="mat-link disabled"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#9879;&#65039;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">Coming soon</div></div>
+        </div></div>
+      </div>
+      <div class="chapter" id="ch-elec">
+        <div class="ch-header" onclick="toggleChapter('ch-elec')">
+          <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.12</div>
+          <div class="ch-info"><div class="ch-name">Electricity</div><div class="ch-tags"><span class="ch-tag">Physics</span><span class="ch-tag">Circuits</span><span class="ch-tag">Ohm's Law</span></div></div>
+          <span class="ch-status status-soon">Coming soon</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <div class="mat-link disabled"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#9879;&#65039;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">Coming soon</div></div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- MATHS -->
+    <div class="subject-section" id="sec-mat">
+      <div class="section-header">
+        <div class="s-icon">&#128208;</div>
+        <div><h2 style="color:var(--maths)">Mathematics</h2><p>Algebra &middot; Geometry &middot; Trigonometry &middot; Statistics</p></div>
+      </div>
+      <div class="chapter open" id="ch-real">
+        <div class="ch-header" onclick="toggleChapter('ch-real')">
+          <div class="ch-num" style="background:rgba(245,158,11,.12);color:#fbbf24">Ch.1</div>
+          <div class="ch-info"><div class="ch-name">Real Numbers</div><div class="ch-tags"><span class="ch-tag">Euclid's Algorithm</span><span class="ch-tag">FTA</span><span class="ch-tag">HCF &amp; LCM</span><span class="ch-tag">Irrational Numbers</span></div></div>
+          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <a class="mat-link" href="maths/ch01_real_numbers/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
+          <a class="mat-link" href="maths/ch01_real_numbers/animated_diagram.html"><div class="mat-icon">&#128208;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive</div></a>
+          <a class="mat-link" href="maths/ch01_real_numbers/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Quick revision</div></a>
+          <a class="mat-link" href="maths/ch01_real_numbers/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards</div></a>
+          <a class="mat-link" href="maths/ch01_real_numbers/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions</div></a>
+        </div></div>
+      </div>
+      <div class="coming-soon"><strong>More Maths chapters coming soon!</strong>Polynomials, Quadratic Equations, Triangles, Trigonometry, Statistics and more.</div>
+    </div>
+
+    <!-- SOCIAL SCIENCE -->
+    <div class="subject-section" id="sec-sst">
+      <div class="section-header">
+        <div class="s-icon">&#127758;</div>
+        <div><h2 style="color:var(--sst)">Social Science</h2><p>History &middot; Geography &middot; Civics &middot; Economics</p></div>
+      </div>
+      <div class="chapter open" id="ch-nationalism">
+        <div class="ch-header" onclick="toggleChapter('ch-nationalism')">
+          <div class="ch-num" style="background:rgba(168,85,247,.12);color:#c084fc">Ch.2</div>
+          <div class="ch-info"><div class="ch-name">Nationalism in India</div><div class="ch-tags"><span class="ch-tag">History</span><span class="ch-tag">Non-Cooperation</span><span class="ch-tag">Civil Disobedience</span><span class="ch-tag">Gandhi</span></div></div>
+          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <a class="mat-link" href="social_science/ch02_nationalism/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
+          <a class="mat-link" href="social_science/ch02_nationalism/animated_diagram.html"><div class="mat-icon">&#127916;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive</div></a>
+          <a class="mat-link" href="social_science/ch02_nationalism/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Formulas &amp; facts</div></a>
+          <a class="mat-link" href="social_science/ch02_nationalism/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">36 cards</div></a>
+          <a class="mat-link" href="social_science/ch02_nationalism/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">28 questions</div></a>
+        </div></div>
+      </div>
+      <div class="chapter open" id="ch-europe">
+        <div class="ch-header" onclick="toggleChapter('ch-europe')">
+          <div class="ch-num" style="background:rgba(168,85,247,.12);color:#c084fc">Ch.1</div>
+          <div class="ch-info"><div class="ch-name">Rise of Nationalism in Europe</div><div class="ch-tags"><span class="ch-tag">History</span><span class="ch-tag">French Revolution</span><span class="ch-tag">Unification</span><span class="ch-tag">Bismarck</span></div></div>
+          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <a class="mat-link" href="social_science/ch01_europe/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
+          <a class="mat-link" href="social_science/ch01_europe/animated_diagram.html"><div class="mat-icon">&#127916;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive</div></a>
+          <a class="mat-link" href="social_science/ch01_europe/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Quick revision</div></a>
+          <a class="mat-link" href="social_science/ch01_europe/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards</div></a>
+          <a class="mat-link" href="social_science/ch01_europe/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions</div></a>
+        </div></div>
+      </div>
+      <div class="chapter" id="ch-power">
+        <div class="ch-header" onclick="toggleChapter('ch-power')">
+          <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.1</div>
+          <div class="ch-info"><div class="ch-name">Power Sharing</div><div class="ch-tags"><span class="ch-tag">Civics</span><span class="ch-tag">Democracy</span><span class="ch-tag">Belgium &amp; Sri Lanka</span></div></div>
+          <span class="ch-status status-soon">Coming soon</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <div class="mat-link disabled"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#127916;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
+          <div class="mat-link disabled"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
+        </div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Getting started</div>
+      <h2 class="section-title">Open a chapter,<br>start learning</h2>
+    </div>
+    <div class="how-grid reveal">
+      <div class="how-step"><div class="how-num">01</div><div class="how-title">Browse any chapter</div><div class="how-desc">Click any complete chapter above. Every material opens instantly &mdash; no login, no signup, no app to install.</div></div>
+      <div class="how-step"><div class="how-num">02</div><div class="how-title">Work through materials</div><div class="how-desc">Start with the Mind Map to get the big picture, then dig into the Animated Diagram and Cheat Sheet.</div></div>
+      <div class="how-step"><div class="how-num">03</div><div class="how-title">Test yourself</div><div class="how-desc">Use the Question Bank &mdash; MCQ, Assertion-Reason and long-answer questions in the CBSE board exam pattern.</div></div>
+      <div class="how-step"><div class="how-num">04</div><div class="how-title">Come back as we grow</div><div class="how-desc">New chapters are added regularly. Bookmark <a href="https://learnr.in" style="color:var(--gold);text-decoration:none">learnr.in</a> and check back every few weeks.</div></div>
     </div>
   </div>
+</section>
 
-  <!-- ═══ SOCIAL SCIENCE ═══ -->
-  <div class="subject-section" id="sec-sst">
-    <div class="section-header">
-      <div class="s-icon">🌍</div>
-      <div>
-        <h2 style="color:var(--sst)">Social Science</h2>
-        <p>History · Geography · Civics · Economics</p>
-      </div>
-    </div>
-    <!-- Ch 2: Nationalism in India — DONE (Mind Map + Animated Diagram) -->
-    <div class="chapter open" id="ch-nationalism">
-      <div class="ch-header" onclick="toggleChapter('ch-nationalism')">
-        <div class="ch-num" style="background:rgba(168,85,247,.12);color:#c084fc">Ch.2</div>
-        <div class="ch-info">
-          <div class="ch-name">Nationalism in India</div>
-          <div class="ch-tags">
-            <span class="ch-tag">History</span>
-            <span class="ch-tag">Non-Cooperation</span>
-            <span class="ch-tag">Civil Disobedience</span>
-            <span class="ch-tag">Gandhi</span>
-          </div>
-        </div>
-        <span class="ch-status status-done">✓ Complete</span>
-        <span class="ch-arrow">▶</span>
-      </div>
-      <div class="ch-body">
-        <div class="material-grid">
-          <a class="mat-link" href="social_science/ch02_nationalism/mindmap.html">
-            <div class="mat-icon">🧠</div>
-            <div class="mat-name">Mind Map</div>
-            <div class="mat-type">Visual web</div>
-          </a>
-          <a class="mat-link" href="social_science/ch02_nationalism/animated_diagram.html">
-            <div class="mat-icon">🎬</div>
-            <div class="mat-name">Animated Diagram</div>
-            <div class="mat-type">Interactive</div>
-          </a>
-          <a class="mat-link" href="social_science/ch02_nationalism/cheatsheet.html">
-            <div class="mat-icon">📋</div>
-            <div class="mat-name">Cheat Sheet</div>
-            <div class="mat-type">Formulas & facts</div>
-          </a>
-          <a class="mat-link" href="social_science/ch02_nationalism/flashcards.html">
-            <div class="mat-icon">🃏</div>
-            <div class="mat-name">Flashcards</div>
-            <div class="mat-type">36 cards</div>
-          </a>
-          <a class="mat-link" href="social_science/ch02_nationalism/question_bank.html">
-            <div class="mat-icon">📝</div>
-            <div class="mat-name">Question Bank</div>
-            <div class="mat-type">28 questions</div>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Ch 1: Rise of Nationalism in Europe — WIP -->
-    <div class="chapter open" id="ch-europe">
-      <div class="ch-header" onclick="toggleChapter('ch-europe')">
-        <div class="ch-num" style="background:rgba(168,85,247,.12);color:#c084fc">Ch.1</div>
-        <div class="ch-info">
-          <div class="ch-name">Rise of Nationalism in Europe</div>
-          <div class="ch-tags"><span class="ch-tag">History</span><span class="ch-tag">French Revolution</span><span class="ch-tag">Unification</span><span class="ch-tag">Bismarck</span></div>
-        </div>
-        <span class="ch-status status-done">✓ Complete</span>
-        <span class="ch-arrow">▶</span>
-      </div>
-      <div class="ch-body">
-        <div class="material-grid">
-          <a class="mat-link" href="social_science/ch01_europe/mindmap.html">
-            <div class="mat-icon">🧠</div>
-            <div class="mat-name">Mind Map</div>
-            <div class="mat-type">Visual web</div>
-          </a>
-          <a class="mat-link" href="social_science/ch01_europe/animated_diagram.html">
-            <div class="mat-icon">🎬</div>
-            <div class="mat-name">Animated Diagram</div>
-            <div class="mat-type">Interactive</div>
-          </a>
-          <a class="mat-link" href="social_science/ch01_europe/cheatsheet.html">
-            <div class="mat-icon">📋</div>
-            <div class="mat-name">Cheat Sheet</div>
-            <div class="mat-type">Quick revision</div>
-          </a>
-          <a class="mat-link" href="social_science/ch01_europe/flashcards.html">
-            <div class="mat-icon">🃏</div>
-            <div class="mat-name">Flashcards</div>
-            <div class="mat-type">40 cards</div>
-          </a>
-          <a class="mat-link" href="social_science/ch01_europe/question_bank.html">
-            <div class="mat-icon">📝</div>
-            <div class="mat-name">Question Bank</div>
-            <div class="mat-type">30 questions</div>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <div class="chapter" id="ch-power">
-      <div class="ch-header" onclick="toggleChapter('ch-power')">
-        <div class="ch-num" style="background:rgba(100,116,139,.1);color:#64748b">Ch.1</div>
-        <div class="ch-info">
-          <div class="ch-name">Power Sharing</div>
-          <div class="ch-tags"><span class="ch-tag">Civics</span><span class="ch-tag">Democracy</span><span class="ch-tag">Belgium & Sri Lanka</span></div>
-        </div>
-        <span class="ch-status status-soon">Coming soon</span>
-        <span class="ch-arrow">▶</span>
-      </div>
-      <div class="ch-body">
-        <div class="material-grid">
-          <div class="mat-link disabled"><div class="mat-icon">🧠</div><div class="mat-name">Mind Map</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">🎬</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Coming soon</div></div>
-          <div class="mat-link disabled"><div class="mat-icon">📋</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Coming soon</div></div>
-        </div>
-      </div>
-    </div>
+<!-- QUOTE -->
+<section class="quote-section">
+  <div class="quote-inner reveal">
+    <blockquote>Tell me and I forget. Teach me and I remember. Involve me and I learn.</blockquote>
+    <div class="quote-src">Benjamin Franklin &middot; The philosophy behind learnr.in</div>
   </div>
+</section>
 
-</main>
-
+<!-- FOOTER -->
 <footer>
-  Class X · CBSE · Study Portal &nbsp;·&nbsp; Open index.html to navigate &nbsp;·&nbsp; Works fully offline
+  <div class="footer-inner">
+    <img src="logos/learnr-colored-dark.svg" alt="learnr" class="footer-logo">
+    <div class="footer-links">
+      <a class="footer-link" href="https://learnr.in">learnr.in</a>
+      <a class="footer-link" href="#materials">Materials</a>
+      <a class="footer-link" href="#chapters">Chapters</a>
+      <a class="footer-link" href="#how">How it works</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 <a href="https://learnr.in">learnr.in</a> &nbsp;&middot;&nbsp; Free for all CBSE students &nbsp;&middot;&nbsp; CBSE Class X &nbsp;&middot;&nbsp; Made with &#10084;&#65039; in India</p>
+  </div>
 </footer>
 
 <script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
+
+function toggleMenu() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
 function showSubject(id, btn) {
   document.querySelectorAll('.subject-section').forEach(s => s.classList.remove('visible'));
   document.getElementById('sec-' + id).classList.add('visible');
   document.querySelectorAll('.subj-tab').forEach(b => b.className = 'subj-tab');
   btn.classList.add('active-' + id);
 }
-
 function toggleChapter(id) {
-  const ch = document.getElementById(id);
-  ch.classList.toggle('open');
+  document.getElementById(id).classList.toggle('open');
 }
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 </script>
 </body>
 </html>
