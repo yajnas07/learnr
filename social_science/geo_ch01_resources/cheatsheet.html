@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Resources and Development</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#04100a; --card:#0a1e10; --card2:#0f2616;
+    --border:#1a3a22; --text:#d4f0dc; --muted:#3a6a48;
+    --geo:#22c55e; --green:#4ade80; --amber:#fbbf24; --red:#f87171;
+    --blue:#60a5fa; --purple:#a78bfa; --teal:#34d399; --orange:#fb923c;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; padding:1.2rem; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 40% at 10% 5%,rgba(34,197,94,.04) 0%,transparent 60%),
+               radial-gradient(ellipse 50% 30% at 90% 90%,rgba(96,165,250,.03) 0%,transparent 50%); }
+
+  /* NAV */
+  .site-nav { display:flex; align-items:center; justify-content:space-between;
+    padding:.4rem 1.2rem; background:rgba(4,16,10,.95); border-bottom:1px solid var(--border);
+    border-radius:10px; margin:-1.2rem -1.2rem 1.2rem; position:sticky; top:0; z-index:100;
+    backdrop-filter:blur(10px); }
+  .site-nav a.logo img { height:26px; }
+  .site-nav a.back { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted);
+    text-decoration:none; border:1px solid var(--border); border-radius:99px;
+    padding:.2rem .65rem; transition:all .2s; }
+  .site-nav a.back:hover { color:var(--green); border-color:var(--geo); }
+
+  header { text-align:center; padding:.8rem 0 1.4rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.1rem); font-weight:900; color:var(--green); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:.9rem; max-width:1100px; margin:0 auto; }
+
+  .panel { background:var(--card); border-radius:12px; border:1px solid var(--border); overflow:hidden; }
+  .panel-head { display:flex; align-items:center; gap:.55rem; padding:.75rem 1rem;
+    border-bottom:1px solid var(--border); font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; }
+  .panel-body { padding:.8rem 1rem; }
+
+  .ph-def .panel-head  { background:rgba(74,222,128,.08);  color:var(--green); }
+  .ph-cls .panel-head  { background:rgba(96,165,250,.08);  color:var(--blue); }
+  .ph-own .panel-head  { background:rgba(251,191,36,.08);  color:var(--amber); }
+  .ph-land .panel-head { background:rgba(248,113,113,.08); color:var(--red); }
+  .ph-soil .panel-head { background:rgba(251,146,60,.08);  color:var(--orange); }
+  .ph-plan .panel-head { background:rgba(167,139,250,.08); color:var(--purple); }
+  .ph-sust .panel-head { background:rgba(52,211,153,.08);  color:var(--teal); }
+  .ph-mem .panel-head  { background:rgba(251,191,36,.06);  color:var(--amber); }
+
+  table { width:100%; border-collapse:collapse; font-size:.78rem; }
+  th { font-family:'DM Mono',monospace; font-size:.67rem; padding:.45rem .6rem;
+    background:var(--card2); color:var(--muted); text-align:left; }
+  td { padding:.4rem .6rem; border-top:1px solid var(--border); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:rgba(74,222,128,.02); }
+  .hl { color:var(--green); font-family:'DM Mono',monospace; font-size:.75rem; }
+  .am { color:var(--amber); } .bl { color:var(--blue); } .rd { color:var(--red); }
+  .or { color:var(--orange); } .pu { color:var(--purple); } .te { color:var(--teal); }
+
+  .fact { display:flex; gap:.5rem; font-size:.8rem; padding:.28rem 0; line-height:1.55; border-top:1px solid var(--border); }
+  .fact:first-child { border-top:none; }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  .soil-row { display:flex; gap:.5rem; padding:.4rem 0; border-top:1px solid var(--border); align-items:flex-start; }
+  .soil-row:first-child { border-top:none; }
+  .soil-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; margin-top:.3rem; }
+  .soil-name { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--text); font-weight:500; min-width:90px; }
+  .soil-info { font-size:.76rem; color:var(--muted); line-height:1.55; }
+  .soil-info strong { color:var(--text); }
+
+  .hbox { border-left:3px solid; border-radius:0 6px 6px 0; padding:.5rem .75rem;
+    margin:.3rem 0; font-size:.8rem; line-height:1.6; }
+  .hbox strong { display:block; font-size:.82rem; margin-bottom:.15rem; }
+
+  .trick { background:var(--card2); border-radius:8px; padding:.55rem .75rem; margin:.35rem 0; font-size:.78rem; }
+  .trick strong { color:var(--amber); font-family:'Playfair Display',serif; font-size:.85rem; }
+  .trick p { color:var(--muted); font-size:.72rem; margin-top:.15rem; }
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:.4rem; }
+  .tag-chip { display:inline-block; padding:.15rem .55rem; border-radius:99px; font-size:.7rem; font-weight:700; margin:.15rem .15rem 0 0; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-resources">&#8592; Back to Portal</a>
+</nav>
+
+<header>
+  <h1>Resources and Development</h1>
+  <p>Class X · Geography Ch.1 · Quick Revision Cheat Sheet — 14 Panels</p>
+</header>
+
+<div class="grid">
+
+  <!-- 1. What is a Resource -->
+  <div class="panel ph-def">
+    <div class="panel-head">🌿 What is a Resource?</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div>Everything in environment that can satisfy human needs provided it is <strong class="hl">technologically accessible, economically feasible</strong> and <strong class="hl">culturally acceptable</strong></div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div>Zimmermann: <strong class="am">"Resources are not — they become"</strong> — utility defines a resource, not physical existence</div></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div>Human beings are themselves a <strong class="bl">vital resource</strong> — they transform nature into resources using technology</div></div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><div>Nation's development depends not just on resource availability but also on <strong>technology, institutions, and political will</strong></div></div>
+    </div>
+  </div>
+
+  <!-- 2. Classification by Origin & Exhaustibility -->
+  <div class="panel ph-cls">
+    <div class="panel-head">🔵 Classification — Origin &amp; Exhaustibility</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Basis</th><th>Type</th><th>Examples</th></tr>
+        <tr><td>Origin</td><td><span class="hl">Biotic</span></td><td>Forests, fish, animals, insects</td></tr>
+        <tr><td></td><td><span class="pu">Abiotic</span></td><td>Rocks, metals, wind, water</td></tr>
+        <tr><td>Exhaustibility</td><td><span class="hl">Renewable</span></td><td>Solar, wind, tidal, water</td></tr>
+        <tr><td></td><td><span class="rd">Non-renewable</span></td><td>Coal, petroleum, natural gas</td></tr>
+      </table>
+      <div style="margin-top:.6rem">
+        <div class="hbox" style="border-color:var(--red);background:rgba(248,113,113,.06)"><strong class="rd">⚠ Non-renewables:</strong> Coal takes <strong>300–350 million years</strong> to form. Once used — gone forever.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Classification by Ownership -->
+  <div class="panel ph-own">
+    <div class="panel-head">🏛️ Classification — Ownership</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Type</th><th>Who Owns</th><th>Examples</th></tr>
+        <tr><td><span class="hl">Individual</span></td><td>Private persons</td><td>Farmland, plantation, house</td></tr>
+        <tr><td><span class="bl">Community</span></td><td>All community members</td><td>Village pond, grazing land, public parks</td></tr>
+        <tr><td><span class="am">National</span></td><td>Nation/state</td><td>Rivers, forests, wildlife, minerals, EEZ (12 nautical miles)</td></tr>
+        <tr><td><span class="rd">International</span></td><td>No single nation</td><td>Open ocean, atmosphere, Antarctica, outer space</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. Classification by Development Status -->
+  <div class="panel ph-plan">
+    <div class="panel-head">⚡ Classification — Development Status</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong class="am">Potential Resource:</strong> Exists but not yet utilised — e.g. vast solar/wind energy of Rajasthan &amp; Gujarat</div></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div><strong class="hl">Actual Resource:</strong> Surveyed, quantified, currently being used — e.g. coal in Jharkhand, Chhattisgarh</div></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div><strong class="bl">Stock:</strong> Materials that exist but humans lack technology to access — e.g. hydrogen as fuel (water exists, splitting technology is costly)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><div><strong class="pu">Reserve:</strong> Subset of actual; technology available but deliberately not used yet — e.g. river water stored for future hydroelectric power</div></div>
+    </div>
+  </div>
+
+  <!-- 5. Resource Planning in India -->
+  <div class="panel ph-plan">
+    <div class="panel-head">🗂️ Resource Planning in India</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div>Resource planning = <strong>judicious use</strong> of resources at all levels (national, state, district)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong>Three Stages:</strong><br>
+        <span class="am">1.</span> Identification &amp; inventory (surveys, resource maps)<br>
+        <span class="am">2.</span> Evolving planning structure (institutions, laws)<br>
+        <span class="am">3.</span> Matching with national development plans</div></div>
+      <div style="margin-top:.6rem">
+        <div class="hbox" style="border-color:var(--orange);background:rgba(251,146,60,.06)"><strong class="or">Paradox:</strong> Jharkhand, Chhattisgarh, MP — mineral-rich but economically backward. Goa — small, resource-poor but developed. Resource availability ≠ development.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Sustainable Development -->
+  <div class="panel ph-sust">
+    <div class="panel-head">♻️ Sustainable Development</div>
+    <div class="panel-body">
+      <div class="hbox" style="border-color:var(--teal);background:rgba(52,211,153,.06)"><strong class="te">Definition (Brundtland, 1987):</strong> "Development that meets the needs of the present without compromising the ability of future generations to meet their own needs."</div>
+      <div class="fact" style="margin-top:.5rem"><div class="dot" style="background:var(--teal)"></div><div><strong>Rio Earth Summit 1992</strong> → <strong class="te">Agenda 21</strong>: global blueprint; 179 nations adopted it</div></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div><strong>Kyoto Protocol 1997</strong>: binding GHG reduction targets</div></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div><strong>Gandhi:</strong> <em>"Earth provides enough to satisfy every man's need, but not every man's greed."</em></div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div>India's <strong class="am">NAPCC</strong> (National Action Plan on Climate Change): 8 national missions including Solar Mission, Energy Efficiency, Green India</div></div>
+    </div>
+  </div>
+
+  <!-- 7. Land Resources -->
+  <div class="panel ph-land">
+    <div class="panel-head">🗺️ Land Resources</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Land Use Category</th><th>Approx %</th></tr>
+        <tr><td>Net Sown Area</td><td><span class="hl">43.4%</span></td></tr>
+        <tr><td>Forests</td><td><span class="hl">23.4%</span> (target: 33%)</td></tr>
+        <tr><td>Fallow Lands</td><td><span class="am">10.2%</span></td></tr>
+        <tr><td>Non-agricultural Uses</td><td><span class="bl">8.0%</span> (growing)</td></tr>
+        <tr><td>Barren &amp; Wasteland</td><td><span class="rd">6.8%</span></td></tr>
+        <tr><td>Pastures &amp; Grazing</td><td><span class="or">3.5%</span> (declining)</td></tr>
+        <tr><td>Culturable Wasteland</td><td><span class="pu">4.7%</span></td></tr>
+      </table>
+      <div style="margin-top:.5rem;font-size:.74rem;color:var(--muted)">Total geographical area: <strong>3.28 million sq km</strong> · Data for ~93% of area</div>
+    </div>
+  </div>
+
+  <!-- 8. Land Degradation -->
+  <div class="panel ph-land">
+    <div class="panel-head">⚠️ Land Degradation &amp; Conservation</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Cause</th><th>Region Affected</th></tr>
+        <tr><td><span class="rd">Deforestation</span></td><td>NE India, Western Ghats, Himalayan foothills</td></tr>
+        <tr><td><span class="am">Overgrazing</span></td><td>Rajasthan, Gujarat, Madhya Pradesh</td></tr>
+        <tr><td><span class="or">Mining</span></td><td>Jharkhand, MP, Odisha (opencast)</td></tr>
+        <tr><td><span class="bl">Over-irrigation</span></td><td>Punjab, Haryana (waterlogging &amp; salinisation)</td></tr>
+        <tr><td><span class="pu">Industrial effluents</span></td><td>Gujarat, Maharashtra</td></tr>
+      </table>
+      <div style="margin-top:.6rem;font-size:.76rem"><strong>Conservation:</strong>
+        <span class="tag-chip" style="background:rgba(74,222,128,.12);color:var(--green)">Afforestation</span>
+        <span class="tag-chip" style="background:rgba(96,165,250,.12);color:var(--blue)">Contour ploughing</span>
+        <span class="tag-chip" style="background:rgba(251,191,36,.12);color:var(--amber)">Shelter belts</span>
+        <span class="tag-chip" style="background:rgba(251,146,60,.12);color:var(--orange)">Terrace farming</span>
+        <span class="tag-chip" style="background:rgba(167,139,250,.12);color:var(--purple)">Plugging gullies</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Alluvial & Black Soil -->
+  <div class="panel ph-soil">
+    <div class="panel-head">🟡⬛ Alluvial &amp; Black Soil</div>
+    <div class="panel-body">
+      <div class="soil-row">
+        <div class="soil-dot" style="background:#fbbf24"></div>
+        <div><div class="soil-name">Alluvial Soil</div>
+        <div class="soil-info">Most widespread (~40% of area). Northern Plains + deltas. Deposited by rivers (Indus, Ganga, Brahmaputra). <strong>Khadar</strong> (new, lighter) vs <strong>Bhangar</strong> (old, contains kankar). Rich in potash &amp; phosphoric acid. Crops: <strong>wheat, rice, sugarcane</strong>.</div></div>
+      </div>
+      <div class="soil-row">
+        <div class="soil-dot" style="background:#94a3b8"></div>
+        <div><div class="soil-name">Black Soil (Regur)</div>
+        <div class="soil-info">Deccan Trap (basalt lava). Maharashtra, Saurashtra, MP, Gujarat. <strong>Self-ploughing</strong> — swells when wet, cracks when dry. Rich in Ca, Mg, K. Crops: <strong>cotton, sugarcane, wheat</strong>. Also called Black Cotton Soil.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. Red, Laterite, Arid, Forest Soil -->
+  <div class="panel ph-soil">
+    <div class="panel-head">🔴🧱 Red, Laterite, Arid &amp; Forest Soil</div>
+    <div class="panel-body">
+      <div class="soil-row">
+        <div class="soil-dot" style="background:#f87171"></div>
+        <div><div class="soil-name">Red Soil</div>
+        <div class="soil-info">Crystalline igneous rocks. Odisha, Chhattisgarh, MP, Tamil Nadu. Red = iron diffusion. Low moisture &amp; N₂. Crops: wheat, rice, cotton with fertilisers.</div></div>
+      </div>
+      <div class="soil-row">
+        <div class="soil-dot" style="background:#fb923c"></div>
+        <div><div class="soil-name">Laterite Soil</div>
+        <div class="soil-info">High temp + heavy rain → leaching. Karnataka, Kerala, TN, MP hills. Rich in Fe &amp; Al, poor in N &amp; K. Hardens = used as bricks. Crops: <strong>tea, coffee, cashew</strong>.</div></div>
+      </div>
+      <div class="soil-row">
+        <div class="soil-dot" style="background:#fde68a"></div>
+        <div><div class="soil-name">Arid (Desert) Soil</div>
+        <div class="soil-info">W. Rajasthan, Kutch. Sandy, low humus. Kankar layer blocks roots. Crops: bajra, pulses. Irrigation can transform it!</div></div>
+      </div>
+      <div class="soil-row">
+        <div class="soil-dot" style="background:#4ade80"></div>
+        <div><div class="soil-name">Forest Soil</div>
+        <div class="soil-info">Himalayan slopes, W &amp; E Ghats. Valley soils loamy &amp; humus-rich. Slope soils thin &amp; coarse. Crops: tea, coffee, spices.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. Soil Erosion Types -->
+  <div class="panel ph-soil">
+    <div class="panel-head">💨 Soil Erosion — Types</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div><strong class="bl">Sheet Erosion:</strong> Thin layer removed uniformly by flowing water — common on gentle slopes after rain</div></div>
+      <div class="fact"><div class="dot" style="background:var(--orange)"></div><div><strong class="or">Rill Erosion:</strong> Small finger-like channels cut into slope — precursor to gully erosion</div></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><div><strong class="rd">Gully Erosion:</strong> Deep channels cut into soil by running water — creates <strong>bad lands</strong>. Classic area: <strong>Chambal valley</strong></div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong class="am">Wind Erosion:</strong> Wind removes top-soil in arid/semi-arid regions — western <strong>Rajasthan</strong>, sand dunes</div></div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><div><strong class="te">Slip Erosion:</strong> Large chunks of land slip off on steep slopes — Himalayan &amp; NE hill states</div></div>
+    </div>
+  </div>
+
+  <!-- 12. Key Movements & International Events -->
+  <div class="panel ph-sust">
+    <div class="panel-head">✊ Movements &amp; Global Events</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div><strong class="hl">Chipko Movement (1973):</strong> Uttarakhand — women hugged trees to prevent felling. Led by <strong>Sunderlal Bahuguna</strong></div></div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><div><strong class="te">Appiko Movement (1987):</strong> Karnataka — similar tree-hugging campaign to protect forests</div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong class="am">Narmada Bachao Andolan:</strong> Against large dams displacing tribal communities. Led by <strong>Medha Patkar</strong></div></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div><strong class="bl">Wangari Maathai (Kenya):</strong> Green Belt Movement — planted 30 million trees. Nobel Peace Prize 2004</div></div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><div><strong class="pu">Rio Earth Summit 1992:</strong> Agenda 21 adopted by 179 nations — blueprint for sustainable development</div></div>
+    </div>
+  </div>
+
+  <!-- 13. Comparison: Resource-rich vs Developed States -->
+  <div class="panel ph-def">
+    <div class="panel-head">📊 Resource-rich ≠ Developed</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>State</th><th>Resources</th><th>Economic Status</th></tr>
+        <tr><td><span class="rd">Jharkhand</span></td><td>Coal, iron ore, minerals</td><td>Among poorest states</td></tr>
+        <tr><td><span class="rd">Chhattisgarh</span></td><td>Forests, minerals, coal</td><td>Low HDI</td></tr>
+        <tr><td><span class="hl">Goa</span></td><td>Small, resource-poor</td><td>Highest per capita income</td></tr>
+        <tr><td><span class="hl">Kerala</span></td><td>Limited minerals</td><td>High HDI, high literacy</td></tr>
+        <tr><td><span class="am">Rajasthan</span></td><td>Huge solar/wind potential</td><td>Potential not fully harnessed</td></tr>
+      </table>
+      <div class="hbox" style="border-color:var(--amber);background:rgba(251,191,36,.06);margin-top:.6rem"><strong class="am">Key Lesson:</strong> Technology + Governance + Education = True Development</div>
+    </div>
+  </div>
+
+  <!-- 14. Memory Tricks -->
+  <div class="panel ph-mem">
+    <div class="panel-head">🧠 Memory Tricks &amp; Exam Tips</div>
+    <div class="panel-body">
+      <div class="trick"><strong>PARS (Resource Status)</strong><p><strong>P</strong>otential → <strong>A</strong>ctual → <strong>R</strong>eserve → <strong>S</strong>tock — remember as "PARS"</p></div>
+      <div class="trick"><strong>BICN (Ownership)</strong><p><strong>B</strong>ig <strong>I</strong>ndividuals <strong>C</strong>ontrol <strong>N</strong>ation = Biotic/Individual/Community/National/International</p></div>
+      <div class="trick"><strong>Soil Colour Trick</strong><p>Red soil = iron (Fe = iron in Latin). Black = basalt. Laterite = brick (Latin: later). Yellow = hydrated iron.</p></div>
+      <div class="trick"><strong>CAFE for Resources</strong><p><strong>C</strong>ulturally acceptable, <strong>A</strong>ccessible (tech), <strong>F</strong>easible (economic), <strong>E</strong>nvironment-based — 3 criteria for a resource</p></div>
+      <div class="hbox" style="border-color:var(--red);background:rgba(248,113,113,.06);margin-top:.4rem"><strong class="rd">⚠ Common exam mistake:</strong> Coal is biotic in origin (formed from plants) but it is non-renewable — don't confuse biotic origin with renewable!</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Resources and Development · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04100a;--card:#0a1e10;--card2:#0f2616;--border:#1a3a22;
+  --text:#d4f0dc;--muted:#3a6a48;--geo:#22c55e;
+  --green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+.top-nav{display:flex;align-items:center;gap:16px;padding:10px 22px;background:rgba(4,16,10,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:27px}
+.nav-bc{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.nav-bc a{color:var(--muted);text-decoration:none}.nav-bc a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-cur{color:var(--geo);font-weight:700}
+.nav-back{margin-left:auto;padding:5px 13px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:18px;color:var(--geo);font-size:.78rem;text-decoration:none;transition:all .2s}
+.nav-back:hover{background:rgba(34,197,94,.2)}
+
+.page-hdr{padding:28px 20px 16px;text-align:center}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.85rem;color:#fff;margin-bottom:5px}
+.page-hdr p{color:var(--muted);font-size:.9rem}
+.ch-badge{display:inline-block;padding:3px 10px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);border-radius:12px;color:var(--geo);font-size:.73rem;font-weight:700;margin-bottom:8px}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 56px}
+
+/* TABS */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:7px 16px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.tab.active{border-color:var(--geo);background:rgba(34,197,94,.1);color:var(--green);font-weight:700}
+
+/* PANELS */
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.panel-title{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;color:var(--text)}
+.panel-body{padding:18px}
+
+canvas{display:block;width:100%;border-radius:8px;background:#060f08}
+
+/* TREE DIAGRAM */
+.tree-svg{width:100%;overflow:visible}
+
+/* RESOURCE TABLE */
+.rtable{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:4px}
+.rtable th{padding:8px 12px;background:rgba(34,197,94,.1);color:var(--green);font-weight:700;text-align:left;border-bottom:1px solid var(--border)}
+.rtable td{padding:8px 12px;border-bottom:1px solid rgba(26,58,34,.4);vertical-align:top}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(34,197,94,.04)}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.72rem;font-weight:700;margin-right:4px}
+.tag-r{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.tag-nr{background:rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.3)}
+.tag-b{background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.3)}
+.tag-ab{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3)}
+
+/* LAND USE */
+.land-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.land-grid{grid-template-columns:1fr}}
+.lu-bar-row{margin-bottom:10px}
+.lu-bar-label{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:3px}
+.lu-bar-label span:first-child{color:var(--text)}
+.lu-bar-label span:last-child{font-family:'DM Mono',monospace;color:var(--green)}
+.lu-bar-track{height:10px;background:#0f2616;border-radius:5px;overflow:hidden}
+.lu-bar-fill{height:100%;border-radius:5px;transition:width 1s ease}
+
+/* SOIL CARDS */
+.soil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:650px){.soil-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:400px){.soil-grid{grid-template-columns:1fr}}
+.soil-card{border-radius:12px;padding:14px;border:1px solid var(--border);cursor:pointer;transition:all .25s;position:relative}
+.soil-card:hover{transform:translateY(-3px)}
+.soil-card h4{font-size:.88rem;font-weight:700;margin-bottom:6px}
+.soil-card .soil-icon{font-size:1.6rem;margin-bottom:6px;display:block}
+.soil-card .soil-info{font-size:.75rem;line-height:1.6;color:var(--muted)}
+.soil-card.active-card{border-color:var(--green);}
+
+/* INFO BOX */
+.ibox{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:12px}
+.ibox strong{color:var(--text)}
+.ibox .kw{color:var(--green);font-weight:700}
+
+/* DEVELOPMENT STAGES */
+.stages-wrap{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:8px 0}
+.stage-box{flex:1;min-width:140px;max-width:200px;border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border)}
+.stage-box .stage-icon{font-size:1.8rem;margin-bottom:8px}
+.stage-box h4{font-size:.85rem;font-weight:700;margin-bottom:6px}
+.stage-box p{font-size:.75rem;color:var(--muted);line-height:1.55}
+.arrow-right{display:flex;align-items:center;color:var(--muted);font-size:1.2rem;flex-shrink:0}
+@media(max-width:600px){.arrow-right{display:none}}
+
+/* CTRL */
+.ctrl-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.ctrl-btn{padding:6px 14px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.8rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.ctrl-btn.active,.ctrl-btn:hover{border-color:var(--geo);color:var(--green);background:rgba(34,197,94,.08)}
+.lbl{font-size:.75rem;color:var(--muted);margin-bottom:3px}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a class="nav-logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <div class="nav-bc">
+    <a href="../../index.html">Home</a><span class="nav-sep">/</span>
+    <a href="../../index.html#geography">Geography</a><span class="nav-sep">/</span>
+    <a href="../../index.html#ch-resources">Ch.1 Resources</a><span class="nav-sep">/</span>
+    <span class="nav-cur">Animated Diagrams</span>
+  </div>
+  <a class="nav-back" href="../../index.html#ch-resources">&#8592; Back</a>
+</nav>
+
+<div class="page-hdr">
+  <div class="ch-badge">Geography · Ch.1</div>
+  <h1>Resources and Development</h1>
+  <p>Interactive diagrams · Click tabs to explore</p>
+</div>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(0)">🌿 Resource Classification</button>
+    <button class="tab" onclick="switchTab(1)">🗺️ Land Use Pattern</button>
+    <button class="tab" onclick="switchTab(2)">🌱 Soil Types</button>
+    <button class="tab" onclick="switchTab(3)">⚖️ Development Stages</button>
+    <button class="tab" onclick="switchTab(4)">♻️ Resource Planning</button>
+  </div>
+
+  <!-- TAB 0: Resource Classification Tree -->
+  <div class="panel active" id="t0">
+    <div class="panel-card">
+      <div class="panel-title">🌿 Classification of Resources — Interactive Hierarchy</div>
+      <div class="panel-body">
+        <div class="ctrl-row">
+          <span style="font-size:.8rem;color:var(--muted)">Click a basis to highlight that branch:</span>
+          <button class="ctrl-btn active" id="cAll" onclick="setTreeFilter('all')">All</button>
+          <button class="ctrl-btn" id="cOrig" onclick="setTreeFilter('origin')">By Origin</button>
+          <button class="ctrl-btn" id="cExh" onclick="setTreeFilter('exhaust')">By Exhaustibility</button>
+          <button class="ctrl-btn" id="cOwn" onclick="setTreeFilter('ownership')">By Ownership</button>
+          <button class="ctrl-btn" id="cDev" onclick="setTreeFilter('status')">By Status</button>
+        </div>
+        <canvas id="cTree" height="320"></canvas>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-title">📋 Classification Quick Reference</div>
+      <div class="panel-body">
+        <table class="rtable">
+          <thead><tr><th>Basis</th><th>Type</th><th>Examples</th><th>Key Point</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="2">Origin</td><td><span class="tag tag-b">Biotic</span></td><td>Forests, fish, animals, humans</td><td>Obtained from biosphere; have life</td></tr>
+            <tr><td><span class="tag tag-ab">Abiotic</span></td><td>Rock, minerals, metals, wind, water</td><td>Non-living things</td></tr>
+            <tr><td rowspan="2">Exhaustibility</td><td><span class="tag tag-r">Renewable</span></td><td>Solar, wind, water, forests, wildlife</td><td>Can be replenished naturally</td></tr>
+            <tr><td><span class="tag tag-nr">Non-renewable</span></td><td>Coal, petroleum, natural gas, minerals</td><td>Takes millions of years to form</td></tr>
+            <tr><td rowspan="4">Ownership</td><td><span class="tag tag-b">Individual</span></td><td>Farmland, house, plantation</td><td>Privately owned</td></tr>
+            <tr><td><span class="tag tag-b">Community</span></td><td>Village pond, grazing land</td><td>Accessible to all in community</td></tr>
+            <tr><td><span class="tag tag-ab">National</span></td><td>Rivers, forests, mineral wealth, EEZ</td><td>Within political boundary of nation</td></tr>
+            <tr><td><span class="tag tag-ab">International</span></td><td>Open ocean, atmosphere, Antarctica</td><td>Beyond national boundaries</td></tr>
+            <tr><td rowspan="4">Development<br>Status</td><td><span class="tag tag-r">Potential</span></td><td>Rajasthan solar/wind energy</td><td>Exists but not yet in use</td></tr>
+            <tr><td><span class="tag tag-r">Actual</span></td><td>Coal from Jharkhand</td><td>Currently surveyed and in use</td></tr>
+            <tr><td><span class="tag tag-nr">Stock</span></td><td>Hydrogen for fuel</td><td>Known but technology unavailable</td></tr>
+            <tr><td><span class="tag tag-nr">Reserve</span></td><td>River water for future hydro</td><td>Can be used in future; held back</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: Land Use -->
+  <div class="panel" id="t1">
+    <div class="panel-card">
+      <div class="panel-title">🗺️ India — Land Use Pattern (% of Reporting Area)</div>
+      <div class="panel-body">
+        <div class="land-grid">
+          <div id="landBars"></div>
+          <div>
+            <canvas id="cLandPie" height="260"></canvas>
+          </div>
+        </div>
+        <div class="ibox" style="margin-top:14px">
+          <strong>Key Facts about India's Land Use:</strong><br>
+          • Total geographical area: <span class="kw">3.28 million sq km</span><br>
+          • Data for only ~93% of total area (some remote areas not surveyed)<br>
+          • Net sown area + fallow = total cultivated area ≈ <span class="kw">54%</span><br>
+          • Forest cover target set by National Forest Policy: <span class="kw">33%</span> — currently only ~23%<br>
+          • Grazing lands are shrinking due to encroachment and conversion<br>
+          • <strong>Increasing trend:</strong> land under non-agricultural uses (urbanisation, industry, roads)<br>
+          • <strong>Concern:</strong> Net sown area is reaching its maximum — future food security depends on productivity, not area
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-title">⚠️ Land Degradation in India</div>
+      <div class="panel-body">
+        <canvas id="cDegr" height="280"></canvas>
+        <div class="ibox">
+          <strong>India has approximately 130 million hectares of degraded land.</strong><br>
+          • <span class="kw">Mining regions:</span> Jharkhand, MP, Odisha — opencast mining leaves land scarred<br>
+          • <span class="kw">Overgrazing:</span> Rajasthan, Gujarat, MP — livestock depletes vegetation cover<br>
+          • <span class="kw">Over-irrigation:</span> Punjab, Haryana — waterlogging and salinisation<br>
+          • <span class="kw">Industrial effluents:</span> Gujarat, Maharashtra — chemical contamination<br>
+          • <span class="kw">Deforestation:</span> NE India, Western Ghats, Himalayan foothills
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Soil Types -->
+  <div class="panel" id="t2">
+    <div class="panel-card">
+      <div class="panel-title">🌱 Soil Types of India — Click a card to explore</div>
+      <div class="panel-body">
+        <div class="soil-grid" id="soilGrid"></div>
+        <div id="soilDetail" class="ibox" style="margin-top:14px;display:none"></div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-title">🛡️ Soil Erosion & Conservation</div>
+      <div class="panel-body">
+        <canvas id="cSoilErosion" height="300"></canvas>
+        <div class="ibox">
+          <strong>Soil Conservation Methods:</strong><br>
+          • <span class="kw">Contour ploughing:</span> ploughing along contour lines reduces water run-off on slopes<br>
+          • <span class="kw">Terrace cultivation:</span> broad, flat steps on steep slopes — common in NE states<br>
+          • <span class="kw">Strip cropping:</span> alternating strips of crops break the force of wind<br>
+          • <span class="kw">Shelter belts:</span> rows of trees to protect crops from wind in semi-arid regions<br>
+          • <span class="kw">Plugging gullies:</span> build small dams to slow water and trap soil in gullies
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Development Stages -->
+  <div class="panel" id="t3">
+    <div class="panel-card">
+      <div class="panel-title">⚖️ Stages of Resource Development</div>
+      <div class="panel-body">
+        <div class="stages-wrap">
+          <div class="stage-box" style="border-color:#fbbf24;background:rgba(251,191,36,.06)">
+            <div class="stage-icon">🔍</div>
+            <h4 style="color:#fbbf24">Potential Resource</h4>
+            <p>Exists in a region but not yet utilised. Technology or investment is the missing link.</p>
+            <p style="margin-top:6px;color:#fbbf24;font-size:.72rem">Example: Solar energy in Rajasthan's Thar Desert</p>
+          </div>
+          <div class="arrow-right">→</div>
+          <div class="stage-box" style="border-color:#4ade80;background:rgba(74,222,128,.06)">
+            <div class="stage-icon">⚡</div>
+            <h4 style="color:#4ade80">Actual Resource</h4>
+            <p>Surveyed, quality/quantity determined, currently being used for productive purposes.</p>
+            <p style="margin-top:6px;color:#4ade80;font-size:.72rem">Example: Coal in Jharkhand, Chhattisgarh</p>
+          </div>
+          <div class="arrow-right">→</div>
+          <div class="stage-box" style="border-color:#60a5fa;background:rgba(96,165,250,.06)">
+            <div class="stage-icon">🔬</div>
+            <h4 style="color:#60a5fa">Stock</h4>
+            <p>Materials in the environment that could meet human needs but humans don't have technology to access them yet.</p>
+            <p style="margin-top:6px;color:#60a5fa;font-size:.72rem">Example: Hydrogen as fuel (water = H₂O exists, but splitting is uneconomical)</p>
+          </div>
+          <div class="arrow-right">→</div>
+          <div class="stage-box" style="border-color:#a78bfa;background:rgba(167,139,250,.06)">
+            <div class="stage-icon">🏦</div>
+            <h4 style="color:#a78bfa">Reserve</h4>
+            <p>Subset of actual resource. Technology available, but deliberately not used — saved for the future.</p>
+            <p style="margin-top:6px;color:#a78bfa;font-size:.72rem">Example: River water for future hydroelectric power</p>
+          </div>
+        </div>
+        <div class="ibox" style="margin-top:16px">
+          <strong>Zimmermann's famous statement:</strong> <span class="kw">"Resources are not — they become."</span><br>
+          This means resources are defined by their function and utility, not by their physical existence. A rock is just a rock until someone discovers that it can be used as a tool, a building material, or a source of metal.
+          Technology, culture, and economics determine what becomes a resource.
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-title">🌍 World Resource Distribution — Is it Fair?</div>
+      <div class="panel-body">
+        <canvas id="cEquity" height="280"></canvas>
+        <div class="ibox">
+          <strong>The Global Resource Paradox:</strong><br>
+          • The world's richest <span class="kw">20% of population</span> consumes about <span class="kw">80% of resources</span><br>
+          • Many resource-rich nations (Africa, South Asia) remain economically underdeveloped<br>
+          • India: states like Jharkhand, Chhattisgarh, MP are mineral-rich but among the poorest<br>
+          • <span class="kw">Goa</span> is resource-poor but developed; <span class="kw">Jharkhand</span> is resource-rich but underdeveloped<br>
+          • This "resource curse" happens when extraction benefits corporations/governments but not local communities
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: Resource Planning -->
+  <div class="panel" id="t4">
+    <div class="panel-card">
+      <div class="panel-title">♻️ Resource Planning in India — Three Stages</div>
+      <div class="panel-body">
+        <canvas id="cPlan" height="320"></canvas>
+        <div class="ibox">
+          <strong>Resource Planning is a multi-level process in India:</strong><br>
+          • <span class="kw">National level</span> — integrated with Five Year Plans<br>
+          • <span class="kw">State level</span> — state development boards identify and allocate resources<br>
+          • <span class="kw">District/local level</span> — Panchayati Raj institutions manage local resources<br><br>
+          <strong>The Challenge:</strong> India has unequal distribution of resources — some states are resource-rich but underdeveloped, while others are resource-scarce but developed. Planning must bridge this gap.
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-title">🌱 Sustainable Development — The Balance</div>
+      <div class="panel-body">
+        <canvas id="cSustain" height="300"></canvas>
+        <div class="ibox">
+          <strong>"Development that meets the needs of the present without compromising the ability of future generations to meet their own needs."</strong> — Brundtland Commission, 1987<br><br>
+          • <span class="kw">Rio Earth Summit 1992:</span> Agenda 21 — global blueprint for sustainable development. 179 nations adopted it.<br>
+          • <span class="kw">Kyoto Protocol 1997:</span> Binding commitments to reduce greenhouse gas emissions<br>
+          • <span class="kw">Paris Agreement 2015:</span> Limit global warming to below 2°C (ideally 1.5°C)<br>
+          • <span class="kw">Gandhi's Warning:</span> "Earth provides enough to satisfy every man's need, but not every man's greed."
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ====================================================
+   TABS
+==================================================== */
+function switchTab(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',i===j));
+  setTimeout(()=>{
+    if(i===0) drawTree();
+    if(i===1){ drawLandBars(); drawLandPie(); drawDegrChart(); }
+    if(i===2) drawSoilErosion();
+    if(i===3) drawEquity();
+    if(i===4){ drawPlanDiag(); drawSustain(); }
+  },50);
+}
+
+/* ====================================================
+   TAB 0 — CLASSIFICATION TREE
+==================================================== */
+let treeFilter = 'all';
+function setTreeFilter(f){
+  treeFilter = f;
+  ['cAll','cOrig','cExh','cOwn','cDev'].forEach((id,i)=>{
+    const filters = ['all','origin','exhaust','ownership','status'];
+    document.getElementById(id).classList.toggle('active', filters[i]===f);
+  });
+  drawTree();
+}
+
+function drawTree(){
+  const c = document.getElementById('cTree');
+  c.width = c.offsetWidth;
+  const W=c.width, H=c.height;
+  const x=c.getContext('2d');
+  x.clearRect(0,0,W,H);
+
+  const MARGIN = 16;
+  const usable = W - MARGIN*2;
+
+  // All 12 leaf nodes in order — evenly spaced across full width
+  const leaves = [
+    {label:'Biotic',       color:'#93c5fd', b:0},
+    {label:'Abiotic',      color:'#bfdbfe', b:0},
+    {label:'Renewable',    color:'#86efac', b:1},
+    {label:'Non-\nrenewable', color:'#fca5a5', b:1},
+    {label:'Individual',   color:'#fde68a', b:2},
+    {label:'Community',    color:'#fde68a', b:2},
+    {label:'National',     color:'#fde68a', b:2},
+    {label:'International',color:'#fde68a', b:2},
+    {label:'Potential',    color:'#c4b5fd', b:3},
+    {label:'Actual',       color:'#c4b5fd', b:3},
+    {label:'Stock',        color:'#c4b5fd', b:3},
+    {label:'Reserve',      color:'#c4b5fd', b:3},
+  ];
+  const N = leaves.length;
+  const step = usable / N;
+  const leafW = Math.max(42, Math.min(78, step - 6));
+  const leafH = 28;
+  const leafY = H - 36;
+  leaves.forEach((l,i)=>{ l.x = MARGIN + (i+0.5)*step; l.y = leafY; });
+
+  // Branch definitions — x is auto-centred over their children
+  const branchDefs = [
+    {label:'By Origin',         filter:'origin',    color:'#60a5fa', ci:[0,1]},
+    {label:'By Exhaustibility', filter:'exhaust',   color:'#4ade80', ci:[2,3]},
+    {label:'By Ownership',      filter:'ownership', color:'#fbbf24', ci:[4,5,6,7]},
+    {label:'By Status',         filter:'status',    color:'#a78bfa', ci:[8,9,10,11]},
+  ];
+  const branchY = leafY - 110;
+  const branchH = 38;
+  const cx = W/2, rootY = 20, rootH = 34;
+
+  branchDefs.forEach(b=>{
+    b.x = (leaves[b.ci[0]].x + leaves[b.ci[b.ci.length-1]].x) / 2;
+    b.w = Math.min(usable*0.22, (leaves[b.ci[b.ci.length-1]].x - leaves[b.ci[0]].x) + leafW + 6);
+    b.w = Math.max(b.w, 90);
+  });
+
+  // Root node
+  x.shadowColor='#4ade80'; x.shadowBlur=18;
+  x.fillStyle='#062010'; x.strokeStyle='#4ade80'; x.lineWidth=2;
+  x.beginPath(); x.roundRect(cx-70, rootY, 140, rootH, 8); x.fill(); x.stroke();
+  x.shadowBlur=0;
+  x.fillStyle='#4ade80'; x.font='bold 12px Lato,sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+  x.fillText('RESOURCE', cx, rootY+rootH/2);
+
+  branchDefs.forEach(b=>{
+    const active = treeFilter==='all' || treeFilter===b.filter;
+    x.globalAlpha = active ? 1 : 0.25;
+
+    // Root → branch line
+    x.strokeStyle=b.color; x.lineWidth=1.8;
+    x.beginPath(); x.moveTo(cx, rootY+rootH); x.lineTo(b.x, branchY); x.stroke();
+
+    // Branch box
+    x.shadowColor=b.color; x.shadowBlur=active?12:0;
+    x.fillStyle='#060f08'; x.strokeStyle=b.color; x.lineWidth=1.5;
+    x.beginPath(); x.roundRect(b.x-b.w/2, branchY, b.w, branchH, 7); x.fill(); x.stroke();
+    x.shadowBlur=0;
+    x.fillStyle=b.color; x.font='bold 10px Lato,sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+    const bWords = b.label.split(' ');
+    if(bWords.length>=2 && b.label.length>14){
+      x.fillText(bWords[0], b.x, branchY+branchH/2-7);
+      x.fillText(bWords.slice(1).join(' '), b.x, branchY+branchH/2+7);
+    } else {
+      x.fillText(b.label, b.x, branchY+branchH/2);
+    }
+
+    // Branch → leaf lines + leaf boxes
+    b.ci.forEach(ci=>{
+      const l=leaves[ci];
+      x.strokeStyle=b.color+'88'; x.lineWidth=1.2;
+      x.beginPath(); x.moveTo(b.x, branchY+branchH); x.lineTo(l.x, l.y-leafH/2); x.stroke();
+      x.fillStyle='#060f08'; x.strokeStyle=l.color; x.lineWidth=1;
+      x.beginPath(); x.roundRect(l.x-leafW/2, l.y-leafH/2, leafW, leafH, 6); x.fill(); x.stroke();
+      x.fillStyle=l.color; x.textAlign='center'; x.textBaseline='middle';
+      const lines=l.label.split('\n');
+      if(lines.length>1){
+        x.font='bold 8px Lato,sans-serif';
+        x.fillText(lines[0], l.x, l.y-5);
+        x.fillText(lines[1], l.x, l.y+5);
+      } else {
+        const fs = leafW < 60 ? '7.5px' : '8.5px';
+        x.font='bold '+fs+' Lato,sans-serif';
+        x.fillText(l.label, l.x, l.y);
+      }
+    });
+    x.globalAlpha=1;
+  });
+}
+
+/* ====================================================
+   TAB 1 — LAND USE
+==================================================== */
+const landData = [
+  { label:'Net Sown Area', pct:43.4, color:'#4ade80' },
+  { label:'Forests', pct:23.4, color:'#22c55e' },
+  { label:'Fallow Lands', pct:10.2, color:'#fbbf24' },
+  { label:'Barren & Wasteland', pct:6.8, color:'#f87171' },
+  { label:'Non-agri Uses', pct:8.0, color:'#60a5fa' },
+  { label:'Pastures & Grazing', pct:3.5, color:'#fb923c' },
+  { label:'Culturable Wasteland', pct:4.7, color:'#a78bfa' },
+];
+
+function drawLandBars(){
+  const wrap = document.getElementById('landBars');
+  wrap.innerHTML = '';
+  landData.forEach(d=>{
+    wrap.innerHTML += `
+    <div class="lu-bar-row">
+      <div class="lu-bar-label"><span>${d.label}</span><span>${d.pct}%</span></div>
+      <div class="lu-bar-track"><div class="lu-bar-fill" style="width:0%;background:${d.color}" data-w="${d.pct*1.8}%"></div></div>
+    </div>`;
+  });
+  setTimeout(()=>{
+    wrap.querySelectorAll('.lu-bar-fill').forEach(el=>{
+      el.style.width = el.dataset.w;
+    });
+  }, 80);
+}
+
+function drawLandPie(){
+  const c = document.getElementById('cLandPie');
+  c.width = c.offsetWidth;
+  const W=c.width, H=c.height, x=c.getContext('2d');
+  x.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2-10, R=Math.min(W,H)*0.38;
+  let angle = -Math.PI/2;
+  const total = landData.reduce((a,d)=>a+d.pct,0);
+  landData.forEach(d=>{
+    const sweep = (d.pct/total)*Math.PI*2;
+    x.beginPath(); x.moveTo(cx,cy);
+    x.arc(cx,cy,R,angle,angle+sweep);
+    x.closePath(); x.fillStyle=d.color; x.fill();
+    x.strokeStyle='#060f08'; x.lineWidth=2; x.stroke();
+    // label if big enough
+    if(d.pct > 5){
+      const mid = angle + sweep/2;
+      const lx = cx + R*0.65*Math.cos(mid), ly = cy + R*0.65*Math.sin(mid);
+      x.fillStyle='#060f08'; x.font='bold 9px DM Mono,monospace'; x.textAlign='center'; x.textBaseline='middle';
+      x.fillText(d.pct+'%', lx, ly);
+    }
+    angle += sweep;
+  });
+}
+
+function drawDegrChart(){
+  const c = document.getElementById('cDegr');
+  c.width = c.offsetWidth;
+  const W=c.width, H=c.height, x=c.getContext('2d');
+  x.clearRect(0,0,W,H);
+
+  const causes = [
+    { label:'Deforestation', val:28, color:'#22c55e' },
+    { label:'Overgrazing', val:24, color:'#f97316' },
+    { label:'Mining', val:18, color:'#f87171' },
+    { label:'Over-irrigation\n(Waterlogging)', val:14, color:'#60a5fa' },
+    { label:'Industrial\nEffluents', val:10, color:'#a78bfa' },
+    { label:'Other', val:6, color:'#94a3b8' },
+  ];
+
+  const barH = 30, gap=10, padL=170, padR=40, padT=20;
+  causes.forEach((c,i)=>{
+    const y = padT + i*(barH+gap);
+    const maxW = W - padL - padR;
+    const bw = (c.val/28)*maxW;
+
+    // label
+    x.fillStyle='#a7d4b8'; x.font='12px Lato,sans-serif'; x.textAlign='right'; x.textBaseline='middle';
+    const lines = c.label.split('\n');
+    lines.forEach((l,li)=> x.fillText(l, padL-8, y+barH/2 + (li - (lines.length-1)/2)*14));
+
+    // bar
+    x.fillStyle=c.color+'33'; x.beginPath(); x.roundRect(padL, y, maxW, barH, 4); x.fill();
+    x.fillStyle=c.color; x.beginPath(); x.roundRect(padL, y, bw, barH, 4); x.fill();
+
+    // value
+    x.fillStyle=c.color; x.font='bold 11px DM Mono,monospace'; x.textAlign='left';
+    x.fillText(c.val+'%', padL+bw+6, y+barH/2);
+  });
+
+  x.fillStyle='#3a6a48'; x.font='11px DM Mono,monospace'; x.textAlign='center';
+  x.fillText('Approximate share of total degraded land area by cause', W/2, H-6);
+}
+
+/* ====================================================
+   TAB 2 — SOIL TYPES
+==================================================== */
+const soils = [
+  { name:'Alluvial Soil', icon:'🟡', color:'#fbbf24', bg:'rgba(251,191,36,.08)',
+    short:'Most widespread. Northern plains & river deltas.',
+    detail:`<strong>Distribution:</strong> Northern Plains (Ganga, Indus, Brahmaputra), river deltas (Krishna, Godavari, Mahanadi, Cauvery), coastal plains<br>
+    <strong>Formation:</strong> Deposited by rivers over thousands of years<br>
+    <strong>Types:</strong> <strong>Khadar</strong> — new alluvium, lighter, near rivers | <strong>Bhangar</strong> — old alluvium, higher up, contains kankar nodules<br>
+    <strong>Properties:</strong> Rich in potash, phosphoric acid, lime. Very fertile. Loamy texture. Well-aerated.<br>
+    <strong>Crops:</strong> Wheat, rice, sugarcane, cotton, oilseeds, pulses<br>
+    <strong>Area:</strong> About 40% of total land area of India` },
+  { name:'Black Soil (Regur)', icon:'⬛', color:'#94a3b8', bg:'rgba(148,163,184,.08)',
+    short:'Volcanic origin. Cotton country. Deccan Trap.',
+    detail:`<strong>Also called:</strong> Regur or Black Cotton Soil<br>
+    <strong>Distribution:</strong> Maharashtra, Saurashtra, Malwa, Madhya Pradesh, Gujarat, Andhra Pradesh<br>
+    <strong>Formation:</strong> Volcanic rocks (basalt lava) — Deccan Trap region<br>
+    <strong>Properties:</strong> Very fine clay particles. Swells when wet → self-ploughing. Cracks when dry. Retains moisture for long.<br>
+    <strong>Rich in:</strong> Calcium carbonate, magnesium, potash, lime<br>
+    <strong>Crops:</strong> Cotton (named for it!), sugarcane, wheat, groundnuts, sunflowers<br>
+    <strong>Fact:</strong> "Self-ploughing" because deep cracks allow air in when dry` },
+  { name:'Red & Yellow Soil', icon:'🔴', color:'#f87171', bg:'rgba(248,113,113,.08)',
+    short:'Crystalline rocks. Red = iron. Deccan plateau edge.',
+    detail:`<strong>Distribution:</strong> Eastern and southern Deccan — Odisha, Chhattisgarh, MP, southern Karnataka, Tamil Nadu, Andhra Pradesh<br>
+    <strong>Formation:</strong> Crystalline igneous rocks under high temperature, low rainfall<br>
+    <strong>Colour:</strong> Red due to iron diffusion (oxidation of iron content). Yellow when hydrated.<br>
+    <strong>Properties:</strong> Sandy, low moisture retention, low humus and nitrogen<br>
+    <strong>Crops:</strong> Wheat, rice, cotton, sugarcane, groundnuts — with irrigation and fertilisers<br>
+    <strong>Yellow soil:</strong> forms where there is good drainage` },
+  { name:'Laterite Soil', icon:'🧱', color:'#fb923c', bg:'rgba(251,146,60,.08)',
+    short:'High temp + heavy rain. Bricklike. Tea & coffee.',
+    detail:`<strong>Distribution:</strong> Karnataka, Kerala, Tamil Nadu, MP, Odisha hills, Assam hills<br>
+    <strong>Formation:</strong> High temperature and heavy seasonal rainfall with alternating wet and dry periods → leaching of silica, iron & aluminium remain<br>
+    <strong>Properties:</strong> Rich in iron and aluminium. Poor in nitrogen, potash, lime. Humus is quickly decomposed by bacteria in high heat.<br>
+    <strong>Hardened:</strong> Hardens on exposure to air — used as bricks (laterite = Latin "later" = brick). Famous use: Angkor Wat temple built with it!<br>
+    <strong>Crops:</strong> Tea, coffee, cashew nuts, rubber (with fertilisers)` },
+  { name:'Arid (Desert) Soil', icon:'🏜️', color:'#fde68a', bg:'rgba(253,230,138,.08)',
+    short:'Dry, sandy. Low humus. Rajasthan.',
+    detail:`<strong>Distribution:</strong> Western Rajasthan, Rann of Kutch (Gujarat), Ladakh<br>
+    <strong>Formation:</strong> Arid and semi-arid conditions with high wind erosion<br>
+    <strong>Properties:</strong> Sandy to gravelly texture. Very low humus and moisture. High salt content in some areas (due to high evaporation). May contain kankar (calcium carbonate) layer below — blocks water from reaching roots.<br>
+    <strong>Irrigation can make productive!</strong> Punjab border areas were once desert — canal irrigation transformed them.<br>
+    <strong>Crops:</strong> Drought-resistant crops — bajra, pulses, guar, sesame` },
+  { name:'Forest Soil', icon:'🌲', color:'#4ade80', bg:'rgba(74,222,128,.08)',
+    short:'Hilly regions. Loamy in valleys. Good for tea.',
+    detail:`<strong>Distribution:</strong> Himalayan slopes, Western and Eastern Ghats, NE hill states<br>
+    <strong>Formation:</strong> Under dense forest cover. Accumulation of leaf litter → humus-rich in valley floors. Coarser on snow-covered upper slopes.<br>
+    <strong>Types:</strong><br>
+    • Valley soils: deep, loamy, humus-rich → good for cultivation<br>
+    • Slope soils: thin, coarse, prone to erosion<br>
+    • Snow-covered soils: very coarse, little organic matter<br>
+    <strong>Crops:</strong> Tea (Assam, Darjeeling), coffee (Nilgiris), spices` },
+];
+
+function buildSoilCards(){
+  const g = document.getElementById('soilGrid');
+  g.innerHTML = '';
+  soils.forEach((s,i)=>{
+    g.innerHTML += `<div class="soil-card" style="background:${s.bg};border-color:${s.color}44" onclick="showSoil(${i})">
+      <span class="soil-icon">${s.icon}</span>
+      <h4 style="color:${s.color}">${s.name}</h4>
+      <div class="soil-info">${s.short}</div>
+    </div>`;
+  });
+}
+buildSoilCards();
+
+function showSoil(i){
+  document.querySelectorAll('.soil-card').forEach((c,j)=>c.classList.toggle('active-card',j===i));
+  const d = document.getElementById('soilDetail');
+  d.style.display='block';
+  d.innerHTML = `<strong style="color:${soils[i].color};font-size:.95rem">${soils[i].icon} ${soils[i].name}</strong><br><br>${soils[i].detail}`;
+}
+
+function drawSoilErosion(){
+  const c = document.getElementById('cSoilErosion');
+  c.width = c.offsetWidth;
+  const W=c.width, H=c.height, x=c.getContext('2d');
+  x.clearRect(0,0,W,H);
+
+  // Draw a landscape cross-section showing erosion types
+  const gndY = H*0.6;
+
+  // sky
+  const sky = x.createLinearGradient(0,0,0,gndY);
+  sky.addColorStop(0,'#020a05'); sky.addColorStop(1,'#060f08');
+  x.fillStyle=sky; x.fillRect(0,0,W,gndY);
+
+  // Ground profile — hill on left, flat on right
+  x.beginPath(); x.moveTo(0,gndY);
+  x.lineTo(W*0.15, gndY);
+  x.lineTo(W*0.4, H*0.25);
+  x.lineTo(W*0.65, H*0.25);
+  x.lineTo(W, gndY);
+  x.lineTo(W, H); x.lineTo(0,H);
+  x.closePath();
+  const grd = x.createLinearGradient(0,H*0.25,0,H);
+  grd.addColorStop(0,'#3d1a00'); grd.addColorStop(0.3,'#5c2e10'); grd.addColorStop(1,'#1a0a00');
+  x.fillStyle=grd; x.fill();
+
+  // Gully erosion (left slope)
+  x.strokeStyle='#f87171'; x.lineWidth=2;
+  for(let g=0;g<3;g++){
+    const sx = W*0.18+g*25, sy=gndY;
+    x.beginPath(); x.moveTo(sx, sy); x.quadraticCurveTo(sx+10,H*0.35,sx+20,H*0.25); x.stroke();
+  }
+  x.fillStyle='#f87171'; x.font='bold 10px Lato,sans-serif'; x.textAlign='center';
+  x.fillText('Gully Erosion', W*0.28, H*0.18);
+
+  // Sheet erosion arrows (middle)
+  x.strokeStyle='#60a5fa'; x.lineWidth=1.5;
+  for(let r=0;r<4;r++){
+    const rx = W*0.42+r*30, ry=H*0.22;
+    x.beginPath(); x.moveTo(rx,ry); x.lineTo(rx+15, ry+30); x.stroke();
+    x.fillStyle='#60a5fa'; x.beginPath();
+    x.moveTo(rx+15,ry+30); x.lineTo(rx+10,ry+20); x.lineTo(rx+20,ry+20);
+    x.closePath(); x.fill();
+  }
+  x.fillStyle='#60a5fa'; x.font='bold 10px Lato,sans-serif'; x.textAlign='center';
+  x.fillText('Sheet Erosion', W*0.52, H*0.18);
+
+  // Wind erosion arrows (right)
+  x.strokeStyle='#fbbf24'; x.lineWidth=1.5;
+  for(let w=0;w<3;w++){
+    const wx=W*0.7, wy=H*0.35+w*18;
+    x.beginPath(); x.moveTo(wx,wy); x.lineTo(wx+55,wy-5); x.stroke();
+    x.fillStyle='#fbbf24'; x.beginPath();
+    x.moveTo(wx+55,wy-5); x.lineTo(wx+43,wy-10); x.lineTo(wx+43,wy);
+    x.closePath(); x.fill();
+  }
+  x.fillStyle='#fbbf24'; x.font='bold 10px Lato,sans-serif'; x.textAlign='center';
+  x.fillText('Wind Erosion', W*0.83, H*0.28);
+
+  // terrace lines (conservation)
+  x.strokeStyle='#4ade80'; x.lineWidth=2; x.setLineDash([4,3]);
+  for(let t=0;t<3;t++){
+    const ty = H*0.32+t*10;
+    x.beginPath(); x.moveTo(W*0.4,ty); x.lineTo(W*0.65,ty); x.stroke();
+  }
+  x.setLineDash([]);
+  x.fillStyle='#4ade80'; x.font='bold 10px Lato,sans-serif';
+  x.fillText('Terraces (Conservation)', W*0.52, H*0.32-14);
+
+  // Labels at bottom
+  x.fillStyle='#3a6a48'; x.font='11px Lato,sans-serif'; x.textAlign='center';
+  x.fillText('Cross-section: Types of Soil Erosion and Conservation', W/2, H-6);
+}
+
+/* ====================================================
+   TAB 3 — EQUITY / WORLD RESOURCE
+==================================================== */
+function drawEquity(){
+  const c = document.getElementById('cEquity');
+  c.width = c.offsetWidth;
+  const W=c.width, H=c.height, x=c.getContext('2d');
+  x.clearRect(0,0,W,H);
+
+  // Population vs resource bar comparison
+  const groups = [
+    { label:'Richest 20%\nof Population', pop:20, resource:80, color:'#f87171' },
+    { label:'Next 20%', pop:20, resource:11, color:'#fb923c' },
+    { label:'Middle 20%', pop:20, resource:6, color:'#fbbf24' },
+    { label:'Lower 20%', pop:20, resource:2, color:'#60a5fa' },
+    { label:'Poorest 20%', pop:20, resource:1, color:'#4ade80' },
+  ];
+
+  const barW = Math.min(60, W/10);
+  const padL=80, padT=30, barH=H-70;
+  const gapBetween = (W - padL - 40 - groups.length*barW*2) / (groups.length+1);
+
+  // Y axis
+  x.strokeStyle='#1a3a22'; x.lineWidth=1;
+  x.beginPath(); x.moveTo(padL,padT); x.lineTo(padL,padT+barH); x.stroke();
+  for(let g=0;g<=4;g++){
+    const yy = padT + barH - (g/4)*barH;
+    x.strokeStyle='#1a3a22'; x.lineWidth=1;
+    x.beginPath(); x.moveTo(padL-4,yy); x.lineTo(W-20,yy); x.stroke();
+    x.fillStyle='#3a6a48'; x.font='10px DM Mono,monospace'; x.textAlign='right';
+    x.fillText(g*25+'%', padL-6, yy+4);
+  }
+
+  groups.forEach((g,i)=>{
+    const bx = padL + gapBetween + i*(barW*2+gapBetween);
+
+    // Population bar (always 20%)
+    const ph = (20/100)*barH;
+    x.fillStyle='#3a6a48';
+    x.fillRect(bx, padT+barH-ph, barW, ph);
+
+    // Resource bar
+    const rh = (g.resource/100)*barH;
+    x.fillStyle=g.color;
+    x.fillRect(bx+barW+4, padT+barH-rh, barW, rh);
+
+    // Labels
+    x.fillStyle='#7a9a8a'; x.font='9px Lato,sans-serif'; x.textAlign='center';
+    const lines = g.label.split('\n');
+    lines.forEach((l,li)=> x.fillText(l, bx+barW+2, padT+barH+16+li*12));
+
+    x.fillStyle=g.color; x.font='bold 10px DM Mono,monospace';
+    x.fillText(g.resource+'%', bx+barW+4+barW/2, padT+barH-rh-5);
+  });
+
+  // Legend
+  x.fillStyle='#3a6a48'; x.fillRect(padL, H-18, 14, 10);
+  x.fillStyle='#60a5fa'; x.fillRect(padL+20, H-18, 14, 10);
+  x.fillStyle='#a7d4b8'; x.font='10px Lato,sans-serif'; x.textAlign='left';
+  x.fillText('Population share (always 20%)', padL+36, H-9);
+  x.fillStyle='#60a5fa';
+  x.fillText('Resource consumption share', padL+200, H-9);
+}
+
+/* ====================================================
+   TAB 4 — RESOURCE PLANNING
+==================================================== */
+function drawPlanDiag(){
+  const c = document.getElementById('cPlan');
+  c.width = c.offsetWidth;
+  const W=c.width, H=c.height, x=c.getContext('2d');
+  x.clearRect(0,0,W,H);
+
+  const stages = [
+    { label:'Stage 1\nIdentification &\nInventory', color:'#4ade80', icon:'🔍',
+      desc:'Identify, survey and measure resources across regions\nCreate resource maps and atlases' },
+    { label:'Stage 2\nEvolution of\nPlanning Structure', color:'#fbbf24', icon:'🏗️',
+      desc:'Set up institutional framework\nLegislation, policies, and resource allocation bodies' },
+    { label:'Stage 3\nMatch with\nNational Plans', color:'#60a5fa', icon:'🗂️',
+      desc:'Align resource plans with Five Year Plans\nIntegrate with state development boards and Panchayati Raj' },
+  ];
+
+  const boxW = Math.min(200, (W-80)/3);
+  const boxH = 130;
+  const startX = (W - stages.length*boxW - (stages.length-1)*30)/2;
+  const boxY = H/2 - boxH/2;
+
+  stages.forEach((s,i)=>{
+    const bx = startX + i*(boxW+30);
+
+    // Connecting arrow
+    if(i>0){
+      x.fillStyle=stages[i-1].color;
+      x.font='22px sans-serif'; x.textAlign='center';
+      x.fillText('→', bx-15, boxY+boxH/2+8);
+    }
+
+    x.shadowColor=s.color; x.shadowBlur=14;
+    x.fillStyle='#060f08'; x.strokeStyle=s.color; x.lineWidth=1.5;
+    x.beginPath(); x.roundRect(bx, boxY, boxW, boxH, 10); x.fill(); x.stroke();
+    x.shadowBlur=0;
+
+    x.font='22px sans-serif'; x.textAlign='center';
+    x.fillText(s.icon, bx+boxW/2, boxY+28);
+
+    x.fillStyle=s.color; x.font='bold 10px Lato,sans-serif'; x.textAlign='center';
+    const lines = s.label.split('\n');
+    lines.forEach((l,li)=> x.fillText(l, bx+boxW/2, boxY+46+li*13));
+
+    x.fillStyle='#3a6a48'; x.font='9px Lato,sans-serif'; x.textAlign='center';
+    const dlines = s.desc.split('\n');
+    dlines.forEach((l,li)=> x.fillText(l, bx+boxW/2, boxY+88+li*13));
+  });
+
+  x.fillStyle='#3a6a48'; x.font='11px Lato,sans-serif'; x.textAlign='center';
+  x.fillText('Resource Planning in India — A 3-Stage Process', W/2, H-10);
+}
+
+function drawSustain(){
+  const c = document.getElementById('cSustain');
+  c.width = c.offsetWidth;
+  const W=c.width, H=c.height, x=c.getContext('2d');
+  x.clearRect(0,0,W,H);
+
+  const cx=W/2, cy=H/2+10;
+
+  // Three overlapping circles for sustainable development
+  const circles = [
+    { label:'Environment', x:cx, y:cy-70, color:'#4ade80', desc:'Biodiversity\nClean air & water\nClimate stability' },
+    { label:'Economy', x:cx-65, y:cy+40, color:'#fbbf24', desc:'Growth\nEmployment\nInfrastructure' },
+    { label:'Society', x:cx+65, y:cy+40, color:'#60a5fa', desc:'Equity\nHealth\nCulture' },
+  ];
+
+  const R = 80;
+  x.globalAlpha=0.18;
+  circles.forEach(c=>{
+    x.fillStyle=c.color;
+    x.beginPath(); x.arc(c.x, c.y, R, 0, Math.PI*2); x.fill();
+  });
+  x.globalAlpha=1;
+
+  circles.forEach(c=>{
+    x.strokeStyle=c.color; x.lineWidth=2;
+    x.beginPath(); x.arc(c.x, c.y, R, 0, Math.PI*2); x.stroke();
+    x.fillStyle=c.color; x.font='bold 12px Lato,sans-serif'; x.textAlign='center';
+    x.fillText(c.label, c.x, c.y - R - 8);
+    const lines = c.desc.split('\n');
+    x.fillStyle=c.color+'cc'; x.font='9px Lato,sans-serif';
+    lines.forEach((l,i)=> x.fillText(l, c.x, c.y + R + 14 + i*12));
+  });
+
+  // Center label
+  x.fillStyle='#fff'; x.font='bold 11px Playfair Display,serif'; x.textAlign='center';
+  x.fillText('SUSTAINABLE', cx, cy-8);
+  x.fillText('DEVELOPMENT', cx, cy+8);
+
+  x.fillStyle='#3a6a48'; x.font='10px Lato,sans-serif'; x.textAlign='center';
+  x.fillText('Sustainable Development = intersection of Environment + Economy + Society', W/2, H-6);
+}
+
+/* ====================================================
+   INIT
+==================================================== */
+window.addEventListener('load', ()=>{
+  setTimeout(drawTree, 100);
+});
+window.addEventListener('resize', ()=>{
+  const active = [...document.querySelectorAll('.panel')].findIndex(p=>p.classList.contains('active'));
+  switchTab(active);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Resources and Development</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#04100a; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(4,16,10,.9) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#4ade80; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#2a5a3a; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #1a3a2a; background:rgba(4,16,10,.85);
+  color:#4a8a5a; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#4ade80; color:#4ade80; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#071410; border:1px solid #1a3a2a;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:280px; font-size:.8rem; color:#a7d4b8;
+  line-height:1.6; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.7);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#4ade80; font-size:.9rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(4,16,10,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,58,42,.75);
+  position:absolute; top:0; left:0; right:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#4a8a5a; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(26,58,42,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#4ade80; border-color:#2a6040; background:rgba(74,222,128,.06); }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<div id="ui" style="top:42px">
+  <div>
+    <h1>Resources and Development</h1>
+    <p>Class X · Geography Ch.1 — drag to pan · scroll to zoom · hover nodes</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2+20; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Resources &\nDevelopment',
+  x:0, y:0, r:66, color:'#062010', stroke:'#4ade80', textColor:'#4ade80', fontSize:13
+};
+
+const BRANCHES = [
+  // ── What is a Resource? ──
+  {
+    id:'def', label:'What is a\nResource?', x:-300, y:-220, r:48,
+    color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+    info:'A resource is everything available in our environment which can be used to satisfy our needs, provided:\n1. It is technologically accessible\n2. It is economically feasible\n3. It is culturally acceptable\nIdea by Zimmermann: "Resources are not — they become."',
+    children:[
+      { id:'d1', label:'Technologically\nAccessible', x:-480, y:-340, r:36, color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+        info:'Technology determines what can be used as a resource.\nExample: Coal was not a resource before the invention of steam engine.\nRooftop solar panels — solar energy becomes accessible resource with photovoltaic technology.\nAs technology advances, more things become resources.' },
+      { id:'d2', label:'Economically\nFeasible', x:-510, y:-200, r:36, color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+        info:'The cost of extracting and using the resource must be worthwhile.\nExample: Deep-sea manganese nodules — technologically possible to mine, but economically not feasible yet.\nA resource must make economic sense to be used.\nPrices, demand, and cost of extraction all determine feasibility.' },
+      { id:'d3', label:'Culturally\nAcceptable', x:-460, y:-75, r:36, color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+        info:'Cultural values shape what is considered a resource.\nExample: Cow is considered sacred in India — not used as food resource, though biologically possible.\nAlcohol banned in dry states — grapes not used for wine production.\nCultural context defines resource utility.' },
+    ]
+  },
+
+  // ── Classification of Resources ──
+  {
+    id:'cls', label:'Types of\nResources', x:300, y:-220, r:48,
+    color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+    info:'Resources are classified on three main bases:\n1. Origin — Biotic / Abiotic\n2. Exhaustibility — Renewable / Non-renewable\n3. Ownership — Individual / Community / National / International\n4. Development Status — Potential / Actual / Stock / Reserve',
+    children:[
+      { id:'cl1', label:'Biotic /\nAbiotic', x:470, y:-355, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Biotic Resources: obtained from the biosphere — have life.\nExamples: forests, animals, fish, human beings, insects, birds.\nAbiotic Resources: non-living things.\nExamples: rocks, metals, wind, solar energy, water.\nNote: Coal, petroleum = biotic origin but classified differently.' },
+      { id:'cl2', label:'Renewable /\nNon-renewable', x:525, y:-210, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Renewable: can be renewed or reproduced by physical, chemical or mechanical processes.\nExamples: solar energy, wind energy, water, forests, wildlife.\nNon-renewable: take millions of years to form; cannot be quickly replenished.\nExamples: fossil fuels (coal, petroleum, natural gas), minerals.\nCoal takes millions of years to form — once used, gone!' },
+      { id:'cl3', label:'Ownership\nTypes', x:490, y:-65, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Individual: owned by private individuals — farmland, houses, plantations.\nCommunity/Common Pool: accessible to all members of a community — community pastures, village ponds.\nNational: within the political boundaries of a nation — rivers, forests, wildlife, mineral wealth, ocean up to 12 nautical miles.\nInternational: beyond national boundaries — open ocean, atmosphere, Antarctica.' },
+      { id:'cl4', label:'Potential /\nActual /\nReserve', x:310, y:-385, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Potential: resources found in a region but not yet used.\nExample: Gujarat, Rajasthan have enormous solar/wind energy potential not fully harnessed.\nActual: resources surveyed, quantified and are currently being used.\nStock: materials that exist in environment but humans lack the technology to use them. Example: hydrogen as fuel.\nReserve: subset of actual resource that can be used with existing technology but has not started yet. Reserves are for the future.' },
+    ]
+  },
+
+  // ── Resource Planning ──
+  {
+    id:'plan', label:'Resource\nPlanning', x:-300, y:220, r:48,
+    color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+    info:'Resource planning = judicious use of resources to achieve sustainable economic development.\nIndia has enormous diversity in resource availability — planning is critical.\nResource planning involves:\n1. Identification and inventory of resources\n2. Evolving a planning structure\n3. Matching resource development plans with national development plans',
+    children:[
+      { id:'p1', label:'Resource-rich\nbut Poor', x:-480, y:130, r:36, color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'India has regions that are resource-rich but economically backward.\nExample: Jharkhand, Chhattisgarh, Madhya Pradesh — rich in minerals and forest.\nAlso states that are resource-poor but economically developed — Goa (small, rich due to tourism & exports).\nResource availability alone ≠ development. Human skills, technology, and governance matter too.' },
+      { id:'p2', label:'Sustainable\nDevelopment', x:-510, y:265, r:36, color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'"Development that meets the needs of the present without compromising the ability of future generations to meet their own needs." — Brundtland Commission, 1987.\nKey idea: balance between economic growth and environmental conservation.\nIndia\'s Five Year Plans included resource conservation.\nRio Earth Summit (1992): Agenda 21 for sustainable development.' },
+      { id:'p3', label:'Gandhian\nPhilosophy', x:-440, y:395, r:36, color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'"There is enough for everybody\'s need, but not for anybody\'s greed." — Mahatma Gandhi.\nGandhi was opposed to industrialisation and mass production.\nAdvocated small-scale self-sufficient village economy.\nThis philosophy anticipated the modern concern about resource depletion and inequitable distribution.\nInspired movements like Chipko Movement.' },
+    ]
+  },
+
+  // ── Land Resources ──
+  {
+    id:'land', label:'Land\nResources', x:0, y:-310, r:48,
+    color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+    info:'Land is the most important natural resource.\nIndia\'s total land area: 3.28 million sq km.\n93% of land used for various purposes.\nLand use categories: forests, land under non-agricultural uses, barren and wasteland, cultivated land, fallow land, pastures, miscellaneous tree crops, culturable wasteland.',
+    children:[
+      { id:'l1', label:'Land Use\nPattern', x:-190, y:-445, r:34, color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Net sown area: ~54% of reporting area\nForests: ~23% (target is 33%)\nGrazing lands: declining\nFallow land: temporarily uncultivated\nWasteland: barren, degraded\nUrban/infrastructure: growing\nNote: Himalayan states have more forest; states like Punjab have more cultivated land.' },
+      { id:'l2', label:'Land\nDegradation', x:0, y:-470, r:34, color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Causes of land degradation:\n• Deforestation\n• Mining activities (open-cast mining leaves scars)\n• Overgrazing (Rajasthan, Gujarat, MP)\n• Chemical fertilisers and pesticides\n• Waterlogging (Punjab, Haryana — from over-irrigation)\n• Industrial effluents and wastes\n• Construction activities\nIndia has ~130 million ha of degraded land.' },
+      { id:'l3', label:'Conservation\nMethods', x:190, y:-445, r:34, color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Afforestation: planting trees\nControlled grazing\nPlanting shelter belts (rows of trees to check wind erosion)\nStabilising sand dunes with thorny bushes (Rajasthan)\nProper management of wastelands\nControl of mining activities\nTreatment of industrial effluents\nBanning of mining in forest areas' },
+    ]
+  },
+
+  // ── Soil as a Resource ──
+  {
+    id:'soil', label:'Soil as a\nResource', x:300, y:220, r:48,
+    color:'#0a0500', stroke:'#f97316', textColor:'#fed7aa',
+    info:'Soil is the most important renewable natural resource.\nIt is the medium of plant growth.\nTakes hundreds of years to form — so precious!\nFormed by: parent rock, climate, vegetation, time.\nIndia has diverse soil types due to varied geological formations, climates, and vegetation.',
+    children:[
+      { id:'s1', label:'Alluvial\nSoil', x:465, y:130, r:36, color:'#0a0500', stroke:'#f97316', textColor:'#fed7aa',
+        info:'Most widespread and important soil of India.\nFound in: Northern plains, river deltas, coastal plains.\nDeposited by rivers (Indus, Ganga, Brahmaputra systems).\nVery fertile — rich in potash, phosphoric acid, lime.\nKhadar (new alluvium — lighter, more sandy, near rivers) vs Bhangar (old alluvium — higher up, contains kankar nodules).\nIdeal for: wheat, rice, sugarcane, cotton, oilseeds.' },
+      { id:'s2', label:'Black Soil\n(Regur)', x:520, y:255, r:36, color:'#0a0500', stroke:'#f97316', textColor:'#fed7aa',
+        info:'Also called regur or black cotton soil.\nFound in: Deccan Trap region — Maharashtra, Saurashtra, MP, Gujarat, Andhra.\nFormed from: volcanic rocks (basalt lava).\nVery fine particles — holds moisture well.\nRich in: calcium carbonate, magnesium, potash, lime.\nIdeal for: cotton (called cotton soil), sugarcane, wheat, groundnuts.\nSelf-ploughing: swells when wet, cracks when dry.' },
+      { id:'s3', label:'Red &\nLateral Soils', x:475, y:385, r:36, color:'#0a0500', stroke:'#f97316', textColor:'#fed7aa',
+        info:'Red Soil: Odisha, Chhattisgarh, parts of MP, Tamil Nadu, Karnataka.\nForms from: crystalline igneous rocks under high temperature.\nRed colour: due to iron diffusion.\nLow moisture and nitrogen; with fertiliser can be productive.\nLaterlite Soil: forms in high temperature + high rainfall areas.\nRich in iron, aluminium; poor in nitrogen, potash, lime.\nFound in: Karnataka, Kerala, TN, MP hills, Odisha.\nUsed for: tea, coffee, cashew.\nHardened — used as bricks (laterite = Latin for brick).' },
+      { id:'s4', label:'Soil\nErosion &\nConservation', x:310, y:410, r:36, color:'#0a0500', stroke:'#f97316', textColor:'#fed7aa',
+        info:'Soil erosion: removal of soil by wind, water, glaciers.\nTypes:\nSheet erosion: water moves as sheet over ground\nRill erosion: water cuts small channels\nGully erosion (bad lands): deep gullies cut into soil — Chambal valley\nWind erosion: deserts — Rajasthan\nConservation:\n• Contour ploughing\n• Terrace cultivation\n• Strip cropping\n• Shelter belts\n• Afforestation\n• Plugging gullies' },
+    ]
+  },
+
+  // ── Conservation Ethics ──
+  {
+    id:'cons', label:'Conservation\nEthics', x:0, y:310, r:48,
+    color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+    info:'Conservation of resources means using them judiciously — avoiding wasteful use and ensuring future availability.\nThree broad approaches:\n1. Individualist (use for personal gain)\n2. Communitarian (use for community benefit)\n3. Environmentalist (protect for nature and future generations)',
+    children:[
+      { id:'co1', label:'Movements &\nActivists', x:-185, y:430, r:34, color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Chipko Movement (1973): Uttarakhand. Women hugged trees to prevent felling. Led by Sunderlal Bahuguna.\n"Appiko Movement" (1987): Karnataka — similar tree-hugging protest.\nNarmada Bachao Andolan: against large dam projects displacing tribals.\nMedha Patkar led protests against Sardar Sarovar Dam.\nWangari Maathai (Kenya): Green Belt Movement — planted 30 million trees.\nEnvironmentalism is a global phenomenon.' },
+      { id:'co2', label:'International\nAgreements', x:0, y:460, r:34, color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Rio Earth Summit 1992 (Rio de Janeiro):\n• Convention on Biodiversity\n• Framework Convention on Climate Change\n• Agenda 21: blueprint for sustainable development\nKyoto Protocol 1997: binding targets for greenhouse gas reductions.\nParis Agreement 2015: limit global warming to 1.5°C.\nIndia\'s National Action Plan on Climate Change (NAPCC): 8 missions including solar, enhanced energy efficiency.' },
+      { id:'co3', label:'Equity &\nJustice', x:185, y:430, r:34, color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Resource development must be equitable.\nCurrent problem: minority consuming majority of resources.\nTop 20% of world population consumes 80% of resources.\nIssues:\n• North-South divide (rich vs poor nations)\n• Urban-rural divide within India\n• Caste and class inequalities in resource access\nRao (1971): Radical redistribution of resources for equitable development.\nSustainability without equity is not real development.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){return allNodes.find(n=>n.id===id);}
+
+// pan/zoom
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found&&found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10,window.innerHeight-240)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {tip.style.display='none';canvas.style.cursor='grab';}
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx,cy);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.22,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2+20;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  // subtle grid
+  ctx.strokeStyle='rgba(74,222,128,.025)'; ctx.lineWidth=1;
+  for(let x=-1400;x<1400;x+=70){ctx.beginPath();ctx.moveTo(x,-1400);ctx.lineTo(x,1400);ctx.stroke();}
+  for(let y=-1400;y<1400;y+=70){ctx.beginPath();ctx.moveTo(-1400,y);ctx.lineTo(1400,y);ctx.stroke();}
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    const cpx=(a.x+b.x)/2+(b.y-a.y)*.15, cpy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cpx,cpy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?38:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-9,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Resources and Development</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#04100a; --card:#0a1e10; --card2:#0f2616;
+    --border:#1a3a22; --text:#d4f0dc; --muted:#3a6a48;
+    --geo:#22c55e; --green:#4ade80; --amber:#fbbf24; --red:#f87171;
+    --blue:#60a5fa; --purple:#a78bfa; --teal:#34d399; --orange:#fb923c;
+    --correct:#22c55e; --wrong:#ef4444;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(34,197,94,.04) 0%,transparent 60%); }
+
+  /* NAV */
+  .site-nav { display:flex; align-items:center; justify-content:space-between;
+    padding:.4rem 1.4rem; background:rgba(4,16,10,.95); border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:100; backdrop-filter:blur(10px); }
+  .site-nav a.logo img { height:26px; }
+  .site-nav a.back { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted);
+    text-decoration:none; border:1px solid var(--border); border-radius:99px;
+    padding:.2rem .65rem; transition:all .2s; }
+  .site-nav a.back:hover { color:var(--green); border-color:var(--geo); }
+
+  header { text-align:center; padding:1.8rem 1rem 1rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2rem); font-weight:900; color:var(--green); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .dash { display:flex; justify-content:center; gap:.9rem; flex-wrap:wrap; padding:.8rem 1rem 1.2rem; }
+  .dcard { background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.6rem 1.2rem; text-align:center; min-width:84px; }
+  .dval { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; }
+  .dlbl { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-top:.1rem; }
+
+  nav.filters { display:flex; justify-content:center; flex-wrap:wrap; gap:.45rem; padding:0 1rem 1.2rem; }
+  nav.filters button { font-family:'Playfair Display',serif; font-weight:700; font-size:.76rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  nav.filters button:hover { color:var(--text); }
+  nav.filters button.active { border-color:var(--green); color:var(--green); background:rgba(34,197,94,.08); }
+
+  main { max-width:800px; margin:0 auto; padding:0 1rem 4rem; }
+
+  .q-card { background:var(--card); border:1px solid var(--border); border-radius:14px;
+    margin-bottom:1rem; overflow:hidden; transition:box-shadow .2s;
+    animation:slideIn .3s ease both; }
+  .q-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.5); }
+  @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .q-header { display:flex; align-items:flex-start; gap:.7rem; padding:1rem 1.1rem .7rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:.68rem; min-width:28px; height:28px;
+    border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .q-text { font-family:'Playfair Display',serif; font-size:.92rem; font-weight:700; line-height:1.45; flex:1; }
+  .q-meta { display:flex; gap:.35rem; flex-wrap:wrap; padding:0 1.1rem .7rem 4rem; }
+
+  .badge { font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .48rem; border-radius:2px; }
+  .b-mcq    { background:rgba(96,165,250,.12);  color:var(--blue); }
+  .b-short  { background:rgba(74,222,128,.12);  color:var(--green); }
+  .b-long   { background:rgba(251,191,36,.12);  color:var(--amber); }
+  .b-assert { background:rgba(167,139,250,.12); color:var(--purple); }
+  .b-1m { background:rgba(148,163,184,.08); color:#94a3b8; }
+  .b-2m { background:rgba(251,191,36,.1);   color:#fde68a; }
+  .b-3m { background:rgba(251,146,60,.1);   color:#fed7aa; }
+  .b-5m { background:rgba(248,113,113,.12); color:#fca5a5; }
+
+  .strip-def  { border-left:4px solid var(--green); }
+  .strip-cls  { border-left:4px solid var(--blue); }
+  .strip-land { border-left:4px solid var(--red); }
+  .strip-soil { border-left:4px solid var(--orange); }
+  .strip-plan { border-left:4px solid var(--purple); }
+  .strip-move { border-left:4px solid var(--teal); }
+
+  .mcq-body { padding:0 1.1rem .6rem; }
+  .mcq-opts { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; margin-bottom:.5rem; }
+  @media(max-width:480px){ .mcq-opts { grid-template-columns:1fr; } }
+  .opt-btn { display:flex; align-items:center; gap:.55rem; background:var(--card2);
+    border:1.5px solid var(--border); border-radius:8px; padding:.55rem .75rem;
+    cursor:pointer; transition:all .16s; text-align:left; color:var(--text);
+    font-family:'Lato',sans-serif; font-size:.82rem; font-weight:600; }
+  .opt-btn:hover:not(:disabled) { border-color:#2a5a38; background:#0f2616; }
+  .opt-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); min-width:18px; }
+  .opt-btn.correct { border-color:var(--correct); background:rgba(34,197,94,.1); color:#4ade80; }
+  .opt-btn.wrong   { border-color:var(--wrong);   background:rgba(239,68,68,.08); color:#fca5a5; }
+  .feedback { font-size:.76rem; font-family:'DM Mono',monospace; padding:.35rem .7rem;
+    border-radius:6px; margin:.25rem 0 .5rem; display:none; }
+  .feedback.correct { background:rgba(34,197,94,.08);  color:#4ade80; display:block; }
+  .feedback.wrong   { background:rgba(239,68,68,.08); color:#f87171; display:block; }
+
+  .ans-reveal { overflow:hidden; max-height:0; transition:max-height .38s ease; }
+  .ans-reveal.open { max-height:1200px; }
+  .ans-body { padding:.75rem 1.1rem 1rem; border-top:1px solid var(--border); }
+  .ans-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--green); margin-bottom:.4rem; }
+  .ans-text { font-size:.84rem; color:var(--text); line-height:1.7; }
+  .ans-text strong { color:var(--amber); }
+  .ans-text em { color:var(--teal); font-style:normal; }
+  .tip { font-size:.74rem; color:var(--amber); background:rgba(251,191,36,.06);
+    border-left:3px solid var(--amber); border-radius:0 6px 6px 0;
+    padding:.38rem .65rem; margin-top:.5rem; }
+
+  .show-btn { display:inline-flex; align-items:center; gap:.35rem; font-family:'Playfair Display',serif;
+    font-weight:700; font-size:.76rem; padding:.38rem 1rem; border-radius:3px;
+    border:1px solid var(--border); background:var(--card); color:var(--muted);
+    cursor:pointer; transition:all .2s; margin:0 1.1rem .8rem; }
+  .show-btn:hover { border-color:var(--green); color:var(--green); }
+
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-resources">&#8592; Back to Portal</a>
+</nav>
+
+<header>
+  <h1>Resources and Development</h1>
+  <p>Class X · Geography Ch.1 · CBSE Pattern Question Bank</p>
+</header>
+
+<div class="dash">
+  <div class="dcard"><div class="dval" style="color:var(--blue)">10</div><div class="dlbl">MCQ</div></div>
+  <div class="dcard"><div class="dval" style="color:var(--purple)">4</div><div class="dlbl">Assertion–Reason</div></div>
+  <div class="dcard"><div class="dval" style="color:var(--green)">12</div><div class="dlbl">Short Answer</div></div>
+  <div class="dcard"><div class="dval" style="color:var(--amber)">4</div><div class="dlbl">Long Answer</div></div>
+  <div class="dcard"><div class="dval" style="color:var(--teal)">30</div><div class="dlbl">Total</div></div>
+</div>
+
+<nav class="filters">
+  <button class="active" onclick="filterQ('all',this)">All (30)</button>
+  <button onclick="filterQ('mcq',this)">MCQ (10)</button>
+  <button onclick="filterQ('assert',this)">Assertion–Reason (4)</button>
+  <button onclick="filterQ('short',this)">Short Answer (12)</button>
+  <button onclick="filterQ('long',this)">Long Answer (4)</button>
+</nav>
+
+<main id="qMain"></main>
+
+<script>
+const QS = [
+  /* ── MCQ ── */
+  { id:1, type:'mcq', topic:'def', strip:'strip-def',
+    q:'Which of the following is NOT a criterion for something to be classified as a resource?',
+    opts:['Technologically accessible','Economically feasible','Geographically located','Culturally acceptable'],
+    ans:2, explanation:'The three criteria for a resource are: technologically accessible, economically feasible, and culturally acceptable. Geographic location is not a criterion by itself.',
+    tip:'Remember the 3 criteria as CAT — Culturally acceptable, Accessible (tech), Technically feasible.' },
+
+  { id:2, type:'mcq', topic:'cls', strip:'strip-cls',
+    q:'Which type of resource is coal?',
+    opts:['Biotic origin, Renewable','Biotic origin, Non-renewable','Abiotic, Renewable','Abiotic, Non-renewable'],
+    ans:1, explanation:'Coal is formed from ancient plants and animals (biotic origin) but takes millions of years to form — so it is non-renewable. A common exam trap!',
+    tip:'Coal is biotic in origin but non-renewable — do not confuse origin with exhaustibility.' },
+
+  { id:3, type:'mcq', topic:'cls', strip:'strip-cls',
+    q:'Village pond, community grazing land, and public parks are examples of:',
+    opts:['Individual resources','Community resources','National resources','International resources'],
+    ans:1, explanation:'Community resources are accessible to all members of a community — village ponds, grazing grounds, and public parks fall in this category.',
+    tip:'Individual = private ownership; Community = local shared use; National = government managed.' },
+
+  { id:4, type:'mcq', topic:'land', strip:'strip-land',
+    q:'The National Forest Policy of India targets forest cover of:',
+    opts:['13% of total area','23% of total area','33% of total area','43% of total area'],
+    ans:2, explanation:'The National Forest Policy target is 33% of total geographical area under forest cover. Current forest cover is only about 23.4% — well short of the target.',
+    tip:'Remember: current 23%, target 33% — a 10% gap often asked in exams.' },
+
+  { id:5, type:'mcq', topic:'land', strip:'strip-land',
+    q:'"Bad lands" created by gully erosion are best associated with which region?',
+    opts:['Kerala Backwaters','Chambal Valley','Brahmaputra plains','Western Ghats'],
+    ans:1, explanation:'The Chambal Valley in Madhya Pradesh and Rajasthan is the most famous example of bad lands created by severe gully erosion. The ravines here are called "ravine lands".',
+    tip:'Chambal Valley = bad lands = gully erosion. This specific example appears frequently in board exams.' },
+
+  { id:6, type:'mcq', topic:'soil', strip:'strip-soil',
+    q:'Which soil is called "self-ploughing"?',
+    opts:['Alluvial soil','Laterite soil','Black soil','Red soil'],
+    ans:2, explanation:'Black soil (regur) has fine clay particles that swell when wet and develop deep cracks when dry. This natural cracking allows air in and acts like ploughing — hence "self-ploughing".',
+    tip:'Black soil = Regur = Black Cotton Soil = self-ploughing. All four names for the same soil!' },
+
+  { id:7, type:'mcq', topic:'soil', strip:'strip-soil',
+    q:'Laterite soil is ideal for which of these crops?',
+    opts:['Wheat and rice','Cotton and sugarcane','Tea, coffee and cashew','Bajra and millet'],
+    ans:2, explanation:'Laterite soil, found in Karnataka, Kerala, TN and MP hills, is ideal for tea, coffee, cashew nuts and rubber — all plantation crops that can tolerate acidic, iron-rich soils.',
+    tip:'Laterite = plantation crops (tea, coffee, cashew). Alluvial = wheat, rice, sugarcane.' },
+
+  { id:8, type:'mcq', topic:'cls', strip:'strip-cls',
+    q:'Hydrogen as a fuel is currently classified as:',
+    opts:['Potential resource','Actual resource','Stock','Reserve'],
+    ans:2, explanation:'Hydrogen is classified as a STOCK — water (H₂O) exists abundantly but humans do not yet have the economically viable technology to extract and use hydrogen as fuel at scale.',
+    tip:'Stock = resource exists but technology is unavailable. Reserve = technology available but use is deferred.' },
+
+  { id:9, type:'mcq', topic:'plan', strip:'strip-plan',
+    q:'The Brundtland Commission defined Sustainable Development in:',
+    opts:['1972','1987','1992','2002'],
+    ans:1, explanation:'The Brundtland Commission (formally the World Commission on Environment and Development) published "Our Common Future" in 1987, which contained the now-famous definition of sustainable development.',
+    tip:'1987 = Brundtland. 1992 = Rio Earth Summit (Agenda 21). Both dates are frequently asked.' },
+
+  { id:10, type:'mcq', topic:'move', strip:'strip-move',
+    q:'The Chipko Movement started in which state?',
+    opts:['Rajasthan','Karnataka','Uttarakhand','Madhya Pradesh'],
+    ans:2, explanation:'The Chipko Movement started in 1973 in Uttarakhand (then part of Uttar Pradesh). Women of Reni village led by Gaura Devi, and the movement was championed by Sunderlal Bahuguna.',
+    tip:'Chipko = Uttarakhand 1973. Appiko = Karnataka 1987. Distinguish clearly.' },
+
+  /* ── ASSERTION–REASON ── */
+  { id:11, type:'assert', topic:'def', strip:'strip-def',
+    q:'<strong>Assertion (A):</strong> Coal is classified as a non-renewable resource.<br><strong>Reason (R):</strong> Coal is formed from the remains of ancient plants and animals over millions of years.',
+    opts:['Both A and R are true, and R is the correct explanation of A',
+          'Both A and R are true, but R is NOT the correct explanation of A',
+          'A is true but R is false',
+          'A is false but R is true'],
+    ans:0, explanation:'Both statements are true, and R correctly explains A. Coal takes millions of years to form (biotic origin from ancient organisms), which is precisely WHY it is non-renewable — once used, it cannot be replenished on a human timescale.',
+    tip:'In A-R questions, always check: (1) Is A true? (2) Is R true? (3) Does R explain A? Here, R is the direct cause of A being non-renewable.' },
+
+  { id:12, type:'assert', topic:'plan', strip:'strip-plan',
+    q:'<strong>Assertion (A):</strong> Jharkhand is one of the poorest states in India despite being rich in minerals.<br><strong>Reason (R):</strong> Resource availability alone does not guarantee development; technology, governance, and institutions are equally important.',
+    opts:['Both A and R are true, and R is the correct explanation of A',
+          'Both A and R are true, but R is NOT the correct explanation of A',
+          'A is true but R is false',
+          'A is false but R is true'],
+    ans:0, explanation:'Both A and R are true, and R correctly explains the paradox of Jharkhand. This "resource curse" is explained by R — development requires more than just natural resources.',
+    tip:'This is a classic example used in textbooks. Remember: Goa (resource-poor but developed) vs Jharkhand (resource-rich but underdeveloped).' },
+
+  { id:13, type:'assert', topic:'soil', strip:'strip-soil',
+    q:'<strong>Assertion (A):</strong> Laterite soil is used as a building material.<br><strong>Reason (R):</strong> Laterite soil hardens on exposure to air.',
+    opts:['Both A and R are true, and R is the correct explanation of A',
+          'Both A and R are true, but R is NOT the correct explanation of A',
+          'A is true but R is false',
+          'A is false but R is true'],
+    ans:0, explanation:'Both are true, and R explains A. The word "laterite" comes from the Latin "later" meaning brick. Because laterite hardens when exposed to air, it has been quarried and used as building bricks — most famously in the construction of Angkor Wat.',
+    tip:'Laterite = brick in Latin = hardens in air = used in construction. All linked!' },
+
+  { id:14, type:'assert', topic:'cls', strip:'strip-cls',
+    q:'<strong>Assertion (A):</strong> Antarctica is an international resource.<br><strong>Reason (R):</strong> Antarctica lies beyond the national boundaries of any single country.',
+    opts:['Both A and R are true, and R is the correct explanation of A',
+          'Both A and R are true, but R is NOT the correct explanation of A',
+          'A is true but R is false',
+          'A is false but R is true'],
+    ans:0, explanation:'Both are true and R explains A. International resources are those beyond any national jurisdiction. Antarctica is governed by the Antarctic Treaty System (1959) which no single nation controls.',
+    tip:'International resources: open ocean (beyond 200nm EEZ), atmosphere, Antarctica, outer space.' },
+
+  /* ── SHORT ANSWER ── */
+  { id:15, type:'short', topic:'def', strip:'strip-def', marks:2,
+    q:'What does Zimmermann mean by "Resources are not — they become"? Give one example.',
+    showAns:false,
+    answer:`<strong>Meaning:</strong> Resources are not fixed, static things — they are defined by their utility and function to humans. Something becomes a resource only when:<br>
+    • Technology exists to use it<br>
+    • It is economically worthwhile<br>
+    • It is culturally acceptable<br><br>
+    <strong>Example:</strong> Uranium was just another rock until nuclear technology was developed. Once humans could harness nuclear fission, uranium became a valuable energy resource.`,
+    tip:'Always explain the "become" part — it means resources are dynamic, not fixed.' },
+
+  { id:16, type:'short', topic:'cls', strip:'strip-cls', marks:2,
+    q:'Distinguish between Renewable and Non-renewable resources with two examples each.',
+    showAns:false,
+    answer:`<strong>Renewable Resources:</strong> Can be replenished naturally in a short time through physical, chemical or biological processes.<br>
+    Examples: Solar energy, wind energy, water, forests (if managed sustainably), tidal energy.<br><br>
+    <strong>Non-renewable Resources:</strong> Take millions of years to form; cannot be replenished at a human timescale. Once depleted, they are gone.<br>
+    Examples: Coal (300–350 million years to form), petroleum, natural gas, metallic minerals like iron ore.`,
+    tip:'Renewable does NOT mean infinite. If overused, even forests can become non-renewable on human timescales.' },
+
+  { id:17, type:'short', topic:'cls', strip:'strip-cls', marks:3,
+    q:'Differentiate between potential, actual, stock and reserve resources with examples.',
+    showAns:false,
+    answer:`<strong>Potential:</strong> Exists in a region but not yet used. Technology or investment is lacking.<br>
+    → Example: Solar and wind energy in Rajasthan and Gujarat.<br><br>
+    <strong>Actual:</strong> Surveyed, quantified and currently being used.<br>
+    → Example: Coal in Jharkhand, Chhattisgarh.<br><br>
+    <strong>Stock:</strong> Materials in the environment that could meet human needs but technology to access them is unavailable.<br>
+    → Example: Hydrogen as fuel — water (H₂O) is abundant but splitting it economically is not yet viable.<br><br>
+    <strong>Reserve:</strong> Subset of actual resource — technology available but use is deferred for the future.<br>
+    → Example: River water reserved for future hydroelectric power.`,
+    tip:'The PARS order (Potential, Actual, Reserve, Stock) helps remember all four.' },
+
+  { id:18, type:'short', topic:'land', strip:'strip-land', marks:2,
+    q:'What is land degradation? Mention any three causes with the regions affected.',
+    showAns:false,
+    answer:`<strong>Land degradation</strong> = decline in the quality of land, making it less productive or unusable.<br><br>
+    <strong>Causes and regions:</strong><br>
+    1. <strong>Mining (opencast)</strong> — Jharkhand, MP, Odisha — leaves land scarred with pits, spoil heaps<br>
+    2. <strong>Overgrazing</strong> — Rajasthan, Gujarat, MP — excessive livestock depletes vegetation, compacts soil<br>
+    3. <strong>Over-irrigation</strong> (waterlogging &amp; salinisation) — Punjab, Haryana — excess water raises water table, salts accumulate<br>
+    4. <strong>Industrial effluents</strong> — Gujarat, Maharashtra — chemical contamination poisons soil`,
+    tip:'Always name the REGION along with the cause — examiners specifically look for this.' },
+
+  { id:19, type:'short', topic:'land', strip:'strip-land', marks:2,
+    q:'Name and describe any three methods of soil conservation.',
+    showAns:false,
+    answer:`1. <strong>Contour ploughing:</strong> Ploughing along the contour lines of slopes (perpendicular to slope). Creates ridges that slow water runoff and prevent topsoil from being washed away.<br><br>
+    2. <strong>Terrace cultivation (step farming):</strong> Broad flat steps cut into steep hillsides. Each step acts as a level field. Common in NE hill states and Uttarakhand.<br><br>
+    3. <strong>Shelter belts:</strong> Rows of trees planted to protect agricultural fields from wind erosion. Used in semi-arid regions of Rajasthan and Gujarat to stabilise sand dunes.<br><br>
+    4. <strong>Strip cropping:</strong> Alternating strips of different crops (food crop + grass strip) break the momentum of wind and water, reducing erosion.`,
+    tip:'Questions asking for "any three" — give four, cross out one. Safety margin in exams!' },
+
+  { id:20, type:'short', topic:'soil', strip:'strip-soil', marks:3,
+    q:'Write a short note on alluvial soil — distribution, formation, types, and uses.',
+    showAns:false,
+    answer:`<strong>Distribution:</strong> Most widespread soil in India. Found in the entire Northern Plains (Ganga, Indus, Brahmaputra river systems), river deltas (Krishna, Godavari, Mahanadi, Cauvery), and coastal plains.<br><br>
+    <strong>Formation:</strong> Deposited by rivers over thousands of years as they flow from mountains to plains. Carried as sediment and deposited when rivers slow down.<br><br>
+    <strong>Types:</strong><br>
+    • <strong>Khadar</strong> — new alluvium; lighter, more sandy; found near river channels; renewed annually by floods; more fertile<br>
+    • <strong>Bhangar</strong> — old alluvium; found on higher terraces away from rivers; contains calcium carbonate (kankar) nodules<br><br>
+    <strong>Properties:</strong> Rich in potash, phosphoric acid, lime. Loamy, well-aerated, good water retention.<br><br>
+    <strong>Crops:</strong> Wheat, rice, sugarcane, cotton, pulses, oilseeds.`,
+    tip:'Khadar vs Bhangar distinction is a very common 1-mark question — memorise it.' },
+
+  { id:21, type:'short', topic:'soil', strip:'strip-soil', marks:2,
+    q:'Compare black soil and red soil.',
+    showAns:false,
+    answer:`<table style="width:100%;border-collapse:collapse;font-size:.8rem">
+    <tr><th style="padding:5px 8px;background:#0f2616;border:1px solid #1a3a22;color:#4ade80">Feature</th><th style="padding:5px 8px;background:#0f2616;border:1px solid #1a3a22;color:#94a3b8">Black Soil</th><th style="padding:5px 8px;background:#0f2616;border:1px solid #1a3a22;color:#f87171">Red Soil</th></tr>
+    <tr><td style="padding:5px 8px;border:1px solid #1a3a22">Origin</td><td style="padding:5px 8px;border:1px solid #1a3a22">Basalt/volcanic rocks (Deccan Trap)</td><td style="padding:5px 8px;border:1px solid #1a3a22">Crystalline igneous rocks</td></tr>
+    <tr><td style="padding:5px 8px;border:1px solid #1a3a22">Colour</td><td style="padding:5px 8px;border:1px solid #1a3a22">Black (iron, aluminium, magnesium)</td><td style="padding:5px 8px;border:1px solid #1a3a22">Red (iron diffusion)</td></tr>
+    <tr><td style="padding:5px 8px;border:1px solid #1a3a22">Region</td><td style="padding:5px 8px;border:1px solid #1a3a22">Maharashtra, Gujarat, Saurashtra, MP</td><td style="padding:5px 8px;border:1px solid #1a3a22">Odisha, Chhattisgarh, TN, Karnataka</td></tr>
+    <tr><td style="padding:5px 8px;border:1px solid #1a3a22">Special feature</td><td style="padding:5px 8px;border:1px solid #1a3a22">Self-ploughing; retains moisture</td><td style="padding:5px 8px;border:1px solid #1a3a22">Low moisture retention</td></tr>
+    <tr><td style="padding:5px 8px;border:1px solid #1a3a22">Main crop</td><td style="padding:5px 8px;border:1px solid #1a3a22">Cotton (Black Cotton Soil)</td><td style="padding:5px 8px;border:1px solid #1a3a22">Wheat, rice (with fertilisers)</td></tr>
+    </table>`,
+    tip:'Comparison tables score full marks — present in tabular form whenever asked "compare".' },
+
+  { id:22, type:'short', topic:'plan', strip:'strip-plan', marks:2,
+    q:'What is sustainable development? Why is it important for India?',
+    showAns:false,
+    answer:`<strong>Definition (Brundtland Commission, 1987):</strong> "Development that meets the needs of the present without compromising the ability of future generations to meet their own needs."<br><br>
+    <strong>Why important for India:</strong><br>
+    • India is home to 17% of world's population but only has 2.4% of land area — resources are under severe pressure<br>
+    • Rapid industrialisation and agriculture are degrading land, water, and forest resources<br>
+    • India has vast poor population dependent on natural resources for livelihood<br>
+    • Climate change threatens agriculture, water security, and coastal areas<br>
+    • Future generations need resources for their development too — equity across time is essential`,
+    tip:'Always include the Brundtland definition with year (1987) in full. Direct quote scores marks.' },
+
+  { id:23, type:'short', topic:'plan', strip:'strip-plan', marks:3,
+    q:'What is resource planning? Describe the three stages of resource planning in India.',
+    showAns:false,
+    answer:`<strong>Resource Planning:</strong> The judicious use of resources to meet current needs without compromising future needs. In India, this is done at national, state, and local levels.<br><br>
+    <strong>Three Stages:</strong><br>
+    <strong>Stage 1 — Identification and Inventory:</strong><br>
+    • Systematic surveys, mapping and measurement of resources<br>
+    • Preparation of resource maps and atlases at all scales<br>
+    • Identification of resource-rich and resource-poor regions<br><br>
+    <strong>Stage 2 — Evolution of Planning Structure:</strong><br>
+    • Setting up institutional framework — laws, policies, regulatory bodies<br>
+    • Matching technology with resource availability<br>
+    • Creating mechanisms for equitable resource distribution<br><br>
+    <strong>Stage 3 — Matching Resource Plans with National Development Plans:</strong><br>
+    • Integrating resource plans into Five Year Plans<br>
+    • Coordination between national, state, and district planning bodies<br>
+    • Implementation through state development boards and Panchayati Raj institutions`,
+    tip:'The three stages must be in order. Common mistake: writing them in wrong sequence.' },
+
+  { id:24, type:'short', topic:'move', strip:'strip-move', marks:2,
+    q:'Describe the Chipko Movement. How is it significant?',
+    showAns:false,
+    answer:`<strong>What:</strong> A non-violent conservation movement where local people — especially women — literally <strong>hugged trees</strong> to prevent commercial felling.<br><br>
+    <strong>When and Where:</strong> 1973 in <strong>Reni village, Uttarakhand</strong>. Led by <strong>Gaura Devi</strong> (initially) and later championed by <strong>Sunderlal Bahuguna</strong>. Name "Chipko" means "to hug" in Hindi.<br><br>
+    <strong>Significance:</strong><br>
+    • First major environmental movement in independent India<br>
+    • Demonstrated that local communities have a stake in forest conservation<br>
+    • Led to the Forest Conservation Act (1980)<br>
+    • Inspired similar movements worldwide — Appiko in Karnataka (1987), Green Belt in Kenya<br>
+    • Showed women as key agents in environmental conservation`,
+    tip:'Name Gaura Devi (initiator) AND Sunderlal Bahuguna (leader/voice). Both are important.' },
+
+  { id:25, type:'short', topic:'move', strip:'strip-move', marks:2,
+    q:'What was Agenda 21? What was its significance?',
+    showAns:false,
+    answer:`<strong>Agenda 21</strong> is a comprehensive action plan for achieving sustainable development, adopted at the <strong>Rio Earth Summit (UN Conference on Environment and Development), Rio de Janeiro, 1992</strong>.<br><br>
+    <strong>Key Points:</strong><br>
+    • Adopted by <strong>179 nations</strong><br>
+    • Blueprint covering economic growth, social equity, and environmental protection<br>
+    • Addressed issues: poverty, health, atmospheric pollution, biodiversity, deforestation<br>
+    • Introduced Local Agenda 21 — local bodies (municipalities, Panchayats) to create local sustainable plans<br><br>
+    <strong>Significance:</strong> First global consensus that development must be sustainable — balancing present needs with future generations' needs.`,
+    tip:'Rio Summit 1992 → Agenda 21. Also remember: Kyoto Protocol 1997, Paris Agreement 2015 — timeline of climate agreements.' },
+
+  { id:26, type:'short', topic:'soil', strip:'strip-soil', marks:2,
+    q:'Why is forest soil of the Himalayan region different from forest soil of the valleys?',
+    showAns:false,
+    answer:`<strong>Himalayan Slope Soils:</strong><br>
+    • Found at higher altitudes on steep slopes<br>
+    • Thin, coarse-textured, gravelly<br>
+    • Prone to erosion due to slope gradient<br>
+    • Less organic matter and humus<br>
+    • Snow cover affects soil formation<br><br>
+    <strong>Valley Soils (Lower Himalayan valleys, river valleys):</strong><br>
+    • Deeper, loamy, fine-textured<br>
+    • Rich in humus from fallen leaves and plant debris<br>
+    • Better moisture retention<br>
+    • Suitable for cultivation — tea, spices, vegetables<br><br>
+    This difference is due to <strong>slope angle, temperature, water availability, and accumulation of organic matter</strong> — valleys trap runoff and leaf litter.`,
+    tip:'Slope = thin, coarse. Valley = deep, loamy, humus-rich. Clear contrast.' },
+
+  /* ── LONG ANSWER ── */
+  { id:27, type:'long', topic:'soil', strip:'strip-soil', marks:5,
+    q:'Describe the major soil types of India. Discuss the properties, distribution and uses of any four.',
+    showAns:false,
+    answer:`India has diverse soil types due to varied geological formations, relief, climate, and vegetation.<br><br>
+    <strong>1. Alluvial Soil</strong><br>
+    • <em>Distribution:</em> Northern Plains (Indo-Gangetic-Brahmaputra belt), river deltas, coastal plains<br>
+    • <em>Properties:</em> Loamy, rich in potash and phosphoric acid; two types — Khadar (new, sandy, near rivers) and Bhangar (old, higher terraces, contains kankar)<br>
+    • <em>Uses:</em> Wheat, rice, sugarcane, cotton, pulses, oilseeds — the breadbasket of India<br><br>
+    <strong>2. Black Soil (Regur/Cotton Soil)</strong><br>
+    • <em>Distribution:</em> Deccan Trap — Maharashtra, Saurashtra, Malwa, MP, Gujarat<br>
+    • <em>Properties:</em> Fine clay, self-ploughing, retains moisture; rich in Ca, Mg, K; poor in nitrogen<br>
+    • <em>Uses:</em> Cotton (named for it), sugarcane, wheat, groundnuts<br><br>
+    <strong>3. Red Soil</strong><br>
+    • <em>Distribution:</em> Odisha, Chhattisgarh, MP, Tamil Nadu, Karnataka<br>
+    • <em>Properties:</em> Formed from crystalline igneous rocks; red due to iron diffusion; low moisture<br>
+    • <em>Uses:</em> Wheat, rice, cotton with fertilisers and irrigation<br><br>
+    <strong>4. Laterite Soil</strong><br>
+    • <em>Distribution:</em> Karnataka, Kerala, TN, MP hills, Odisha hills<br>
+    • <em>Properties:</em> High temp + heavy rain → leaching → rich in Fe and Al, poor in N and K; hardens in air<br>
+    • <em>Uses:</em> Tea, coffee, cashew; also used as bricks for construction<br><br>
+    <strong>5. Arid (Desert) Soil</strong><br>
+    • <em>Distribution:</em> Western Rajasthan, Rann of Kutch<br>
+    • <em>Properties:</em> Sandy, low humus, high salt; kankar layer below; wind erosion common<br>
+    • <em>Uses:</em> Bajra, pulses; canal irrigation can make it productive`,
+    tip:'For 5-mark soil questions: distribution + properties + crops — all three for each soil type. Bullet points save time.' },
+
+  { id:28, type:'long', topic:'plan', strip:'strip-plan', marks:5,
+    q:'Explain the concept of sustainable development. What steps has India taken towards achieving it?',
+    showAns:false,
+    answer:`<strong>Sustainable Development — Concept:</strong><br>
+    Defined by the Brundtland Commission (1987): <em>"Development that meets the needs of the present without compromising the ability of future generations to meet their own needs."</em><br><br>
+    It rests on three pillars:<br>
+    1. <strong>Environmental sustainability</strong> — biodiversity, clean air, water, climate<br>
+    2. <strong>Economic growth</strong> — employment, infrastructure, poverty reduction<br>
+    3. <strong>Social equity</strong> — fair distribution of resources, health, culture<br><br>
+    True development lies at the intersection of all three.<br><br>
+    <strong>India's Steps Towards Sustainable Development:</strong><br>
+    1. <strong>National Forest Policy (1988):</strong> Set target of 33% forest cover; emphasis on social forestry<br>
+    2. <strong>Chipko Movement (1973):</strong> Community participation in forest conservation<br>
+    3. <strong>Forest Conservation Act (1980):</strong> Restrictions on diversion of forest land<br>
+    4. <strong>National Action Plan on Climate Change (NAPCC, 2008):</strong> 8 national missions — solar, energy efficiency, water, Green India, sustainable agriculture, strategic knowledge for climate change<br>
+    5. <strong>Panchayati Raj and Local Resource Management:</strong> Local bodies empowered to manage land, water, forests<br>
+    6. <strong>International commitments:</strong> Rio 1992, Kyoto Protocol 1997, Paris Agreement 2015 — all ratified or signed<br>
+    7. <strong>Renewable Energy Push:</strong> India targets 500 GW of renewable energy by 2030`,
+    tip:'Use the Brundtland quote word-for-word. Then give 4–5 India-specific steps. Structure matters in 5-mark answers.' },
+
+  { id:29, type:'long', topic:'land', strip:'strip-land', marks:5,
+    q:'What is land degradation? Explain the causes and suggest measures for conservation of land resources in India.',
+    showAns:false,
+    answer:`<strong>Land Degradation:</strong> The decline in the productive capacity and quality of land. India has approximately <strong>130 million hectares</strong> of degraded land.<br><br>
+    <strong>Causes of Land Degradation:</strong><br>
+    1. <strong>Deforestation:</strong> Removal of tree cover exposes soil to rain and wind — NE India, Western Ghats, Himalayan foothills<br>
+    2. <strong>Overgrazing:</strong> Excessive livestock removes vegetation cover — Rajasthan, Gujarat, MP<br>
+    3. <strong>Mining (opencast):</strong> Excavation leaves deep pits, spoil heaps; land becomes barren — Jharkhand, MP, Odisha<br>
+    4. <strong>Over-irrigation:</strong> Raises water table → waterlogging → salt accumulation (salinisation) — Punjab, Haryana<br>
+    5. <strong>Chemical fertilisers and pesticides:</strong> Alter soil chemistry and biology; reduce fertility over time<br>
+    6. <strong>Industrial effluents:</strong> Chemical waste poisons soil — Gujarat, Maharashtra<br>
+    7. <strong>Urbanisation and construction:</strong> Paving over land, loss of topsoil<br><br>
+    <strong>Conservation Measures:</strong><br>
+    1. <strong>Afforestation:</strong> Planting trees on degraded/barren land<br>
+    2. <strong>Contour ploughing:</strong> Reduces water runoff on slopes<br>
+    3. <strong>Terrace cultivation:</strong> On steep slopes in hill states<br>
+    4. <strong>Strip cropping:</strong> Alternating crop strips break wind/water erosion<br>
+    5. <strong>Shelter belts:</strong> Tree rows protect against wind erosion in Rajasthan<br>
+    6. <strong>Plugging gullies:</strong> Small check dams in ravine regions<br>
+    7. <strong>Regulation of mining:</strong> Mandatory restoration of mined land<br>
+    8. <strong>Controlled grazing:</strong> Demarcate pastures, prevent overgrazing`,
+    tip:'Causes must include REGIONS. Conservation must include METHODS. Both halves needed for full marks.' },
+
+  { id:30, type:'long', topic:'def', strip:'strip-def', marks:5,
+    q:'Classify resources on different bases. Why is equitable distribution of resources important for society?',
+    showAns:false,
+    answer:`<strong>Classification of Resources:</strong><br><br>
+    <strong>A. On the basis of Origin:</strong><br>
+    • <em>Biotic:</em> obtained from biosphere; have life — forests, fish, animals, humans<br>
+    • <em>Abiotic:</em> non-living — rocks, metals, wind, water, minerals<br><br>
+    <strong>B. On the basis of Exhaustibility:</strong><br>
+    • <em>Renewable:</em> replenished by nature — solar, wind, water, forests (if managed)<br>
+    • <em>Non-renewable:</em> millions of years to form — coal, petroleum, metallic minerals<br><br>
+    <strong>C. On the basis of Ownership:</strong><br>
+    • <em>Individual:</em> owned privately — farmland, house, plantation<br>
+    • <em>Community:</em> shared by community — village pond, grazing land<br>
+    • <em>National:</em> within political territory — rivers, forests, minerals, EEZ<br>
+    • <em>International:</em> beyond national boundaries — open ocean, atmosphere, Antarctica<br><br>
+    <strong>D. On the basis of Development Status:</strong><br>
+    • Potential → Actual → Stock → Reserve (see earlier)<br><br>
+    <strong>Importance of Equitable Distribution:</strong><br>
+    • The world's richest 20% consume about 80% of resources — this is deeply unjust<br>
+    • Resource-rich regions (Jharkhand, Chhattisgarh) are often the most economically backward<br>
+    • Inequitable access fuels poverty, social unrest, and conflict<br>
+    • All citizens have equal right to national resources — forests, water, minerals<br>
+    • Gandhi's warning: "Earth provides enough for everybody's need, but not for everybody's greed" — greed creates scarcity, equity creates abundance<br>
+    • Equitable distribution ensures that development benefits reach all sections of society, not just the wealthy`,
+    tip:'Classification questions need ALL four bases. Equitable distribution part: use the Gandhi quote and the 20%/80% statistic — both are direct textbook references.' },
+];
+
+function pickColor(type){ return {mcq:'var(--blue)',assert:'var(--purple)',short:'var(--green)',long:'var(--amber)'}[type]||'#fff'; }
+function pickLabel(type){ return {mcq:'MCQ',assert:'Assertion–Reason',short:'Short Answer',long:'Long Answer'}[type]||type; }
+function pickMarks(type, marks){ if(type==='mcq'||type==='assert') return '1 mark'; return marks+' marks'; }
+
+function render(filter){
+  const container = document.getElementById('qMain');
+  container.innerHTML = '';
+  const list = filter==='all' ? QS : filter==='mcq' ? QS.filter(q=>q.type==='mcq') :
+    filter==='assert' ? QS.filter(q=>q.type==='assert') :
+    filter==='short' ? QS.filter(q=>q.type==='short') : QS.filter(q=>q.type==='long');
+
+  list.forEach((q,i)=>{
+    const col = pickColor(q.type);
+    const isMCQ = q.type==='mcq'||q.type==='assert';
+    let optsHtml = '';
+    if(isMCQ){
+      optsHtml = `<div class="mcq-body">
+        <div class="mcq-opts">
+          ${q.opts.map((o,oi)=>`<button class="opt-btn" onclick="checkAns(${q.id},${oi})">
+            <span class="opt-lbl">${String.fromCharCode(65+oi)}.</span>${o}
+          </button>`).join('')}
+        </div>
+        <div class="feedback" id="fb${q.id}"></div>
+      </div>`;
+    }
+    const ansSection = !isMCQ ? `
+      <button class="show-btn" onclick="toggleAns('ans${q.id}',this)">&#9656; Show Answer</button>
+      <div class="ans-reveal" id="ans${q.id}">
+        <div class="ans-body">
+          <div class="ans-lbl">✦ MODEL ANSWER</div>
+          <div class="ans-text">${q.answer}</div>
+          ${q.tip?`<div class="tip">📌 Exam Tip: ${q.tip}</div>`:''}
+        </div>
+      </div>` : (q.explanation ? `
+      <div class="ans-reveal" id="ans${q.id}">
+        <div class="ans-body">
+          <div class="ans-lbl">✦ EXPLANATION</div>
+          <div class="ans-text">${q.explanation}</div>
+          ${q.tip?`<div class="tip">📌 Exam Tip: ${q.tip}</div>`:''}
+        </div>
+      </div>` : '');
+
+    container.innerHTML += `
+    <div class="q-card ${q.strip}">
+      <div class="q-header">
+        <div class="q-num" style="background:${col}22;color:${col}">${q.id}</div>
+        <div class="q-text">${q.q}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge b-${q.type}">${pickLabel(q.type)}</span>
+        <span class="badge b-${q.type==='short'?q.marks+'m':q.type==='long'?q.marks+'m':'1m'}">${pickMarks(q.type,q.marks)}</span>
+      </div>
+      ${optsHtml}
+      ${ansSection}
+    </div>`;
+  });
+}
+
+function checkAns(id, chosen){
+  const q = QS.find(x=>x.id===id);
+  const btns = document.querySelectorAll(`#qMain .q-card`);
+  let card;
+  btns.forEach(c=>{ if(c.querySelector(`.q-num`)?.textContent==id) card=c; });
+  if(!card) return;
+  const opts = card.querySelectorAll('.opt-btn');
+  opts.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.ans) b.classList.add('correct');
+    else if(i===chosen) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('fb'+id);
+  if(fb){ fb.textContent = chosen===q.ans ? '✓ Correct!' : `✗ Incorrect. Correct answer: ${String.fromCharCode(65+q.ans)}.`;
+    fb.className = 'feedback ' + (chosen===q.ans ? 'correct' : 'wrong'); }
+  const ansDiv = document.getElementById('ans'+id);
+  if(ansDiv){ ansDiv.classList.add('open'); }
+}
+
+function toggleAns(id, btn){
+  const d=document.getElementById(id);
+  d.classList.toggle('open');
+  btn.textContent = d.classList.contains('open') ? '▾ Hide Answer' : '▶ Show Answer';
+}
+
+function filterQ(type, btn){
+  document.querySelectorAll('nav.filters button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render(type);
+}
+
+render('all');
+</script>
+</body>
+</html>

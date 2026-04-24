@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Resources and Development</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#04100a; --card:#0a1e10; --card2:#0f2616;
+    --border:#1a3a22; --text:#d4f0dc; --muted:#3a6a48;
+    --geo:#22c55e; --green:#4ade80; --amber:#fbbf24; --red:#f87171;
+    --blue:#60a5fa; --purple:#a78bfa; --teal:#34d399; --orange:#fb923c;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(34,197,94,.05) 0%,transparent 60%); }
+
+  /* NAV */
+  .site-nav { display:flex; align-items:center; justify-content:space-between; width:100%;
+    padding:.4rem 1.4rem; background:rgba(4,16,10,.95); border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:100; backdrop-filter:blur(10px); }
+  .site-nav a.logo img { height:26px; }
+  .site-nav a.back { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted);
+    text-decoration:none; border:1px solid var(--border); border-radius:99px;
+    padding:.2rem .65rem; transition:all .2s; }
+  .site-nav a.back:hover { color:var(--green); border-color:var(--geo); }
+
+  header { text-align:center; padding:1.6rem 1rem .7rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.3rem,4vw,2rem); font-weight:900; color:var(--green); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .prog-row { display:flex; align-items:center; gap:1rem; padding:.5rem 1rem .8rem; width:100%; max-width:560px; }
+  .prog-bar { flex:1; height:5px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:99px;
+    background:linear-gradient(90deg,var(--geo),var(--green)); transition:width .4s ease; }
+  .prog-text { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); white-space:nowrap; }
+
+  .filters { display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center; padding:.2rem 1rem .8rem; }
+  .f-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.72rem;
+    padding:.3rem .9rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .f-btn:hover { color:var(--text); }
+  .f-btn.on { color:#04100a; border-color:transparent; }
+  .f-all.on   { background:var(--muted); color:var(--text) !important; }
+  .f-def.on   { background:var(--green); }
+  .f-cls.on   { background:var(--blue); }
+  .f-land.on  { background:var(--red); }
+  .f-soil.on  { background:var(--orange); }
+  .f-plan.on  { background:var(--purple); color:#fff !important; }
+  .f-move.on  { background:var(--teal); }
+
+  .stage { width:100%; max-width:560px; padding:0 1rem; perspective:1200px; }
+
+  .fc-wrap { width:100%; aspect-ratio:3/2; position:relative; cursor:pointer;
+    transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1); }
+  .fc-wrap.flipped { transform:rotateY(180deg); }
+
+  .fc-face { position:absolute; inset:0; border-radius:16px;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:1.4rem; text-align:center; }
+  .fc-front { background:var(--card); border:1px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.6); }
+  .fc-back  { transform:rotateY(180deg); background:var(--card2); border:1px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.6); }
+
+  .fc-tag { font-family:'DM Mono',monospace; font-size:.65rem; font-weight:500;
+    padding:.18rem .65rem; border-radius:2px; margin-bottom:.7rem; }
+  .fc-q { font-family:'Playfair Display',serif; font-size:clamp(.88rem,2.4vw,1.1rem);
+    font-weight:700; line-height:1.45; }
+  .fc-hint { font-size:.68rem; color:var(--muted); margin-top:.5rem; font-family:'DM Mono',monospace; }
+  .fc-flip-hint { position:absolute; bottom:.75rem; font-size:.65rem;
+    font-family:'DM Mono',monospace; color:rgba(26,58,34,.8); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  .fc-ans-lbl { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--green); margin-bottom:.5rem; }
+  .fc-ans { font-size:clamp(.78rem,2vw,.95rem); line-height:1.65; color:var(--text); }
+  .fc-ans strong { color:var(--amber); }
+  .fc-ans em { color:var(--teal); font-style:normal; }
+
+  .known-badge { position:absolute; top:.7rem; right:.7rem;
+    font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .45rem; border-radius:2px; }
+  .known   { background:rgba(74,222,128,.15); color:#4ade80; }
+  .unknown { background:rgba(239,68,68,.1);   color:#f87171; }
+
+  .nav-row { display:flex; gap:.7rem; align-items:center; padding:1rem; }
+  .nav-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.85rem;
+    padding:.5rem 1.3rem; border-radius:4px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .nav-btn:hover:not(:disabled) { border-color:#2a5a38; color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; }
+  .card-ctr { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--muted); min-width:70px; text-align:center; }
+
+  .bottom-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem 2rem; }
+  .bot-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.75rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .bot-btn:hover { border-color:var(--green); color:var(--green); }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-resources">&#8592; Back to Portal</a>
+</nav>
+
+<header>
+  <h1>Resources and Development</h1>
+  <p>Class X · Geography Ch.1 · 44 Flashcards — Click to flip</p>
+</header>
+
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <div class="prog-text" id="progText">0 / 44 known</div>
+</div>
+
+<div class="filters">
+  <button class="f-btn f-all on"  onclick="setFilter('all')">All (44)</button>
+  <button class="f-btn f-def"  onclick="setFilter('def')">🌿 Definition (7)</button>
+  <button class="f-btn f-cls"  onclick="setFilter('cls')">🔵 Classification (10)</button>
+  <button class="f-btn f-land" onclick="setFilter('land')">🗺️ Land &amp; Soil (12)</button>
+  <button class="f-btn f-plan" onclick="setFilter('plan')">🗂️ Planning (7)</button>
+  <button class="f-btn f-move" onclick="setFilter('move')">✊ Movements (8)</button>
+</div>
+
+<div class="stage">
+  <div class="fc-wrap" id="fcWrap" onclick="flipCard()">
+    <div class="fc-face fc-front" id="fcFront">
+      <span class="fc-tag" id="fcTag"></span>
+      <div class="fc-q" id="fcQ"></div>
+      <div class="fc-hint" id="fcHint"></div>
+      <div class="fc-flip-hint">tap to reveal ↓</div>
+      <span class="known-badge" id="knownBadge"></span>
+    </div>
+    <div class="fc-face fc-back" id="fcBack">
+      <div class="fc-ans-lbl">✦ ANSWER</div>
+      <div class="fc-ans" id="fcAns"></div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prevBtn" onclick="go(-1)">&#8592; Prev</button>
+  <div class="card-ctr" id="cardCtr">1 / 44</div>
+  <button class="nav-btn" id="nextBtn" onclick="go(1)">Next &#8594;</button>
+</div>
+
+<div class="bottom-row">
+  <button class="bot-btn" onclick="markKnown()">&#10003; Mark Known</button>
+  <button class="bot-btn" onclick="shuffleDeck()">&#8635; Shuffle</button>
+  <button class="bot-btn" onclick="resetKnown()">&#9940; Reset</button>
+</div>
+
+<script>
+const ALL_CARDS = [
+  // ── DEFINITION (7) ──
+  { cat:'def', q:'What is a resource?', hint:'3 criteria', a:'Everything in environment that can satisfy human needs, provided it is <strong>technologically accessible, economically feasible</strong> and <strong>culturally acceptable</strong>.' },
+  { cat:'def', q:'Who gave the idea "Resources are not — they become"?', hint:'Famous geographer', a:'<strong>Zimmermann</strong>. It means resources are defined by their utility and function, not physical existence.' },
+  { cat:'def', q:'Why is a cow not used as a food resource in India despite being biologically possible?', hint:'3rd criterion', a:'Because it is <strong>culturally not acceptable</strong> — the cow is considered sacred in India. Cultural values shape resource use.' },
+  { cat:'def', q:'Why was hydrogen not considered a resource until recently?', hint:'1st criterion', a:'Because humans lacked the <em>technology</em> to use hydrogen efficiently as fuel — it was a <strong>stock</strong>, not a resource.' },
+  { cat:'def', q:'Are human beings a resource?', hint:'Think carefully', a:'<strong>Yes.</strong> Humans are the most important resource — they use technology, skills and knowledge to transform other elements into resources.' },
+  { cat:'def', q:'What is the difference between Potential and Actual resources?', hint:'Think of Rajasthan vs Jharkhand', a:'<strong>Potential:</strong> exists but not yet used (e.g. solar energy in Rajasthan).<br><strong>Actual:</strong> surveyed, quantified and currently being used (e.g. coal in Jharkhand).' },
+  { cat:'def', q:'What is the difference between Stock and Reserve?', hint:'Both involve technology gaps', a:'<strong>Stock:</strong> materials exist but technology to use them is unavailable (e.g. hydrogen fuel).<br><strong>Reserve:</strong> technology is available but use is deliberately delayed (e.g. river water for future hydro power).' },
+
+  // ── CLASSIFICATION (10) ──
+  { cat:'cls', q:'Give two examples each of biotic and abiotic resources.', hint:'Living vs non-living', a:'<strong>Biotic:</strong> forests, fish, animals, insects, birds.<br><strong>Abiotic:</strong> rocks, metals, wind energy, water, minerals.' },
+  { cat:'cls', q:'Is coal biotic or abiotic? Is it renewable or non-renewable?', hint:'Important distinction!', a:'Coal is <strong>biotic in origin</strong> (formed from ancient plants) but is classified as <strong>non-renewable</strong> because it takes millions of years to form.' },
+  { cat:'cls', q:'What are community resources? Give examples.', hint:'Accessible to all', a:'Resources accessible to all members of a community. Examples: <strong>village pond, grazing land, public parks, community forests</strong>.' },
+  { cat:'cls', q:'Up to how many nautical miles from coast is the sea a national resource?', hint:'Economic Exclusion Zone', a:'India\'s national territory extends <strong>12 nautical miles</strong> into the sea. EEZ (Exclusive Economic Zone) extends up to <strong>200 nautical miles</strong>.' },
+  { cat:'cls', q:'Name two examples of international resources.', hint:'Beyond national boundaries', a:'<strong>Open ocean</strong> (beyond national waters), <strong>atmosphere</strong>, <strong>Antarctica</strong>, and outer space — governed by international agreements.' },
+  { cat:'cls', q:'Why is solar energy a renewable resource?', hint:'Source is inexhaustible', a:'Solar energy comes from the Sun, which is inexhaustible on human timescales. It can be used again and again without being depleted.' },
+  { cat:'cls', q:'What makes a resource "individually owned"?', hint:'Think farmland, house', a:'Resources owned by private individuals — examples: <strong>farmland, house, plantation, orchard</strong>. They can be sold, leased or inherited.' },
+  { cat:'cls', q:'Classify rivers, forests, wildlife, and minerals by ownership.', hint:'Political boundary', a:'All are <strong>national resources</strong> — within the political boundaries of a nation and managed by the government.' },
+  { cat:'cls', q:'Name two stock resources with reasons.', hint:'Technology is the barrier', a:'1. <strong>Hydrogen (water)</strong> — water exists, but economically splitting H₂O for fuel is not yet viable.<br>2. <strong>Tidal energy</strong> in many regions — technology exists but large-scale implementation remains costly.' },
+  { cat:'cls', q:'Give an example to show that cultural values can determine what is a resource.', hint:'India + alcohol', a:'Grapes can be used to make wine in France but in dry states of India, <strong>alcohol production is banned</strong> — cultural/legal norms prevent that use.' },
+
+  // ── LAND & SOIL (12) ──
+  { cat:'land', q:'What is the total geographical area of India?', hint:'In sq km', a:'<strong>3.28 million square kilometres</strong>. Land use data is available for about 93% of this area.' },
+  { cat:'land', q:'What percentage of India\'s land is under forests? What should it ideally be?', hint:'Current vs target', a:'Current forest cover: approximately <strong>23.4%</strong>. The National Forest Policy target is <strong>33%</strong> of total area.' },
+  { cat:'land', q:'Name 3 causes of land degradation in India with regions.', hint:'Mining, grazing, irrigation', a:'1. <strong>Mining</strong> — Jharkhand, MP, Odisha (opencast mining scars land).<br>2. <strong>Overgrazing</strong> — Rajasthan, Gujarat, MP.<br>3. <strong>Over-irrigation</strong> — Punjab, Haryana (waterlogging &amp; salinisation).' },
+  { cat:'land', q:'What is gully erosion? Where does it create "bad lands"?', hint:'Deep channels in soil', a:'Water cuts deep channels into soft soil → <strong>gully erosion</strong>. Creates ravines and <strong>bad lands</strong> — most notoriously in the <strong>Chambal valley</strong> (MP, Rajasthan).' },
+  { cat:'land', q:'Name the most widespread soil type in India and its key properties.', hint:'River deposited', a:'<strong>Alluvial soil</strong> — deposited by rivers (Ganga, Indus, Brahmaputra). Rich in potash, phosphoric acid, lime. Covers ~40% of India\'s land. Ideal for wheat, rice, sugarcane.' },
+  { cat:'land', q:'What is the difference between Khadar and Bhangar?', hint:'New vs old alluvium', a:'<strong>Khadar:</strong> new alluvium — lighter, more sandy, found near river channels, renewed annually by floods.<br><strong>Bhangar:</strong> old alluvium — higher up terraces, contains calcium carbonate (kankar) nodules.' },
+  { cat:'land', q:'Why is black soil called "self-ploughing"?', hint:'Wet and dry cycles', a:'Black soil has very fine clay particles that <strong>swell and become sticky when wet</strong>, then develop <strong>deep cracks when dry</strong>. These cracks allow air to penetrate — this natural tilling is called self-ploughing.' },
+  { cat:'land', q:'In which region is black soil found? What is it ideal for?', hint:'Deccan Trap', a:'Found in the <strong>Deccan Trap region</strong> — Maharashtra, Saurashtra, Malwa, MP, Gujarat, Andhra Pradesh. Ideal for <strong>cotton</strong> (hence called Black Cotton Soil).' },
+  { cat:'land', q:'Why is laterite soil unsuitable for agriculture without treatment?', hint:'Iron, aluminium, no nitrogen', a:'Laterite soil is rich in <strong>iron and aluminium</strong> but poor in <strong>nitrogen, potash, and lime</strong>. Humus is quickly destroyed by bacteria in high heat. Needs heavy fertilisation.' },
+  { cat:'land', q:'What does "laterite" mean and why is it named so?', hint:'Latin word', a:'"Laterite" comes from Latin <strong>"later" = brick</strong>. This soil hardens on exposure to air and is used as building material — the famous <strong>Angkor Wat</strong> temple was built using it!' },
+  { cat:'land', q:'Name two methods of soil conservation on slopes.', hint:'Farming techniques', a:'1. <strong>Contour ploughing:</strong> ploughing along contour lines slows water runoff.<br>2. <strong>Terrace cultivation:</strong> broad flat steps cut into steep slopes — common in NE hill states.' },
+  { cat:'land', q:'What are shelter belts? Where are they used?', hint:'Trees as windbreaks', a:'<strong>Rows of trees</strong> planted to protect crops from wind erosion. Used extensively in <strong>semi-arid regions of Rajasthan and Gujarat</strong> to stabilise sand dunes.' },
+
+  // ── PLANNING (7) ──
+  { cat:'plan', q:'What are the three stages of resource planning in India?', hint:'Identify → Plan → Match', a:'1. <strong>Identification and inventory</strong> of resources (surveys, maps)<br>2. <strong>Evolving a planning structure</strong> (institutions, laws, policies)<br>3. <strong>Matching resource plans</strong> with national development plans (Five Year Plans)' },
+  { cat:'plan', q:'State the Brundtland Commission\'s definition of Sustainable Development.', hint:'1987, future generations', a:'"<strong>Development that meets the needs of the present without compromising the ability of future generations to meet their own needs.</strong>" — Brundtland Commission, 1987.' },
+  { cat:'plan', q:'What was Agenda 21? When and where was it adopted?', hint:'Rio + year', a:'<strong>Agenda 21</strong> is a global blueprint for sustainable development adopted at the <strong>Rio Earth Summit (1992)</strong> in Rio de Janeiro by <strong>179 nations</strong>.' },
+  { cat:'plan', q:'What does India\'s NAPCC stand for? Name two of its missions.', hint:'8 missions total', a:'<strong>National Action Plan on Climate Change</strong>. Two missions: <strong>National Solar Mission</strong> and <strong>National Mission for Enhanced Energy Efficiency</strong>.' },
+  { cat:'plan', q:'Why is Jharkhand resource-rich but economically backward?', hint:'Resource curse', a:'Resources are extracted but benefits flow to corporations/government rather than local communities. Tribal displacement, lack of local industry, poor governance and infrastructure keep incomes low despite mineral wealth.' },
+  { cat:'plan', q:'Why did Gandhi oppose industrialisation?', hint:'Greed vs need', a:'Gandhi believed mass industrialisation promotes <strong>greed</strong> and leads to inequitable distribution and resource depletion. He advocated <strong>small-scale, self-sufficient village economies</strong> — anticipated modern environmental concerns.' },
+  { cat:'plan', q:'What is the "resource curse"?', hint:'Paradox of plenty', a:'The <strong>resource curse</strong> (paradox of plenty): nations/regions rich in natural resources often have <strong>lower economic growth, less democracy, and worse development outcomes</strong> than resource-poor ones, due to corruption, conflict, and neglect of other sectors.' },
+
+  // ── MOVEMENTS (8) ──
+  { cat:'move', q:'What was the Chipko Movement? Who led it?', hint:'Hugging trees, 1973', a:'Started in <strong>1973</strong> in <strong>Uttarakhand</strong>. Women and villagers <strong>hugged trees</strong> to prevent commercial felling. Led by <strong>Sunderlal Bahuguna</strong>. Inspired by Gaura Devi\'s resistance at Reni village.' },
+  { cat:'move', q:'What was the Appiko Movement?', hint:'South Indian version', a:'A <strong>1987</strong> movement in <strong>Karnataka</strong> similar to Chipko — villagers hugged trees ("Appiko" = to hug in Kannada) to prevent forest destruction in the Western Ghats.' },
+  { cat:'move', q:'Who is Medha Patkar? What movement did she lead?', hint:'Narmada river', a:'<strong>Medha Patkar</strong> is a social activist who led the <strong>Narmada Bachao Andolan</strong> — a protest movement against large dams (especially the Sardar Sarovar Dam) on the Narmada river that displaced tribal communities.' },
+  { cat:'move', q:'Who was Wangari Maathai? What was her achievement?', hint:'Nobel + trees', a:'<strong>Wangari Maathai</strong> was a Kenyan environmental activist who founded the <strong>Green Belt Movement</strong> — planted over <strong>30 million trees</strong> across Africa. Won the <strong>Nobel Peace Prize in 2004</strong>.' },
+  { cat:'move', q:'What is the Narmada Bachao Andolan and why was it started?', hint:'Dams, displacement', a:'A movement against large dam projects on the <strong>Narmada river</strong>, particularly the Sardar Sarovar Dam. Started because these dams would <strong>submerge forests and displace thousands of tribal communities</strong> without proper rehabilitation.' },
+  { cat:'move', q:'What did the Kyoto Protocol (1997) commit signatory nations to?', hint:'GHG emissions', a:'Binding commitments to <strong>reduce greenhouse gas (GHG) emissions</strong> — specifically 5.2% below 1990 levels by 2008–2012. The USA refused to ratify it; India and China were exempt as developing nations.' },
+  { cat:'move', q:'What was decided at the Paris Agreement (2015)?', hint:'Temperature target', a:'Nations agreed to limit global average temperature rise to <strong>well below 2°C above pre-industrial levels</strong>, and pursue efforts to limit it to <strong>1.5°C</strong>. Each nation submitted its own NDCs (Nationally Determined Contributions).' },
+  { cat:'move', q:'Name the three pillars of sustainable development.', hint:'Three interlocking circles', a:'1. <strong>Environment:</strong> biodiversity, clean air and water, climate stability.<br>2. <strong>Economy:</strong> growth, employment, infrastructure.<br>3. <strong>Society:</strong> equity, health, culture, justice.<br>Sustainable development lies at the intersection of all three.' },
+];
+
+let deck = [...ALL_CARDS];
+let knownSet = new Set();
+let current = 0;
+let filterCat = 'all';
+
+function filtered(){ return filterCat==='all' ? deck : deck.filter(c=>c.cat===filterCat); }
+
+function render(){
+  const cards = filtered();
+  if(!cards.length){ document.getElementById('fcQ').textContent='No cards in this category.'; return; }
+  const c = cards[current % cards.length];
+  document.getElementById('fcWrap').classList.remove('flipped');
+  setTimeout(()=>{
+    const idx = deck.indexOf(c);
+    document.getElementById('fcTag').textContent = ({def:'🌿 Definition',cls:'🔵 Classification',land:'🗺️ Land & Soil',plan:'🗂️ Planning',move:'✊ Movements'})[c.cat]||c.cat;
+    const tagColors = {def:'rgba(74,222,128,.15)',cls:'rgba(96,165,250,.15)',land:'rgba(248,113,113,.15)',plan:'rgba(167,139,250,.15)',move:'rgba(52,211,153,.15)'};
+    const tagTxt = {def:'#4ade80',cls:'#93c5fd',land:'#fca5a5',plan:'#c4b5fd',move:'#6ee7b7'};
+    document.getElementById('fcTag').style.background = tagColors[c.cat]||'';
+    document.getElementById('fcTag').style.color = tagTxt[c.cat]||'';
+    document.getElementById('fcQ').textContent = c.q;
+    document.getElementById('fcHint').textContent = c.hint ? '💡 ' + c.hint : '';
+    document.getElementById('fcAns').innerHTML = c.a;
+    const kb = document.getElementById('knownBadge');
+    if(knownSet.has(idx)){ kb.textContent='✓ Known'; kb.className='known-badge known'; }
+    else { kb.textContent=''; kb.className='known-badge'; }
+    document.getElementById('cardCtr').textContent = `${(current%cards.length)+1} / ${cards.length}`;
+    document.getElementById('prevBtn').disabled = current===0;
+    document.getElementById('nextBtn').disabled = current>=cards.length-1;
+    updateProg();
+  }, 150);
+}
+
+function flipCard(){ document.getElementById('fcWrap').classList.toggle('flipped'); }
+function go(d){ const cards=filtered(); current=Math.max(0,Math.min(current+d,cards.length-1)); render(); }
+function markKnown(){
+  const cards=filtered(); if(!cards.length)return;
+  const idx=deck.indexOf(cards[current%cards.length]);
+  if(knownSet.has(idx)) knownSet.delete(idx); else knownSet.add(idx);
+  render();
+}
+function shuffleDeck(){
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  current=0; render();
+}
+function resetKnown(){ knownSet.clear(); render(); }
+function setFilter(f){
+  filterCat=f; current=0;
+  document.querySelectorAll('.f-btn').forEach(b=>{
+    b.classList.toggle('on', b.classList.contains('f-'+f));
+  });
+  render();
+}
+function updateProg(){
+  const pct = ALL_CARDS.length ? Math.round(knownSet.size/ALL_CARDS.length*100) : 0;
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progText').textContent=`${knownSet.size} / ${ALL_CARDS.length} known`;
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight') go(1);
+  else if(e.key==='ArrowLeft') go(-1);
+  else if(e.key===' '){ e.preventDefault(); flipCard(); }
+  else if(e.key==='k'||e.key==='K') markKnown();
+});
+
+render();
+</script>
+</body>
+</html>
