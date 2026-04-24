@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Light: Reflection & Refraction</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080f1e;--card:#111c2e;--card2:#162236;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;--blue:#38bdf8;--green:#22c55e;--amber:#f59e0b;--purple:#a78bfa;--pink:#f472b6;--teal:#2dd4bf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+header{text-align:center;padding:2.2rem 1rem 1rem;position:relative}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.1),transparent 70%);pointer-events:none}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4.5vw,2.5rem);font-weight:800;background:linear-gradient(135deg,#38bdf8,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;margin-top:.3rem}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;padding:.8rem 1rem}
+.fbtn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .85rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.fbtn:hover{border-color:#64748b;color:var(--text)}
+.fbtn.active{border-color:var(--blue);color:#fff;background:rgba(56,189,248,.12)}
+
+/* progress */
+.progress-bar{max-width:600px;margin:.5rem auto;padding:0 1rem;display:flex;align-items:center;gap:.6rem}
+.pbar{flex:1;height:6px;border-radius:3px;background:var(--card2);overflow:hidden}
+.pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .3s}
+.ptext{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);min-width:80px;text-align:right}
+
+/* toolbar */
+.toolbar{display:flex;justify-content:center;gap:.5rem;padding:.3rem 1rem .8rem}
+.tbtn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tbtn:hover{border-color:#64748b;color:var(--text)}
+
+/* card area */
+.card-area{display:flex;justify-content:center;align-items:center;min-height:340px;padding:1rem;perspective:900px}
+.flip-card{width:min(520px,92vw);height:300px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center}
+.flip-front{background:var(--card);border:1.5px solid var(--border)}
+.flip-back{background:var(--card2);border:1.5px solid rgba(56,189,248,.25);transform:rotateY(180deg)}
+.flip-front .cat{font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.8rem;padding:.2rem .7rem;border-radius:99px;border:1px solid var(--border)}
+.flip-front .q{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;line-height:1.6}
+.flip-back .a{font-size:.95rem;line-height:1.75;color:var(--text)}
+.flip-back .a strong{color:var(--blue)}
+.flip-hint{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-top:auto;padding-top:1rem}
+.card-num{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);position:absolute;top:.8rem;right:1rem}
+
+/* nav arrows */
+.card-nav{display:flex;justify-content:center;align-items:center;gap:1.5rem;padding:.5rem}
+.nav-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-size:1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.nav-btn:hover{border-color:var(--blue);color:var(--text)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+
+/* keyboard hint */
+.kb-hint{text-align:center;font-family:'DM Mono',monospace;font-size:.65rem;color:#334155;padding:.5rem}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(8,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.5);position:relative;z-index:100}
+.site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#64748b;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e2e8f0}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Light — Reflection & Refraction</h1>
+  <p>Flashcards · 42 cards · CBSE Class X · Ch.10</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress-bar"><div class="pbar"><div class="pfill" id="pfill"></div></div><div class="ptext" id="ptext">0 / 0</div></div>
+<div class="toolbar">
+  <button class="tbtn" onclick="shuffle()">🔀 Shuffle</button>
+  <button class="tbtn" onclick="markKnown()">✅ Known</button>
+  <button class="tbtn" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="card-area"><div class="flip-card" id="fc" onclick="flip()"><div class="flip-front" id="ff"></div><div class="flip-back" id="fb"></div></div></div>
+<div class="card-nav">
+  <button class="nav-btn" id="prevBtn" onclick="prev()">◀</button>
+  <button class="nav-btn" id="nextBtn" onclick="next()">▶</button>
+</div>
+<div class="kb-hint">← → to navigate · Space to flip · K to mark known</div>
+
+<script>
+const CARDS = [
+  // REFLECTION (refl)
+  {cat:'refl',q:'What is the law of reflection?',a:'<strong>∠i = ∠r</strong> — the angle of incidence equals the angle of reflection. Both angles are measured from the <strong>normal</strong>, and the incident ray, reflected ray, and normal all lie in the same plane.'},
+  {cat:'refl',q:'What is rectilinear propagation of light?',a:'Light travels in <strong>straight lines</strong> in a homogeneous transparent medium. This property explains the formation of shadows.'},
+  {cat:'refl',q:'Differentiate between regular and diffuse reflection.',a:'<strong>Regular:</strong> Smooth surface → parallel rays remain parallel after reflection (mirror).<br><strong>Diffuse:</strong> Rough surface → parallel rays scatter in different directions. Laws of reflection are obeyed at each point in both cases.'},
+  {cat:'refl',q:'What is lateral inversion?',a:'The left-right reversal of an image in a plane mirror. The word <strong>AMBULANCE</strong> is written reversed on emergency vehicles so it reads correctly in rear-view mirrors.'},
+  {cat:'refl',q:'List the properties of an image formed by a plane mirror.',a:'<strong>Virtual</strong>, <strong>erect</strong>, same size as object, <strong>laterally inverted</strong>, and image distance = object distance from mirror.'},
+  {cat:'refl',q:'What are luminous and non-luminous objects?',a:'<strong>Luminous:</strong> Emit their own light (Sun, candle, bulb).<br><strong>Non-luminous:</strong> Do not emit light, only reflect it (Moon, book, table).'},
+
+  // MIRRORS (mirr)
+  {cat:'mirr',q:'What is the relationship between radius of curvature (R) and focal length (f)?',a:'<strong>R = 2f</strong> (or f = R/2). The principal focus F is the midpoint of the line segment PC (pole to centre of curvature).'},
+  {cat:'mirr',q:'State the mirror formula.',a:'<strong>1/v + 1/u = 1/f</strong><br>v = image distance, u = object distance, f = focal length. All measured from the pole P.'},
+  {cat:'mirr',q:'What is magnification for mirrors?',a:'<strong>m = h′/h = −v/u</strong><br>m positive → erect (virtual image)<br>m negative → inverted (real image)<br>|m| > 1 → enlarged, |m| < 1 → diminished.'},
+  {cat:'mirr',q:'A concave mirror always forms a virtual image. True or false?',a:'<strong>False.</strong> A concave mirror forms a virtual, erect, enlarged image only when the object is between F and P. For all other positions, the image is real and inverted.'},
+  {cat:'mirr',q:'What type of image does a convex mirror always form?',a:'A convex mirror <strong>always</strong> forms a <strong>virtual, erect, and diminished</strong> image, regardless of the object\'s position.'},
+  {cat:'mirr',q:'Where is the image when an object is placed at C of a concave mirror?',a:'The image is formed <strong>at C</strong> itself. It is <strong>real, inverted, and same size</strong> as the object.'},
+  {cat:'mirr',q:'Why are convex mirrors used as rear-view mirrors?',a:'Because they always form <strong>erect and diminished</strong> images, giving a <strong>wider field of view</strong> — the driver can see more of the road behind.'},
+  {cat:'mirr',q:'Why are concave mirrors used in torches and headlights?',a:'When a bulb is placed at the <strong>focus</strong> of a concave mirror, the reflected light forms a strong, <strong>parallel beam</strong> — ideal for illumination.'},
+  {cat:'mirr',q:'What happens to the image as the object moves from infinity towards the pole of a concave mirror?',a:'The image starts at F (point, real) and moves away from the mirror, growing in size. At C it equals the object. Beyond C it\'s enlarged. At F the image goes to infinity. Between F and P it flips to virtual, erect, enlarged behind the mirror.'},
+  {cat:'mirr',q:'What is the sign of f for a concave mirror?',a:'<strong>f is negative</strong> for a concave mirror (focus is in front, on the same side as incident light, which is the −ve direction).'},
+
+  // REFRACTION (refr)
+  {cat:'refr',q:'What is refraction of light?',a:'The <strong>bending of light</strong> when it passes from one transparent medium to another, caused by a change in the <strong>speed of light</strong> in different media.'},
+  {cat:'refr',q:'State Snell\'s Law.',a:'<strong>n₁ sin i = n₂ sin r</strong><br>The ratio sin i / sin r is constant for a given pair of media. n₁ and n₂ are the refractive indices of the two media.'},
+  {cat:'refr',q:'What is refractive index?',a:'<strong>n = c / v</strong> — the ratio of speed of light in vacuum (c) to speed of light in the medium (v). Higher n → denser medium → light travels slower.'},
+  {cat:'refr',q:'Light enters a denser medium from a rarer medium. Which way does it bend?',a:'It bends <strong>towards the normal</strong>. The angle of refraction is less than the angle of incidence (∠r < ∠i).'},
+  {cat:'refr',q:'Why does a swimming pool appear shallower than it actually is?',a:'Due to refraction: light bends away from the normal when going from water (denser) to air (rarer). The apparent depth is less than real depth.<br><strong>Apparent Depth = Real Depth / n</strong>'},
+  {cat:'refr',q:'Why do stars twinkle?',a:'Due to <strong>atmospheric refraction</strong>. Starlight passes through layers of air with varying density, causing the apparent position to shift continuously, making stars appear to twinkle.'},
+  {cat:'refr',q:'The refractive index of diamond is 2.42. What does this mean?',a:'The speed of light in diamond is <strong>c/2.42 ≈ 1.24 × 10⁸ m/s</strong> — about 2.42 times slower than in vacuum. This high n causes strong bending and the sparkling brilliance of diamond.'},
+  {cat:'refr',q:'A ray of light passes through a glass slab. Does it emerge parallel to the incident ray?',a:'<strong>Yes</strong> — the emergent ray is parallel to the incident ray but is <strong>laterally displaced</strong> (shifted sideways). The displacement increases with slab thickness and angle of incidence.'},
+
+  // LENSES (lens)
+  {cat:'lens',q:'Differentiate between convex and concave lenses.',a:'<strong>Convex:</strong> Thicker at centre, thinner at edges. Converges light → positive focal length.<br><strong>Concave:</strong> Thinner at centre, thicker at edges. Diverges light → negative focal length.'},
+  {cat:'lens',q:'State the lens formula.',a:'<strong>1/v − 1/u = 1/f</strong><br>Note: lens formula has a <strong>minus</strong> (unlike mirror formula which has a plus).'},
+  {cat:'lens',q:'What is the power of a lens?',a:'<strong>P = 1/f</strong> (f in metres). Unit: <strong>Dioptre (D)</strong>.<br>Convex → +ve power. Concave → −ve power.<br>For combination: P = P₁ + P₂ + ...'},
+  {cat:'lens',q:'A convex lens always forms a real image. True or false?',a:'<strong>False.</strong> When the object is between F₁ and O, a convex lens forms a <strong>virtual, erect, enlarged</strong> image on the same side as the object (works as a magnifying glass).'},
+  {cat:'lens',q:'What image does a concave lens always form?',a:'A concave lens <strong>always</strong> forms a <strong>virtual, erect, diminished</strong> image between F₁ and O, regardless of object position.'},
+  {cat:'lens',q:'Where is the image when an object is at 2F₁ of a convex lens?',a:'At <strong>2F₂</strong> on the other side. The image is <strong>real, inverted, and same size</strong>.'},
+  {cat:'lens',q:'A lens has f = +20 cm. Find its power.',a:'f = +20 cm = <strong>+0.20 m</strong><br>P = 1/f = 1/0.20 = <strong>+5 D</strong> (convex lens).'},
+  {cat:'lens',q:'Two lenses of power +3 D and −1.5 D are combined. What is the equivalent power and focal length?',a:'P = +3 + (−1.5) = <strong>+1.5 D</strong><br>f = 1/P = 1/1.5 = <strong>0.667 m = 66.7 cm</strong> (acts as a convex lens).'},
+
+  // SIGN CONVENTION (sign)
+  {cat:'sign',q:'What is the New Cartesian Sign Convention?',a:'Origin at pole (mirror) or optical centre (lens). <strong>+x</strong> = direction of incident light. Heights above axis = +ve, below = −ve. Object on left → <strong>u is always −ve</strong>.'},
+  {cat:'sign',q:'In the sign convention, what is the sign of u?',a:'<strong>u is always negative</strong> because the object is always placed on the left side (against the direction of positive x-axis).'},
+  {cat:'sign',q:'For a convex mirror, f is _____ and v is _____.',a:'f is <strong>positive</strong> (focus behind mirror, in +ve direction).<br>v is <strong>positive</strong> (image is virtual, behind mirror).'},
+  {cat:'sign',q:'For a convex lens, f is _____ . For a concave lens, f is _____ .',a:'Convex lens: f is <strong>positive</strong>.<br>Concave lens: f is <strong>negative</strong>.'},
+
+  // RAY DIAGRAMS (rays)
+  {cat:'rays',q:'State the 3 rules for drawing ray diagrams for mirrors.',a:'1) Ray <strong>parallel to axis</strong> → reflects through F (concave) / appears from F (convex).<br>2) Ray <strong>through F</strong> → reflects parallel to axis.<br>3) Ray <strong>through C</strong> → retraces its path.'},
+  {cat:'rays',q:'State the 3 rules for drawing ray diagrams for lenses.',a:'1) Ray <strong>parallel to axis</strong> → passes through F₂ (convex) / appears from F₁ (concave).<br>2) Ray <strong>through optical centre O</strong> → goes straight (undeviated).<br>3) Ray <strong>through F₁</strong> → emerges parallel to axis.'},
+  {cat:'rays',q:'How many rays are needed to locate an image?',a:'At least <strong>two</strong> rays are needed. Their intersection (real) or apparent intersection (virtual, traced back as dashed lines) gives the image position.'},
+  {cat:'rays',q:'How is a virtual image shown in a ray diagram?',a:'Virtual images are located by extending reflected/refracted rays <strong>backwards as dashed lines</strong>. The point where dashed lines appear to meet is the virtual image position.'},
+  {cat:'rays',q:'What kind of image can be obtained on a screen?',a:'Only a <strong>real image</strong> can be obtained on a screen because real images are formed by actual convergence of light rays. Virtual images cannot be projected on a screen.'},
+  {cat:'rays',q:'A concave mirror produces a highly enlarged image at infinity. Where is the object?',a:'The object is at the <strong>focus (F)</strong> of the concave mirror. Rays from F reflect parallel to the axis and never converge, forming the image at infinity.'},
+];
+
+const CATS = [
+  {id:'all', label:'All'},
+  {id:'refl', label:'Reflection'},
+  {id:'mirr', label:'Mirrors'},
+  {id:'refr', label:'Refraction'},
+  {id:'lens', label:'Lenses'},
+  {id:'sign', label:'Sign Conv.'},
+  {id:'rays', label:'Ray Diagrams'},
+];
+
+let activeCat = 'all', idx = 0, known = new Set();
+function filtered() { return activeCat === 'all' ? CARDS : CARDS.filter(c => c.cat === activeCat); }
+
+// Build filter buttons
+const filtersEl = document.getElementById('filters');
+CATS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'fbtn' + (c.id === 'all' ? ' active' : '');
+  b.textContent = c.label + (c.id === 'all' ? ` (${CARDS.length})` : ` (${CARDS.filter(x=>x.cat===c.id).length})`);
+  b.onclick = () => { activeCat = c.id; idx = 0; filtersEl.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); render(); };
+  filtersEl.appendChild(b);
+});
+
+const fc = document.getElementById('fc'), ff = document.getElementById('ff'), fb = document.getElementById('fb');
+const pfill = document.getElementById('pfill'), ptext = document.getElementById('ptext');
+
+function render() {
+  const deck = filtered();
+  if (!deck.length) { ff.innerHTML = '<div class="q">No cards in this category</div>'; fb.innerHTML = ''; return; }
+  if (idx >= deck.length) idx = deck.length - 1;
+  const c = deck[idx];
+  const catInfo = CATS.find(x=>x.id===c.cat);
+  fc.classList.remove('flipped');
+  ff.innerHTML = `<div class="card-num">${idx+1} / ${deck.length}</div><div class="cat" style="color:var(--blue)">${catInfo ? catInfo.label : c.cat}</div><div class="q">${c.q}</div><div class="flip-hint">Click or press Space to reveal answer</div>`;
+  fb.innerHTML = `<div class="card-num">${idx+1} / ${deck.length}</div><div class="a">${c.a}</div><div class="flip-hint">Click to flip back · K to mark known</div>`;
+  // progress
+  const knownInDeck = deck.filter((_,i) => known.has(CARDS.indexOf(deck[i]))).length;
+  const pct = deck.length ? (knownInDeck / deck.length * 100) : 0;
+  pfill.style.width = pct + '%';
+  ptext.textContent = `${knownInDeck} / ${deck.length} known`;
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx >= deck.length - 1;
+}
+
+function flip() { fc.classList.toggle('flipped'); }
+function next() { const d = filtered(); if (idx < d.length-1) { idx++; render(); } }
+function prev() { if (idx > 0) { idx--; render(); } }
+function shuffle() { CARDS.sort(() => Math.random() - .5); idx = 0; render(); }
+function markKnown() { const d = filtered(); const gi = CARDS.indexOf(d[idx]); known.add(gi); next(); if(idx===filtered().length-1) render(); }
+function resetAll() { known.clear(); idx = 0; render(); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') next();
+  else if (e.key === 'ArrowLeft') prev();
+  else if (e.key === ' ') { e.preventDefault(); flip(); }
+  else if (e.key === 'k' || e.key === 'K') markKnown();
+});
+
+render();
+</script>
+</body>
+</html>

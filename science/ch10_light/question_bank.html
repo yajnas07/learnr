@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Light: Reflection & Refraction</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080f1e;--card:#111c2e;--card2:#162236;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;--blue:#38bdf8;--green:#22c55e;--amber:#f59e0b;--purple:#a78bfa;--pink:#f472b6;--teal:#2dd4bf;--red:#f87171}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+header{text-align:center;padding:2.2rem 1rem 1rem;position:relative}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.1),transparent 70%);pointer-events:none}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4.5vw,2.5rem);font-weight:800;background:linear-gradient(135deg,#38bdf8,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;margin-top:.3rem}
+
+.container{max-width:900px;margin:auto;padding:0 1rem 3rem}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;padding:1rem 0}
+.fbtn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .8rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.fbtn:hover{border-color:#64748b;color:var(--text)}
+.fbtn.active{border-color:var(--blue);color:#fff;background:rgba(56,189,248,.12)}
+
+/* score bar */
+.score-bar{display:flex;align-items:center;gap:.8rem;padding:.6rem 0;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.score-bar .sbar{flex:1;height:6px;border-radius:3px;background:var(--card2);overflow:hidden}
+.score-bar .sfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--teal));transition:width .3s}
+
+/* question card */
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:1rem;overflow:hidden}
+.qcard .qhead{display:flex;align-items:flex-start;gap:.8rem;padding:1.2rem 1.2rem .8rem;cursor:pointer}
+.qcard .qnum{font-family:'Playfair Display',serif;font-weight:800;font-size:1rem;color:var(--blue);min-width:30px}
+.qcard .qtag{font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:1px;padding:.15rem .5rem;border-radius:99px;margin-left:auto;white-space:nowrap}
+.qcard .qbody{padding:0 1.2rem;font-size:.9rem;line-height:1.7}
+.qcard .qbody p{margin-bottom:.5rem}
+
+/* MCQ options */
+.opts{list-style:none;padding:.3rem 0 .8rem}
+.opts li{padding:.45rem .8rem;margin:.3rem 0;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:.85rem;transition:all .2s;display:flex;align-items:center;gap:.5rem}
+.opts li:hover{border-color:#64748b}
+.opts li.correct{border-color:var(--green);background:rgba(34,197,94,.08);color:var(--green)}
+.opts li.wrong{border-color:var(--red);background:rgba(248,113,113,.08);color:var(--red)}
+.opts li .ol{font-family:'DM Mono',monospace;font-weight:700;font-size:.78rem;min-width:20px}
+
+/* answer toggle */
+.ans-toggle{font-family:'DM Mono',monospace;font-size:.75rem;padding:.35rem 1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;margin:.5rem 0 .8rem;display:inline-block;transition:all .2s}
+.ans-toggle:hover{border-color:var(--blue);color:var(--text)}
+.model-ans{display:none;padding:.8rem 1rem;margin:0 0 1rem;background:rgba(56,189,248,.04);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;font-size:.85rem;line-height:1.75;color:var(--text)}
+.model-ans.show{display:block}
+.model-ans strong{color:var(--blue)}
+.exam-tip{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--amber);margin-top:.4rem;display:block}
+
+/* strip colors */
+.strip-refl{border-left:3px solid var(--green)}.strip-mirr{border-left:3px solid var(--amber)}.strip-refr{border-left:3px solid var(--purple)}.strip-lens{border-left:3px solid var(--teal)}.strip-num{border-left:3px solid var(--pink)}.strip-sign{border-left:3px solid var(--blue)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(8,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.5);position:relative;z-index:100}
+.site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#64748b;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e2e8f0}
+@media(max-width:600px){.container{padding:0 .6rem 2rem}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Light — Reflection & Refraction</h1>
+  <p>Question Bank · 30 Questions · CBSE Class X · Ch.10</p>
+</header>
+
+<div class="container">
+  <div class="filters" id="filters"></div>
+  <div class="score-bar"><span id="scoreText">0 / 0 correct</span><div class="sbar"><div class="sfill" id="sfill"></div></div></div>
+  <div id="qlist"></div>
+</div>
+
+<script>
+const QS = [
+  // ── MCQ (10) ──
+  {type:'mcq',cat:'refl',strip:'strip-refl',q:'Which of the following is correct about the laws of reflection?',ops:['Angle of incidence > Angle of reflection','Angle of incidence = Angle of reflection','Angle of incidence < Angle of reflection','Angle of incidence + Angle of reflection = 180°'],ans:1,explain:'The first law of reflection states ∠i = ∠r. Both are measured from the normal.'},
+  {type:'mcq',cat:'mirr',strip:'strip-mirr',q:'A concave mirror produces an erect and enlarged image. The object must be placed:',ops:['At the centre of curvature','Beyond C','Between F and P','At infinity'],ans:2,explain:'Between F and P is the only position where a concave mirror forms a virtual, erect, enlarged image (behind the mirror).'},
+  {type:'mcq',cat:'mirr',strip:'strip-mirr',q:'The focal length of a convex mirror of radius of curvature 40 cm is:',ops:['+40 cm','+20 cm','−20 cm','−40 cm'],ans:1,explain:'f = R/2 = 40/2 = 20 cm. For a convex mirror, f is positive → +20 cm.'},
+  {type:'mcq',cat:'refr',strip:'strip-refr',q:'When light travels from a rarer to a denser medium, it bends:',ops:['Away from the normal','Along the normal','Towards the normal','Does not bend'],ans:2,explain:'Light slows down in a denser medium → bends towards the normal (∠r < ∠i).'},
+  {type:'mcq',cat:'refr',strip:'strip-refr',q:'The refractive index of diamond is 2.42. The speed of light in diamond is approximately:',ops:['3 × 10⁸ m/s','1.24 × 10⁸ m/s','2.42 × 10⁸ m/s','7.26 × 10⁸ m/s'],ans:1,explain:'v = c/n = 3×10⁸ / 2.42 ≈ 1.24 × 10⁸ m/s.'},
+  {type:'mcq',cat:'lens',strip:'strip-lens',q:'A concave lens always forms an image that is:',ops:['Real, inverted, enlarged','Virtual, erect, diminished','Real, erect, same size','Virtual, inverted, diminished'],ans:1,explain:'A concave lens (diverging) always produces a virtual, erect, diminished image between F and O.'},
+  {type:'mcq',cat:'lens',strip:'strip-lens',q:'The power of a convex lens of focal length 25 cm is:',ops:['+4 D','+0.25 D','−4 D','+25 D'],ans:0,explain:'P = 1/f = 1/0.25 = +4 D (f must be in metres: 25 cm = 0.25 m).'},
+  {type:'mcq',cat:'mirr',strip:'strip-mirr',q:'Which mirror is used as a rear-view mirror in vehicles?',ops:['Concave mirror','Plane mirror','Convex mirror','Any of these'],ans:2,explain:'Convex mirrors give a wider field of view and always form erect, diminished images — ideal for rear-view mirrors.'},
+  {type:'mcq',cat:'lens',strip:'strip-lens',q:'An object is placed at 2F₁ of a convex lens. The image is:',ops:['At F₂, real, diminished','At 2F₂, real, same size','Beyond 2F₂, real, enlarged','Between F₂ and 2F₂, real'],ans:1,explain:'At 2F₁ → image at 2F₂ → real, inverted, same size (symmetric case).'},
+  {type:'mcq',cat:'sign',strip:'strip-sign',q:'In the new Cartesian sign convention, the object distance (u) is:',ops:['Always positive','Always negative','Positive for real, negative for virtual','Depends on the mirror type'],ans:1,explain:'The object is always placed on the left → against the +ve x direction → u is always negative.'},
+
+  // ── ASSERTION-REASON (4) ──
+  {type:'ar',cat:'mirr',strip:'strip-mirr',q:'<strong>Assertion:</strong> A convex mirror is preferred for rear-view mirrors.<br><strong>Reason:</strong> A convex mirror always forms a virtual, erect and diminished image for all positions of the object.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'Both statements are correct, and the reason (wider field of view from diminished image) directly explains why convex mirrors are preferred.'},
+  {type:'ar',cat:'refr',strip:'strip-refr',q:'<strong>Assertion:</strong> A pencil partly immersed in water appears bent at the interface.<br><strong>Reason:</strong> Light undergoes refraction when passing from water to air.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'The apparent bending is caused by refraction at the water-air interface, changing the direction of light from the submerged part.'},
+  {type:'ar',cat:'lens',strip:'strip-lens',q:'<strong>Assertion:</strong> The power of a concave lens is negative.<br><strong>Reason:</strong> The focal length of a concave lens is positive.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:2,explain:'A is true (P = 1/f, f is negative → P is negative). R is false — concave lens has negative focal length.'},
+  {type:'ar',cat:'refl',strip:'strip-refl',q:'<strong>Assertion:</strong> Diffuse reflection does not obey the laws of reflection.<br><strong>Reason:</strong> In diffuse reflection, the reflected rays go in different directions.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is false but R is true','Both A and R are false'],ans:2,explain:'A is false — diffuse reflection DOES obey the laws at each point. R is true — rays scatter due to surface irregularities, but each individual reflection follows ∠i = ∠r.'},
+
+  // ── SHORT ANSWER (12) ──
+  {type:'short',cat:'refl',strip:'strip-refl',q:'Define the angle of incidence and the angle of reflection.',
+   answer:'The <strong>angle of incidence (∠i)</strong> is the angle between the incident ray and the normal at the point of incidence. The <strong>angle of reflection (∠r)</strong> is the angle between the reflected ray and the normal. According to the law of reflection, ∠i = ∠r.',tip:'Always mention "measured from the normal" — not from the surface.'},
+  {type:'short',cat:'mirr',strip:'strip-mirr',q:'Define the principal focus of a concave mirror.',
+   answer:'The point on the principal axis where rays <strong>parallel to the principal axis</strong> converge after reflection from a concave mirror is called the <strong>principal focus (F)</strong>. It lies between the pole P and the centre of curvature C, at a distance f = R/2 from P.',tip:'For convex mirror, say "appear to diverge from F (virtual focus)".'},
+  {type:'short',cat:'mirr',strip:'strip-mirr',q:'An object is placed at a distance of 30 cm from a concave mirror of focal length 15 cm. Find the position, nature and magnification of the image.',
+   answer:'u = −30 cm, f = −15 cm.<br>1/v = 1/f − 1/u = 1/(−15) − 1/(−30) = −1/15 + 1/30 = −1/30<br><strong>v = −30 cm</strong> (real, in front of mirror).<br>m = −v/u = −(−30)/(−30) = <strong>−1</strong> (inverted, same size).<br>Image is at C, real, inverted, same size.',tip:'Show sign convention clearly. Board loves this — 3–5 marks.'},
+  {type:'short',cat:'refr',strip:'strip-refr',q:'State two effects of refraction observed in daily life.',
+   answer:'1) A <strong>coin at the bottom of a bowl</strong> of water appears raised — apparent depth is less than real depth.<br>2) A <strong>pencil partly immersed in water</strong> appears bent at the interface due to the change in speed of light.<br>Other examples: stars twinkling, sun visible before actual sunrise.',tip:'Give 2 well-explained examples with brief reasoning.'},
+  {type:'short',cat:'refr',strip:'strip-refr',q:'A ray of light travelling in air enters obliquely into water. Does the ray bend towards or away from the normal? Why?',
+   answer:'The ray bends <strong>towards the normal</strong>. Water is optically denser than air (n<sub>water</sub> = 1.33 > n<sub>air</sub> = 1). When light enters a denser medium, its speed decreases, causing it to bend towards the normal (∠r < ∠i).',tip:'Always state why — mention speed change + refractive index.'},
+  {type:'short',cat:'lens',strip:'strip-lens',q:'An object is placed at a distance of 40 cm from a convex lens of focal length 20 cm. Find the image position and magnification.',
+   answer:'u = −40 cm, f = +20 cm.<br>1/v = 1/f + 1/u = 1/20 + 1/(−40) = 2/40 − 1/40 = 1/40<br><strong>v = +40 cm</strong> (real, on the other side).<br>m = v/u = 40/(−40) = <strong>−1</strong> (inverted, same size).<br>Object at 2F₁ → image at 2F₂.',tip:'Note lens formula has minus: 1/v − 1/u = 1/f, so 1/v = 1/f + 1/u.'},
+  {type:'short',cat:'lens',strip:'strip-lens',q:'A doctor prescribes a corrective lens of power +1.5 D. Find the focal length and identify the type of lens.',
+   answer:'f = 1/P = 1/1.5 = <strong>0.667 m = 66.7 cm</strong>.<br>Since power is positive, the lens is a <strong>convex (converging) lens</strong>. This corrects <strong>hypermetropia</strong> (farsightedness).',tip:'Don\'t forget to convert D to focal length in metres first.'},
+  {type:'short',cat:'mirr',strip:'strip-mirr',q:'List the uses of concave mirrors.',
+   answer:'1) <strong>Torches and headlights</strong> — bulb at focus produces parallel beam.<br>2) <strong>Shaving/make-up mirrors</strong> — object between F and P gives enlarged virtual image.<br>3) <strong>Dentist\'s mirror</strong> — enlarged image of teeth.<br>4) <strong>Solar furnaces</strong> — concentrates sunlight at focus.',tip:'Give 3-4 uses with brief reason for each — easy 2-3 marks.'},
+  {type:'short',cat:'sign',strip:'strip-sign',q:'Why is the sign convention important in optics?',
+   answer:'The <strong>New Cartesian Sign Convention</strong> provides a standardised way to assign positive and negative values to distances. It ensures the mirror and lens formulas give correct results for all cases — real/virtual objects and images. Without consistent signs, numerical answers would be ambiguous.',tip:'Mention: origin at P/O, +x along incident light, u always −ve.'},
+  {type:'short',cat:'refl',strip:'strip-refl',q:'Why do we see a virtual image in a plane mirror?',
+   answer:'Light rays from the object reflect off the plane mirror. The reflected rays <strong>diverge</strong>, but when our brain traces them backwards (extends them behind the mirror), they appear to meet at a point. This apparent meeting point is the <strong>virtual image</strong>. It cannot be captured on a screen because no actual light converges there.',tip:'Key phrase: "apparent intersection of diverging rays traced backwards".'},
+  {type:'short',cat:'mirr',strip:'strip-mirr',q:'Why does a convex mirror have a wider field of view than a plane mirror?',
+   answer:'A convex mirror\'s <strong>outward-curved surface</strong> causes light from a wider area to converge towards the eye. It forms <strong>diminished images</strong>, effectively fitting a larger scene into the mirror. That\'s why convex mirrors are used as rear-view mirrors and in shops for security.',tip:'Compare: plane mirror shows 1:1 sized image → limited view area.'},
+  {type:'short',cat:'refr',strip:'strip-refr',q:'What is the absolute refractive index? How is it related to the speed of light?',
+   answer:'The <strong>absolute refractive index (n)</strong> of a medium is the ratio of the speed of light in vacuum (c) to the speed of light in that medium (v):<br><strong>n = c / v</strong><br>A higher n means the medium is optically denser and light travels slower in it. Example: n<sub>glass</sub> ≈ 1.5 → light in glass is 1.5× slower than in vacuum.',tip:'Also know: n₁₂ = n₂/n₁ = v₁/v₂ (relative refractive index).'},
+
+  // ── LONG ANSWER (4) ──
+  {type:'long',cat:'mirr',strip:'strip-mirr',q:'With the help of a ray diagram, show the image formation when an object is placed between C and F of a concave mirror. State the nature, position and size of the image. Also derive the mirror formula.',
+   answer:'<strong>Ray Diagram:</strong> Object between C and F.<br>Ray 1: Parallel to axis → reflects through F.<br>Ray 2: Through C → retraces path.<br>Rays meet beyond C → <strong>Image: beyond C, real, inverted, enlarged</strong>.<br><br><strong>Mirror Formula Derivation:</strong><br>Using similar triangles in the ray diagram:<br>△A\'B\'F ~ △MPF gives: (A\'B\'/MP) = (B\'F/FP)<br>Since MP = AB: A\'B\'/AB = (v−f)/f ...(1)<br>△A\'B\'P ~ △ABP gives: A\'B\'/AB = v/u ...(2)<br>From (1) and (2): (v−f)/f = v/u<br>⟹ uv − uf = vf ⟹ uv = uf + vf<br>Dividing by uvf: <strong>1/f = 1/v + 1/u</strong>',tip:'This is a 5-mark question. Draw a neat labelled ray diagram FIRST, then derive. Always use sign convention.'},
+  {type:'long',cat:'refr',strip:'strip-refr',q:'State and explain the laws of refraction of light. Define refractive index and derive Snell\'s law. List three everyday phenomena caused by refraction.',
+   answer:'<strong>Laws of Refraction:</strong><br>1) The incident ray, refracted ray, and normal all lie in the <strong>same plane</strong>.<br>2) The ratio sin i / sin r is a <strong>constant</strong> for a given pair of media (Snell\'s Law).<br><br><strong>Refractive Index:</strong> n = c/v (speed in vacuum / speed in medium).<br>From Snell\'s law: n₁ sin i = n₂ sin r ⟹ sin i / sin r = n₂/n₁<br><br><strong>Everyday Phenomena:</strong><br>1) <strong>Apparent depth</strong> — pool looks shallower (depth\' = d/n).<br>2) <strong>Bending of pencil</strong> in water at the surface.<br>3) <strong>Twinkling of stars</strong> due to atmospheric refraction — varying air density shifts apparent position.',tip:'For 5 marks, state both laws clearly, define n with formula, and give 3 well-explained examples.'},
+  {type:'long',cat:'lens',strip:'strip-lens',q:'Draw ray diagrams for image formation by a convex lens when the object is (i) beyond 2F₁ (ii) between F₁ and O. State nature, position and size in each case. Also define power of a lens with its SI unit.',
+   answer:'<strong>Case (i): Object beyond 2F₁</strong><br>Ray 1: Parallel to axis → passes through F₂.<br>Ray 2: Through O → straight.<br>Image: <strong>Between F₂ and 2F₂, real, inverted, diminished.</strong><br><br><strong>Case (ii): Object between F₁ and O</strong><br>Same two rays, but they diverge after the lens. Extend backwards → appear to meet on same side as object.<br>Image: <strong>Same side as object, virtual, erect, enlarged</strong> (magnifying glass).<br><br><strong>Power of a Lens:</strong> P = 1/f (f in metres).<br>SI unit: <strong>Dioptre (D)</strong>. 1 D = power of a lens with f = 1 m.<br>Convex → +ve power. Concave → −ve power.<br>Combination: P = P₁ + P₂ + ...',tip:'Draw TWO separate ray diagrams with labels. For (ii) show dashed virtual image on the same side. This is a frequent 5-mark board question.'},
+  {type:'long',cat:'mirr',strip:'strip-mirr',q:'Compare concave and convex mirrors. Give the mirror formula and explain the sign convention with a diagram. Solve: An object is placed 20 cm from a convex mirror of focal length 15 cm. Find v and m.',
+   answer:'<strong>Comparison:</strong><table style="width:100%;border-collapse:collapse;margin:.5rem 0;font-size:.82rem"><tr style="border-bottom:1px solid #1a2d45"><th style="text-align:left;padding:.3rem;color:#38bdf8">Property</th><th style="padding:.3rem;color:#f59e0b">Concave</th><th style="padding:.3rem;color:#38bdf8">Convex</th></tr><tr><td style="padding:.3rem">Shape</td><td style="padding:.3rem;text-align:center">Caves inward</td><td style="padding:.3rem;text-align:center">Bulges outward</td></tr><tr><td style="padding:.3rem">f sign</td><td style="padding:.3rem;text-align:center">−ve</td><td style="padding:.3rem;text-align:center">+ve</td></tr><tr><td style="padding:.3rem">Image</td><td style="padding:.3rem;text-align:center">Real or virtual</td><td style="padding:.3rem;text-align:center">Always virtual</td></tr><tr><td style="padding:.3rem">Use</td><td style="padding:.3rem;text-align:center">Torch, shaving</td><td style="padding:.3rem;text-align:center">Rear-view mirror</td></tr></table><br><strong>Mirror Formula:</strong> 1/v + 1/u = 1/f<br><strong>Sign Convention:</strong> Origin at P, +x along incident light, u always −ve.<br><br><strong>Numerical:</strong> u = −20 cm, f = +15 cm (convex).<br>1/v = 1/f − 1/u = 1/15 − 1/(−20) = 1/15 + 1/20 = (4+3)/60 = 7/60<br><strong>v = +60/7 ≈ +8.57 cm</strong> (positive → behind mirror → virtual).<br>m = −v/u = −(8.57)/(−20) = <strong>+0.43</strong> (erect, diminished). ✓',tip:'This is a comprehensive 5-mark question. Include comparison table + formula + sign convention + numerical. Show all steps clearly.'},
+];
+
+const CATS = [
+  {id:'all',label:'All'},{id:'mcq',label:'MCQ'},{id:'ar',label:'Assert-Reason'},
+  {id:'short',label:'Short Answer'},{id:'long',label:'Long Answer'}
+];
+const TOPIC_COLORS = {refl:'var(--green)',mirr:'var(--amber)',refr:'var(--purple)',lens:'var(--teal)',sign:'var(--blue)',num:'var(--pink)'};
+
+let activeCat = 'all', score = 0, attempted = 0;
+
+// filters
+const filtersEl = document.getElementById('filters');
+CATS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'fbtn' + (c.id==='all'?' active':'');
+  const cnt = c.id==='all' ? QS.length : QS.filter(q => q.type === c.id).length;
+  b.textContent = c.label + ` (${cnt})`;
+  b.onclick = () => { activeCat = c.id; filtersEl.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderAll(); };
+  filtersEl.appendChild(b);
+});
+
+function renderAll() {
+  const list = document.getElementById('qlist');
+  list.innerHTML = '';
+  const qs = activeCat === 'all' ? QS : QS.filter(q => q.type === activeCat);
+  qs.forEach((q, qi) => {
+    const gi = QS.indexOf(q);
+    const div = document.createElement('div');
+    div.className = 'qcard ' + (q.strip || '');
+    const typeLabel = q.type === 'mcq' ? 'MCQ' : q.type === 'ar' ? 'Assertion-Reason' : q.type === 'short' ? 'Short Answer' : 'Long Answer';
+    const tagColor = TOPIC_COLORS[q.cat] || 'var(--muted)';
+    let html = `<div class="qhead" onclick="this.parentElement.querySelector('.qbody').style.display=this.parentElement.querySelector('.qbody').style.display==='none'?'block':'block'">
+      <span class="qnum">Q${qi+1}</span>
+      <span style="flex:1;font-size:.9rem;line-height:1.6">${q.q}</span>
+      <span class="qtag" style="border:1px solid ${tagColor};color:${tagColor}">${typeLabel}</span>
+    </div><div class="qbody">`;
+
+    if (q.type === 'mcq' || q.type === 'ar') {
+      html += '<ul class="opts">';
+      q.ops.forEach((op, oi) => {
+        html += `<li onclick="checkMCQ(this,${gi},${oi})" data-qi="${gi}" data-oi="${oi}"><span class="ol">${String.fromCharCode(65+oi)}.</span> ${op}</li>`;
+      });
+      html += '</ul>';
+      html += `<div class="model-ans" id="exp-${gi}"><strong>Explanation:</strong> ${q.explain}</div>`;
+    } else {
+      html += `<button class="ans-toggle" onclick="toggleAns(${gi})">Show Model Answer</button>`;
+      html += `<div class="model-ans" id="ans-${gi}">${q.answer}`;
+      if (q.tip) html += `<span class="exam-tip">📝 Exam Tip: ${q.tip}</span>`;
+      html += '</div>';
+    }
+    html += '</div>';
+    div.innerHTML = html;
+    list.appendChild(div);
+  });
+  updateScore();
+}
+
+function checkMCQ(el, qi, oi) {
+  const q = QS[qi];
+  const parent = el.parentElement;
+  if (parent.dataset.done) return;
+  parent.dataset.done = '1';
+  attempted++;
+  if (oi === q.ans) { el.classList.add('correct'); score++; }
+  else {
+    el.classList.add('wrong');
+    parent.children[q.ans].classList.add('correct');
+  }
+  document.getElementById('exp-' + qi).classList.add('show');
+  updateScore();
+}
+
+function toggleAns(qi) {
+  const el = document.getElementById('ans-' + qi);
+  el.classList.toggle('show');
+}
+
+function updateScore() {
+  const total = QS.filter(q => q.type==='mcq'||q.type==='ar').length;
+  document.getElementById('scoreText').textContent = `${score} / ${attempted} correct (${total} MCQ+AR total)`;
+  document.getElementById('sfill').style.width = (total ? score/total*100 : 0) + '%';
+}
+
+renderAll();
+</script>
+</body>
+</html>

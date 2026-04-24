@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Light: Reflection & Refraction</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #080f1e; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#38bdf8,#a78bfa,#f59e0b);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 260px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.55rem 1.5rem;
+    background:rgba(8,15,30,.92); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(51,65,85,.5);
+    position:relative; z-index:100;
+  }
+  .site-nav img { height:26px; }
+  .site-nav a.back {
+    font-family:'DM Mono',monospace; font-size:.72rem; color:#64748b;
+    text-decoration:none; transition:color .2s;
+  }
+  .site-nav a.back:hover { color:#e2e8f0; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<div id="ui"><div><h1>Light — Reflection & Refraction</h1><p>Mind Map · Hover nodes for details · Drag to pan · Scroll to zoom</p></div></div>
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="resetView()">Reset View</button>
+  <button class="ctrl-btn" onclick="toggleLabels()">Toggle Labels</button>
+</div>
+
+<script>
+const C = document.getElementById('c'), X = C.getContext('2d'), tip = document.getElementById('tooltip');
+let W, H, ox = 0, oy = 0, sc = 1, drag = false, lx, ly, showLbl = true;
+
+function resize() { W = C.width = innerWidth; H = C.height = innerHeight; draw(); }
+addEventListener('resize', resize);
+
+/* ── DATA — absolute positions like other mind maps ── */
+const CENTER = { id:'c', label:'Light:\nReflection &\nRefraction', x:0, y:0, r:58, color:'#1e3a5f', stroke:'#38bdf8', textColor:'#bae6fd', fontSize:13 };
+
+const BRANCHES = [
+  {
+    id:'nature', label:'Nature of\nLight', x:0, y:-220, r:42, color:'#312e81', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'Light is electromagnetic radiation that travels in straight lines at 3×10⁸ m/s in vacuum.',
+    children:[
+      { id:'n1', label:'Rectilinear\nPropagation', x:-140, y:-360, r:34, color:'#312e81', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'<strong>Rectilinear Propagation</strong>Light travels in straight lines in a homogeneous medium. This is why shadows are formed.' },
+      { id:'n2', label:'Speed:\n3 × 10⁸ m/s', x:0, y:-380, r:34, color:'#312e81', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'<strong>Speed of Light</strong>c = 3 × 10⁸ m/s in vacuum. It slows down in denser media (glass, water).' },
+      { id:'n3', label:'Luminous &\nNon-luminous', x:140, y:-360, r:34, color:'#312e81', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'<strong>Luminous vs Non-luminous</strong>Luminous objects emit their own light (Sun, candle). Non-luminous objects reflect light (Moon, book).' },
+    ]
+  },
+  {
+    id:'refl', label:'Reflection\nof Light', x:280, y:-120, r:42, color:'#14532d', stroke:'#22c55e', textColor:'#86efac',
+    info:'Bouncing back of light from a surface. Follows two laws: ∠i = ∠r and all rays in same plane.',
+    children:[
+      { id:'rf1', label:'Laws of\nReflection', x:480, y:-240, r:34, color:'#14532d', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'<strong>Laws of Reflection</strong>1) Angle of incidence = Angle of reflection (∠i = ∠r).\n2) Incident ray, reflected ray, and normal all lie in the same plane.' },
+      { id:'rf2', label:'Regular &\nDiffuse', x:500, y:-120, r:34, color:'#14532d', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'<strong>Types of Reflection</strong>Regular: from smooth surfaces (mirror) — parallel rays stay parallel.\nDiffuse: from rough surfaces — rays scatter in different directions.' },
+      { id:'rf3', label:'Plane Mirror\nImage', x:480, y:0, r:34, color:'#14532d', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'<strong>Plane Mirror Image</strong>Virtual, erect, same size, laterally inverted. Image distance = Object distance from mirror.' },
+    ]
+  },
+  {
+    id:'smir', label:'Spherical\nMirrors', x:280, y:140, r:42, color:'#78350f', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'Mirrors that are part of a sphere. Concave (converging) and Convex (diverging). R = 2f.',
+    children:[
+      { id:'m1', label:'Concave\nMirror', x:500, y:70, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'<strong>Concave Mirror</strong>Reflecting surface curves inward. Converges light. Used in torches, headlights, solar furnaces, shaving mirrors.' },
+      { id:'m2', label:'Convex\nMirror', x:530, y:170, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'<strong>Convex Mirror</strong>Reflecting surface curves outward. Diverges light. Always forms virtual, erect, diminished images. Used as rear-view mirrors.' },
+      { id:'m3', label:'P, C, F, R\nTerms', x:500, y:270, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'<strong>Mirror Terminology</strong>P = Pole (centre of mirror surface)\nC = Centre of Curvature\nF = Focus (midpoint of PC)\nR = Radius of Curvature (R = 2f)' },
+      { id:'m4', label:'Mirror\nFormula', x:380, y:330, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'<strong>Mirror Formula</strong>1/v + 1/u = 1/f\nSign convention: All distances measured from pole.\nu = object distance, v = image distance, f = focal length.' },
+      { id:'m5', label:'m = −v/u', x:230, y:330, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'<strong>Magnification</strong>m = h′/h = −v/u\nm > 1 → enlarged, m < 1 → diminished.\nm positive → erect (virtual), m negative → inverted (real).' },
+    ]
+  },
+  {
+    id:'refr', label:'Refraction\nof Light', x:-280, y:140, r:42, color:'#4c1d95', stroke:'#e879f9', textColor:'#f0abfc',
+    info:'Bending of light when passing from one medium to another due to change in speed. Snell\'s law: n₁ sin i = n₂ sin r.',
+    children:[
+      { id:'rr1', label:'Snell\'s Law\nn₁sin i=n₂sin r', x:-500, y:70, r:34, color:'#4c1d95', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'<strong>Laws of Refraction (Snell\'s Law)</strong>1) Incident ray, refracted ray, and normal lie in the same plane.\n2) n₁ sin i = n₂ sin r (Snell\'s law).\nRatio sin i / sin r = constant for a given pair of media.' },
+      { id:'rr2', label:'Refractive\nIndex (n)', x:-530, y:170, r:34, color:'#4c1d95', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'<strong>Refractive Index</strong>n = c / v (speed of light in vacuum / speed in medium).\nDenser medium → higher n → light bends towards normal.\nExamples: Water n≈1.33, Glass n≈1.5, Diamond n≈2.42.' },
+      { id:'rr3', label:'Apparent\nDepth', x:-500, y:270, r:34, color:'#4c1d95', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'<strong>Effects of Refraction</strong>• A coin in water appears raised (apparent depth < real depth).\n• A pencil in water appears bent at the surface.\n• Stars twinkle due to atmospheric refraction.' },
+    ]
+  },
+  {
+    id:'lens', label:'Spherical\nLenses', x:-280, y:-120, r:42, color:'#134e4a', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:'Transparent curved glass. Convex (converging) and Concave (diverging). Lens formula: 1/v − 1/u = 1/f.',
+    children:[
+      { id:'l1', label:'Convex\n(Converging)', x:-500, y:-240, r:34, color:'#134e4a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'<strong>Convex Lens</strong>Thicker at centre, thinner at edges. Converges light rays. Forms real & inverted images (except when object is between F and O → virtual, erect, magnified).' },
+      { id:'l2', label:'Concave\n(Diverging)', x:-500, y:-120, r:34, color:'#134e4a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'<strong>Concave Lens</strong>Thinner at centre, thicker at edges. Diverges light rays. Always forms virtual, erect, diminished images regardless of object position.' },
+      { id:'l3', label:'Lens Formula\n1/v−1/u=1/f', x:-500, y:0, r:34, color:'#134e4a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'<strong>Lens Formula</strong>1/v − 1/u = 1/f\nSign convention: +ve to the right of the optical centre.\nConvex lens: f is +ve. Concave lens: f is −ve.' },
+      { id:'l4', label:'Power (D)\nP = 1/f', x:-380, y:-330, r:34, color:'#134e4a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'<strong>Power of a Lens</strong>P = 1/f (f in metres).\nUnit: Dioptre (D).\nConvex → +ve power, Concave → −ve power.\nCombined: P = P₁ + P₂ + ...' },
+    ]
+  },
+  {
+    id:'sign', label:'Sign Convention\n& Uses', x:0, y:260, r:42, color:'#7c2d12', stroke:'#fb923c', textColor:'#fed7aa',
+    info:'New Cartesian Sign Convention: origin at pole/optical centre, +x in direction of incident light.',
+    children:[
+      { id:'s1', label:'New Cartesian\nConvention', x:-160, y:390, r:34, color:'#7c2d12', stroke:'#fdba74', textColor:'#ffedd5',
+        info:'<strong>New Cartesian Sign Convention</strong>• Origin at pole/optical centre.\n• +x = direction of incident light.\n• Heights above axis = +ve, below = −ve.\n• Object always on left → u is always −ve.' },
+      { id:'s2', label:'Mirror\nApplications', x:0, y:420, r:34, color:'#7c2d12', stroke:'#fdba74', textColor:'#ffedd5',
+        info:'<strong>Mirror Applications</strong>Concave: Torches, headlights, solar furnaces, dentist mirrors, shaving mirrors.\nConvex: Rear-view mirrors in vehicles (wider field of view).' },
+      { id:'s3', label:'Lens\nApplications', x:160, y:390, r:34, color:'#7c2d12', stroke:'#fdba74', textColor:'#ffedd5',
+        info:'<strong>Lens Applications</strong>Convex: Magnifying glass, camera, projector, human eye, microscope, telescope.\nConcave: Spectacles for myopia, peepholes in doors.' },
+    ]
+  }
+];
+
+/* Build flat node list and edges */
+const allN = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allN.push(b);
+  allEdges.push({ from: 'c', to: b.id });
+  (b.children || []).forEach(ch => {
+    ch.color = b.color; ch.stroke = b.stroke || b.color; ch.textColor = ch.textColor || b.textColor;
+    allN.push(ch);
+    allEdges.push({ from: b.id, to: ch.id });
+  });
+});
+function getNode(id) { return allN.find(n => n.id === id); }
+function allNodes() { return allN; }
+
+/* Drawing */
+function draw() {
+  X.setTransform(1,0,0,1,0,0); X.clearRect(0,0,W,H);
+  X.setTransform(sc,0,0,sc, W/2+ox, H/2+oy);
+
+  // edges
+  allEdges.forEach(e => {
+    const a = getNode(e.from), b = getNode(e.to);
+    const lw = e.from === 'c' ? 3 : 1.8;
+    X.beginPath(); X.moveTo(a.x, a.y);
+    const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
+    X.quadraticCurveTo(mx, my, b.x, b.y);
+    X.strokeStyle = (b.stroke || b.color) + '55'; X.lineWidth = lw; X.stroke();
+  });
+
+  // nodes
+  allN.forEach(n => {
+    const isCenter = n === CENTER;
+    const isBranch = BRANCHES.includes(n);
+    const alpha = isCenter ? 1 : isBranch ? .85 : .7;
+    const col = n.stroke || n.color;
+
+    // glow
+    const g = X.createRadialGradient(n.x, n.y, n.r*.3, n.x, n.y, n.r*1.8);
+    g.addColorStop(0, col + '30'); g.addColorStop(1, 'transparent');
+    X.fillStyle = g; X.beginPath(); X.arc(n.x, n.y, n.r*1.8, 0, Math.PI*2); X.fill();
+
+    // circle
+    X.beginPath(); X.arc(n.x, n.y, n.r, 0, Math.PI*2);
+    X.fillStyle = n.color; X.fill();
+    X.strokeStyle = col; X.lineWidth = 2.5; X.globalAlpha = alpha; X.stroke(); X.globalAlpha = 1;
+
+    // label
+    if (showLbl) {
+      X.fillStyle = n.textColor || '#e2e8f0'; X.textAlign = 'center'; X.textBaseline = 'middle';
+      const fs = n.fontSize || (n.r < 38 ? 9.5 : 12);
+      X.font = `${isCenter ? 700 : 600} ${fs}px Nunito`;
+      const lines = n.label.split('\n');
+      const lh = n.r < 38 ? 12 : 15;
+      lines.forEach((l, i) => X.fillText(l, n.x, n.y + (i - (lines.length-1)/2) * lh));
+    }
+  });
+}
+
+/* Interaction */
+function toWorld(ex, ey) {
+  return { x: (ex - W/2 - ox) / sc, y: (ey - H/2 - oy) / sc };
+}
+function hitTest(ex, ey) {
+  const p = toWorld(ex, ey);
+  for (const n of allNodes()) {
+    if (Math.hypot(p.x - n.x, p.y - n.y) < n.r) return n;
+  }
+  return null;
+}
+
+C.addEventListener('mousemove', e => {
+  if (drag) { ox += e.clientX - lx; oy += e.clientY - ly; lx = e.clientX; ly = e.clientY; draw(); return; }
+  const n = hitTest(e.clientX, e.clientY);
+  if (n && n.info) {
+    tip.innerHTML = n.info;
+    tip.style.display = 'block';
+    tip.style.left = Math.min(e.clientX + 14, W - 270) + 'px';
+    tip.style.top = (e.clientY + 14) + 'px';
+  } else if (n && n.children) {
+    tip.innerHTML = `<strong>${n.label.replace(/\n/g,' ')}</strong>${n.children.length} sub-topics — hover children for details`;
+    tip.style.display = 'block';
+    tip.style.left = Math.min(e.clientX + 14, W - 270) + 'px';
+    tip.style.top = (e.clientY + 14) + 'px';
+  } else {
+    tip.style.display = 'none';
+  }
+});
+
+C.addEventListener('mousedown', e => { drag = true; lx = e.clientX; ly = e.clientY; C.style.cursor = 'grabbing'; });
+addEventListener('mouseup', () => { drag = false; C.style.cursor = 'default'; });
+C.addEventListener('wheel', e => { e.preventDefault(); const z = e.deltaY < 0 ? 1.08 : 1/1.08; sc *= z; sc = Math.max(.3, Math.min(4, sc)); draw(); }, {passive:false});
+
+/* Touch */
+let lastDist = 0;
+C.addEventListener('touchstart', e => { if(e.touches.length===1){drag=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;} if(e.touches.length===2){lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);} });
+C.addEventListener('touchmove', e => { e.preventDefault(); if(e.touches.length===1&&drag){ox+=e.touches[0].clientX-lx;oy+=e.touches[0].clientY-ly;lx=e.touches[0].clientX;ly=e.touches[0].clientY;draw();} if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);sc*=d/lastDist;sc=Math.max(.3,Math.min(4,sc));lastDist=d;draw();} }, {passive:false});
+C.addEventListener('touchend', () => { drag = false; });
+
+function resetView() { ox = 0; oy = 0; sc = 1; draw(); }
+function toggleLabels() { showLbl = !showLbl; draw(); }
+
+resize();
+</script>
+</body>
+</html>

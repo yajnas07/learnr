@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Light: Reflection & Refraction</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#080f1e; --card:#111c2e; --card2:#162236; --border:#1a2d45; --text:#cce4ff; --muted:#4a6890; --blue:#38bdf8; --green:#22c55e; --amber:#f59e0b; --purple:#a78bfa; --pink:#f472b6; --teal:#2dd4bf; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+  header{text-align:center;padding:2.5rem 1rem 1.5rem;position:relative}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.1),transparent 70%);pointer-events:none}
+  header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;background:linear-gradient(135deg,#38bdf8,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.82rem;margin-top:.4rem}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.2rem;max-width:1120px;margin:auto;padding:0 1.2rem 3rem}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;position:relative;overflow:hidden}
+  .panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0}
+  .panel.blue::before{background:var(--blue)} .panel.green::before{background:var(--green)} .panel.amber::before{background:var(--amber)} .panel.purple::before{background:var(--purple)} .panel.pink::before{background:var(--pink)} .panel.teal::before{background:var(--teal)}
+  .panel h2{font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:.7rem}
+  .panel h3{font-size:.88rem;margin:.8rem 0 .4rem;color:var(--blue)}
+  .panel p,.panel li{font-size:.82rem;line-height:1.7;color:var(--muted)}
+  .panel ul{padding-left:1.1rem}
+  .panel li{margin-bottom:.25rem}
+  .f{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--amber);background:rgba(245,158,11,.08);padding:.35rem .7rem;border-radius:6px;margin:.4rem 0;display:inline-block}
+  .tbl{width:100%;border-collapse:collapse;margin:.5rem 0;font-size:.76rem}
+  .tbl th,.tbl td{border:1px solid var(--border);padding:.4rem .5rem;text-align:center}
+  .tbl th{background:var(--card2);color:var(--blue);font-weight:700}
+  .tbl td{color:var(--muted)}
+  .tip{background:rgba(56,189,248,.05);border-left:3px solid var(--blue);padding:.5rem .8rem;border-radius:0 6px 6px 0;margin:.6rem 0;font-size:.78rem;color:var(--text)}
+  .tip strong{color:var(--blue)}
+  .wide{grid-column:1/-1}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(8,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.5);position:relative;z-index:100}
+  .site-nav img{height:26px} .site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#64748b;text-decoration:none;transition:color .2s} .site-nav a.back:hover{color:#e2e8f0}
+  @media(max-width:600px){.grid{grid-template-columns:1fr;padding:0 .7rem 2rem} .wide{grid-column:1}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Light — Reflection & Refraction</h1>
+  <p>Cheat Sheet · CBSE Class X · Chapter 10</p>
+</header>
+<div class="grid">
+
+<!-- 1 -->
+<div class="panel blue">
+  <h2 style="color:var(--blue)">🔦 Nature of Light</h2>
+  <ul>
+    <li>Light is a form of <strong>electromagnetic radiation</strong> visible to the human eye.</li>
+    <li>Travels in <strong>straight lines</strong> (rectilinear propagation).</li>
+    <li>Speed in vacuum: <span class="f">c = 3 × 10⁸ m/s</span></li>
+    <li><strong>Luminous objects</strong> emit light (Sun, bulb). <strong>Non-luminous</strong> reflect light (Moon, book).</li>
+    <li>Transparent → transmits light; Translucent → partial; Opaque → blocks.</li>
+  </ul>
+</div>
+
+<!-- 2 -->
+<div class="panel green">
+  <h2 style="color:var(--green)">🪞 Laws of Reflection</h2>
+  <ul>
+    <li><strong>Law 1:</strong> Angle of incidence = Angle of reflection <span class="f">∠i = ∠r</span></li>
+    <li><strong>Law 2:</strong> Incident ray, reflected ray, and normal all lie in the <strong>same plane</strong>.</li>
+    <li>These laws hold for ALL types of surfaces (smooth or rough).</li>
+  </ul>
+  <h3>Regular vs Diffuse Reflection</h3>
+  <ul>
+    <li><strong>Regular:</strong> Smooth surface → parallel rays stay parallel (mirror).</li>
+    <li><strong>Diffuse:</strong> Rough surface → rays scatter (wall, paper). Laws still obeyed at each point!</li>
+  </ul>
+</div>
+
+<!-- 3 -->
+<div class="panel blue">
+  <h2 style="color:var(--blue)">📷 Plane Mirror Image</h2>
+  <ul>
+    <li>Image is <strong>virtual, erect, same size</strong>.</li>
+    <li><strong>Laterally inverted</strong> (left ↔ right swapped).</li>
+    <li>Image distance = Object distance from mirror.</li>
+    <li>If you walk towards a mirror at speed v, your image approaches you at speed <strong>2v</strong>.</li>
+  </ul>
+</div>
+
+<!-- 4 -->
+<div class="panel amber">
+  <h2 style="color:var(--amber)">🔭 Spherical Mirrors — Basics</h2>
+  <table class="tbl">
+    <tr><th>Term</th><th>Symbol</th><th>Meaning</th></tr>
+    <tr><td>Pole</td><td>P</td><td>Centre of mirror surface</td></tr>
+    <tr><td>Centre of Curvature</td><td>C</td><td>Centre of the sphere</td></tr>
+    <tr><td>Principal Focus</td><td>F</td><td>Midpoint of P and C</td></tr>
+    <tr><td>Radius of Curvature</td><td>R</td><td>Distance P → C</td></tr>
+    <tr><td>Focal Length</td><td>f</td><td>Distance P → F</td></tr>
+  </table>
+  <div class="f">R = 2f &nbsp;⟹&nbsp; f = R / 2</div>
+</div>
+
+<!-- 5 -->
+<div class="panel amber">
+  <h2 style="color:var(--amber)">Concave Mirror — Image Table</h2>
+  <table class="tbl">
+    <tr><th>Object at</th><th>Image at</th><th>Nature</th><th>Size</th></tr>
+    <tr><td>∞</td><td>F</td><td>Real, inv.</td><td>Point</td></tr>
+    <tr><td>Beyond C</td><td>Between F & C</td><td>Real, inv.</td><td>Diminished</td></tr>
+    <tr><td>At C</td><td>At C</td><td>Real, inv.</td><td>Same</td></tr>
+    <tr><td>Between C & F</td><td>Beyond C</td><td>Real, inv.</td><td>Enlarged</td></tr>
+    <tr><td>At F</td><td>∞</td><td>Real, inv.</td><td>Very large</td></tr>
+    <tr><td>Between F & P</td><td>Behind mirror</td><td>Virtual, erect</td><td>Enlarged</td></tr>
+  </table>
+  <div class="tip"><strong>Convex mirror:</strong> Always virtual, erect, diminished — behind the mirror.</div>
+</div>
+
+<!-- 6 -->
+<div class="panel amber wide">
+  <h2 style="color:var(--amber)">Mirror Formula & Magnification</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:1.5rem">
+    <div style="flex:1;min-width:200px">
+      <div class="f" style="font-size:1rem">1/v + 1/u = 1/f</div>
+      <p style="margin-top:.4rem">u = object distance, v = image distance, f = focal length. All measured from pole P.</p>
+    </div>
+    <div style="flex:1;min-width:200px">
+      <div class="f" style="font-size:1rem">m = h'/h = −v/u</div>
+      <p style="margin-top:.4rem">m > 0 → erect (virtual). m < 0 → inverted (real).<br>|m| > 1 → enlarged. |m| < 1 → diminished.</p>
+    </div>
+  </div>
+  <h3>Uses of Mirrors</h3>
+  <table class="tbl">
+    <tr><th>Concave Mirror</th><th>Convex Mirror</th></tr>
+    <tr><td>Torches, headlights, solar furnaces</td><td>Rear-view mirrors in vehicles</td></tr>
+    <tr><td>Shaving / make-up mirrors</td><td>Security mirrors in shops</td></tr>
+    <tr><td>Dentist's mirror</td><td>Wider field of view</td></tr>
+  </table>
+</div>
+
+<!-- 7 -->
+<div class="panel purple">
+  <h2 style="color:var(--purple)">🌊 Refraction of Light</h2>
+  <ul>
+    <li>Bending of light when it passes from one medium to another.</li>
+    <li>Caused by change in <strong>speed</strong> of light.</li>
+    <li><strong>Rarer → Denser:</strong> Bends towards normal (speed decreases).</li>
+    <li><strong>Denser → Rarer:</strong> Bends away from normal (speed increases).</li>
+  </ul>
+  <h3>Laws of Refraction (Snell's Law)</h3>
+  <div class="f">n₁ sin i = n₂ sin r</div>
+  <p>The ratio sin i / sin r = constant = <sup>n₂</sup>/<sub>n₁</sub> = ₁n₂ (refractive index of medium 2 w.r.t. 1).</p>
+</div>
+
+<!-- 8 -->
+<div class="panel purple">
+  <h2 style="color:var(--purple)">Refractive Index</h2>
+  <div class="f">n = c / v</div>
+  <p>c = speed in vacuum, v = speed in medium.</p>
+  <table class="tbl">
+    <tr><th>Material</th><th>n</th></tr>
+    <tr><td>Air</td><td>1.0003 ≈ 1</td></tr>
+    <tr><td>Water</td><td>1.33</td></tr>
+    <tr><td>Glass</td><td>1.50 – 1.52</td></tr>
+    <tr><td>Diamond</td><td>2.42</td></tr>
+  </table>
+  <div class="tip"><strong>Apparent Depth:</strong> Apparent Depth = Real Depth / n. This is why a pool looks shallower!</div>
+</div>
+
+<!-- 9 -->
+<div class="panel teal">
+  <h2 style="color:var(--teal)">🔍 Spherical Lenses</h2>
+  <ul>
+    <li><strong>Convex (converging):</strong> Thicker at centre, converges rays.</li>
+    <li><strong>Concave (diverging):</strong> Thinner at centre, diverges rays.</li>
+    <li>Key points: O (optical centre), F₁, F₂, 2F₁, 2F₂.</li>
+  </ul>
+  <h3>Convex Lens Image Table</h3>
+  <table class="tbl">
+    <tr><th>Object</th><th>Image</th><th>Nature</th><th>Size</th></tr>
+    <tr><td>∞</td><td>F₂</td><td>Real</td><td>Point</td></tr>
+    <tr><td>Beyond 2F₁</td><td>F₂ – 2F₂</td><td>Real</td><td>Diminished</td></tr>
+    <tr><td>At 2F₁</td><td>At 2F₂</td><td>Real</td><td>Same</td></tr>
+    <tr><td>F₁ – 2F₁</td><td>Beyond 2F₂</td><td>Real</td><td>Enlarged</td></tr>
+    <tr><td>At F₁</td><td>∞</td><td>Real</td><td>Very large</td></tr>
+    <tr><td>O – F₁</td><td>Same side</td><td>Virtual</td><td>Enlarged</td></tr>
+  </table>
+  <div class="tip"><strong>Concave lens:</strong> Always virtual, erect, diminished — between F₁ and O.</div>
+</div>
+
+<!-- 10 -->
+<div class="panel teal">
+  <h2 style="color:var(--teal)">Lens Formula & Power</h2>
+  <div class="f" style="font-size:1rem">1/v − 1/u = 1/f</div>
+  <p style="margin:.4rem 0">Magnification: <span class="f">m = h'/h = v/u</span></p>
+  <h3>Power of a Lens</h3>
+  <div class="f" style="font-size:1rem">P = 1/f &nbsp;&nbsp;(f in metres → P in Dioptres)</div>
+  <ul>
+    <li>Convex → P is <strong>positive</strong></li>
+    <li>Concave → P is <strong>negative</strong></li>
+    <li>Combination: <span class="f">P = P₁ + P₂ + ...</span></li>
+  </ul>
+</div>
+
+<!-- 11 -->
+<div class="panel pink wide">
+  <h2 style="color:var(--pink)">📐 Sign Convention (New Cartesian)</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:1rem">
+    <ul style="flex:1;min-width:220px">
+      <li>All distances measured from <strong>pole (mirror)</strong> or <strong>optical centre (lens)</strong>.</li>
+      <li>Distances in the direction of incident light = <strong>+ve</strong>.</li>
+      <li>Distances against incident light = <strong>−ve</strong>.</li>
+      <li>Heights above principal axis = +ve; below = −ve.</li>
+    </ul>
+    <table class="tbl" style="flex:1;min-width:280px">
+      <tr><th></th><th>Concave M</th><th>Convex M</th><th>Convex L</th><th>Concave L</th></tr>
+      <tr><td>u</td><td>−</td><td>−</td><td>−</td><td>−</td></tr>
+      <tr><td>f</td><td>−</td><td>+</td><td>+</td><td>−</td></tr>
+      <tr><td>v (real)</td><td>−</td><td>—</td><td>+</td><td>—</td></tr>
+      <tr><td>v (virtual)</td><td>+</td><td>+</td><td>−</td><td>−</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 12 -->
+<div class="panel green">
+  <h2 style="color:var(--green)">📏 Ray Diagram Rules</h2>
+  <h3>Mirrors (use any 2)</h3>
+  <ul>
+    <li>Parallel to axis → passes through / appears from F.</li>
+    <li>Through F → reflects parallel to axis.</li>
+    <li>Through C → retraces path.</li>
+    <li>At pole → reflects with ∠i = ∠r.</li>
+  </ul>
+  <h3>Lenses (use any 2)</h3>
+  <ul>
+    <li>Parallel to axis → passes through / appears from F₂ (convex) or F₁ (concave).</li>
+    <li>Through optical centre O → undeviated.</li>
+    <li>Through F₁ → emerges parallel to axis.</li>
+  </ul>
+</div>
+
+<!-- 13 -->
+<div class="panel blue">
+  <h2 style="color:var(--blue)">🧠 Memory Tricks</h2>
+  <ul>
+    <li><strong>"CAVE"</strong> for Concave: C = Converging, A = All images (real+virtual), V = Various sizes, E = Everyday uses (torch, shaving).</li>
+    <li><strong>"VED"</strong> for Convex mirror: V = Virtual, E = Erect, D = Diminished (always).</li>
+    <li><strong>Mirror formula:</strong> "VUF" → 1/<strong>V</strong> + 1/<strong>U</strong> = 1/<strong>F</strong>.</li>
+    <li><strong>Lens formula:</strong> "V minus U equals F" → 1/v − 1/u = 1/f (lens has a MINUS).</li>
+    <li><strong>Sign trick:</strong> Object is ALWAYS on the left → u is ALWAYS negative.</li>
+    <li><strong>"n = c/v"</strong> — "Never Compromise on Values" (n = c over v).</li>
+  </ul>
+</div>
+
+<!-- 14 -->
+<div class="panel amber">
+  <h2 style="color:var(--amber)">⚠️ Common Board Mistakes</h2>
+  <ul>
+    <li>❌ Forgetting sign convention — u should be <strong>−ve</strong> always.</li>
+    <li>❌ Confusing mirror and lens formulas: mirror has +, lens has −.</li>
+    <li>❌ Writing R = f (correct: <strong>R = 2f</strong>).</li>
+    <li>❌ Not converting focal length to metres before calculating Power.</li>
+    <li>❌ Saying "convex mirror forms real images" — it NEVER does (always virtual).</li>
+    <li>❌ Drawing ray diagrams without labelling P, F, C / O, F₁, F₂.</li>
+    <li>❌ Mixing up ∠i measured from ray (wrong) vs from <strong>normal</strong> (correct).</li>
+  </ul>
+</div>
+
+<!-- 15 -->
+<div class="panel purple wide">
+  <h2 style="color:var(--purple)">🎯 Frequently Asked Numericals — Worked Examples</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:1.5rem">
+    <div style="flex:1;min-width:260px">
+      <h3>Mirror Problem</h3>
+      <p>An object is placed 30 cm from a concave mirror of focal length 15 cm. Find image position and nature.</p>
+      <p style="color:var(--text);margin-top:.4rem"><strong>Solution:</strong> u = −30, f = −15</p>
+      <div class="f">1/v = 1/f − 1/u = 1/(−15) − 1/(−30) = −1/30</div>
+      <p style="color:var(--text)">v = −30 cm (real, inverted, same size — object at C, image at C).</p>
+      <p>m = −(−30)/(−30) = −1 → inverted, same size ✓</p>
+    </div>
+    <div style="flex:1;min-width:260px">
+      <h3>Lens Problem</h3>
+      <p>A convex lens of focal length 20 cm has an object at 30 cm. Find v and m.</p>
+      <p style="color:var(--text);margin-top:.4rem"><strong>Solution:</strong> u = −30, f = +20</p>
+      <div class="f">1/v = 1/f + 1/u = 1/20 + 1/(−30) = 1/60</div>
+      <p style="color:var(--text)">v = +60 cm (real, inverted, on the other side).</p>
+      <p>m = v/u = 60/(−30) = −2 → inverted, 2× enlarged ✓</p>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
