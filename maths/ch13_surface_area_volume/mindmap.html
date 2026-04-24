@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Surface Areas &amp; Volumes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#040810; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(4,8,16,.92) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#f59e0b; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#3a5a78; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #1a2d45; background:rgba(4,10,20,.85);
+  color:#3a5a78; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#f59e0b; color:#f59e0b; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#0a1422; border:1px solid #1e3550;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:320px; font-size:.8rem; color:#9cc0e0;
+  line-height:1.65; display:none;
+  box-shadow:0 8px 28px rgba(0,0,0,.85);
+}
+#tooltip strong {
+  font-family:'Playfair Display',serif; display:block;
+  margin-bottom:.3rem; color:#f59e0b; font-size:.9rem;
+}
+
+/* ---- learnr site-nav ---- */
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,45,69,.75);
+  position:fixed; top:0; left:0; right:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a9ab8; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(26,45,69,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<div id="ui">
+  <div>
+    <h1>Surface Areas &amp; Volumes</h1>
+    <p>Class X · Mathematics Ch.13 — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2 + 20;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Surface\nAreas &\nVolumes',
+  x:0, y:0, r:66, color:'#050e1c', stroke:'#f59e0b', textColor:'#f59e0b', fontSize:13
+};
+
+const BRANCHES = [
+  // ── 1. Cuboid & Cube (indigo) ──
+  {
+    id:'cb', label:'Cuboid\n& Cube', x:-340, y:-210, r:46,
+    color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'The cuboid (rectangular box) and cube are the most basic 3D shapes.\nA cuboid has 6 rectangular faces, 12 edges and 8 vertices.\nA cube is a special cuboid where all sides are equal (l = b = h).\nThese are the foundation for understanding all surface area and volume concepts.',
+    children:[
+      { id:'cb1', label:'Cuboid\nFormulas', x:-530, y:-340, r:35, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Cuboid with length l, breadth b, height h:\n\nTotal Surface Area (TSA) = 2(lb + bh + hl)\nLateral Surface Area (LSA) = 2(l + b)h\nVolume = l × b × h\nDiagonal = √(l² + b² + h²)\n\nExample: l=5, b=4, h=3\nTSA = 2(20+12+15) = 94 cm²\nLSA = 2(5+4)×3 = 54 cm²\nVolume = 60 cm³\nDiagonal = √50 = 5√2 cm' },
+      { id:'cb2', label:'Cube\nFormulas', x:-545, y:-180, r:35, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Cube with side a:\n\nTSA = 6a²\nLSA = 4a²\nVolume = a³\nDiagonal = a√3\n\nExample: side = 5 cm\nTSA = 6×25 = 150 cm²\nLSA = 4×25 = 100 cm²\nVolume = 125 cm³\nDiagonal = 5√3 ≈ 8.66 cm\n\nNote: All faces are squares, all edges equal.' },
+      { id:'cb3', label:'TSA\nvs LSA', x:-500, y:-60, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'TSA (Total Surface Area):\n→ Area of ALL faces (including top & bottom)\n→ Used when entire surface needs painting/covering\n\nLSA (Lateral/Curved Surface Area):\n→ Area of SIDE faces only (excluding top & bottom)\n→ Used for wallpapering walls of a room, labeling a tin\n\nBoard tip: Read the problem carefully!\n"Open box" → TSA minus one face (top)\n"Room walls" → LSA only' },
+    ]
+  },
+  // ── 2. Right Circular Cylinder (teal) ──
+  {
+    id:'cy', label:'Right\nCircular\nCylinder', x:340, y:-210, r:46,
+    color:'#001418', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:'A cylinder has two parallel circular bases connected by a curved surface.\nRadius = r, Height = h.\nThink of it as a circle extruded along its height.\nCommon objects: pipe, tin can, pillar, roller.',
+    children:[
+      { id:'cy1', label:'Cylinder\nTSA & CSA', x:530, y:-340, r:35, color:'#001418', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Curved Surface Area (CSA) = 2πrh\n→ Area of the side surface only (unrolls into a rectangle)\nRectangle: width = 2πr (circumference), height = h\n\nTSA = 2πrh + 2πr² = 2πr(h + r)\n→ CSA + two circular bases\n\nExample: r=7, h=10\nCSA = 2 × 22/7 × 7 × 10 = 440 cm²\nTSA = 440 + 2 × 22/7 × 49 = 440 + 308 = 748 cm²' },
+      { id:'cy2', label:'Cylinder\nVolume', x:555, y:-180, r:35, color:'#001418', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Volume = πr²h\n= (area of base) × height\n\nExample: r=7 cm, h=10 cm\nV = 22/7 × 49 × 10 = 1540 cm³\n\nHollow Cylinder (pipe):\nVolume = πh(R² − r²)\nwhere R = outer radius, r = inner radius\nTSA = 2π(R+r)h + 2π(R²−r²)' },
+      { id:'cy3', label:'Open\nCylinder', x:500, y:-55, r:34, color:'#001418', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Open cylinder (no lid / no top):\nSurface Area = CSA + one base\n= 2πrh + πr²\n= πr(2h + r)\n\nExamples of open cylinders:\n• Bucket (open top)\n• Drinking glass\n• Water tank (open at top)\n\nBoard tip: Always check if the shape is open or closed!' },
+    ]
+  },
+  // ── 3. Right Circular Cone (amber) ──
+  {
+    id:'co', label:'Right\nCircular\nCone', x:0, y:310, r:46,
+    color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'A cone has a circular base and a curved surface tapering to a point (apex).\nRadius = r, Height = h, Slant height = l\nRelation: l = √(r² + h²)\nCommon objects: ice cream cone, party hat, funnel.',
+    children:[
+      { id:'co1', label:'Cone\nCSA & TSA', x:-170, y:440, r:35, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'Slant height: l = √(r² + h²)\n\nCSA = πrl\n→ Curved surface only (the sloping part)\n→ Unrolls into a sector of a circle\n\nTSA = πrl + πr² = πr(l + r)\n→ CSA + circular base\n\nExample: r=7, h=24\nl = √(49+576) = √625 = 25 cm\nCSA = 22/7 × 7 × 25 = 550 cm²\nTSA = 550 + 154 = 704 cm²' },
+      { id:'co2', label:'Cone\nVolume', x:170, y:440, r:35, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'Volume = ⅓ πr²h\n= one-third of the volume of a cylinder with same base and height!\n\nWhy ⅓? It takes exactly 3 cones to fill a cylinder of the same r and h.\nThis can be demonstrated experimentally.\n\nExample: r=7 cm, h=24 cm\nV = ⅓ × 22/7 × 49 × 24\n= ⅓ × 3696 = 1232 cm³\n\nFrustum volume: ⅓πh(r₁² + r₂² + r₁r₂)' },
+      { id:'co3', label:'Frustum\nof Cone', x:0, y:500, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'A frustum is formed when a cone is cut by a plane parallel to the base.\nIt has two circular ends: radius r₁ (top) and r₂ (bottom).\n\nSlant height: l = √(h² + (r₂−r₁)²)\nCSA = π(r₁+r₂)l\nTSA = π(r₁+r₂)l + πr₁² + πr₂²\nVolume = ⅓πh(r₁² + r₂² + r₁r₂)\n\nExamples: bucket, glass tumbler, lamp shade\nBoard tip: Frustum questions are commonly asked for 5 marks!' },
+    ]
+  },
+  // ── 4. Sphere & Hemisphere (purple) ──
+  {
+    id:'sp', label:'Sphere &\nHemisphere', x:-340, y:190, r:46,
+    color:'#130018', stroke:'#d946ef', textColor:'#f0abfc',
+    info:'A sphere is the set of all points equidistant from a center point.\nA hemisphere is half of a sphere.\nRadius = r.\nCommon objects: ball, globe, dome, bowl.',
+    children:[
+      { id:'sp1', label:'Sphere\nFormulas', x:-540, y:110, r:35, color:'#130018', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'Sphere (radius r):\n\nSurface Area = 4πr²\n→ Exactly 4 times the area of a great circle!\n→ No CSA/LSA distinction (no flat face)\n\nVolume = ⁴⁄₃ πr³\n\nExample: r = 7 cm\nSA = 4 × 22/7 × 49 = 616 cm²\nV = 4/3 × 22/7 × 343 = 1437.33 cm³\n\nNote: Sphere has the MINIMUM surface area for a given volume — nature\'s most efficient shape!' },
+      { id:'sp2', label:'Hemisphere\nFormulas', x:-545, y:260, r:35, color:'#130018', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'Hemisphere (radius r):\n\nCSA = 2πr² (just the dome, no flat base)\nTSA = 2πr² + πr² = 3πr² (dome + flat circle)\nVolume = ⅔ πr³ (half of sphere volume)\n\nExample: r = 7 cm\nCSA = 2 × 22/7 × 49 = 308 cm²\nTSA = 3 × 22/7 × 49 = 462 cm²\nV = 2/3 × 22/7 × 343 = 718.67 cm³\n\nCommon use: bowl (open hemisphere → CSA), dome building (closed → TSA)' },
+      { id:'sp3', label:'Hollow\nSphere', x:-480, y:380, r:34, color:'#130018', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'Hollow Sphere (outer radius R, inner radius r):\n\nVolume of material = ⁴⁄₃ π(R³ − r³)\n\nExamples: tennis ball, hollow metal ball, coconut shell\n\nOuter SA = 4πR²\nInner SA = 4πr²\n\nBoard tip: Read carefully whether the question asks for\nvolume of the solid material OR the enclosed space.' },
+    ]
+  },
+  // ── 5. Combination of Solids (blue) ──
+  {
+    id:'cm', label:'Combination\nof Solids', x:340, y:190, r:46,
+    color:'#001020', stroke:'#38bdf8', textColor:'#bae6fd',
+    info:'Many real-world objects are combinations of basic solids.\nTo find surface area: add visible surfaces (subtract hidden/joined faces).\nTo find volume: add volumes of individual parts.\nKey insight: when two solids join, the contact surface disappears from the total surface area!',
+    children:[
+      { id:'cm1', label:'Cone on\nCylinder', x:540, y:105, r:35, color:'#001020', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Cone mounted on a cylinder (like a rocket or tent):\n\nTSA = CSA(cylinder) + CSA(cone) + base area of cylinder\n→ The top circle of the cylinder and base of the cone cancel out!\n\nVolume = V(cylinder) + V(cone)\n= πr²h₁ + ⅓πr²h₂\n\nExample: tent with cylindrical base (r=7, h=3) and conical top (h=4)\nl = √(49+16) = √65 ≈ 8.06 m\nTSA = 2π(7)(3) + π(7)(8.06) = 131.95 + 177.14 ≈ 309.1 m²' },
+      { id:'cm2', label:'Hemisphere\non Cylinder', x:555, y:260, r:35, color:'#001020', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Hemisphere on top of a cylinder (like a storage tank, capsule):\n\nTSA = CSA(cyl) + CSA(hemi) + base of cyl\n= 2πrh + 2πr² + πr²\n\nVolume = πr²h + ⅔πr³\n\nMedicine capsule:\nCapsule = cylinder + 2 hemispheres\n= cylinder + 1 full sphere\nTSA = 2πrh + 4πr² (no flat ends visible)\nV = πr²h + ⁴⁄₃πr³' },
+      { id:'cm3', label:'Cone on\nHemisphere', x:490, y:380, r:35, color:'#001020', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Cone on hemisphere (like a spinning top, ice cream):\n\nTSA = CSA(cone) + CSA(hemisphere)\n= πrl + 2πr²\n→ The flat faces cancel out completely!\n\nVolume = ⅓πr²h + ⅔πr³\n\nExample: Ice cream cone + scoop:\nCone: r=3.5, h=12 → l=√(12.25+144)=√156.25=12.5\nCSA(cone) = π(3.5)(12.5) = 137.5 cm²\nCSA(hemi) = 2π(3.5)² = 77 cm²\nTotal visible surface = 214.5 cm²' },
+    ]
+  },
+  // ── 6. Conversion of Solids (green) ──
+  {
+    id:'cv', label:'Conversion\nof Solids', x:0, y:-310, r:46,
+    color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+    info:'When a solid is melted and recast into another shape, the VOLUME remains the same.\nThis is the key principle: Volume before = Volume after.\nSurface area changes! Only volume is conserved.\nThese are among the most common board exam questions (3-5 marks).',
+    children:[
+      { id:'cv1', label:'Melting &\nRecasting', x:-180, y:-440, r:35, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Principle: Volume is conserved.\n\nExample 1: A metallic sphere of radius 6 cm is melted into a wire of diameter 0.4 cm. Find the length of the wire.\nV(sphere) = V(wire cylinder)\n⁴⁄₃π(6)³ = π(0.2)²×L\n288 = 0.04×L → L = 7200 cm = 72 m\n\nExample 2: A cone (r=6, h=24) melted into a sphere.\n⅓π(36)(24) = ⁴⁄₃πR³\n288 = ⁴⁄₃R³ → R³=216 → R=6 cm' },
+      { id:'cv2', label:'Multiple\nObjects', x:0, y:-470, r:35, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'One big solid melted into many small ones:\n\nNumber of small objects = V(big) ÷ V(small)\n\nExample: A sphere of radius 3 cm is melted into small spheres of radius 0.3 cm.\nN = [⁴⁄₃π(3)³] ÷ [⁴⁄₃π(0.3)³]\n= 27 ÷ 0.027 = 1000 spheres!\n\nBoard tip: The π and ⁴⁄₃ cancel out.\nN = (R/r)³ = (3/0.3)³ = 10³ = 1000' },
+      { id:'cv3', label:'Water Flow\nProblems', x:180, y:-440, r:35, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Water flowing through a pipe fills a tank:\nVolume flow rate × time = Volume of tank\n\nPipe: cross-section area × speed × time = tank volume\nπr²(pipe) × speed × time = Volume(tank)\n\nExample: Water flows at 5 m/s through a pipe of diameter 14 cm into a cuboidal tank (50×44 cm).\nRate = π(7)² × 500 = 77000 cm³/s\nTo fill 21 cm: V = 50×44×21 = 46200 cm³\nTime = 46200/77000 = 0.6 s\n\nAlso: rising water level problems — equate volumes.' },
+    ]
+  }
+];
+
+/* ── Flatten for hit-testing ── */
+const allNodes = [];
+allNodes.push(CENTER);
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  (b.children||[]).forEach(c => allNodes.push(c));
+});
+
+/* ── Drawing ── */
+function toScreen(x,y) { return { sx: ox + x*scale, sy: oy + y*scale }; }
+
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  // faint grid
+  ctx.strokeStyle='rgba(129,140,248,.03)';
+  ctx.lineWidth=1;
+  const gs=80*scale;
+  for(let gx=(ox%gs);gx<W;gx+=gs){ ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke(); }
+  for(let gy=(oy%gs);gy<H;gy+=gs){ ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke(); }
+
+  // edges: center→branch, branch→child
+  BRANCHES.forEach(b => {
+    drawEdge(CENTER, b, b.stroke);
+    (b.children||[]).forEach(ch => drawEdge(b, ch, b.stroke));
+  });
+
+  // nodes
+  BRANCHES.forEach(b => {
+    (b.children||[]).forEach(ch => drawNode(ch, ch.r));
+    drawNode(b, b.r);
+  });
+  drawNode(CENTER, CENTER.r, true);
+}
+
+function drawEdge(a, b, color) {
+  const p1 = toScreen(a.x, a.y);
+  const p2 = toScreen(b.x, b.y);
+  const mx = (p1.sx+p2.sx)/2, my = (p1.sy+p2.sy)/2 - 18*scale;
+  const grad = ctx.createLinearGradient(p1.sx, p1.sy, p2.sx, p2.sy);
+  grad.addColorStop(0, color+'55');
+  grad.addColorStop(1, color+'22');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2.2*scale;
+  ctx.beginPath();
+  ctx.moveTo(p1.sx, p1.sy);
+  ctx.quadraticCurveTo(mx, my, p2.sx, p2.sy);
+  ctx.stroke();
+}
+
+function drawNode(n, r, isCenter) {
+  const {sx,sy} = toScreen(n.x, n.y);
+  const sr = r*scale;
+  ctx.save();
+  ctx.shadowColor = n.stroke;
+  ctx.shadowBlur = isCenter ? 22 : 12;
+  ctx.beginPath();
+  ctx.arc(sx,sy,sr,0,Math.PI*2);
+  ctx.fillStyle = n.color;
+  ctx.fill();
+  ctx.strokeStyle = n.stroke;
+  ctx.lineWidth = isCenter ? 3 : 2;
+  ctx.stroke();
+  ctx.restore();
+
+  if(isCenter) {
+    ctx.beginPath();
+    ctx.arc(sx,sy,sr-8*scale,0,Math.PI*2);
+    ctx.strokeStyle = n.stroke+'55';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = n.textColor || '#cce4ff';
+  ctx.font = `bold ${(n.fontSize||11)*scale}px 'Lato',sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const lines = n.label.split('\n');
+  const lh = (n.fontSize||11)*scale*1.2;
+  const startY = sy - (lines.length-1)*lh/2;
+  lines.forEach((l,i) => ctx.fillText(l, sx, startY+i*lh));
+}
+
+/* ── Interaction ── */
+let hovered = null;
+canvas.addEventListener('mousemove', e => {
+  const mx=e.clientX, my=e.clientY;
+  let found = null;
+  for(const n of allNodes) {
+    const {sx,sy} = toScreen(n.x,n.y);
+    const sr = (n.r||40)*scale;
+    if(Math.hypot(mx-sx, my-sy) < sr) { found=n; break; }
+  }
+  if(found && found.info) {
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    tip.style.display='block';
+    let tx=mx+18, ty=my+18;
+    if(tx+320>W) tx=mx-330;
+    if(ty+200>H) ty=my-200;
+    tip.style.left=tx+'px'; tip.style.top=ty+'px';
+    canvas.style.cursor='pointer';
+  } else {
+    tip.style.display='none';
+    canvas.style.cursor=dragging?'grabbing':'grab';
+  }
+  if(dragging) {
+    ox = dragOrigin.x + (mx-dragStart.x);
+    oy = dragOrigin.y + (my-dragStart.y);
+    draw();
+  }
+});
+canvas.addEventListener('mousedown', e => {
+  dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy};
+  canvas.style.cursor='grabbing';
+});
+window.addEventListener('mouseup', ()=>{ dragging=false; canvas.style.cursor='grab'; });
+canvas.addEventListener('mouseleave', ()=>{ tip.style.display='none'; });
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const f = e.deltaY<0?1.08:0.92;
+  zoomAt(e.clientX, e.clientY, f);
+}, {passive:false});
+
+function zoomAt(px,py,f) {
+  const wx=(px-ox)/scale, wy=(py-oy)/scale;
+  scale*=f;
+  scale=Math.max(.25,Math.min(3,scale));
+  ox=px-wx*scale; oy=py-wy*scale;
+  draw();
+}
+function zoom(f) { zoomAt(W/2,H/2,f); }
+function resetView() { scale=1; ox=W/2; oy=H/2+20; draw(); }
+
+// Touch
+let lastTouchDist=0;
+canvas.addEventListener('touchstart', e => {
+  if(e.touches.length===1){
+    dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy};
+  } else if(e.touches.length===2){
+    dragging=false;
+    lastTouchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+  }
+},{passive:true});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if(e.touches.length===1 && dragging){
+    ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);
+    oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);
+    draw();
+  } else if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    const cx=(e.touches[0].clientX+e.touches[1].clientX)/2;
+    const cy=(e.touches[0].clientY+e.touches[1].clientY)/2;
+    zoomAt(cx,cy,d/lastTouchDist);
+    lastTouchDist=d;
+  }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;});
+
+resize();
+</script>
+</body>
+</html>

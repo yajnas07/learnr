@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surface Areas &amp; Volumes — Animated Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+  }
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 55% 40% at 20% 10%, rgba(245,158,11,.04) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 80% 85%, rgba(56,189,248,.03) 0%, transparent 55%);
+  }
+
+  header { text-align:center; padding:1.8rem 1rem 1.2rem; border-bottom:1px solid var(--border); }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:900; color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.73rem; margin-top:.3rem; }
+
+  /* ── nav tabs ── */
+  .tab-nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.45rem; padding:1.1rem 1rem .5rem; }
+  .tab-nav button {
+    font-family:'Playfair Display',serif; font-weight:700; font-size:.76rem;
+    padding:.42rem 1rem; border-radius:4px;
+    border:1px solid var(--border); background:var(--card);
+    color:var(--muted); cursor:pointer; transition:all .22s;
+  }
+  .tab-nav button:hover { color:var(--text); border-color:#2a3f5a; }
+  .tab-nav button.a-cub { border-color:var(--indigo); color:var(--indigo); background:rgba(129,140,248,.08); }
+  .tab-nav button.a-cyl { border-color:var(--teal);   color:var(--teal);   background:rgba(45,212,191,.08); }
+  .tab-nav button.a-con { border-color:var(--amber);  color:var(--amber);  background:rgba(245,158,11,.08); }
+  .tab-nav button.a-sph { border-color:var(--purple); color:var(--purple); background:rgba(217,70,239,.08); }
+  .tab-nav button.a-cmb { border-color:var(--blue);   color:var(--blue);   background:rgba(56,189,248,.08); }
+  .tab-nav button.a-cvt { border-color:var(--green);  color:var(--green);  background:rgba(34,197,94,.08); }
+
+  main { max-width:900px; margin:0 auto; padding:1rem 1rem 4rem; }
+  section { display:none; animation:fadeUp .35s ease; }
+  section.vis { display:block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .sec-title { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:900;
+    margin-bottom:1.1rem; display:flex; align-items:center; gap:.5rem; }
+
+  /* ── cards ── */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:.85rem; margin-bottom:1.2rem; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.1rem; transition:transform .18s, box-shadow .18s; }
+  .card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.5); }
+  .card-title { font-family:'Playfair Display',serif; font-size:.92rem; font-weight:700; margin-bottom:.6rem; }
+  .card p, .card li { font-size:.82rem; line-height:1.6; }
+  .card ul { padding-left:1.1rem; margin-top:.3rem; }
+
+  /* ── formula blocks ── */
+  .f-block { background:var(--card2); border-radius:10px; padding:.8rem 1rem; margin:.6rem 0; }
+  .f-label { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-bottom:.25rem; }
+  .f-eq { font-family:'DM Mono',monospace; font-size:.88rem; color:var(--amber); font-weight:600; line-height:1.5; }
+  .f-note { font-size:.72rem; color:var(--muted); margin-top:.2rem; line-height:1.5; }
+
+  /* ── shape diagrams (canvas) ── */
+  .shape-wrap { display:flex; flex-wrap:wrap; gap:1rem; margin:1rem 0; align-items:flex-start; }
+  .shape-canvas { background:var(--card); border:1px solid var(--border); border-radius:12px; flex-shrink:0; }
+  .shape-info { flex:1; min-width:220px; }
+
+  /* ── calculator ── */
+  .calc-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1rem; margin:1rem 0; }
+  .calc-title { font-family:'Playfair Display',serif; font-size:.95rem; font-weight:900; margin-bottom:.7rem; display:flex; align-items:center; gap:.4rem; }
+  .calc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.5rem; margin-bottom:.7rem; }
+  .calc-field label { display:block; font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); margin-bottom:.15rem; }
+  .calc-field input {
+    width:100%; background:var(--card2); border:1px solid var(--border); border-radius:6px;
+    color:var(--text); font-family:'DM Mono',monospace; font-size:.82rem;
+    padding:.35rem .6rem; outline:none; transition:border-color .18s;
+  }
+  .calc-field input:focus { border-color:var(--amber); }
+  .calc-btn {
+    font-family:'Playfair Display',serif; font-weight:700; font-size:.78rem;
+    padding:.42rem 1.2rem; border-radius:4px; border:1px solid var(--amber);
+    background:rgba(245,158,11,.1); color:var(--amber); cursor:pointer; transition:all .18s;
+  }
+  .calc-btn:hover { background:rgba(245,158,11,.2); }
+  .calc-result {
+    margin-top:.6rem; background:var(--card2); border-radius:8px; padding:.7rem .9rem;
+    font-family:'DM Mono',monospace; font-size:.78rem; line-height:1.7; color:var(--teal);
+    min-height:2.5rem; white-space:pre-line;
+  }
+
+  /* ── info boxes ── */
+  .tip-box { background:rgba(245,158,11,.06); border-left:3px solid var(--amber); border-radius:0 8px 8px 0;
+    padding:.6rem .9rem; margin:.8rem 0; font-size:.8rem; line-height:1.6; color:var(--amber); }
+  .tip-box strong { font-family:'Playfair Display',serif; }
+
+  .proof-box { background:var(--card2); border:1px solid var(--border); border-radius:10px;
+    padding:.8rem 1rem; margin:.8rem 0; }
+  .proof-box .pb-title { font-family:'Playfair Display',serif; font-size:.88rem; font-weight:700; margin-bottom:.4rem; }
+  .proof-box p, .proof-box li { font-size:.78rem; line-height:1.7; }
+
+  /* timeline steps */
+  .timeline { display:flex; flex-direction:column; gap:.5rem; margin:.8rem 0; }
+  .tl-step { display:flex; gap:.7rem; align-items:flex-start; }
+  .tl-num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'DM Mono',monospace; font-size:.7rem; font-weight:700; flex-shrink:0; }
+  .tl-text { font-size:.8rem; line-height:1.55; padding-top:.2rem; }
+
+  /* ── worked example ── */
+  .worked { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1rem; margin:.7rem 0; }
+  .worked .w-q { font-family:'Playfair Display',serif; font-size:.88rem; font-weight:700; margin-bottom:.5rem; }
+  .worked .w-a { font-family:'DM Mono',monospace; font-size:.78rem; color:var(--teal); line-height:1.75; white-space:pre-line; }
+
+  /* ---- learnr site-nav ---- */
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Surface Areas &amp; Volumes</h1>
+  <p>Class X · Mathematics Ch.13 · Interactive Diagrams · CBSE</p>
+</header>
+
+<div class="tab-nav">
+  <button class="a-cub" onclick="show('cub',this,'a-cub')">📦 Cuboid &amp; Cube</button>
+  <button class="a-cyl" onclick="show('cyl',this,'a-cyl')">🛢️ Cylinder</button>
+  <button class="a-con" onclick="show('con',this,'a-con')">🍦 Cone</button>
+  <button class="a-sph" onclick="show('sph',this,'a-sph')">🔮 Sphere</button>
+  <button class="a-cmb" onclick="show('cmb',this,'a-cmb')">🧩 Combinations</button>
+  <button class="a-cvt" onclick="show('cvt',this,'a-cvt')">♻ Conversions</button>
+</div>
+
+<main>
+
+<!-- ═══════════════ CUBOID & CUBE ═══════════════ -->
+<section id="sec-cub" class="vis">
+  <div class="sec-title" style="color:var(--indigo)">📦 Cuboid &amp; Cube</div>
+
+  <div class="shape-wrap">
+    <canvas id="cv-cuboid" class="shape-canvas" width="280" height="220"></canvas>
+    <div class="shape-info">
+      <div class="f-block">
+        <div class="f-label">CUBOID (l × b × h)</div>
+        <div class="f-eq">TSA = 2(lb + bh + hl)</div>
+        <div class="f-eq">LSA = 2(l + b) × h</div>
+        <div class="f-eq">Volume = l × b × h</div>
+        <div class="f-eq">Diagonal = √(l² + b² + h²)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shape-wrap">
+    <canvas id="cv-cube" class="shape-canvas" width="220" height="220"></canvas>
+    <div class="shape-info">
+      <div class="f-block">
+        <div class="f-label">CUBE (side = a)</div>
+        <div class="f-eq">TSA = 6a²</div>
+        <div class="f-eq">LSA = 4a²</div>
+        <div class="f-eq">Volume = a³</div>
+        <div class="f-eq">Diagonal = a√3</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box"><strong>🎯 Board Tip:</strong> "Open box" means no lid → TSA minus one face. "Room walls" means only lateral surface → use LSA.</div>
+
+  <!-- Calculator -->
+  <div class="calc-box">
+    <div class="calc-title" style="color:var(--indigo)">🧮 Cuboid Calculator</div>
+    <div class="calc-grid">
+      <div class="calc-field"><label>Length (l)</label><input id="cub-l" type="number" value="5"></div>
+      <div class="calc-field"><label>Breadth (b)</label><input id="cub-b" type="number" value="4"></div>
+      <div class="calc-field"><label>Height (h)</label><input id="cub-h" type="number" value="3"></div>
+    </div>
+    <button class="calc-btn" onclick="calcCuboid()">Calculate</button>
+    <div class="calc-result" id="res-cub"></div>
+  </div>
+
+  <div class="worked">
+    <div class="w-q">Q: A cuboidal box has dimensions 60 cm × 40 cm × 50 cm. Find its TSA and volume.</div>
+    <div class="w-a">TSA = 2(60×40 + 40×50 + 50×60)
+    = 2(2400 + 2000 + 3000)
+    = 2 × 7400 = <strong style="color:var(--amber)">14800 cm²</strong>
+
+Volume = 60 × 40 × 50 = <strong style="color:var(--amber)">120000 cm³</strong> = 120 litres</div>
+  </div>
+</section>
+
+<!-- ═══════════════ CYLINDER ═══════════════ -->
+<section id="sec-cyl">
+  <div class="sec-title" style="color:var(--teal)">🛢️ Right Circular Cylinder</div>
+
+  <div class="shape-wrap">
+    <canvas id="cv-cylinder" class="shape-canvas" width="260" height="260"></canvas>
+    <div class="shape-info">
+      <div class="f-block">
+        <div class="f-label">CYLINDER (radius r, height h)</div>
+        <div class="f-eq">CSA = 2πrh</div>
+        <div class="f-note">Unrolled → rectangle: 2πr × h</div>
+        <div class="f-eq" style="margin-top:.3rem">TSA = 2πr(h + r)</div>
+        <div class="f-eq">Volume = πr²h</div>
+      </div>
+      <div class="f-block">
+        <div class="f-label">HOLLOW CYLINDER (outer R, inner r)</div>
+        <div class="f-eq">Volume = πh(R² − r²)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calc-box">
+    <div class="calc-title" style="color:var(--teal)">🧮 Cylinder Calculator</div>
+    <div class="calc-grid">
+      <div class="calc-field"><label>Radius (r)</label><input id="cyl-r" type="number" value="7"></div>
+      <div class="calc-field"><label>Height (h)</label><input id="cyl-h" type="number" value="10"></div>
+    </div>
+    <button class="calc-btn" onclick="calcCylinder()">Calculate</button>
+    <div class="calc-result" id="res-cyl"></div>
+  </div>
+
+  <div class="worked">
+    <div class="w-q">Q: A cylindrical pillar has radius 20 cm and height 3.5 m. Find the cost of painting its CSA at ₹12/m².</div>
+    <div class="w-a">r = 20 cm = 0.2 m,  h = 3.5 m
+CSA = 2 × 22/7 × 0.2 × 3.5 = 2 × 22/7 × 0.7 = 4.4 m²
+Cost = 4.4 × 12 = <strong style="color:var(--amber)">₹52.80</strong></div>
+  </div>
+</section>
+
+<!-- ═══════════════ CONE ═══════════════ -->
+<section id="sec-con">
+  <div class="sec-title" style="color:var(--amber)">🍦 Right Circular Cone</div>
+
+  <div class="shape-wrap">
+    <canvas id="cv-cone" class="shape-canvas" width="260" height="280"></canvas>
+    <div class="shape-info">
+      <div class="f-block">
+        <div class="f-label">CONE (radius r, height h, slant height l)</div>
+        <div class="f-eq">l = √(r² + h²)</div>
+        <div class="f-eq">CSA = πrl</div>
+        <div class="f-eq">TSA = πr(l + r)</div>
+        <div class="f-eq">Volume = ⅓ πr²h</div>
+        <div class="f-note">Volume = ⅓ × cylinder volume with same r and h</div>
+      </div>
+      <div class="f-block">
+        <div class="f-label">FRUSTUM (radii r₁, r₂, height h)</div>
+        <div class="f-eq">l = √(h² + (r₂−r₁)²)</div>
+        <div class="f-eq">CSA = π(r₁+r₂)l</div>
+        <div class="f-eq">TSA = π(r₁+r₂)l + πr₁² + πr₂²</div>
+        <div class="f-eq">Vol = ⅓πh(r₁²+r₂²+r₁r₂)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calc-box">
+    <div class="calc-title" style="color:var(--amber)">🧮 Cone Calculator</div>
+    <div class="calc-grid">
+      <div class="calc-field"><label>Radius (r)</label><input id="con-r" type="number" value="7"></div>
+      <div class="calc-field"><label>Height (h)</label><input id="con-h" type="number" value="24"></div>
+    </div>
+    <button class="calc-btn" onclick="calcCone()">Calculate</button>
+    <div class="calc-result" id="res-con"></div>
+  </div>
+
+  <div class="tip-box"><strong>💡 Why ⅓?</strong> It takes exactly 3 cones to fill a cylinder of the same radius and height. This can be demonstrated experimentally by pouring water!</div>
+
+  <div class="worked">
+    <div class="w-q">Q: A conical tent has radius 7 m and height 24 m. Find the cost of canvas at ₹100/m² (ignore stitching margins).</div>
+    <div class="w-a">l = √(7² + 24²) = √(49 + 576) = √625 = 25 m
+CSA = 22/7 × 7 × 25 = 550 m²
+Cost = 550 × 100 = <strong style="color:var(--amber)">₹55,000</strong></div>
+  </div>
+</section>
+
+<!-- ═══════════════ SPHERE & HEMISPHERE ═══════════════ -->
+<section id="sec-sph">
+  <div class="sec-title" style="color:var(--purple)">🔮 Sphere &amp; Hemisphere</div>
+
+  <div class="shape-wrap">
+    <canvas id="cv-sphere" class="shape-canvas" width="240" height="240"></canvas>
+    <div class="shape-info">
+      <div class="f-block">
+        <div class="f-label">SPHERE (radius r)</div>
+        <div class="f-eq">Surface Area = 4πr²</div>
+        <div class="f-note">= 4 × (area of great circle). No CSA/LSA distinction.</div>
+        <div class="f-eq" style="margin-top:.2rem">Volume = ⁴⁄₃ πr³</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shape-wrap">
+    <canvas id="cv-hemi" class="shape-canvas" width="240" height="180"></canvas>
+    <div class="shape-info">
+      <div class="f-block">
+        <div class="f-label">HEMISPHERE (radius r)</div>
+        <div class="f-eq">CSA = 2πr² (dome only)</div>
+        <div class="f-eq">TSA = 3πr² (dome + flat base)</div>
+        <div class="f-eq">Volume = ⅔ πr³</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calc-box">
+    <div class="calc-title" style="color:var(--purple)">🧮 Sphere / Hemisphere Calculator</div>
+    <div class="calc-grid">
+      <div class="calc-field"><label>Radius (r)</label><input id="sph-r" type="number" value="7"></div>
+    </div>
+    <button class="calc-btn" onclick="calcSphere()">Calculate</button>
+    <div class="calc-result" id="res-sph"></div>
+  </div>
+
+  <div class="worked">
+    <div class="w-q">Q: A dome of a building is hemispherical with radius 2.8 m. Find the cost of painting it at ₹5/m².</div>
+    <div class="w-a">CSA = 2πr² = 2 × 22/7 × 2.8 × 2.8 = 2 × 22/7 × 7.84 = 49.28 m²
+Cost = 49.28 × 5 = <strong style="color:var(--amber)">₹246.40</strong></div>
+  </div>
+</section>
+
+<!-- ═══════════════ COMBINATIONS ═══════════════ -->
+<section id="sec-cmb">
+  <div class="sec-title" style="color:var(--blue)">🧩 Combination of Solids</div>
+
+  <div class="tip-box"><strong>Key Principle:</strong> When two solids are joined, the contact surface is hidden. TSA = sum of visible surfaces (subtract joined faces). Volume = sum of individual volumes.</div>
+
+  <div class="cards">
+    <div class="card" style="border-color:rgba(56,189,248,.2)">
+      <div class="card-title" style="color:var(--blue)">🚀 Cone on Cylinder</div>
+      <canvas id="cv-concyl" class="shape-canvas" width="220" height="200" style="margin-bottom:.5rem"></canvas>
+      <p>TSA = CSA(cyl) + CSA(cone) + area(base)</p>
+      <p>Volume = πr²h₁ + ⅓πr²h₂</p>
+    </div>
+    <div class="card" style="border-color:rgba(56,189,248,.2)">
+      <div class="card-title" style="color:var(--blue)">💊 Capsule (Cyl + 2 Hemi)</div>
+      <canvas id="cv-capsule" class="shape-canvas" width="220" height="160" style="margin-bottom:.5rem"></canvas>
+      <p>TSA = 2πrh + 4πr² (no flat ends)</p>
+      <p>Volume = πr²h + ⁴⁄₃πr³</p>
+    </div>
+    <div class="card" style="border-color:rgba(56,189,248,.2)">
+      <div class="card-title" style="color:var(--blue)">🍦 Cone on Hemisphere</div>
+      <canvas id="cv-conhemi" class="shape-canvas" width="220" height="200" style="margin-bottom:.5rem"></canvas>
+      <p>TSA = πrl + 2πr² (flat faces cancel)</p>
+      <p>Volume = ⅓πr²h + ⅔πr³</p>
+    </div>
+  </div>
+
+  <div class="worked">
+    <div class="w-q">Q: A wooden article is made by scooping out a hemisphere of radius 3.5 cm from each end of a cylinder of radius 3.5 cm and height 10 cm. Find TSA.</div>
+    <div class="w-a">TSA = CSA(cylinder) + 2 × CSA(hemisphere)
+     = 2πrh + 2 × 2πr²
+     = 2 × 22/7 × 3.5 × 10 + 4 × 22/7 × 3.5²
+     = 220 + 154
+     = <strong style="color:var(--amber)">374 cm²</strong></div>
+  </div>
+</section>
+
+<!-- ═══════════════ CONVERSIONS ═══════════════ -->
+<section id="sec-cvt">
+  <div class="sec-title" style="color:var(--green)">♻ Conversion of Solids</div>
+
+  <div class="tip-box"><strong>Golden Rule:</strong> When a solid is melted and recast into another shape, <em>volume is conserved</em>. Surface area changes!</div>
+
+  <div class="timeline">
+    <div class="tl-step"><div class="tl-num" style="background:rgba(34,197,94,.15);color:var(--green)">1</div><div class="tl-text">Write volume formula for the original solid</div></div>
+    <div class="tl-step"><div class="tl-num" style="background:rgba(34,197,94,.15);color:var(--green)">2</div><div class="tl-text">Write volume formula for the new solid</div></div>
+    <div class="tl-step"><div class="tl-num" style="background:rgba(34,197,94,.15);color:var(--green)">3</div><div class="tl-text">Set V₁ = V₂ (or V₁ = n × V₂ for multiple objects)</div></div>
+    <div class="tl-step"><div class="tl-num" style="background:rgba(34,197,94,.15);color:var(--green)">4</div><div class="tl-text">Solve for the unknown dimension or count</div></div>
+  </div>
+
+  <div class="calc-box">
+    <div class="calc-title" style="color:var(--green)">🧮 Melting & Recasting Calculator</div>
+    <div style="font-size:.78rem;color:var(--muted);margin-bottom:.6rem">Sphere melted into small spheres</div>
+    <div class="calc-grid">
+      <div class="calc-field"><label>Original Radius (R)</label><input id="cvt-R" type="number" value="3"></div>
+      <div class="calc-field"><label>Small Radius (r)</label><input id="cvt-r" type="number" value="0.3"></div>
+    </div>
+    <button class="calc-btn" onclick="calcConvert()">Calculate</button>
+    <div class="calc-result" id="res-cvt"></div>
+  </div>
+
+  <div class="worked">
+    <div class="w-q">Q: A metallic sphere of radius 4.2 cm is melted and recast into a cylinder of radius 6 cm. Find the height of the cylinder.</div>
+    <div class="w-a">V(sphere) = V(cylinder)
+⁴⁄₃ πr³ = πR²h
+⁴⁄₃ × (4.2)³ = (6)² × h
+⁴⁄₃ × 74.088 = 36 × h
+98.784 = 36h
+h = 98.784 / 36 = <strong style="color:var(--amber)">2.744 cm</strong></div>
+  </div>
+
+  <div class="worked">
+    <div class="w-q">Q: Water flows at 10 m/min through a pipe of diameter 1.4 cm into a conical vessel of diameter 40 cm and depth 24 cm. How long will it take to fill the vessel?</div>
+    <div class="w-a">Pipe: r = 0.7 cm, speed = 1000 cm/min
+Volume/min = πr² × speed = 22/7 × 0.49 × 1000 = 1540 cm³/min
+
+Cone: R = 20 cm, H = 24 cm
+Volume = ⅓ × 22/7 × 400 × 24 = 10057.14 cm³
+
+Time = 10057.14 / 1540 ≈ <strong style="color:var(--amber)">6.53 minutes ≈ 6 min 32 sec</strong></div>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ── Tab switching ── */
+function show(id, btn, cls) {
+  document.querySelectorAll('main section').forEach(s => s.classList.remove('vis'));
+  document.getElementById('sec-'+id).classList.add('vis');
+  document.querySelectorAll('.tab-nav button').forEach(b => {
+    b.className = '';
+    b.style.borderColor=''; b.style.color=''; b.style.background='';
+  });
+  btn.classList.add(cls);
+}
+
+/* ── Calculators ── */
+const PI = Math.PI;
+function fmt(n) { return parseFloat(n.toFixed(4)); }
+
+function calcCuboid() {
+  const l=+document.getElementById('cub-l').value, b=+document.getElementById('cub-b').value, h=+document.getElementById('cub-h').value;
+  const tsa=2*(l*b+b*h+h*l), lsa=2*(l+b)*h, vol=l*b*h, diag=Math.sqrt(l*l+b*b+h*h);
+  document.getElementById('res-cub').innerHTML=
+    `TSA = 2(${l}×${b} + ${b}×${h} + ${h}×${l}) = <strong style="color:var(--amber)">${fmt(tsa)} sq units</strong>\nLSA = 2(${l}+${b})×${h} = <strong style="color:var(--amber)">${fmt(lsa)} sq units</strong>\nVolume = ${l}×${b}×${h} = <strong style="color:var(--amber)">${fmt(vol)} cubic units</strong>\nDiagonal = √(${l}²+${b}²+${h}²) = <strong style="color:var(--amber)">${fmt(diag)} units</strong>`;
+}
+
+function calcCylinder() {
+  const r=+document.getElementById('cyl-r').value, h=+document.getElementById('cyl-h').value;
+  const csa=2*PI*r*h, tsa=2*PI*r*(h+r), vol=PI*r*r*h;
+  document.getElementById('res-cyl').innerHTML=
+    `CSA = 2π(${r})(${h}) = <strong style="color:var(--amber)">${fmt(csa)} sq units</strong>\nTSA = 2π(${r})(${h}+${r}) = <strong style="color:var(--amber)">${fmt(tsa)} sq units</strong>\nVolume = π(${r})²(${h}) = <strong style="color:var(--amber)">${fmt(vol)} cubic units</strong>`;
+}
+
+function calcCone() {
+  const r=+document.getElementById('con-r').value, h=+document.getElementById('con-h').value;
+  const l=Math.sqrt(r*r+h*h), csa=PI*r*l, tsa=PI*r*(l+r), vol=PI*r*r*h/3;
+  document.getElementById('res-con').innerHTML=
+    `Slant height l = √(${r}²+${h}²) = <strong style="color:var(--teal)">${fmt(l)}</strong>\nCSA = π(${r})(${fmt(l)}) = <strong style="color:var(--amber)">${fmt(csa)} sq units</strong>\nTSA = π(${r})(${fmt(l)}+${r}) = <strong style="color:var(--amber)">${fmt(tsa)} sq units</strong>\nVolume = ⅓π(${r})²(${h}) = <strong style="color:var(--amber)">${fmt(vol)} cubic units</strong>`;
+}
+
+function calcSphere() {
+  const r=+document.getElementById('sph-r').value;
+  const sa=4*PI*r*r, vol=4/3*PI*r*r*r;
+  const hcsa=2*PI*r*r, htsa=3*PI*r*r, hvol=2/3*PI*r*r*r;
+  document.getElementById('res-sph').innerHTML=
+    `<strong style="color:var(--purple)">── Sphere ──</strong>\nSA = 4π(${r})² = <strong style="color:var(--amber)">${fmt(sa)} sq units</strong>\nVolume = ⁴⁄₃π(${r})³ = <strong style="color:var(--amber)">${fmt(vol)} cubic units</strong>\n\n<strong style="color:var(--purple)">── Hemisphere ──</strong>\nCSA = 2π(${r})² = <strong style="color:var(--amber)">${fmt(hcsa)} sq units</strong>\nTSA = 3π(${r})² = <strong style="color:var(--amber)">${fmt(htsa)} sq units</strong>\nVolume = ⅔π(${r})³ = <strong style="color:var(--amber)">${fmt(hvol)} cubic units</strong>`;
+}
+
+function calcConvert() {
+  const R=+document.getElementById('cvt-R').value, r=+document.getElementById('cvt-r').value;
+  const VR=4/3*PI*R*R*R, Vr=4/3*PI*r*r*r;
+  const n=Math.round(VR/Vr);
+  document.getElementById('res-cvt').innerHTML=
+    `V(big sphere) = ⁴⁄₃π(${R})³ = <strong style="color:var(--teal)">${fmt(VR)}</strong>\nV(small sphere) = ⁴⁄₃π(${r})³ = <strong style="color:var(--teal)">${fmt(Vr)}</strong>\nNumber of small spheres = ${fmt(VR)} ÷ ${fmt(Vr)} = <strong style="color:var(--amber)">${n}</strong>\n\nShortcut: N = (R/r)³ = (${R}/${r})³ = ${fmt(R/r)}³ = <strong style="color:var(--amber)">${n}</strong>`;
+}
+
+/* ── Shape Drawing (Canvas) ── */
+function drawAllShapes() {
+  drawCuboid();
+  drawCube();
+  drawCylinder();
+  drawCone();
+  drawSphere();
+  drawHemisphere();
+  drawConeOnCylinder();
+  drawCapsule();
+  drawConeOnHemi();
+}
+
+function drawCuboid() {
+  const cv=document.getElementById('cv-cuboid');
+  if(!cv) return;
+  const c=cv.getContext('2d'), w=cv.width, h=cv.height;
+  c.clearRect(0,0,w,h);
+  // 3D cuboid isometric
+  const ox=80,oy=160,fw=120,fh=90,dx=55,dy=-35;
+  // back face
+  c.fillStyle='rgba(129,140,248,.08)';
+  c.strokeStyle='rgba(129,140,248,.3)';
+  c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(ox+dx,oy+dy); c.lineTo(ox+fw+dx,oy+dy); c.lineTo(ox+fw+dx,oy-fh+dy); c.lineTo(ox+dx,oy-fh+dy); c.closePath(); c.fill(); c.stroke();
+  // right face
+  c.fillStyle='rgba(129,140,248,.12)';
+  c.beginPath(); c.moveTo(ox+fw,oy); c.lineTo(ox+fw+dx,oy+dy); c.lineTo(ox+fw+dx,oy-fh+dy); c.lineTo(ox+fw,oy-fh); c.closePath(); c.fill(); c.stroke();
+  // top face
+  c.fillStyle='rgba(129,140,248,.18)';
+  c.beginPath(); c.moveTo(ox,oy-fh); c.lineTo(ox+dx,oy-fh+dy); c.lineTo(ox+fw+dx,oy-fh+dy); c.lineTo(ox+fw,oy-fh); c.closePath(); c.fill(); c.stroke();
+  // front face
+  c.fillStyle='rgba(129,140,248,.06)';
+  c.strokeStyle='#818cf8';
+  c.lineWidth=2;
+  c.beginPath(); c.moveTo(ox,oy); c.lineTo(ox+fw,oy); c.lineTo(ox+fw,oy-fh); c.lineTo(ox,oy-fh); c.closePath(); c.fill(); c.stroke();
+  // labels
+  c.font="bold 12px 'DM Mono',monospace"; c.fillStyle='#818cf8'; c.textAlign='center';
+  c.fillText('l', ox+fw/2, oy+16);
+  c.fillText('b', ox+fw+dx/2+10, oy+dy/2+8);
+  c.save(); c.translate(ox-12, oy-fh/2); c.rotate(-Math.PI/2); c.fillText('h', 0, 0); c.restore();
+}
+
+function drawCube() {
+  const cv=document.getElementById('cv-cube');
+  if(!cv) return;
+  const c=cv.getContext('2d'), w=cv.width, h=cv.height;
+  c.clearRect(0,0,w,h);
+  const ox=55,oy=160,s=90,dx=45,dy=-30;
+  c.fillStyle='rgba(129,140,248,.08)'; c.strokeStyle='rgba(129,140,248,.3)'; c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(ox+dx,oy+dy); c.lineTo(ox+s+dx,oy+dy); c.lineTo(ox+s+dx,oy-s+dy); c.lineTo(ox+dx,oy-s+dy); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle='rgba(129,140,248,.12)';
+  c.beginPath(); c.moveTo(ox+s,oy); c.lineTo(ox+s+dx,oy+dy); c.lineTo(ox+s+dx,oy-s+dy); c.lineTo(ox+s,oy-s); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle='rgba(129,140,248,.18)';
+  c.beginPath(); c.moveTo(ox,oy-s); c.lineTo(ox+dx,oy-s+dy); c.lineTo(ox+s+dx,oy-s+dy); c.lineTo(ox+s,oy-s); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle='rgba(129,140,248,.06)'; c.strokeStyle='#818cf8'; c.lineWidth=2;
+  c.beginPath(); c.moveTo(ox,oy); c.lineTo(ox+s,oy); c.lineTo(ox+s,oy-s); c.lineTo(ox,oy-s); c.closePath(); c.fill(); c.stroke();
+  c.font="bold 13px 'DM Mono',monospace"; c.fillStyle='#818cf8'; c.textAlign='center';
+  c.fillText('a', ox+s/2, oy+16);
+}
+
+function drawCylinder() {
+  const cv=document.getElementById('cv-cylinder');
+  if(!cv) return;
+  const c=cv.getContext('2d'), cx=130,cy=130,rx=60,ry=20,h=130;
+  c.clearRect(0,0,cv.width,cv.height);
+  // body
+  c.fillStyle='rgba(45,212,191,.06)';
+  c.beginPath(); c.moveTo(cx-rx,cy-h/2); c.lineTo(cx-rx,cy+h/2);
+  c.ellipse(cx,cy+h/2,rx,ry,0,Math.PI,0,true);
+  c.lineTo(cx+rx,cy-h/2);
+  c.ellipse(cx,cy-h/2,rx,ry,0,0,Math.PI,true);
+  c.closePath(); c.fill();
+  // side lines
+  c.strokeStyle='#2dd4bf'; c.lineWidth=2;
+  c.beginPath(); c.moveTo(cx-rx,cy-h/2); c.lineTo(cx-rx,cy+h/2); c.stroke();
+  c.beginPath(); c.moveTo(cx+rx,cy-h/2); c.lineTo(cx+rx,cy+h/2); c.stroke();
+  // bottom ellipse
+  c.strokeStyle='#2dd4bf'; c.lineWidth=2;
+  c.beginPath(); c.ellipse(cx,cy+h/2,rx,ry,0,0,Math.PI*2); c.stroke();
+  // top ellipse
+  c.fillStyle='rgba(45,212,191,.15)';
+  c.beginPath(); c.ellipse(cx,cy-h/2,rx,ry,0,0,Math.PI*2); c.fill(); c.stroke();
+  // dimension labels
+  c.font="bold 12px 'DM Mono',monospace"; c.fillStyle='#2dd4bf'; c.textAlign='center';
+  c.fillText('r', cx+rx/2+5, cy-h/2-8);
+  c.beginPath(); c.setLineDash([4,4]); c.moveTo(cx,cy-h/2); c.lineTo(cx+rx,cy-h/2); c.stroke(); c.setLineDash([]);
+  c.save(); c.translate(cx+rx+14, cy); c.rotate(-Math.PI/2); c.fillText('h', 0, 0); c.restore();
+}
+
+function drawCone() {
+  const cv=document.getElementById('cv-cone');
+  if(!cv) return;
+  const c=cv.getContext('2d'), cx=130,baseY=230,rx=65,ry=20,apexY=40;
+  c.clearRect(0,0,cv.width,cv.height);
+  // body
+  c.fillStyle='rgba(245,158,11,.06)';
+  c.beginPath(); c.moveTo(cx,apexY); c.lineTo(cx-rx,baseY);
+  c.ellipse(cx,baseY,rx,ry,0,Math.PI,0,true);
+  c.lineTo(cx,apexY); c.closePath(); c.fill();
+  // slant edges
+  c.strokeStyle='#f59e0b'; c.lineWidth=2;
+  c.beginPath(); c.moveTo(cx,apexY); c.lineTo(cx-rx,baseY); c.stroke();
+  c.beginPath(); c.moveTo(cx,apexY); c.lineTo(cx+rx,baseY); c.stroke();
+  // base ellipse
+  c.beginPath(); c.ellipse(cx,baseY,rx,ry,0,0,Math.PI*2); c.stroke();
+  // height (dashed)
+  c.setLineDash([4,4]); c.strokeStyle='rgba(245,158,11,.5)';
+  c.beginPath(); c.moveTo(cx,apexY); c.lineTo(cx,baseY); c.stroke(); c.setLineDash([]);
+  // radius (dashed)
+  c.setLineDash([4,4]); c.beginPath(); c.moveTo(cx,baseY); c.lineTo(cx+rx,baseY); c.stroke(); c.setLineDash([]);
+  // labels
+  c.font="bold 12px 'DM Mono',monospace"; c.fillStyle='#f59e0b'; c.textAlign='center';
+  c.fillText('r', cx+rx/2+5, baseY-8);
+  c.fillText('h', cx-14, (apexY+baseY)/2);
+  c.fillText('l', cx+rx/2+16, (apexY+baseY)/2);
+}
+
+function drawSphere() {
+  const cv=document.getElementById('cv-sphere');
+  if(!cv) return;
+  const c=cv.getContext('2d'), cx=120,cy=120,r=80;
+  c.clearRect(0,0,cv.width,cv.height);
+  // main circle
+  c.fillStyle='rgba(217,70,239,.06)';
+  c.strokeStyle='#d946ef'; c.lineWidth=2;
+  c.beginPath(); c.arc(cx,cy,r,0,Math.PI*2); c.fill(); c.stroke();
+  // equator ellipse
+  c.strokeStyle='rgba(217,70,239,.4)'; c.lineWidth=1;
+  c.beginPath(); c.ellipse(cx,cy,r,r*0.3,0,0,Math.PI*2); c.stroke();
+  // vertical meridian
+  c.beginPath(); c.ellipse(cx,cy,r*0.3,r,0,0,Math.PI*2); c.stroke();
+  // radius line
+  c.setLineDash([4,4]); c.strokeStyle='#d946ef'; c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(cx,cy); c.lineTo(cx+r,cy); c.stroke(); c.setLineDash([]);
+  c.font="bold 13px 'DM Mono',monospace"; c.fillStyle='#d946ef'; c.textAlign='center';
+  c.fillText('r', cx+r/2, cy-10);
+  // center dot
+  c.beginPath(); c.arc(cx,cy,3,0,Math.PI*2); c.fillStyle='#d946ef'; c.fill();
+}
+
+function drawHemisphere() {
+  const cv=document.getElementById('cv-hemi');
+  if(!cv) return;
+  const c=cv.getContext('2d'), cx=120,baseY=130,r=75;
+  c.clearRect(0,0,cv.width,cv.height);
+  // dome
+  c.fillStyle='rgba(217,70,239,.06)';
+  c.strokeStyle='#d946ef'; c.lineWidth=2;
+  c.beginPath(); c.arc(cx,baseY,r,Math.PI,0); c.fill(); c.stroke();
+  // base ellipse
+  c.beginPath(); c.ellipse(cx,baseY,r,r*0.25,0,0,Math.PI*2); c.stroke();
+  // radius
+  c.setLineDash([4,4]); c.strokeStyle='#d946ef'; c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(cx,baseY); c.lineTo(cx+r,baseY); c.stroke(); c.setLineDash([]);
+  c.font="bold 13px 'DM Mono',monospace"; c.fillStyle='#d946ef'; c.textAlign='center';
+  c.fillText('r', cx+r/2, baseY+18);
+}
+
+function drawConeOnCylinder() {
+  const cv=document.getElementById('cv-concyl');
+  if(!cv) return;
+  const c=cv.getContext('2d'), cx=110,rx=50,ry=14;
+  // cylinder bottom
+  const cylBot=170, cylTop=100;
+  c.clearRect(0,0,cv.width,cv.height);
+  c.fillStyle='rgba(56,189,248,.06)';
+  c.strokeStyle='#38bdf8'; c.lineWidth=1.8;
+  c.beginPath(); c.moveTo(cx-rx,cylTop); c.lineTo(cx-rx,cylBot);
+  c.ellipse(cx,cylBot,rx,ry,0,Math.PI,0,true);
+  c.lineTo(cx+rx,cylTop); c.closePath(); c.fill(); c.stroke();
+  c.beginPath(); c.ellipse(cx,cylBot,rx,ry,0,0,Math.PI*2); c.stroke();
+  // cone on top
+  const apex=20;
+  c.fillStyle='rgba(56,189,248,.1)';
+  c.beginPath(); c.moveTo(cx,apex); c.lineTo(cx-rx,cylTop); c.lineTo(cx+rx,cylTop); c.closePath(); c.fill(); c.stroke();
+  c.beginPath(); c.ellipse(cx,cylTop,rx,ry,0,0,Math.PI*2); c.stroke();
+}
+
+function drawCapsule() {
+  const cv=document.getElementById('cv-capsule');
+  if(!cv) return;
+  const c=cv.getContext('2d'), cx=110,r=35, left=50, right=170;
+  c.clearRect(0,0,cv.width,cv.height);
+  c.fillStyle='rgba(56,189,248,.06)'; c.strokeStyle='#38bdf8'; c.lineWidth=1.8;
+  // body
+  c.beginPath(); c.moveTo(left,cx-r); c.lineTo(right,cx-r); c.arc(right,cx,r,-Math.PI/2,Math.PI/2);
+  c.lineTo(left,cx+r); c.arc(left,cx,r,Math.PI/2,-Math.PI/2); c.closePath(); c.fill(); c.stroke();
+  // middle lines
+  c.setLineDash([3,3]); c.strokeStyle='rgba(56,189,248,.3)';
+  c.beginPath(); c.moveTo(left,cx-r); c.lineTo(left,cx+r); c.stroke();
+  c.beginPath(); c.moveTo(right,cx-r); c.lineTo(right,cx+r); c.stroke();
+  c.setLineDash([]);
+  // labels
+  c.font="bold 11px 'DM Mono',monospace"; c.fillStyle='#38bdf8'; c.textAlign='center';
+  c.fillText('h', (left+right)/2, cx-r-6);
+  c.fillText('r', right+18, cx-4);
+}
+
+function drawConeOnHemi() {
+  const cv=document.getElementById('cv-conhemi');
+  if(!cv) return;
+  const c=cv.getContext('2d'), cx=110,r=55, baseY=140, apex=25;
+  c.clearRect(0,0,cv.width,cv.height);
+  // hemisphere (bottom)
+  c.fillStyle='rgba(56,189,248,.06)'; c.strokeStyle='#38bdf8'; c.lineWidth=1.8;
+  c.beginPath(); c.arc(cx,baseY,r,0,Math.PI); c.closePath(); c.fill(); c.stroke();
+  c.beginPath(); c.ellipse(cx,baseY,r,r*0.25,0,0,Math.PI*2); c.stroke();
+  // cone (top)
+  c.fillStyle='rgba(56,189,248,.08)';
+  c.beginPath(); c.moveTo(cx,apex); c.lineTo(cx-r,baseY); c.lineTo(cx+r,baseY); c.closePath(); c.fill(); c.stroke();
+}
+
+drawAllShapes();
+// Redraw on visibility (tab switch)
+const observer = new MutationObserver(drawAllShapes);
+document.querySelectorAll('main section').forEach(s => {
+  observer.observe(s, {attributes:true, attributeFilter:['class']});
+});
+
+// Default: first tab active
+document.querySelector('.tab-nav button').classList.add('a-cub');
+</script>
+</body>
+</html>

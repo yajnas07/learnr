@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Surface Areas &amp; Volumes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; padding:1.2rem; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 50% 30% at 10% 5%, rgba(245,158,11,.04) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 30% at 90% 90%, rgba(129,140,248,.03) 0%, transparent 50%); }
+
+  header { text-align:center; padding:.8rem 0 1.4rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:900; color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:.9rem; max-width:1100px; margin:0 auto; }
+  .panel { background:var(--card); border-radius:12px; border:1px solid var(--border); overflow:hidden; }
+  .panel-head { display:flex; align-items:center; gap:.55rem; padding:.75rem 1rem;
+    border-bottom:1px solid var(--border); font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; }
+  .panel-body { padding:.8rem 1rem; }
+
+  .ph-cub .panel-head { background:rgba(129,140,248,.08); color:var(--indigo); }
+  .ph-cyl .panel-head { background:rgba(45,212,191,.08);  color:var(--teal); }
+  .ph-con .panel-head { background:rgba(245,158,11,.08);  color:var(--amber); }
+  .ph-sph .panel-head { background:rgba(217,70,239,.08);  color:var(--purple); }
+  .ph-cmb .panel-head { background:rgba(56,189,248,.08);  color:var(--blue); }
+  .ph-cvt .panel-head { background:rgba(34,197,94,.08);   color:var(--green); }
+  .ph-mem .panel-head { background:rgba(217,70,239,.06);  color:#c084fc; }
+  .ph-cmp .panel-head { background:rgba(100,116,139,.08); color:#94a3b8; }
+
+  table { width:100%; border-collapse:collapse; font-size:.78rem; }
+  th { font-family:'DM Mono',monospace; font-size:.67rem; padding:.45rem .6rem;
+    background:var(--card2); color:var(--muted); text-align:left; }
+  td { padding:.4rem .6rem; border-top:1px solid var(--border); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:rgba(255,255,255,.015); }
+  .hl { color:var(--amber); font-family:'DM Mono',monospace; font-size:.75rem; }
+  .te { color:var(--teal); } .am { color:var(--amber); } .bl { color:var(--blue); }
+  .gr { color:var(--green); } .re { color:var(--red); } .in { color:var(--indigo); }
+  .pu { color:var(--purple); }
+
+  .fact { display:flex; gap:.5rem; font-size:.8rem; padding:.3rem 0; line-height:1.55; border-top:1px solid var(--border); }
+  .fact:first-child { border-top:none; }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  .formula-block { background:var(--card2); border-radius:8px; padding:.65rem .9rem; margin:.4rem 0; }
+  .formula-block .f-label { font-family:'DM Mono',monospace; font-size:.63rem; color:var(--muted); margin-bottom:.25rem; }
+  .formula-block .f-eq { font-family:'DM Mono',monospace; font-size:.9rem; color:var(--amber); font-weight:500; line-height:1.6; }
+  .formula-block .f-note { font-size:.72rem; color:var(--muted); margin-top:.2rem; line-height:1.5; }
+
+  .trick { background:var(--card2); border-radius:8px; padding:.55rem .75rem; margin:.35rem 0; font-size:.78rem; }
+  .trick strong { color:var(--amber); font-family:'Playfair Display',serif; font-size:.85rem; }
+  .trick p { color:var(--muted); font-size:.72rem; margin-top:.15rem; line-height:1.5; }
+
+  .hbox { border-left:3px solid; border-radius:0 6px 6px 0; padding:.5rem .75rem; margin:.4rem 0; font-size:.78rem; line-height:1.6; }
+  .hbox strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.15rem; font-size:.85rem; }
+
+  .span2 { grid-column:1/-1; }
+  @media(max-width:620px){ .span2 { grid-column:1; } }
+
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>📋 Cheat Sheet</h1>
+  <p>Surface Areas &amp; Volumes · Mathematics Ch.13 · Class X CBSE · Quick Revision</p>
+</header>
+
+<div class="grid">
+
+  <!-- ── Cuboid ── -->
+  <div class="panel ph-cub">
+    <div class="panel-head">📦 Cuboid (l × b × h)</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">TOTAL SURFACE AREA</div>
+        <div class="f-eq">TSA = 2(lb + bh + hl)</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">LATERAL / CURVED SURFACE AREA</div>
+        <div class="f-eq">LSA = 2(l + b) × h</div>
+        <div class="f-note">Only the four walls — excludes top and bottom.</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">VOLUME</div>
+        <div class="f-eq">V = l × b × h</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">DIAGONAL</div>
+        <div class="f-eq">d = √(l² + b² + h²)</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--indigo)"></div><span><strong>Open box (no lid):</strong> SA = 2(bh + hl) + lb = TSA − lb.</span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Room painting:</strong> Walls only = LSA. Walls + ceiling = LSA + lb.</span></div>
+    </div>
+  </div>
+
+  <!-- ── Cube ── -->
+  <div class="panel ph-cub">
+    <div class="panel-head">🎲 Cube (side = a)</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">TOTAL SURFACE AREA</div>
+        <div class="f-eq">TSA = 6a²</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">LATERAL SURFACE AREA</div>
+        <div class="f-eq">LSA = 4a²</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">VOLUME</div>
+        <div class="f-eq">V = a³</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">DIAGONAL</div>
+        <div class="f-eq">d = a√3</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--indigo)"></div><span><strong>Cube is a special cuboid</strong> where l = b = h = a. All 6 faces are equal squares.</span></div>
+    </div>
+  </div>
+
+  <!-- ── Cylinder ── -->
+  <div class="panel ph-cyl">
+    <div class="panel-head">🛢️ Right Circular Cylinder (r, h)</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">CURVED SURFACE AREA</div>
+        <div class="f-eq">CSA = 2πrh</div>
+        <div class="f-note">Think: unroll the cylinder → rectangle of width 2πr and height h.</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">TOTAL SURFACE AREA</div>
+        <div class="f-eq">TSA = 2πr(h + r)</div>
+        <div class="f-note">= CSA + 2 × base area = 2πrh + 2πr²</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">VOLUME</div>
+        <div class="f-eq">V = πr²h</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><span><strong>Hollow cylinder:</strong> V = π(R² − r²)h where R = outer, r = inner radius.</span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Open cylinder (no lid):</strong> SA = 2πrh + πr² (one base only).</span></div>
+    </div>
+  </div>
+
+  <!-- ── Cone ── -->
+  <div class="panel ph-con">
+    <div class="panel-head">🍦 Right Circular Cone (r, h, l)</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">SLANT HEIGHT</div>
+        <div class="f-eq">l = √(r² + h²)</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">CURVED SURFACE AREA</div>
+        <div class="f-eq">CSA = πrl</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">TOTAL SURFACE AREA</div>
+        <div class="f-eq">TSA = πr(l + r)</div>
+        <div class="f-note">= CSA + base area = πrl + πr²</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">VOLUME</div>
+        <div class="f-eq">V = ⅓ πr²h</div>
+        <div class="f-note">= ⅓ × volume of cylinder with same r and h</div>
+      </div>
+      <div class="hbox" style="border-color:var(--amber)">
+        <strong style="color:var(--amber)">💡 Why ⅓?</strong>
+        Exactly 3 cones fill a cylinder of same radius and height. Experimental proof: pour water from cone to cylinder 3 times.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Sphere ── -->
+  <div class="panel ph-sph">
+    <div class="panel-head">🔮 Sphere (radius r)</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">SURFACE AREA</div>
+        <div class="f-eq">SA = 4πr²</div>
+        <div class="f-note">= 4 × area of a great circle. No CSA/LSA distinction for a sphere.</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">VOLUME</div>
+        <div class="f-eq">V = ⁴⁄₃ πr³</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><span>Given <strong>diameter d</strong>: use r = d/2 in all formulas.</span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Earth/ball problems:</strong> SA = 4πr². Cost = SA × rate per unit area.</span></div>
+    </div>
+  </div>
+
+  <!-- ── Hemisphere ── -->
+  <div class="panel ph-sph">
+    <div class="panel-head">🥣 Hemisphere (radius r)</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">CURVED SURFACE AREA (dome only)</div>
+        <div class="f-eq">CSA = 2πr²</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">TOTAL SURFACE AREA (dome + flat base)</div>
+        <div class="f-eq">TSA = 3πr²</div>
+        <div class="f-note">= 2πr² + πr² (CSA + one flat circle)</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">VOLUME</div>
+        <div class="f-eq">V = ⅔ πr³</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><span><strong>Hollow hemisphere:</strong> V = ⅔ π(R³ − r³)</span></div>
+    </div>
+  </div>
+
+  <!-- ── Frustum of Cone ── -->
+  <div class="panel ph-con">
+    <div class="panel-head">🪣 Frustum of a Cone (r₁, r₂, h)</div>
+    <div class="panel-body">
+      <div class="hbox" style="border-color:var(--amber)">
+        <strong style="color:var(--amber)">What is a Frustum?</strong>
+        When a cone is cut by a plane parallel to the base, the portion between the base and the cut is a frustum. r₁ and r₂ are the radii of the two circular ends.
+      </div>
+      <div class="formula-block">
+        <div class="f-label">SLANT HEIGHT</div>
+        <div class="f-eq">l = √[h² + (r₁ − r₂)²]</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">CURVED SURFACE AREA</div>
+        <div class="f-eq">CSA = π(r₁ + r₂)l</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">TOTAL SURFACE AREA</div>
+        <div class="f-eq">TSA = π(r₁+r₂)l + πr₁² + πr₂²</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">VOLUME</div>
+        <div class="f-eq">V = ⅓ πh(r₁² + r₂² + r₁r₂)</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Bucket problems:</strong> A bucket is a frustum with r₁ (bottom) < r₂ (top).</span></div>
+    </div>
+  </div>
+
+  <!-- ── Combination of Solids ── -->
+  <div class="panel ph-cmb">
+    <div class="panel-head">🧩 Combination of Solids</div>
+    <div class="panel-body">
+      <div class="hbox" style="border-color:var(--blue)">
+        <strong style="color:var(--blue)">Key Principle</strong>
+        Volume = Sum of individual volumes. TSA = Sum of visible surfaces (subtract overlapping/hidden areas).
+      </div>
+      <table>
+        <tr><th>Combination</th><th>TSA</th><th>Volume</th></tr>
+        <tr><td class="bl">Cone on Cylinder</td><td>CSA(cyl) + CSA(cone) + πr²(base)</td><td>πr²h₁ + ⅓πr²h₂</td></tr>
+        <tr><td class="bl">Hemisphere on Cylinder</td><td>CSA(cyl) + 2πr² + πr²(base)</td><td>πr²h + ⅔πr³</td></tr>
+        <tr><td class="bl">Cone on Hemisphere</td><td>πrl + 2πr²</td><td>⅓πr²h + ⅔πr³</td></tr>
+        <tr><td class="bl">Capsule (cyl + 2 hemi)</td><td>2πrh + 4πr²</td><td>πr²h + ⁴⁄₃πr³</td></tr>
+      </table>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><span><strong>Scooped out:</strong> hollow carved = original TSA + inner surface − 2 × contact area.</span></div>
+    </div>
+  </div>
+
+  <!-- ── Conversion of Solids ── -->
+  <div class="panel ph-cvt">
+    <div class="panel-head">♻ Conversion of Solids</div>
+    <div class="panel-body">
+      <div class="hbox" style="border-color:var(--green)">
+        <strong style="color:var(--green)">Golden Rule</strong>
+        When a solid is melted and recast, <strong>volume is conserved</strong>. Surface area changes.
+      </div>
+      <div class="formula-block">
+        <div class="f-label">MELTING INTO n IDENTICAL OBJECTS</div>
+        <div class="f-eq">V(original) = n × V(small)</div>
+        <div class="f-note">Solve for n or for the unknown dimension.</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">SPHERE → n SMALL SPHERES</div>
+        <div class="f-eq">n = (R/r)³</div>
+        <div class="f-note">Shortcut: number = ratio of radii cubed.</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">WATER FLOW PROBLEMS</div>
+        <div class="f-eq">Volume per min = πr²(pipe) × speed</div>
+        <div class="f-note">Time = Volume(vessel) ÷ Volume per minute. Ensure consistent units!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Master Formula Table ── -->
+  <div class="panel ph-cmp span2">
+    <div class="panel-head">📊 Master Formula Table</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Shape</th><th>CSA / LSA</th><th>TSA</th><th>Volume</th></tr>
+        <tr><td class="in">Cuboid</td><td class="am">2(l+b)h</td><td class="am">2(lb+bh+hl)</td><td class="am">lbh</td></tr>
+        <tr><td class="in">Cube</td><td class="am">4a²</td><td class="am">6a²</td><td class="am">a³</td></tr>
+        <tr><td class="te">Cylinder</td><td class="am">2πrh</td><td class="am">2πr(h+r)</td><td class="am">πr²h</td></tr>
+        <tr><td class="am">Cone</td><td class="am">πrl</td><td class="am">πr(l+r)</td><td class="am">⅓πr²h</td></tr>
+        <tr><td class="pu">Sphere</td><td class="am">—</td><td class="am">4πr²</td><td class="am">⁴⁄₃πr³</td></tr>
+        <tr><td class="pu">Hemisphere</td><td class="am">2πr²</td><td class="am">3πr²</td><td class="am">⅔πr³</td></tr>
+        <tr><td class="am">Frustum</td><td class="am">π(r₁+r₂)l</td><td class="am">π(r₁+r₂)l+πr₁²+πr₂²</td><td class="am">⅓πh(r₁²+r₂²+r₁r₂)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Worked Examples ── -->
+  <div class="panel ph-con">
+    <div class="panel-head">✏️ Worked Examples</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Tent (cone on cylinder):</strong> r=7m, cyl h=5m, cone h=24m<br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          l = √(7²+24²) = 25m<br>
+          Canvas = CSA(cyl) + CSA(cone) = 2π(7)(5) + π(7)(25) = 220 + 550 = <span class="am">770 m²</span>
+        </span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--purple)"></div><span><strong>Sphere melted → wire (cylinder):</strong> Sphere r=3cm, wire r=0.2cm<br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          ⁴⁄₃π(3)³ = π(0.2)²h → h = 4×27/(3×0.04) = <span class="am">900 cm = 9 m</span>
+        </span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><span><strong>Water flow:</strong> pipe r=0.7cm, speed=10 m/min, cone r=20cm, h=24cm<br>
+        <span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">
+          Flow/min = π(0.7)²(1000) = 1540 cm³/min<br>
+          V(cone) = ⅓π(400)(24) ≈ 10057 cm³<br>
+          Time ≈ <span class="am">6.53 min ≈ 6 min 32 sec</span>
+        </span></span></div>
+    </div>
+  </div>
+
+  <!-- ── Memory Tricks ── -->
+  <div class="panel ph-mem span2">
+    <div class="panel-head">🧠 Memory Tricks &amp; Mnemonics</div>
+    <div class="panel-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.5rem">
+      <div class="trick">
+        <strong>Cone = ⅓ Cylinder</strong>
+        <p>Volume of cone = ⅓ × cylinder with same r, h. Three cones fill one cylinder.</p>
+      </div>
+      <div class="trick">
+        <strong>Hemisphere = ⅔ Cylinder</strong>
+        <p>V(hemisphere) = ⅔πr³. Think: 2/3 of the cylinder πr²·r where h = r.</p>
+      </div>
+      <div class="trick">
+        <strong>Sphere SA = 4 Great Circles</strong>
+        <p>4πr² = 4 × πr². The surface of a sphere equals the area of 4 great circles.</p>
+      </div>
+      <div class="trick">
+        <strong>Hemisphere TSA: "2 + 1 = 3"</strong>
+        <p>CSA = 2πr² (dome) + πr² (flat base) = TSA = 3πr². Remember 2+1=3.</p>
+      </div>
+      <div class="trick">
+        <strong>Slant Height: Pythagoras!</strong>
+        <p>l² = r² + h² for cone. l² = h² + (r₁−r₂)² for frustum. Always use l in CSA.</p>
+      </div>
+      <div class="trick">
+        <strong>Melting = Volume constant</strong>
+        <p>Solid melted & recast → Volume stays same, surface area changes. Set V₁ = V₂.</p>
+      </div>
+      <div class="trick">
+        <strong>Combination TSA: subtract hidden</strong>
+        <p>When two solids join, the contact face is hidden on both sides. Subtract 2 × contact area from the raw sum.</p>
+      </div>
+      <div class="trick">
+        <strong>Units check!</strong>
+        <p>SA in cm²/m², Volume in cm³/m³. 1 litre = 1000 cm³. 1 m³ = 10⁶ cm³. Always convert before computing.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Common Board Mistakes ── -->
+  <div class="panel ph-cmp span2">
+    <div class="panel-head">⚠️ Common Board Exam Mistakes</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Mistake</th><th>Correct Approach</th></tr>
+        <tr><td class="re">Using h instead of l in cone CSA</td><td class="gr">CSA = πrl (slant height), NOT πrh. Always find l = √(r²+h²) first.</td></tr>
+        <tr><td class="re">Forgetting to add base in TSA</td><td class="gr">TSA includes ALL surfaces. Check: does the shape have a flat base? Add πr² or lb for each base.</td></tr>
+        <tr><td class="re">Using diameter instead of radius</td><td class="gr">Read carefully: if "diameter = 14 cm" is given, use r = 7 cm in all formulas.</td></tr>
+        <tr><td class="re">Wrong π value</td><td class="gr">Use π = 22/7 when r is a multiple of 7. Use π = 3.14 otherwise. Follow "unless stated otherwise".</td></tr>
+        <tr><td class="re">Inconsistent units</td><td class="gr">Convert all measurements to the same unit BEFORE calculating. cm + m together = disaster.</td></tr>
+        <tr><td class="re">Adding SAs in combination problems</td><td class="gr">Remember to subtract the hidden/contact surfaces when solids are joined!</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shape Lab — Surface Areas &amp; Volumes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+  }
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 40% at 20% 10%, rgba(245,158,11,.04) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 80% 80%, rgba(56,189,248,.03) 0%, transparent 50%); }
+
+  header { text-align:center; padding:1.4rem 1rem .8rem; border-bottom:1px solid var(--border); }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,4vw,2.3rem); font-weight:900; color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  /* ── Preset grid ── */
+  .preset-grid { display:flex; flex-wrap:wrap; gap:.55rem; justify-content:center;
+    padding:1rem 1rem .5rem; max-width:760px; margin:0 auto; }
+  .preset-tile { display:flex; align-items:center; gap:.45rem;
+    padding:.45rem 1rem; border-radius:8px; border:1.5px solid var(--border);
+    background:var(--card); cursor:pointer; transition:all .2s;
+    font-family:'Playfair Display',serif; font-size:.78rem; font-weight:700; color:var(--muted); }
+  .preset-tile:hover { color:var(--text); border-color:#2a4060; }
+  .preset-tile.active { color:#040810; border-color:transparent; }
+  .pt-emoji { font-size:1rem; }
+
+  /* ── Main lab area ── */
+  .lab-wrap { max-width:900px; margin:0 auto; padding:.8rem 1rem 3rem;
+    display:grid; grid-template-columns:270px 1fr; gap:1rem; align-items:start; }
+  @media(max-width:640px){ .lab-wrap { grid-template-columns:1fr; } }
+
+  /* ── Canvas panel ── */
+  .canvas-panel { background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:1rem; display:flex; flex-direction:column; align-items:center; gap:.4rem; position:sticky; top:60px; }
+  .cv-title { font-family:'Playfair Display',serif; font-size:.95rem; font-weight:700; }
+  #shape-canvas { display:block; border-radius:8px; }
+  .dim-chips { display:flex; flex-wrap:wrap; gap:.3rem; justify-content:center; margin-top:.2rem; }
+  .dim-chip { font-family:'DM Mono',monospace; font-size:.65rem;
+    background:rgba(45,212,191,.08); border:1px solid rgba(45,212,191,.2);
+    border-radius:4px; padding:.15rem .5rem; color:var(--teal); }
+
+  /* ── Control panel ── */
+  .ctrl-panel { display:flex; flex-direction:column; gap:.75rem; }
+
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:.9rem 1rem; }
+  .card-title { font-family:'Playfair Display',serif; font-size:.9rem; font-weight:700; margin-bottom:.65rem; }
+
+  /* sliders */
+  .sl-row { margin:.42rem 0; }
+  .sl-row label { font-family:'DM Mono',monospace; font-size:.63rem; color:var(--muted);
+    display:flex; justify-content:space-between; margin-bottom:.18rem; }
+  .sl-val { color:var(--amber); font-weight:600; }
+  input[type=range] { width:100%; height:4px; accent-color:var(--amber); cursor:pointer; border-radius:2px; }
+
+  /* breakdown rows */
+  .bk-row { display:flex; align-items:center; gap:.5rem; padding:.3rem 0;
+    border-top:1px solid var(--border); font-size:.77rem; }
+  .bk-row:first-child { border-top:none; }
+  .bk-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .bk-lbl { flex:1; font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); line-height:1.4; }
+  .bk-val { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--amber); font-weight:600; white-space:nowrap; }
+
+  .total-row { background:var(--card2); border-radius:7px; padding:.4rem .7rem; margin-top:.45rem;
+    display:flex; justify-content:space-between; align-items:center; }
+  .total-lbl { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--text); font-weight:600; }
+  .total-val { font-family:'DM Mono',monospace; font-size:.92rem; color:var(--amber); font-weight:700; }
+
+  .hidden-note { background:rgba(244,63,94,.06); border-left:2px solid var(--red); border-radius:0 6px 6px 0;
+    padding:.3rem .6rem; margin:.4rem 0; font-size:.68rem; color:#f87171; font-family:'DM Mono',monospace; line-height:1.5; }
+
+  .tip-box { background:rgba(245,158,11,.06); border-left:3px solid var(--amber); border-radius:0 8px 8px 0;
+    padding:.55rem .8rem; font-size:.78rem; line-height:1.6; color:var(--amber); }
+  .tip-box strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.2rem; font-size:.85rem; }
+
+  /* ── site-nav ── */
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75); position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem; color:#7a9ab8; text-decoration:none;
+    transition:all .2s; border:1px solid rgba(26,45,69,.9); border-radius:99px; padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<header>
+  <h1>🔬 Shape Lab</h1>
+  <p>Surface Areas &amp; Volumes · Ch.13 · Build &amp; Explore Combinations of Solids · Live Formulas</p>
+</header>
+
+<div class="preset-grid" id="preset-grid"></div>
+
+<div class="lab-wrap">
+  <div class="canvas-panel">
+    <div class="cv-title" id="cv-title">—</div>
+    <canvas id="shape-canvas" width="240" height="360"></canvas>
+    <div class="dim-chips" id="dim-chips"></div>
+  </div>
+  <div class="ctrl-panel">
+    <div class="card">
+      <div class="card-title">⚙️ Dimensions</div>
+      <div id="sliders-area"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📐 Surface Area Breakdown</div>
+      <div id="tsa-area"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📦 Volume Breakdown</div>
+      <div id="vol-area"></div>
+    </div>
+    <div id="tip-area"></div>
+  </div>
+</div>
+
+<script>
+const PI = Math.PI;
+const f2 = n => (+n.toFixed(2)).toString();
+const f4 = n => (+n.toFixed(4)).toString();
+
+/* ═══════════════════════════════════════════
+   CANVAS DRAWING HELPERS
+═══════════════════════════════════════════ */
+const CV = document.getElementById('shape-canvas');
+const cx2d = CV.getContext('2d');
+
+function clrCanvas() {
+  cx2d.clearRect(0, 0, CV.width, CV.height);
+  // subtle grid
+  cx2d.save();
+  cx2d.strokeStyle = 'rgba(26,45,69,.35)'; cx2d.lineWidth = .5;
+  for (let x = 0; x <= CV.width; x += 30) { cx2d.beginPath(); cx2d.moveTo(x,0); cx2d.lineTo(x,CV.height); cx2d.stroke(); }
+  for (let y = 0; y <= CV.height; y += 30) { cx2d.beginPath(); cx2d.moveTo(0,y); cx2d.lineTo(CV.width,y); cx2d.stroke(); }
+  cx2d.restore();
+}
+
+function dRect(cx, yB, hw, h, fill, stroke) {
+  cx2d.fillStyle = fill; cx2d.strokeStyle = stroke; cx2d.lineWidth = 2;
+  cx2d.beginPath(); cx2d.rect(cx-hw, yB-h, hw*2, h);
+  cx2d.fill(); cx2d.stroke();
+}
+function dTri(cx, yB, hw, h, fill, stroke) {
+  cx2d.fillStyle = fill; cx2d.strokeStyle = stroke; cx2d.lineWidth = 2;
+  cx2d.beginPath(); cx2d.moveTo(cx, yB-h); cx2d.lineTo(cx+hw, yB); cx2d.lineTo(cx-hw, yB); cx2d.closePath();
+  cx2d.fill(); cx2d.stroke();
+}
+function dSemiUp(cx, y, r, fill, stroke) {
+  cx2d.fillStyle = fill; cx2d.strokeStyle = stroke; cx2d.lineWidth = 2;
+  cx2d.beginPath(); cx2d.arc(cx, y, r, Math.PI, 0); cx2d.closePath(); cx2d.fill(); cx2d.stroke();
+}
+function dSemiDn(cx, y, r, fill, stroke) {
+  cx2d.fillStyle = fill; cx2d.strokeStyle = stroke; cx2d.lineWidth = 2;
+  cx2d.beginPath(); cx2d.arc(cx, y, r, 0, Math.PI); cx2d.closePath(); cx2d.fill(); cx2d.stroke();
+}
+function dCircle(cx, cy, r, fill, stroke) {
+  cx2d.fillStyle = fill; cx2d.strokeStyle = stroke; cx2d.lineWidth = 2;
+  cx2d.beginPath(); cx2d.arc(cx, cy, r, 0, Math.PI*2); cx2d.fill(); cx2d.stroke();
+}
+function dTrap(cx, yB, r1, r2, h, fill, stroke) {
+  cx2d.fillStyle = fill; cx2d.strokeStyle = stroke; cx2d.lineWidth = 2;
+  cx2d.beginPath();
+  cx2d.moveTo(cx-r1, yB); cx2d.lineTo(cx+r1, yB);
+  cx2d.lineTo(cx+r2, yB-h); cx2d.lineTo(cx-r2, yB-h);
+  cx2d.closePath(); cx2d.fill(); cx2d.stroke();
+}
+function dAxis(cx, y1, y2) {
+  cx2d.save(); cx2d.setLineDash([4,4]); cx2d.strokeStyle='rgba(255,255,255,.12)'; cx2d.lineWidth=1;
+  cx2d.beginPath(); cx2d.moveTo(cx,y1); cx2d.lineTo(cx,y2); cx2d.stroke(); cx2d.restore();
+}
+function dLabel(x, y, text, color) {
+  cx2d.save(); cx2d.font = "bold 11px 'DM Mono',monospace";
+  const w = cx2d.measureText(text).width;
+  cx2d.fillStyle = 'rgba(4,8,16,.85)'; cx2d.fillRect(x-w/2-4, y-9, w+8, 16);
+  cx2d.fillStyle = color; cx2d.textAlign = 'center'; cx2d.fillText(text, x, y+3);
+  cx2d.restore();
+}
+function dDimLine(x1, y1, x2, y2, label, color) {
+  cx2d.save(); cx2d.setLineDash([3,3]); cx2d.strokeStyle = color; cx2d.lineWidth = 1; cx2d.globalAlpha=.5;
+  cx2d.beginPath(); cx2d.moveTo(x1,y1); cx2d.lineTo(x2,y2); cx2d.stroke();
+  cx2d.restore();
+  dLabel((x1+x2)/2+14, (y1+y2)/2, label, color);
+}
+
+/* ═══════════════════════════════════════════
+   PRESET DEFINITIONS
+═══════════════════════════════════════════ */
+const PRESETS = [
+  /* ─── 1. Tent ─── */
+  { id:'tent', name:'Tent', emoji:'🏕️', color:'#f59e0b',
+    sliders:[
+      {id:'r',  label:'Shared Radius r', val:7,  min:.5, max:20, step:.5},
+      {id:'h1', label:'Cylinder Height h₁', val:5,  min:.5, max:30, step:.5},
+      {id:'h2', label:'Cone Height h₂',     val:24, min:.5, max:40, step:.5},
+    ],
+    tip:'Canvas area = CSA(cyl) + CSA(cone). The base is NOT counted — the tent sits on the ground! Always find slant height l = √(r²+h²) first.',
+    calc(v) {
+      const r=+v.r, h1=+v.h1, h2=+v.h2;
+      const l = Math.sqrt(r*r+h2*h2);
+      const cy_csa=2*PI*r*h1, cn_csa=PI*r*l, base=PI*r*r;
+      const cy_vol=PI*r*r*h1, cn_vol=PI*r*r*h2/3;
+      return {
+        dims:{ 'l (slant)': l },
+        tsa_parts:[
+          {lbl:'CSA Cylinder = 2πrh₁', val:cy_csa, col:'#f59e0b'},
+          {lbl:'CSA Cone = πrl', val:cn_csa, col:'#818cf8'},
+          {lbl:'Circular base = πr²', val:base, col:'#2dd4bf'},
+        ],
+        hidden:'Cone base ↔ Cylinder top are joined — the contact circle is internal (not extra area).',
+        tsa: cy_csa+cn_csa+base,
+        vol_parts:[
+          {lbl:'V(Cylinder) = πr²h₁', val:cy_vol, col:'#f59e0b'},
+          {lbl:'V(Cone) = ⅓πr²h₂',   val:cn_vol, col:'#818cf8'},
+        ],
+        vol: cy_vol+cn_vol,
+      };
+    },
+    draw(v) {
+      const r=+v.r, h1=+v.h1, h2=+v.h2;
+      const CX=120, H=CV.height;
+      const sc=Math.min(H*.76/(h1+h2), 80/r);
+      const sr=r*sc, s1=h1*sc, s2=h2*sc, yB=H*.91;
+      clrCanvas();
+      dRect(CX, yB, sr, s1, 'rgba(245,158,11,.1)', '#f59e0b');
+      dTri(CX, yB-s1, sr, s2, 'rgba(129,140,248,.12)', '#818cf8');
+      dAxis(CX, yB, yB-s1-s2);
+      dDimLine(CX+sr+4, yB, CX+sr+4, yB-s1, `h₁=${v.h1}`, '#f59e0b');
+      dDimLine(CX+sr+4, yB-s1, CX+sr+4, yB-s1-s2, `h₂=${v.h2}`, '#818cf8');
+      dLabel(CX, yB+16, `r=${v.r}`, '#2dd4bf');
+      // slant label along slope
+      const slope_x = CX+sr*.5+8, slope_y = yB-s1-s2*.5;
+      const ang = -Math.atan2(s2, sr);
+      cx2d.save(); cx2d.translate(slope_x, slope_y); cx2d.rotate(ang);
+      cx2d.font="bold 11px 'DM Mono',monospace"; cx2d.fillStyle='#818cf8';
+      cx2d.fillText(`l=${f2(Math.sqrt(r*r+h2*h2))}`, 4, -3); cx2d.restore();
+    }
+  },
+
+  /* ─── 2. Capsule ─── */
+  { id:'capsule', name:'Capsule', emoji:'💊', color:'#2dd4bf',
+    sliders:[
+      {id:'r', label:'Radius r', val:3.5, min:.5, max:15, step:.5},
+      {id:'h', label:'Cylinder Height h', val:7, min:.5, max:30, step:.5},
+    ],
+    tip:'2 hemispheres together = 1 full sphere for SA. TSA = 2πrh + 4πr². No flat circular ends are visible — both are internal joints.',
+    calc(v) {
+      const r=+v.r, h=+v.h;
+      const cyl=2*PI*r*h, sph=4*PI*r*r;
+      const v_cyl=PI*r*r*h, v_sph=4/3*PI*r*r*r;
+      return {
+        dims:{},
+        tsa_parts:[
+          {lbl:'CSA Cylinder = 2πrh', val:cyl, col:'#2dd4bf'},
+          {lbl:'2 Hemispheres = 4πr² (= 1 sphere SA)', val:sph, col:'#d946ef'},
+        ],
+        hidden:'Both circular flat ends (top and bottom) are internal joints — subtract 2×πr² from raw sum. Net TSA = 2πrh + 4πr².',
+        tsa: cyl+sph,
+        vol_parts:[
+          {lbl:'V(Cylinder) = πr²h', val:v_cyl, col:'#2dd4bf'},
+          {lbl:'V(Sphere) = ⁴⁄₃πr³',  val:v_sph, col:'#d946ef'},
+        ],
+        vol: v_cyl+v_sph,
+      };
+    },
+    draw(v) {
+      const r=+v.r, h=+v.h;
+      const CX=120, H=CV.height;
+      const sc=Math.min(H*.78/(h+2*r), 80/r);
+      const sr=r*sc, sh=h*sc, yB=H*.88;
+      clrCanvas();
+      dSemiDn(CX, yB, sr, 'rgba(217,70,239,.1)','#d946ef');
+      dRect(CX, yB, sr, sh, 'rgba(45,212,191,.09)','#2dd4bf');
+      dSemiUp(CX, yB-sh, sr, 'rgba(217,70,239,.1)','#d946ef');
+      dAxis(CX, yB+sr, yB-sh-sr);
+      dDimLine(CX+sr+4, yB, CX+sr+4, yB-sh, `h=${v.h}`, '#2dd4bf');
+      dLabel(CX, yB+sr+16, `r=${v.r}`, '#d946ef');
+    }
+  },
+
+  /* ─── 3. Ice Cream ─── */
+  { id:'icecream', name:'Ice Cream', emoji:'🍦', color:'#d946ef',
+    sliders:[
+      {id:'r', label:'Shared Radius r', val:6,  min:.5, max:18, step:.5},
+      {id:'h', label:'Cone Height h',   val:12, min:.5, max:40, step:.5},
+    ],
+    tip:'Hemisphere sits on cone. Their shared flat face is hidden (cone base = hemisphere flat). TSA = πrl + 2πr². The ⅓ vs ⅔ volumes are classic board exam traps.',
+    calc(v) {
+      const r=+v.r, h=+v.h;
+      const l=Math.sqrt(r*r+h*h);
+      const cn=PI*r*l, hm=2*PI*r*r;
+      const v_cn=PI*r*r*h/3, v_hm=2/3*PI*r*r*r;
+      return {
+        dims:{'l (slant)':l},
+        tsa_parts:[
+          {lbl:'CSA Cone = πrl', val:cn, col:'#f59e0b'},
+          {lbl:'CSA Hemisphere = 2πr²', val:hm, col:'#d946ef'},
+        ],
+        hidden:'Cone base = Hemisphere flat face — both hidden at the joint. Subtract 2×πr² from sum.',
+        tsa: cn+hm,
+        vol_parts:[
+          {lbl:'V(Cone) = ⅓πr²h', val:v_cn, col:'#f59e0b'},
+          {lbl:'V(Hemisphere) = ⅔πr³', val:v_hm, col:'#d946ef'},
+        ],
+        vol: v_cn+v_hm,
+      };
+    },
+    draw(v) {
+      const r=+v.r, h=+v.h;
+      const CX=120, H=CV.height;
+      const sc=Math.min(H*.80/(h+r), 80/r);
+      const sr=r*sc, sh=h*sc;
+      // hemisphere scoop at top, cone pointing down
+      const hemiY=H*.22+sr; // center-bottom of hemisphere
+      const coneTop=hemiY;   // top of cone = base of hemisphere
+      const coneTip=coneTop+sh; // cone tip (bottom)
+      clrCanvas();
+      // hemisphere scoop (top)
+      dSemiUp(CX, hemiY, sr, 'rgba(217,70,239,.1)','#d946ef');
+      // inverted cone (pointing down)
+      cx2d.fillStyle='rgba(245,158,11,.12)'; cx2d.strokeStyle='#f59e0b'; cx2d.lineWidth=2;
+      cx2d.beginPath(); cx2d.moveTo(CX-sr, coneTop); cx2d.lineTo(CX+sr, coneTop);
+      cx2d.lineTo(CX, coneTip); cx2d.closePath(); cx2d.fill(); cx2d.stroke();
+      // axis
+      dAxis(CX, hemiY-sr, coneTip);
+      // dimension lines
+      dDimLine(CX+sr+4, coneTop, CX+sr+4, coneTip, `h=${v.h}`, '#f59e0b');
+      dLabel(CX, hemiY+4, `r=${v.r}`, '#d946ef');
+      // slant label
+      const ang=Math.atan2(sh,sr);
+      cx2d.save(); cx2d.translate(CX+sr*.5+6, coneTop+sh*.5); cx2d.rotate(ang);
+      cx2d.font="bold 11px 'DM Mono',monospace"; cx2d.fillStyle='#f59e0b';
+      cx2d.fillText(`l=${f2(Math.sqrt(r*r+h*h))}`, 4, -3); cx2d.restore();
+    }
+  },
+
+  /* ─── 4. Silo ─── */
+  { id:'silo', name:'Silo', emoji:'🏗️', color:'#818cf8',
+    sliders:[
+      {id:'r', label:'Shared Radius r', val:5,  min:.5, max:20, step:.5},
+      {id:'h', label:'Cylinder Height h', val:12, min:.5, max:40, step:.5},
+    ],
+    tip:'Grain silos, water tanks, water towers — all use Cylinder + Hemisphere. TSA includes the flat bottom base but NOT the top (hemisphere replaces it).',
+    calc(v) {
+      const r=+v.r, h=+v.h;
+      const cy=2*PI*r*h, hm=2*PI*r*r, base=PI*r*r;
+      const v_cy=PI*r*r*h, v_hm=2/3*PI*r*r*r;
+      return {
+        dims:{},
+        tsa_parts:[
+          {lbl:'CSA Cylinder = 2πrh', val:cy, col:'#818cf8'},
+          {lbl:'CSA Hemisphere = 2πr²', val:hm, col:'#d946ef'},
+          {lbl:'Flat circular base = πr²', val:base, col:'#2dd4bf'},
+        ],
+        hidden:'Cylinder top ↔ Hemisphere flat face: internal joint. Subtract 2×πr² from sum.',
+        tsa: cy+hm+base,
+        vol_parts:[
+          {lbl:'V(Cylinder) = πr²h', val:v_cy, col:'#818cf8'},
+          {lbl:'V(Hemisphere) = ⅔πr³', val:v_hm, col:'#d946ef'},
+        ],
+        vol: v_cy+v_hm,
+      };
+    },
+    draw(v) {
+      const r=+v.r, h=+v.h;
+      const CX=120, H=CV.height;
+      const sc=Math.min(H*.80/(h+r), 80/r);
+      const sr=r*sc, sh=h*sc, yB=H*.91;
+      clrCanvas();
+      dRect(CX, yB, sr, sh, 'rgba(129,140,248,.1)','#818cf8');
+      dSemiUp(CX, yB-sh, sr, 'rgba(217,70,239,.1)','#d946ef');
+      dAxis(CX, yB, yB-sh-sr);
+      dDimLine(CX+sr+4, yB, CX+sr+4, yB-sh, `h=${v.h}`, '#818cf8');
+      dLabel(CX, yB+16, `r=${v.r}`, '#d946ef');
+      // base arrow
+      dDimLine(CX-sr-4, yB, CX+sr+4, yB, '', '#2dd4bf');
+      dLabel(CX, yB+28, `base r=${v.r}`, '#2dd4bf');
+    }
+  },
+
+  /* ─── 5. Bucket (Frustum) ─── */
+  { id:'bucket', name:'Bucket', emoji:'🪣', color:'#38bdf8',
+    sliders:[
+      {id:'r1', label:'Bottom Radius r₁', val:15, min:1, max:40, step:.5},
+      {id:'r2', label:'Top Radius r₂',    val:25, min:1, max:50, step:.5},
+      {id:'h',  label:'Height h',         val:30, min:1, max:60, step:.5},
+    ],
+    tip:'Buckets, lamp shades, glasses — all frustums. Slant height l = √[h²+(r₂−r₁)²]. CSA = π(r₁+r₂)l. The volume formula ⅓πh(r₁²+r₂²+r₁r₂) is a favourite in board exams.',
+    calc(v) {
+      const r1=+v.r1, r2=+v.r2, h=+v.h;
+      const l=Math.sqrt(h*h+(r2-r1)*(r2-r1));
+      const csa=PI*(r1+r2)*l, bot=PI*r1*r1, top=PI*r2*r2;
+      const vol=PI*h/3*(r1*r1+r2*r2+r1*r2);
+      return {
+        dims:{'l (slant)':l},
+        tsa_parts:[
+          {lbl:'CSA = π(r₁+r₂)l', val:csa, col:'#38bdf8'},
+          {lbl:'Bottom face = πr₁²', val:bot, col:'#2dd4bf'},
+          {lbl:'Top face = πr₂²',   val:top, col:'#f59e0b'},
+        ],
+        tsa: csa+bot+top,
+        vol_parts:[
+          {lbl:'V = ⅓πh(r₁²+r₂²+r₁r₂)', val:vol, col:'#38bdf8'},
+        ],
+        vol,
+      };
+    },
+    draw(v) {
+      const r1=+v.r1, r2=+v.r2, h=+v.h;
+      const CX=120, H=CV.height;
+      const sc=Math.min(H*.78/h, 80/Math.max(r1,r2));
+      const sr1=r1*sc, sr2=r2*sc, sh=h*sc, yB=H*.90;
+      clrCanvas();
+      dTrap(CX, yB, sr1, sr2, sh, 'rgba(56,189,248,.1)','#38bdf8');
+      dAxis(CX, yB, yB-sh);
+      dLabel(CX, yB+16, `r₁=${v.r1}`, '#2dd4bf');
+      dLabel(CX, yB-sh-14, `r₂=${v.r2}`, '#f59e0b');
+      dDimLine(CX+sr2+4, yB, CX+sr2+4, yB-sh, `h=${v.h}`, '#38bdf8');
+      // slant label
+      const sx=CX+sr1*.5+sr2*.5+6, sy=yB-sh*.5;
+      cx2d.save(); cx2d.translate(sx, sy); cx2d.rotate(-Math.atan2(sh, sr2-sr1));
+      cx2d.font="bold 11px 'DM Mono',monospace"; cx2d.fillStyle='#38bdf8';
+      cx2d.fillText(`l=${f2(Math.sqrt(h*h+(r2-r1)*(r2-r1)))}`, 4, -3); cx2d.restore();
+    }
+  },
+
+  /* ─── 6. Tower / Rocket ─── */
+  { id:'tower', name:'Rocket', emoji:'🚀', color:'#22c55e',
+    sliders:[
+      {id:'r',  label:'Shared Radius r',   val:4, min:.5, max:14, step:.5},
+      {id:'h1', label:'Cylinder Height h₁', val:8, min:.5, max:30, step:.5},
+      {id:'h2', label:'Cone Height h₂',     val:6, min:.5, max:24, step:.5},
+    ],
+    tip:'3-part combination: Hemisphere (base) + Cylinder (body) + Cone (nose). TSA = CSA(cyl) + CSA(hemi) + CSA(cone). Two internal joints mean 2×πr² subtracted.',
+    calc(v) {
+      const r=+v.r, h1=+v.h1, h2=+v.h2;
+      const l=Math.sqrt(r*r+h2*h2);
+      const cy=2*PI*r*h1, hm=2*PI*r*r, cn=PI*r*l;
+      const v_cy=PI*r*r*h1, v_hm=2/3*PI*r*r*r, v_cn=PI*r*r*h2/3;
+      return {
+        dims:{'l (cone slant)':l},
+        tsa_parts:[
+          {lbl:'CSA Cylinder = 2πrh₁', val:cy, col:'#22c55e'},
+          {lbl:'CSA Hemisphere = 2πr²', val:hm, col:'#d946ef'},
+          {lbl:'CSA Cone = πrl', val:cn, col:'#f59e0b'},
+        ],
+        hidden:'2 joints: cylinder/hemisphere base + cylinder/cone top → subtract 2×πr² from raw SA sum.',
+        tsa: cy+hm+cn,
+        vol_parts:[
+          {lbl:'V(Cylinder) = πr²h₁', val:v_cy, col:'#22c55e'},
+          {lbl:'V(Hemisphere) = ⅔πr³', val:v_hm, col:'#d946ef'},
+          {lbl:'V(Cone) = ⅓πr²h₂', val:v_cn, col:'#f59e0b'},
+        ],
+        vol: v_cy+v_hm+v_cn,
+      };
+    },
+    draw(v) {
+      const r=+v.r, h1=+v.h1, h2=+v.h2;
+      const CX=120, H=CV.height;
+      const totalH=r+h1+h2;
+      const sc=Math.min(H*.82/totalH, 80/r);
+      const sr=r*sc, s1=h1*sc, s2=h2*sc, yB=H*.90;
+      clrCanvas();
+      dSemiDn(CX, yB, sr, 'rgba(217,70,239,.1)','#d946ef');
+      dRect(CX, yB, sr, s1, 'rgba(34,197,94,.09)','#22c55e');
+      dTri(CX, yB-s1, sr, s2, 'rgba(245,158,11,.12)','#f59e0b');
+      dAxis(CX, yB+sr, yB-s1-s2);
+      dDimLine(CX+sr+4, yB, CX+sr+4, yB-s1, `h₁=${v.h1}`, '#22c55e');
+      dDimLine(CX+sr+4, yB-s1, CX+sr+4, yB-s1-s2, `h₂=${v.h2}`, '#f59e0b');
+      dLabel(CX, yB+sr+16, `r=${v.r}`, '#d946ef');
+      const ang=-Math.atan2(s2,sr);
+      cx2d.save(); cx2d.translate(CX+sr*.5+6, yB-s1-s2*.5); cx2d.rotate(ang);
+      cx2d.font="bold 11px 'DM Mono',monospace"; cx2d.fillStyle='#f59e0b';
+      cx2d.fillText(`l=${f2(Math.sqrt(r*r+h2*h2))}`, 4, -3); cx2d.restore();
+    }
+  },
+
+  /* ─── 7. Gulab Jamun ─── */
+  { id:'gulab', name:'Gulab Jamun', emoji:'🟤', color:'#f97316',
+    sliders:[
+      {id:'r', label:'Radius r', val:1.4, min:.3, max:6, step:.1},
+      {id:'h', label:'Total Length (end-to-end)', val:5, min:1, max:16, step:.1},
+    ],
+    tip:'Gulab Jamun = cylinder + 2 hemispheres (same as capsule). Cylinder height = total length − 2r. Syrup fills ~30% of volume — a favourite CBSE board question!',
+    calc(v) {
+      const r=+v.r, totL=+v.h;
+      const ch=Math.max(0, totL-2*r);
+      const cyl=2*PI*r*ch, sph=4*PI*r*r;
+      const v_cyl=PI*r*r*ch, v_sph=4/3*PI*r*r*r;
+      return {
+        dims:{'Cyl height':ch, 'Syrup (30%)': (v_cyl+v_sph)*0.3},
+        tsa_parts:[
+          {lbl:'CSA Cylinder = 2πr(L−2r)', val:cyl, col:'#f97316'},
+          {lbl:'2 Hemispheres = 4πr²', val:sph, col:'#d946ef'},
+        ],
+        hidden:'Flat ends are internal joints.',
+        tsa: cyl+sph,
+        vol_parts:[
+          {lbl:'V(Cylinder) = πr²(L−2r)', val:v_cyl, col:'#f97316'},
+          {lbl:'V(Sphere) = ⁴⁄₃πr³', val:v_sph, col:'#d946ef'},
+        ],
+        vol: v_cyl+v_sph,
+      };
+    },
+    draw(v) {
+      const r=+v.r, totL=+v.h;
+      const ch=Math.max(0, totL-2*r);
+      const CX=120, H=CV.height;
+      const sc=Math.min(H*.70/(ch+2*r), 80/r);
+      const sr=r*sc, sh=ch*sc, yB=H*.85;
+      clrCanvas();
+      dSemiDn(CX, yB, sr, 'rgba(217,70,239,.1)','#d946ef');
+      if(sh>0) dRect(CX, yB, sr, sh, 'rgba(249,115,22,.1)','#f97316');
+      dSemiUp(CX, yB-sh, sr, 'rgba(217,70,239,.1)','#d946ef');
+      dAxis(CX, yB+sr, yB-sh-sr);
+      if(sh>0) dDimLine(CX+sr+4, yB, CX+sr+4, yB-sh, `cyl=${f2(ch)}`, '#f97316');
+      dDimLine(CX-sr-6, yB+sr, CX-sr-6, yB-sh-sr, `L=${v.h}`, '#d946ef');
+      dLabel(CX, yB+sr+16, `r=${v.r}`, '#d946ef');
+    }
+  },
+
+  /* ─── 8. Pencil ─── */
+  { id:'pencil', name:'Pencil', emoji:'✏️', color:'#fbbf24',
+    sliders:[
+      {id:'r', label:'Radius r', val:0.5, min:.1, max:4, step:.1},
+      {id:'h1', label:'Cylinder Length h₁', val:18, min:1, max:50, step:.5},
+      {id:'h2', label:'Cone Tip Height h₂', val:1.5, min:.2, max:8, step:.1},
+    ],
+    tip:'A sharpened pencil = Cylinder (body) + Cone (sharpened tip). TSA = CSA(cyl) + CSA(cone) + πr² (back flat end). The cone base is hidden inside.',
+    calc(v) {
+      const r=+v.r, h1=+v.h1, h2=+v.h2;
+      const l=Math.sqrt(r*r+h2*h2);
+      const cy=2*PI*r*h1, cn=PI*r*l, base=PI*r*r;
+      const v_cy=PI*r*r*h1, v_cn=PI*r*r*h2/3;
+      return {
+        dims:{'l (slant)':l, 'Total length':h1+h2},
+        tsa_parts:[
+          {lbl:'CSA Cylinder = 2πrh₁', val:cy, col:'#fbbf24'},
+          {lbl:'CSA Cone tip = πrl', val:cn, col:'#f59e0b'},
+          {lbl:'Back flat end = πr²', val:base, col:'#2dd4bf'},
+        ],
+        hidden:'Cone base ↔ Cylinder front end — hidden at joint.',
+        tsa: cy+cn+base,
+        vol_parts:[
+          {lbl:'V(Cylinder) = πr²h₁', val:v_cy, col:'#fbbf24'},
+          {lbl:'V(Cone) = ⅓πr²h₂', val:v_cn, col:'#f59e0b'},
+        ],
+        vol: v_cy+v_cn,
+      };
+    },
+    draw(v) {
+      const r=+v.r, h1=+v.h1, h2=+v.h2;
+      const CX=120, H=CV.height;
+      // draw horizontally for pencil shape
+      const sc=Math.min(200/(h1+h2), 60/r);
+      const sr=r*sc, s1=h1*sc, s2=h2*sc;
+      const leftX=CX-(s1+s2)/2, midX=leftX+s1, tipX=midX+s2, cy=H*.5;
+      clrCanvas();
+      // cylinder body
+      cx2d.fillStyle='rgba(251,191,36,.1)'; cx2d.strokeStyle='#fbbf24'; cx2d.lineWidth=2;
+      cx2d.beginPath(); cx2d.rect(leftX, cy-sr, s1, sr*2); cx2d.fill(); cx2d.stroke();
+      // cone tip
+      cx2d.fillStyle='rgba(245,158,11,.12)'; cx2d.strokeStyle='#f59e0b'; cx2d.lineWidth=2;
+      cx2d.beginPath(); cx2d.moveTo(midX, cy-sr); cx2d.lineTo(tipX, cy); cx2d.lineTo(midX, cy+sr); cx2d.closePath();
+      cx2d.fill(); cx2d.stroke();
+      // back flat end
+      cx2d.strokeStyle='#2dd4bf'; cx2d.beginPath(); cx2d.moveTo(leftX, cy-sr); cx2d.lineTo(leftX, cy+sr); cx2d.stroke();
+      // labels
+      dLabel((leftX+midX)/2, cy+sr+18, `h₁=${v.h1}`, '#fbbf24');
+      dLabel((midX+tipX)/2, cy-sr-12, `h₂=${v.h2}`, '#f59e0b');
+      dLabel(leftX-16, cy, `r=${v.r}`, '#2dd4bf');
+    }
+  },
+
+  /* ─── 9. Well ─── */
+  { id:'well', name:'Well / Pipe', emoji:'🕳️', color:'#64748b',
+    sliders:[
+      {id:'R', label:'Outer Radius R', val:5, min:1, max:20, step:.5},
+      {id:'r', label:'Inner Radius r', val:3, min:.5, max:19, step:.5},
+      {id:'h', label:'Height / Depth h', val:14, min:1, max:50, step:.5},
+    ],
+    tip:'A hollow cylinder (well, pipe, tube). Volume = πh(R²−r²). TSA = outer CSA + inner CSA + 2 ring ends. This is a common CBSE 3-mark problem.',
+    calc(v) {
+      const R=+v.R, r=Math.min(+v.r, R-.1), h=+v.h;
+      const outer=2*PI*R*h, inner=2*PI*r*h, ring=2*PI*(R*R-r*r);
+      const vol=PI*h*(R*R-r*r);
+      return {
+        dims:{'Thickness':R-r},
+        tsa_parts:[
+          {lbl:'Outer CSA = 2πRh', val:outer, col:'#94a3b8'},
+          {lbl:'Inner CSA = 2πrh', val:inner, col:'#64748b'},
+          {lbl:'2 Ring ends = 2π(R²−r²)', val:ring, col:'#2dd4bf'},
+        ],
+        tsa: outer+inner+ring,
+        vol_parts:[
+          {lbl:'V = πh(R²−r²)', val:vol, col:'#64748b'},
+        ],
+        vol,
+      };
+    },
+    draw(v) {
+      const R=+v.R, r=Math.min(+v.r, R-.1), h=+v.h;
+      const CX=120, H=CV.height;
+      const sc=Math.min(H*.70/h, 80/R);
+      const sR=R*sc, sr=r*sc, sh=h*sc, yB=H*.88;
+      clrCanvas();
+      // outer rect
+      cx2d.fillStyle='rgba(148,163,184,.08)'; cx2d.strokeStyle='#94a3b8'; cx2d.lineWidth=2;
+      cx2d.beginPath(); cx2d.rect(CX-sR, yB-sh, sR*2, sh); cx2d.fill(); cx2d.stroke();
+      // inner hollow (darker)
+      cx2d.fillStyle='rgba(4,8,16,.7)'; cx2d.strokeStyle='#64748b'; cx2d.lineWidth=1.5;
+      cx2d.beginPath(); cx2d.rect(CX-sr, yB-sh, sr*2, sh); cx2d.fill(); cx2d.stroke();
+      // ring at top
+      cx2d.fillStyle='rgba(45,212,191,.1)'; cx2d.strokeStyle='#2dd4bf'; cx2d.lineWidth=1;
+      cx2d.beginPath(); cx2d.rect(CX-sR, yB-sh-4, sR-sr, 4); cx2d.fill(); cx2d.stroke();
+      cx2d.beginPath(); cx2d.rect(CX+sr, yB-sh-4, sR-sr, 4); cx2d.fill(); cx2d.stroke();
+      // labels
+      dDimLine(CX+sR+6, yB, CX+sR+6, yB-sh, `h=${v.h}`, '#94a3b8');
+      dLabel(CX, yB+16, `R=${v.R}`, '#94a3b8');
+      dLabel(CX, yB-sh-20, `r=${v.r}`, '#64748b');
+    }
+  },
+
+  /* ─── 10. Hourglass ─── */
+  { id:'hourglass', name:'Hourglass', emoji:'⏳', color:'#e879f9',
+    sliders:[
+      {id:'r', label:'Base/Top Radius r', val:6, min:1, max:18, step:.5},
+      {id:'h', label:'Height of each cone h', val:10, min:1, max:30, step:.5},
+    ],
+    tip:'An hourglass = 2 cones joined at their tips (apex to apex). TSA = 2 × πrl (only curved surfaces — no flat bases are visible from inside). Total volume = 2 × ⅓πr²h.',
+    calc(v) {
+      const r=+v.r, h=+v.h;
+      const l=Math.sqrt(r*r+h*h);
+      const csa=2*PI*r*l, bases=2*PI*r*r;
+      const vol=2*PI*r*r*h/3;
+      return {
+        dims:{'l (slant each)':l, 'Total height': 2*h},
+        tsa_parts:[
+          {lbl:'2 × CSA Cone = 2πrl', val:csa, col:'#e879f9'},
+          {lbl:'2 × Base circle = 2πr²', val:bases, col:'#2dd4bf'},
+        ],
+        hidden:'The two cone tips meet at the center — no area is hidden there (point contact only).',
+        tsa: csa+bases,
+        vol_parts:[
+          {lbl:'2 × V(Cone) = 2 × ⅓πr²h', val:vol, col:'#e879f9'},
+        ],
+        vol,
+      };
+    },
+    draw(v) {
+      const r=+v.r, h=+v.h;
+      const CX=120, H=CV.height;
+      const sc=Math.min(H*.78/(2*h), 80/r);
+      const sr=r*sc, sh=h*sc;
+      const midY=H*.5;
+      clrCanvas();
+      // top cone (inverted — tip at center)
+      cx2d.fillStyle='rgba(232,121,249,.08)'; cx2d.strokeStyle='#e879f9'; cx2d.lineWidth=2;
+      cx2d.beginPath(); cx2d.moveTo(CX-sr, midY-sh); cx2d.lineTo(CX+sr, midY-sh);
+      cx2d.lineTo(CX, midY); cx2d.closePath(); cx2d.fill(); cx2d.stroke();
+      // bottom cone (upright — tip at center)
+      cx2d.beginPath(); cx2d.moveTo(CX-sr, midY+sh); cx2d.lineTo(CX+sr, midY+sh);
+      cx2d.lineTo(CX, midY); cx2d.closePath(); cx2d.fill(); cx2d.stroke();
+      // center dot
+      cx2d.beginPath(); cx2d.arc(CX, midY, 3, 0, PI*2); cx2d.fillStyle='#e879f9'; cx2d.fill();
+      // axis
+      dAxis(CX, midY-sh, midY+sh);
+      // labels
+      dDimLine(CX+sr+6, midY-sh, CX+sr+6, midY, `h=${v.h}`, '#e879f9');
+      dDimLine(CX+sr+6, midY, CX+sr+6, midY+sh, `h=${v.h}`, '#e879f9');
+      dLabel(CX, midY+sh+16, `r=${v.r}`, '#2dd4bf');
+      dLabel(CX, midY-sh-16, `r=${v.r}`, '#2dd4bf');
+      // slant
+      const ang=Math.atan2(sh,sr);
+      cx2d.save(); cx2d.translate(CX+sr*.5+8, midY+sh*.5); cx2d.rotate(ang);
+      cx2d.font="bold 11px 'DM Mono',monospace"; cx2d.fillStyle='#e879f9';
+      cx2d.fillText(`l=${f2(Math.sqrt(r*r+h*h))}`, 4, -3); cx2d.restore();
+    }
+  },
+];
+
+/* ═══════════════════════════════════════════
+   UI STATE
+═══════════════════════════════════════════ */
+let activePreset = PRESETS[0];
+let dimVals = {};
+
+function initDimVals(preset) {
+  dimVals = {};
+  preset.sliders.forEach(s => { dimVals[s.id] = s.val; });
+}
+
+function renderPresetGrid() {
+  const grid = document.getElementById('preset-grid');
+  grid.innerHTML = PRESETS.map(p => `
+    <div class="preset-tile" id="pt-${p.id}" onclick="selectPreset('${p.id}')"
+         style="${p.id===activePreset.id?`background:${p.color};color:#040810;border-color:${p.color};`:''}">
+      <span class="pt-emoji">${p.emoji}</span>${p.name}
+    </div>`).join('');
+}
+
+function renderSliders() {
+  const area = document.getElementById('sliders-area');
+  area.innerHTML = activePreset.sliders.map(s => `
+    <div class="sl-row">
+      <label>
+        <span>${s.label}</span>
+        <span class="sl-val" id="sv-${s.id}">${dimVals[s.id]}</span>
+      </label>
+      <input type="range" id="sl-${s.id}" min="${s.min}" max="${s.max}" step="${s.step}" value="${dimVals[s.id]}"
+        oninput="onSlider('${s.id}',this.value)">
+    </div>`).join('');
+}
+
+function onSlider(id, val) {
+  dimVals[id] = +val;
+  document.getElementById('sv-'+id).textContent = val;
+  updateAll();
+}
+
+function renderResults(res) {
+  // Surface area
+  const tsaEl = document.getElementById('tsa-area');
+  tsaEl.innerHTML = res.tsa_parts.map(p =>
+    `<div class="bk-row">
+       <div class="bk-dot" style="background:${p.col}"></div>
+       <div class="bk-lbl">${p.lbl}</div>
+       <div class="bk-val">${f2(p.val)}</div>
+     </div>`).join('');
+  if (res.hidden) {
+    tsaEl.innerHTML += `<div class="hidden-note">⚠ Hidden faces: ${res.hidden}</div>`;
+  }
+  tsaEl.innerHTML += `<div class="total-row"><span class="total-lbl">Total TSA</span><span class="total-val">${f2(res.tsa)}</span></div>`;
+
+  // Volume
+  const volEl = document.getElementById('vol-area');
+  volEl.innerHTML = res.vol_parts.map(p =>
+    `<div class="bk-row">
+       <div class="bk-dot" style="background:${p.col}"></div>
+       <div class="bk-lbl">${p.lbl}</div>
+       <div class="bk-val">${f2(p.val)}</div>
+     </div>`).join('');
+  volEl.innerHTML += `<div class="total-row"><span class="total-lbl">Total Volume</span><span class="total-val">${f2(res.vol)}</span></div>`;
+
+  // Computed dims (e.g. slant height)
+  const chips = document.getElementById('dim-chips');
+  chips.innerHTML = Object.entries(res.dims||{}).map(([k,v]) =>
+    `<span class="dim-chip">${k} = ${f4(v)}</span>`).join('');
+}
+
+function renderTip() {
+  document.getElementById('tip-area').innerHTML = activePreset.tip
+    ? `<div class="tip-box"><strong>🎯 CBSE Board Tip</strong>${activePreset.tip}</div>` : '';
+}
+
+function updateAll() {
+  const res = activePreset.calc(dimVals);
+  document.getElementById('cv-title').textContent = activePreset.emoji + ' ' + activePreset.name;
+  activePreset.draw(dimVals);
+  renderResults(res);
+  renderTip();
+}
+
+function selectPreset(id) {
+  activePreset = PRESETS.find(p => p.id === id);
+  initDimVals(activePreset);
+  renderPresetGrid();
+  renderSliders();
+  updateAll();
+}
+
+/* ── Boot ── */
+initDimVals(activePreset);
+renderPresetGrid();
+renderSliders();
+updateAll();
+</script>
+</body>
+</html>

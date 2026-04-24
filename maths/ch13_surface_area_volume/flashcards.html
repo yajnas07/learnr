@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Surface Areas &amp; Volumes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,158,11,.05) 0%, transparent 60%); }
+
+  header { text-align:center; padding:1.8rem 1rem .8rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.3rem,4vw,2rem); font-weight:900; color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .prog-row { display:flex; align-items:center; gap:1rem; padding:.5rem 1rem .8rem; width:100%; max-width:560px; }
+  .prog-bar { flex:1; height:5px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--indigo),var(--amber)); transition:width .4s ease; }
+  .prog-text { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); white-space:nowrap; }
+
+  .filters { display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center; padding:.2rem 1rem .8rem; }
+  .f-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.72rem;
+    padding:.3rem .9rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .f-btn:hover { color:var(--text); }
+  .f-btn.on { color:#040810; border-color:transparent; }
+  .f-all.on { background:var(--muted); color:var(--text) !important; }
+  .f-cub.on { background:var(--indigo); }
+  .f-cyl.on { background:var(--teal); }
+  .f-con.on { background:var(--amber); }
+  .f-sph.on { background:var(--purple); color:#fff !important; }
+  .f-cmb.on { background:var(--blue); }
+  .f-cvt.on { background:var(--green); }
+
+  .stage { width:100%; max-width:560px; padding:0 1rem; perspective:1200px; }
+  .fc-wrap { width:100%; aspect-ratio:3/2; position:relative; cursor:pointer;
+    transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1); }
+  .fc-wrap.flipped { transform:rotateY(180deg); }
+  .fc-face { position:absolute; inset:0; border-radius:16px;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:1.4rem; text-align:center; }
+  .fc-front { background:var(--card); border:1px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.6); }
+  .fc-back  { transform:rotateY(180deg); background:var(--card); border:1px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.6); }
+  .fc-tag { font-family:'DM Mono',monospace; font-size:.65rem; font-weight:500; padding:.18rem .65rem; border-radius:2px; margin-bottom:.7rem; }
+  .fc-q { font-family:'Playfair Display',serif; font-size:clamp(.88rem,2.4vw,1.1rem); font-weight:700; line-height:1.45; }
+  .fc-hint { font-size:.68rem; color:var(--muted); margin-top:.5rem; font-family:'DM Mono',monospace; }
+  .fc-flip-hint { position:absolute; bottom:.75rem; font-size:.65rem; font-family:'DM Mono',monospace; color:#1a2d45; animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+  .fc-ans-lbl { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--green); margin-bottom:.5rem; }
+  .fc-ans { font-size:clamp(.78rem,2vw,.95rem); line-height:1.65; color:var(--text); }
+  .fc-ans strong { color:var(--amber); }
+  .fc-ans em { color:var(--teal); font-style:normal; }
+  .known-badge { position:absolute; top:.7rem; right:.7rem; font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .45rem; border-radius:2px; }
+  .known   { background:rgba(34,197,94,.15); color:#4ade80; }
+
+  .nav-row { display:flex; gap:.7rem; align-items:center; padding:1rem; }
+  .nav-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.85rem;
+    padding:.5rem 1.3rem; border-radius:4px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .nav-btn:hover:not(:disabled) { border-color:#2a4a6a; color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; }
+  .card-ctr { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--muted); min-width:70px; text-align:center; }
+
+  .bottom-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem 2rem; }
+  .bot-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.75rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .bot-btn:hover { border-color:var(--amber); color:var(--amber); }
+
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<header>
+  <h1>Flashcard Deck</h1>
+  <p>Surface Areas &amp; Volumes · Mathematics Ch.13 · 42 Cards · Tap to flip</p>
+</header>
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 42</div>
+</div>
+<div class="filters">
+  <button class="f-btn f-all on" onclick="setFilter('all',this)">All (42)</button>
+  <button class="f-btn f-cub" onclick="setFilter('cub',this)">📦 Cuboid/Cube</button>
+  <button class="f-btn f-cyl" onclick="setFilter('cyl',this)">🛢️ Cylinder</button>
+  <button class="f-btn f-con" onclick="setFilter('con',this)">🍦 Cone</button>
+  <button class="f-btn f-sph" onclick="setFilter('sph',this)">🔮 Sphere</button>
+  <button class="f-btn f-cmb" onclick="setFilter('cmb',this)">🧩 Combinations</button>
+  <button class="f-btn f-cvt" onclick="setFilter('cvt',this)">♻ Conversions</button>
+</div>
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flipCard()">
+    <div class="fc-face fc-front" id="fc-front"></div>
+    <div class="fc-face fc-back"  id="fc-back"></div>
+  </div>
+</div>
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="prevCard()" disabled>← Prev</button>
+  <div class="card-ctr" id="card-ctr">1 / 42</div>
+  <button class="nav-btn" id="next-btn" onclick="nextCard()">Next →</button>
+</div>
+<div class="bottom-row">
+  <button class="bot-btn" onclick="markKnown()">✓ Know it</button>
+  <button class="bot-btn" onclick="markUnknown()">✗ Still learning</button>
+  <button class="bot-btn" onclick="shuffleDeck()">🔀 Shuffle</button>
+  <button class="bot-btn" onclick="resetDeck()">↺ Reset</button>
+</div>
+
+<script>
+const ALL_CARDS = [
+  // ── CUBOID & CUBE (cub) — 7 cards ──
+  {cat:'cub',tag:'📦 Cuboid & Cube',tagBg:'rgba(129,140,248,.15)',tagCol:'#818cf8',
+   q:'What is the Total Surface Area of a cuboid with dimensions l, b, h?',
+   a:'<strong>TSA = 2(lb + bh + hl)</strong><br>Sum of areas of all 6 faces (3 pairs of identical rectangles).<br>Example: 5×4×3 → TSA = 2(20+12+15) = <em>94 sq units</em>'},
+  {cat:'cub',tag:'📦 Cuboid & Cube',tagBg:'rgba(129,140,248,.15)',tagCol:'#818cf8',
+   q:'What is the Lateral Surface Area of a cuboid?',
+   a:'<strong>LSA = 2(l + b) × h</strong><br>Only the 4 walls — excludes top and bottom.<br>Use for: painting room walls, fencing around sides.'},
+  {cat:'cub',tag:'📦 Cuboid & Cube',tagBg:'rgba(129,140,248,.15)',tagCol:'#818cf8',
+   q:'What is the volume and diagonal of a cuboid?',
+   a:'<strong>Volume = l × b × h</strong><br><strong>Diagonal = √(l² + b² + h²)</strong><br>The space diagonal connects opposite vertices of the cuboid.'},
+  {cat:'cub',tag:'📦 Cuboid & Cube',tagBg:'rgba(129,140,248,.15)',tagCol:'#818cf8',
+   q:'Write all formulas for a cube with side a.',
+   a:'<strong>TSA = 6a²</strong> (6 equal square faces)<br><strong>LSA = 4a²</strong> (4 side faces)<br><strong>Volume = a³</strong><br><strong>Diagonal = a√3</strong>'},
+  {cat:'cub',tag:'📦 Cuboid & Cube',tagBg:'rgba(129,140,248,.15)',tagCol:'#818cf8',
+   q:'A box has no lid (open top). How do you find its surface area?',
+   a:'<strong>SA = TSA − (one face)</strong><br>Open cuboid: SA = 2(bh + hl) + lb = TSA − lb<br>Open cube: SA = 5a² (instead of 6a²)'},
+  {cat:'cub',tag:'📦 Cuboid & Cube',tagBg:'rgba(129,140,248,.15)',tagCol:'#818cf8',
+   q:'A room is 12m × 8m × 4m. Find cost of painting the walls at ₹15/m².',
+   a:'Walls = LSA = 2(l+b)×h = 2(12+8)×4 = <strong>160 m²</strong><br>Cost = 160 × 15 = <strong>₹2400</strong><br>Note: we used LSA, not TSA (no floor/ceiling).'},
+  {cat:'cub',tag:'📦 Cuboid & Cube',tagBg:'rgba(129,140,248,.15)',tagCol:'#818cf8',
+   q:'What is the difference between TSA and LSA?',
+   a:'<strong>TSA</strong> = Total Surface Area = ALL faces including top and bottom.<br><strong>LSA</strong> = Lateral Surface Area = side faces only, <em>excludes</em> top and bottom.<br>TSA = LSA + 2 × (base area)'},
+
+  // ── CYLINDER (cyl) — 7 cards ──
+  {cat:'cyl',tag:'🛢️ Cylinder',tagBg:'rgba(45,212,191,.15)',tagCol:'#2dd4bf',
+   q:'What is the Curved Surface Area of a cylinder?',
+   a:'<strong>CSA = 2πrh</strong><br>Think: unroll the cylinder → rectangle of width 2πr (circumference) and height h.<br>Area = 2πr × h'},
+  {cat:'cyl',tag:'🛢️ Cylinder',tagBg:'rgba(45,212,191,.15)',tagCol:'#2dd4bf',
+   q:'What is the Total Surface Area of a cylinder?',
+   a:'<strong>TSA = 2πr(h + r)</strong><br>= CSA + 2 circular bases<br>= 2πrh + 2πr²<br>= 2πr(h + r)'},
+  {cat:'cyl',tag:'🛢️ Cylinder',tagBg:'rgba(45,212,191,.15)',tagCol:'#2dd4bf',
+   q:'What is the volume of a cylinder?',
+   a:'<strong>V = πr²h</strong><br>= base area × height<br>Think: stack of circles (area πr²) up to height h.'},
+  {cat:'cyl',tag:'🛢️ Cylinder',tagBg:'rgba(45,212,191,.15)',tagCol:'#2dd4bf',
+   q:'What is the volume of a hollow cylinder with outer radius R and inner radius r?',
+   a:'<strong>V = πh(R² − r²)</strong><br>= π(R² − r²)h<br>= Volume of outer cylinder − volume of inner cylinder.<br>Example: pipe with R=5, r=3, h=10 → V = π(25−9)×10 = <em>160π</em>'},
+  {cat:'cyl',tag:'🛢️ Cylinder',tagBg:'rgba(45,212,191,.15)',tagCol:'#2dd4bf',
+   q:'A cylindrical pillar has radius 20 cm and height 3.5 m. Find its CSA.',
+   a:'r = 20 cm = <em>0.2 m</em> (convert units first!)<br>CSA = 2πrh = 2 × 22/7 × 0.2 × 3.5<br>= 2 × 0.2 × 3.5 × 22/7 = <strong>4.4 m²</strong>'},
+  {cat:'cyl',tag:'🛢️ Cylinder',tagBg:'rgba(45,212,191,.15)',tagCol:'#2dd4bf',
+   q:'What is the SA of an open cylinder (no lid)?',
+   a:'<strong>SA = 2πrh + πr²</strong><br>= CSA + one base only (not two).<br>Open at top → remove one πr² from TSA.'},
+  {cat:'cyl',tag:'🛢️ Cylinder',tagBg:'rgba(45,212,191,.15)',tagCol:'#2dd4bf',
+   q:'Why is the CSA of a cylinder equal to 2πrh?',
+   a:'If you "unroll" the curved surface, you get a <strong>rectangle</strong>.<br>Width = circumference of base = <em>2πr</em><br>Height = <em>h</em><br>Area of rectangle = 2πr × h = <strong>2πrh</strong>'},
+
+  // ── CONE (con) — 7 cards ──
+  {cat:'con',tag:'🍦 Cone',tagBg:'rgba(245,158,11,.15)',tagCol:'#f59e0b',
+   q:'What is the slant height of a cone?',
+   a:'<strong>l = √(r² + h²)</strong><br>Uses the Pythagoras theorem on the right triangle formed by r (base radius), h (height), and l (slant height).<br>Always find l first before computing CSA/TSA.'},
+  {cat:'con',tag:'🍦 Cone',tagBg:'rgba(245,158,11,.15)',tagCol:'#f59e0b',
+   q:'What is the CSA and TSA of a cone?',
+   a:'<strong>CSA = πrl</strong> (slant height, not height!)<br><strong>TSA = πr(l + r)</strong> = πrl + πr²<br>⚠️ Common mistake: using h instead of l in CSA.'},
+  {cat:'con',tag:'🍦 Cone',tagBg:'rgba(245,158,11,.15)',tagCol:'#f59e0b',
+   q:'What is the volume of a cone?',
+   a:'<strong>V = ⅓ πr²h</strong><br>= one-third of a cylinder with same r and h.<br>3 cones exactly fill 1 cylinder (experimental fact).'},
+  {cat:'con',tag:'🍦 Cone',tagBg:'rgba(245,158,11,.15)',tagCol:'#f59e0b',
+   q:'A cone has r = 7 m, h = 24 m. Find slant height and CSA.',
+   a:'l = √(49 + 576) = √625 = <strong>25 m</strong><br>CSA = πrl = 22/7 × 7 × 25 = <strong>550 m²</strong><br>Note: 7-24-25 is a Pythagorean triple!'},
+  {cat:'con',tag:'🍦 Cone',tagBg:'rgba(245,158,11,.15)',tagCol:'#f59e0b',
+   q:'What is a Frustum of a cone?',
+   a:'When a cone is <strong>cut by a plane parallel to its base</strong>, the part between the base and the cut is a frustum.<br>It has two circular faces with radii r₁ (smaller) and r₂ (larger).'},
+  {cat:'con',tag:'🍦 Cone',tagBg:'rgba(245,158,11,.15)',tagCol:'#f59e0b',
+   q:'Write all formulas for a Frustum (radii r₁, r₂, height h).',
+   a:'<strong>l = √[h² + (r₁−r₂)²]</strong><br><strong>CSA = π(r₁+r₂)l</strong><br><strong>TSA = π(r₁+r₂)l + πr₁² + πr₂²</strong><br><strong>V = ⅓πh(r₁² + r₂² + r₁r₂)</strong>'},
+  {cat:'con',tag:'🍦 Cone',tagBg:'rgba(245,158,11,.15)',tagCol:'#f59e0b',
+   q:'Why is cone volume exactly ⅓ of cylinder volume?',
+   a:'<strong>Experimental proof:</strong> fill a cone with water and pour into a cylinder of same r and h — it takes exactly <em>3 fills</em>.<br>So V(cone) = ⅓ × V(cylinder) = ⅓πr²h.'},
+
+  // ── SPHERE & HEMISPHERE (sph) — 7 cards ──
+  {cat:'sph',tag:'🔮 Sphere',tagBg:'rgba(217,70,239,.15)',tagCol:'#d946ef',
+   q:'What is the surface area of a sphere?',
+   a:'<strong>SA = 4πr²</strong><br>= 4 × (area of a great circle)<br>A sphere has no edges or vertices — just one continuous curved surface. There is no CSA vs TSA distinction.'},
+  {cat:'sph',tag:'🔮 Sphere',tagBg:'rgba(217,70,239,.15)',tagCol:'#d946ef',
+   q:'What is the volume of a sphere?',
+   a:'<strong>V = ⁴⁄₃ πr³</strong><br>Mnemonic: "Four-thirds pi r cubed."<br>If diameter d is given: r = d/2, so V = πd³/6.'},
+  {cat:'sph',tag:'🔮 Sphere',tagBg:'rgba(217,70,239,.15)',tagCol:'#d946ef',
+   q:'What are the CSA, TSA, and Volume of a hemisphere?',
+   a:'<strong>CSA = 2πr²</strong> (dome surface only)<br><strong>TSA = 3πr²</strong> = 2πr² + πr² (dome + flat base)<br><strong>V = ⅔ πr³</strong><br>Memory: TSA coefficients are 2+1=3.'},
+  {cat:'sph',tag:'🔮 Sphere',tagBg:'rgba(217,70,239,.15)',tagCol:'#d946ef',
+   q:'A hemispherical dome has radius 2.8 m. Find cost of painting at ₹5/m².',
+   a:'CSA = 2πr² = 2 × 22/7 × (2.8)²<br>= 2 × 22/7 × 7.84 = <strong>49.28 m²</strong><br>Cost = 49.28 × 5 = <strong>₹246.40</strong><br>We used CSA (dome only, not the flat base).'},
+  {cat:'sph',tag:'🔮 Sphere',tagBg:'rgba(217,70,239,.15)',tagCol:'#d946ef',
+   q:'What is the volume of a hollow sphere (outer R, inner r)?',
+   a:'<strong>V = ⁴⁄₃ π(R³ − r³)</strong><br>= Volume of outer sphere − Volume of inner sphere.<br>Similarly, hollow hemisphere: V = ⅔ π(R³ − r³).'},
+  {cat:'sph',tag:'🔮 Sphere',tagBg:'rgba(217,70,239,.15)',tagCol:'#d946ef',
+   q:'Why is sphere SA = 4πr² (4 times the great circle area)?',
+   a:'Archimedes proved that the surface area of a sphere equals the lateral surface area of its <em>circumscribing cylinder</em>.<br>Cylinder CSA = 2πr × 2r = <strong>4πr²</strong>.<br>This is a beautiful geometric result!'},
+  {cat:'sph',tag:'🔮 Sphere',tagBg:'rgba(217,70,239,.15)',tagCol:'#d946ef',
+   q:'The radius of a sphere is doubled. How do SA and V change?',
+   a:'New r = 2r.<br>New SA = 4π(2r)² = 16πr² = <strong>4× original SA</strong><br>New V = ⁴⁄₃π(2r)³ = ⁴⁄₃π·8r³ = <strong>8× original V</strong><br>SA scales as r², V scales as r³.'},
+
+  // ── COMBINATIONS (cmb) — 7 cards ──
+  {cat:'cmb',tag:'🧩 Combinations',tagBg:'rgba(56,189,248,.15)',tagCol:'#38bdf8',
+   q:'What is the key principle for combination of solids?',
+   a:'<strong>Volume = Sum of individual volumes</strong> (always additive).<br><strong>TSA = Sum of visible surfaces</strong> — subtract hidden/contact areas where solids are joined.'},
+  {cat:'cmb',tag:'🧩 Combinations',tagBg:'rgba(56,189,248,.15)',tagCol:'#38bdf8',
+   q:'A cone sits on top of a cylinder (same radius). Find TSA.',
+   a:'<strong>TSA = CSA(cylinder) + CSA(cone) + base area</strong><br>= 2πrh₁ + πrl + πr²<br>The circular face between cone and cylinder is hidden (internal), so we don\'t count it.'},
+  {cat:'cmb',tag:'🧩 Combinations',tagBg:'rgba(56,189,248,.15)',tagCol:'#38bdf8',
+   q:'A capsule shape is a cylinder with hemispheres on both ends. Find TSA and Volume.',
+   a:'<strong>TSA = 2πrh + 4πr²</strong><br>(CSA of cylinder + SA of full sphere, no flat ends visible)<br><strong>V = πr²h + ⁴⁄₃πr³</strong><br>(cylinder volume + sphere volume)'},
+  {cat:'cmb',tag:'🧩 Combinations',tagBg:'rgba(56,189,248,.15)',tagCol:'#38bdf8',
+   q:'A cone sits on a hemisphere (same radius). Find TSA.',
+   a:'<strong>TSA = πrl + 2πr²</strong><br>= CSA(cone) + CSA(hemisphere)<br>The flat circular faces of both the cone base and hemisphere base are joined and hidden.'},
+  {cat:'cmb',tag:'🧩 Combinations',tagBg:'rgba(56,189,248,.15)',tagCol:'#38bdf8',
+   q:'A wooden article: hemispheres scooped from both ends of a cylinder (r=3.5, h=10). Find TSA.',
+   a:'TSA = CSA(cyl) + 2 × CSA(hemi)<br>= 2πrh + 2 × 2πr²<br>= 2×22/7×3.5×10 + 4×22/7×(3.5)²<br>= 220 + 154 = <strong>374 cm²</strong><br>Flat bases removed, inner dome surfaces added.'},
+  {cat:'cmb',tag:'🧩 Combinations',tagBg:'rgba(56,189,248,.15)',tagCol:'#38bdf8',
+   q:'A tent: cylinder of r=7m, h=5m with a cone of h=24m on top. Find canvas area.',
+   a:'l = √(7²+24²) = √625 = <strong>25 m</strong><br>Canvas = CSA(cyl) + CSA(cone)<br>= 2π(7)(5) + π(7)(25)<br>= 220 + 550 = <strong>770 m²</strong><br>No base — tent sits on ground.'},
+  {cat:'cmb',tag:'🧩 Combinations',tagBg:'rgba(56,189,248,.15)',tagCol:'#38bdf8',
+   q:'When do we NOT subtract any area in combination problems?',
+   a:'When the solids are placed <em>next to each other</em> without overlapping faces — e.g., a cone placed beside a cylinder (not on top).<br>Subtract only when surfaces are in <strong>direct contact and hidden</strong>.'},
+
+  // ── CONVERSIONS (cvt) — 7 cards ──
+  {cat:'cvt',tag:'♻ Conversions',tagBg:'rgba(34,197,94,.15)',tagCol:'#22c55e',
+   q:'What is the golden rule for conversion of solids?',
+   a:'When a solid is <strong>melted and recast</strong> into a new shape:<br><strong>Volume is conserved.</strong><br>V(original) = V(new)<br>Surface area will change!'},
+  {cat:'cvt',tag:'♻ Conversions',tagBg:'rgba(34,197,94,.15)',tagCol:'#22c55e',
+   q:'A sphere of radius R is melted into n small spheres of radius r. Find n.',
+   a:'V(big) = n × V(small)<br>⁴⁄₃πR³ = n × ⁴⁄₃πr³<br><strong>n = (R/r)³</strong><br>Shortcut: just cube the ratio of radii!<br>Example: R=3, r=0.3 → n = 10³ = <strong>1000</strong>'},
+  {cat:'cvt',tag:'♻ Conversions',tagBg:'rgba(34,197,94,.15)',tagCol:'#22c55e',
+   q:'A metallic sphere of radius 4.2 cm is melted into a cylinder of radius 6 cm. Find height.',
+   a:'V(sphere) = V(cylinder)<br>⁴⁄₃π(4.2)³ = π(6)²h<br>⁴⁄₃ × 74.088 = 36h<br>98.784 = 36h<br>h = <strong>2.744 cm</strong>'},
+  {cat:'cvt',tag:'♻ Conversions',tagBg:'rgba(34,197,94,.15)',tagCol:'#22c55e',
+   q:'A sphere is melted and drawn into a wire (cylinder). How do you find wire length?',
+   a:'Wire = very thin, long cylinder.<br>⁴⁄₃πR³ = πr²(wire) × h<br>h = <strong>4R³ / (3r²)</strong><br>Example: R=3cm, r(wire)=0.2cm → h = 4×27/(3×0.04) = <em>900 cm = 9 m</em>'},
+  {cat:'cvt',tag:'♻ Conversions',tagBg:'rgba(34,197,94,.15)',tagCol:'#22c55e',
+   q:'How do you solve water flow problems?',
+   a:'<strong>Step 1:</strong> Volume per unit time = πr²(pipe) × speed<br><strong>Step 2:</strong> Total volume of container<br><strong>Step 3:</strong> Time = V(container) ÷ V(per unit time)<br>⚠️ Ensure consistent units (cm/m, sec/min)!'},
+  {cat:'cvt',tag:'♻ Conversions',tagBg:'rgba(34,197,94,.15)',tagCol:'#22c55e',
+   q:'A cone is converted to a sphere. If cone r=6, h=8, find sphere radius.',
+   a:'V(cone) = V(sphere)<br>⅓π(6)²(8) = ⁴⁄₃πR³<br>⅓ × 36 × 8 = ⁴⁄₃R³<br>96 = ⁴⁄₃R³<br>R³ = 72 → R = <strong>∛72 ≈ 4.16 cm</strong>'},
+  {cat:'cvt',tag:'♻ Conversions',tagBg:'rgba(34,197,94,.15)',tagCol:'#22c55e',
+   q:'1 litre = ? cm³. 1 m³ = ? litres.',
+   a:'<strong>1 litre = 1000 cm³</strong><br><strong>1 m³ = 10⁶ cm³ = 1000 litres</strong><br>These conversions are critical in water tank / container problems.<br>Always convert before calculating!'},
+];
+
+let deck=[...ALL_CARDS], current=0, known=new Set();
+
+function renderCard(){
+  const c=deck[current]; const fc=document.getElementById('fc');
+  fc.classList.remove('flipped');
+  document.getElementById('fc-front').innerHTML=`
+    <div class="fc-tag" style="background:${c.tagBg};color:${c.tagCol}">${c.tag}</div>
+    <div class="fc-q">${c.q}</div>
+    <div class="fc-flip-hint">↻ flip</div>
+    ${known.has(c)?'<div class="known-badge known">✓ Know it</div>':''}`;
+  document.getElementById('fc-back').innerHTML=`
+    <div class="fc-tag" style="background:${c.tagBg};color:${c.tagCol}">${c.tag}</div>
+    <div class="fc-ans-lbl">✅ Answer</div>
+    <div class="fc-ans">${c.a}</div>
+    ${known.has(c)?'<div class="known-badge known">✓ Know it</div>':''}`;
+  document.getElementById('card-ctr').textContent=`${current+1} / ${deck.length}`;
+  document.getElementById('prev-btn').disabled=current===0;
+  document.getElementById('next-btn').disabled=current===deck.length-1;
+  const pct=deck.length>0?((current+1)/deck.length*100):0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-text').textContent=`${current+1} / ${deck.length}`;
+}
+function flipCard(){document.getElementById('fc').classList.toggle('flipped')}
+function nextCard(){if(current<deck.length-1){current++;renderCard()}}
+function prevCard(){if(current>0){current--;renderCard()}}
+function markKnown(){known.add(deck[current]);renderCard();if(current<deck.length-1)setTimeout(nextCard,400)}
+function markUnknown(){known.delete(deck[current]);renderCard();if(current<deck.length-1)setTimeout(nextCard,400)}
+function shuffleDeck(){for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}current=0;known.clear();renderCard()}
+function resetDeck(){deck=[...ALL_CARDS];current=0;known.clear();renderCard();updateFilterUI('all')}
+function setFilter(cat,btn){deck=cat==='all'?[...ALL_CARDS]:ALL_CARDS.filter(c=>c.cat===cat);current=0;known.clear();updateFilterUI(cat);renderCard()}
+function updateFilterUI(cat){
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+  const m={all:'.f-all',cub:'.f-cub',cyl:'.f-cyl',con:'.f-con',sph:'.f-sph',cmb:'.f-cmb',cvt:'.f-cvt'};
+  document.querySelector(m[cat])?.classList.add('on');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')nextCard();
+  else if(e.key==='ArrowLeft')prevCard();
+  else if(e.key===' '){e.preventDefault();flipCard();}
+});
+renderCard();
+</script>
+</body>
+</html>
