@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Power Sharing · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#080612; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(8,6,18,.9) 0%, transparent 100%);
+}
+#ui h1 { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900; color:#a78bfa; letter-spacing:.5px; }
+#ui p  { font-family:'DM Mono',monospace; font-size:.65rem; color:#3d2a6a; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #1e1640; background:rgba(8,6,18,.85);
+  color:#5a4a8a; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#a78bfa; color:#a78bfa; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#0e0a1c; border:1px solid #2a1e4a;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:290px; font-size:.8rem; color:#c4b5fd;
+  line-height:1.65; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.8);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#a78bfa; font-size:.9rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; flex-shrink:0;
+  background:rgba(8,6,18,.92); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(42,30,72,.75);
+  position:absolute; top:0; left:0; right:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#5a4a8a; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(42,30,72,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#a78bfa; border-color:#4a3a7a; background:rgba(167,139,250,.06); }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html#ch-power" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<div id="ui" style="top:42px">
+  <div>
+    <h1>Power Sharing</h1>
+    <p>Class X · Civics Ch.1 — drag to pan · scroll to zoom · hover nodes</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2+20; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Power\nSharing',
+  x:0, y:0, r:64, color:'#0d0824', stroke:'#a78bfa', textColor:'#a78bfa', fontSize:14
+};
+
+const BRANCHES = [
+  // ── Belgium Story ──
+  {
+    id:'bel', label:'Belgium\nStory', x:-310, y:-230, r:50,
+    color:'#080c1e', stroke:'#60a5fa', textColor:'#bfdbfe',
+    info:'Belgium — a small country in Europe — had a serious problem of ethnic diversity.\nEthnic composition: 59% Dutch-speaking (Flemish, in north), 40% French-speaking (Walloon, in south), 1% German-speaking (east).\nBrussels (capital): 80% French, 20% Dutch — despite being in Dutch-speaking region.\nThis imbalance caused severe tensions between linguistic communities.\nSolution: innovative power-sharing arrangements through 4 constitutional amendments (1970–1993).',
+    children:[
+      { id:'b1', label:'Ethnic\nComposition', x:-490, y:-355, r:38, color:'#080c1e', stroke:'#93c5fd', textColor:'#dbeafe',
+        info:'Dutch-speaking (Flemish): 59% — northern region (Flanders)\nFrench-speaking (Walloons): 40% — southern region (Wallonia)\nGerman-speaking: 1% — eastern cantons\nBrussels (capital): 80% French + 20% Dutch — a bilingual city.\nKey problem: French minority was economically and educationally richer; Dutch majority felt threatened.\nThis created tension between two well-entrenched communities.' },
+      { id:'b2', label:'Constitutional\nAmendments', x:-540, y:-210, r:38, color:'#080c1e', stroke:'#93c5fd', textColor:'#dbeafe',
+        info:'4 major constitutional amendments (1970–1993) to prevent civil war:\n1. Equal number of French and Dutch-speaking ministers in central cabinet.\n2. Many central powers given to state governments of two regions.\n3. Brussels: separate government with equal representation of both communities.\n4. Community government: elected by people of each linguistic community — handles cultural, educational and language-related issues.\nResult: Turned a unitary state into a federal one with elaborate power-sharing.' },
+      { id:'b3', label:'Key\nLesson', x:-490, y:-60, r:38, color:'#080c1e', stroke:'#93c5fd', textColor:'#dbeafe',
+        info:'Belgium\'s story shows that power sharing is better than imposing majority will.\nDespite complexity of arrangements, Belgium stayed together as a peaceful nation.\nContrast with Sri Lanka: Belgium chose accommodation, Sri Lanka chose majoritarianism.\nBelgium is today the headquarters of the European Union (EU) — a symbol of multi-ethnic cooperation.\nLesson: Mutual respect and accommodation prevent conflict; rigid majoritarianism causes civil war.' },
+    ]
+  },
+
+  // ── Sri Lanka Story ──
+  {
+    id:'sl', label:'Sri Lanka\nStory', x:-310, y:230, r:50,
+    color:'#1a0808', stroke:'#f87171', textColor:'#fecaca',
+    info:'Sri Lanka became independent in 1948.\nEthnic composition: Sinhala 74%, Sri Lankan Tamil 11%, Indian Tamil 7%, Moors (Muslim) 7%.\nTamils mainly live in northern and eastern regions.\nAfter independence, Sinhala leaders pursued MAJORITARIAN policies — using their numerical majority to dominate.\nResult: alienation of Tamils, discrimination, and eventually a brutal civil war lasting 26 years.',
+    children:[
+      { id:'sl1', label:'Majoritarian\nPolicies', x:-490, y:100, r:38, color:'#1a0808', stroke:'#fca5a5', textColor:'#fee2e2',
+        info:'Majoritarianism: when the majority community imposes its will on minorities.\nKey majoritarian decisions in Sri Lanka:\n• 1956: Sinhala Only Act — declared Sinhala the only official language (replacing English).\n• Sri Lankan university admission: preferred Sinhala candidates.\n• Government and army jobs: heavily dominated by Sinhalese.\n• State patronage to Buddhism — despite Tamil Hindus and Christians.\nThese policies made Tamils feel like second-class citizens in their own country.' },
+      { id:'sl2', label:'Tamil\nAlienation', x:-540, y:240, r:38, color:'#1a0808', stroke:'#fca5a5', textColor:'#fee2e2',
+        info:'Tamils felt systematically excluded:\n• Language: English-educated Tamils suddenly found jobs closed due to Sinhala requirement.\n• Education: university quotas reduced Tamil representation.\n• Employment: Sinhala preference in government services.\n• Culture: Buddhist festivals became national holidays; Hindu/Christian Tamil culture marginalised.\nResponse: Tamil political parties formed, demanded federation, then separate nation.\nLTTE (Liberation Tigers of Tamil Eelam) formed — an armed separatist group.' },
+      { id:'sl3', label:'Civil War\n& Lessons', x:-490, y:380, r:38, color:'#1a0808', stroke:'#fca5a5', textColor:'#fee2e2',
+        info:'Civil war: an armed internal conflict between the state and a section of its own people.\nSri Lanka civil war (1983–2009): 26 years of brutal conflict.\nLTTE demanded independent Tamil homeland "Eelam" in north and east.\nHuge human cost: thousands killed, millions displaced, economy devastated.\nWar ended in 2009 — LTTE militarily defeated.\nLesson: A country that does not accommodate minorities eventually faces internal conflict and instability.\nContrast with Belgium: accommodation vs suppression — very different outcomes.' },
+    ]
+  },
+
+  // ── Why Share Power ──
+  {
+    id:'why', label:'Why Share\nPower?', x:0, y:-320, r:50,
+    color:'#001a0e', stroke:'#34d399', textColor:'#a7f3d0',
+    info:'Two kinds of reasons why power sharing is desirable:\n1. PRUDENTIAL reasons — pragmatic/practical: power sharing reduces possibility of conflict, ensures stability, promotes social peace.\n2. MORAL reasons — principle-based: power sharing is the very spirit of democracy. Democracy means rule by people — all people, not just the majority.\nA single community monopolising power destroys democracy.',
+    children:[
+      { id:'w1', label:'Prudential\nReasons', x:-185, y:-460, r:36, color:'#001a0e', stroke:'#6ee7b7', textColor:'#d1fae5',
+        info:'Prudential = based on practical wisdom, not principles.\nIf one community monopolises power, minorities rebel → social conflict → instability → everyone loses.\nPower sharing reduces the possibility and intensity of social conflict.\nEven from a selfish perspective, the majority benefits from sharing power:\n• Prevents violent conflict\n• Maintains social peace\n• Ensures political stability\n• Allows economic development\nSri Lanka\'s civil war was extremely costly for Sinhalese too.' },
+      { id:'w2', label:'Moral\nReasons', x:0, y:-475, r:36, color:'#001a0e', stroke:'#6ee7b7', textColor:'#d1fae5',
+        info:'Moral = based on principles of right and wrong, regardless of outcomes.\nPower sharing is the very spirit of democracy.\nDemocracy = rule by the people = rule by ALL the people, not just 50%+1.\nIn a democracy, people have a right to be consulted on decisions that affect them.\nPower sharing respects the dignity of ALL citizens.\nMajoritarianism = tyranny of the majority = NOT democratic in spirit.\nPower should be distributed so it benefits all and no one can misuse it.' },
+      { id:'w3', label:'Social\nPeace', x:185, y:-460, r:36, color:'#001a0e', stroke:'#6ee7b7', textColor:'#d1fae5',
+        info:'Social peace is maintained when all groups feel included.\nExample: India — reserved constituencies for SC/ST ensures their voice in Parliament.\nNorthern Ireland (UK): power-sharing between Catholic and Protestant communities after decades of violence.\nLebanon: power divided between Christian, Sunni, and Shia leaders.\nIn all these cases, sharing power = maintaining peace.\nWhen power is NOT shared: Sri Lanka, Yugoslavia (broke up), Rwanda (genocide 1994) — all examples of majority dominance gone wrong.' },
+    ]
+  },
+
+  // ── Horizontal & Vertical ──
+  {
+    id:'forms1', label:'Horizontal &\nVertical', x:310, y:-230, r:50,
+    color:'#0a0e00', stroke:'#fbbf24', textColor:'#fef3c7',
+    info:'Two key STRUCTURAL forms of power sharing:\n1. HORIZONTAL distribution: among different organs of government — legislature, executive, judiciary — at the same level.\n2. VERTICAL distribution: among different levels of government — national, state, local.\nBoth types ensure that no single person or group can concentrate all power.',
+    children:[
+      { id:'f1', label:'Separation\nof Powers', x:480, y:-355, r:38, color:'#0a0e00', stroke:'#fde68a', textColor:'#fef9c3',
+        info:'Horizontal distribution = separation of powers.\nThe three organs of government:\n• Legislature: makes laws (Parliament / State Assembly)\n• Executive: implements laws (Cabinet, PM, bureaucracy)\n• Judiciary: interprets laws and checks their constitutionality (Supreme Court, High Courts)\nEach organ can check the others — "checks and balances".\nExample: Indian Supreme Court can strike down laws made by Parliament (judicial review).\nPresident (executive) cannot make laws; Parliament cannot deliver judgments.' },
+      { id:'f2', label:'Federal\nSystem', x:530, y:-210, r:38, color:'#0a0e00', stroke:'#fde68a', textColor:'#fef9c3',
+        info:'Vertical distribution = federalism.\nPower divided between central government and state governments.\nIndia: Centre has Union List (97 subjects), States have State List (66 subjects), both share Concurrent List (47 subjects).\nBelgium: centre + regional governments + community governments.\nUSA, Australia, Canada — also federal systems.\nFederalism allows regional diversity while maintaining national unity.\nStates can make laws suited to their own conditions without centre\'s interference in those areas.' },
+      { id:'f3', label:'Local\nSelf-Govt', x:490, y:-70, r:38, color:'#0a0e00', stroke:'#fde68a', textColor:'#fef9c3',
+        info:'Power sharing at the grassroots level.\nIndia: Panchayati Raj system (73rd Amendment, 1992) and Municipalities (74th Amendment).\nGram Panchayat, Panchayat Samiti, Zilla Parishad at village/district level.\nUrban: Ward Councils, Municipal Committees, Municipal Corporations.\nDecentralisation: transfer of power from central/state to local bodies.\nLocal self-government ensures ordinary citizens can participate in decision-making that directly affects their lives.' },
+    ]
+  },
+
+  // ── Social Groups & Political ──
+  {
+    id:'forms2', label:'Social &\nPolitical', x:310, y:230, r:50,
+    color:'#0a0014', stroke:'#e879f9', textColor:'#f5d0fe',
+    info:'Two more forms of power sharing:\n3. AMONG SOCIAL GROUPS: Power shared with religious, linguistic, and other minority communities — prevents social exclusion.\n4. AMONG POLITICAL PARTIES: Multi-party system, coalition governments, pressure groups — prevents monopoly by one party.',
+    children:[
+      { id:'fp1', label:'Social\nGroups', x:480, y:100, r:38, color:'#0a0014', stroke:'#f0abfc', textColor:'#fae8ff',
+        info:'Sharing power with minority communities, religious groups, linguistic minorities.\nExamples in India:\n• Reserved constituencies for SC/ST in Parliament and State Assemblies.\n• Reservation in government jobs (SC/ST/OBC).\n• Minority rights: right to run educational institutions, use own language.\n• National Minorities Commission.\nExamples in other countries:\n• Lebanon: President must be Maronite Christian, PM must be Sunni, Speaker must be Shia.\n• Belgium: equal French and Dutch representation in cabinet.\nPurpose: ensure marginalised communities have voice in governance.' },
+      { id:'fp2', label:'Political\nParties', x:540, y:240, r:38, color:'#0a0014', stroke:'#f0abfc', textColor:'#fae8ff',
+        info:'Multi-party system prevents one-party rule.\nCoalition government: alliance of different parties with different social bases → power shared among them.\nIndia: Coalition era from 1989 — NDA, UPA governments involved multiple parties.\nPressure groups: trade unions, business groups, farmers\'s associations, student organisations — they lobby government and influence decisions.\nMovements: civil society movements (environmental, women\'s rights) — they raise issues and keep government accountable.\nFree media is also a form of power sharing — 4th estate.' },
+      { id:'fp3', label:'Checks\n& Balances', x:490, y:380, r:38, color:'#0a0014', stroke:'#f0abfc', textColor:'#fae8ff',
+        info:'All forms of power sharing serve the same purpose: prevent concentration of power.\nConcentration of power = corruption, authoritarianism, exclusion.\nChecks and balances exist at every level:\n• Legislative vs Executive vs Judicial\n• Centre vs State vs Local\n• Majority vs Minority\n• Government vs Civil society\nJames Madison (US Constitution): "Ambition must be made to counteract ambition."\nPower sharing is not just about solving conflicts — it is about making democracy real and meaningful for all citizens.' },
+    ]
+  },
+
+  // ── Key Concepts ──
+  {
+    id:'key', label:'Key\nConcepts', x:0, y:320, r:50,
+    color:'#000a14', stroke:'#38bdf8', textColor:'#bae6fd',
+    info:'Important terms and concepts from this chapter:\n1. Majoritarianism\n2. Power sharing\n3. Ethnic group\n4. Civil war\n5. Prudential vs Moral reasons\n6. Coalition government\n7. Federalism / Decentralisation',
+    children:[
+      { id:'k1', label:'Majoritar-\nianism', x:-185, y:455, r:36, color:'#000a14', stroke:'#7dd3fc', textColor:'#e0f2fe',
+        info:'Majoritarianism: the belief that the majority community should be able to rule a country in whatever way it wants, disregarding the wishes of the minority.\nExample: Sri Lanka\'s Sinhala-only policy was majoritarian — it ignored Tamil interests.\nProblem: Even in a democracy, the majority can oppress the minority.\n"Tyranny of the majority" — a real danger in democracies.\nAntidote: Power sharing, constitutional safeguards, minority rights.\nDifference from "majority rule": In democracy, majority rules but minority rights are protected.' },
+      { id:'k2', label:'Ethnic\nGroup', x:0, y:475, r:36, color:'#000a14', stroke:'#7dd3fc', textColor:'#e0f2fe',
+        info:'Ethnic group: a social group with a common cultural tradition, history, language, or religion.\nThe word "ethnic" refers to cultural, not racial, identity.\nExamples:\n• Flemish and Walloons in Belgium (language-based ethnic groups)\n• Sinhalese and Tamils in Sri Lanka (language + religion + history)\n• Pashtun, Hazara, Tajik in Afghanistan\nEthnic conflicts arise when one group gains political dominance at the expense of others.\nEthnic diversity is not a problem in itself — the problem is when power is not shared fairly.' },
+      { id:'k3', label:'Civil War &\nCoalition', x:185, y:455, r:36, color:'#000a14', stroke:'#7dd3fc', textColor:'#e0f2fe',
+        info:'Civil War: an internal armed conflict between the government/state and a section of its own people, or between two groups within a country.\nExample: Sri Lanka (1983–2009) — government vs LTTE.\nCoalition Government: a government formed by two or more political parties that agree to cooperate and share power.\nExample: Most Indian governments since 1989 have been coalition governments.\nCoalition = power sharing in practice.\nFederal system: a political system in which power is divided between a central authority and various constituent units.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){ return allNodes.find(n=>n.id===id); }
+
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found&&found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10,window.innerHeight-250)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx2=(e.touches[0].clientX+e.touches[1].clientX)/2,cy2=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx2,cy2);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.22,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2+20;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  // subtle grid
+  ctx.strokeStyle='rgba(167,139,250,.022)'; ctx.lineWidth=1;
+  for(let gx=-1600;gx<1600;gx+=70){ctx.beginPath();ctx.moveTo(gx,-1600);ctx.lineTo(gx,1600);ctx.stroke();}
+  for(let gy=-1600;gy<1600;gy+=70){ctx.beginPath();ctx.moveTo(-1600,gy);ctx.lineTo(1600,gy);ctx.stroke();}
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from), b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    const cpx=(a.x+b.x)/2+(b.y-a.y)*.15, cpy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cpx,cpy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?40:22;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-9,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

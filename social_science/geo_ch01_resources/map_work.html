@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Work — Resources and Development · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04100a;--card:#0a1a10;--card2:#102418;--border:#1a3a28;--text:#c8f5d8;--muted:#4a8a5a;
+  --geo:#22c55e;--green:#4ade80;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--purple:#a78bfa;--orange:#fb923c;--cyan:#38bdf8;--pink:#f472b6;--teal:#34d399}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.2rem;background:rgba(4,16,10,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem;transition:all .2s}
+.site-nav a.back:hover{color:var(--geo);border-color:var(--geo)}
+header{text-align:center;padding:1.4rem 1rem .8rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3.5vw,1.8rem);font-weight:900;color:var(--green)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+.wrap{max-width:960px;margin:0 auto;padding:0 1rem 3rem}
+.mode-bar{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem}
+.mode-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;padding:.45rem 1.2rem;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.mode-btn.active{border-color:var(--geo);color:var(--green);background:rgba(34,197,94,.08)}
+.tab-bar{display:flex;gap:.4rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.3rem .8rem;border-radius:99px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tab-btn.active{border-color:var(--geo);color:var(--green);background:rgba(34,197,94,.08)}
+.map-area{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;aspect-ratio:6/7;max-height:630px;margin:0 auto;max-width:540px}
+.map-area svg{width:100%;height:100%;display:block}
+.pin{cursor:pointer;transition:all .2s}
+.pin circle{transition:all .2s}
+.pin:hover circle{r:7;filter:drop-shadow(0 0 8px currentColor)}
+.pin text{font-family:'DM Mono',monospace;font-size:11px;pointer-events:none;opacity:0;transition:opacity .2s}
+.pin:hover text{opacity:1}
+.pin.highlight circle{animation:ping 1s ease infinite}
+@keyframes ping{0%,100%{r:5;opacity:1}50%{r:10;opacity:.5}}
+.info-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:1rem;min-height:80px}
+.info-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.info-desc{font-size:.84rem;color:var(--muted);line-height:1.65}
+.info-desc strong{color:var(--text)}
+.quiz-bar{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:1rem;flex-wrap:wrap}
+.quiz-q{flex:1;font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;min-width:200px}
+.quiz-score{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.quiz-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:4px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s}
+.quiz-btn:hover{border-color:var(--geo);color:var(--green)}
+.feedback-flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;pointer-events:none;opacity:0;transition:opacity .3s;z-index:10;text-shadow:0 0 20px #000}
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+/* soil region overlays */
+.soil-region{opacity:.25;transition:opacity .3s;cursor:pointer}
+.soil-region:hover{opacity:.45}
+#indiaBase{filter:invert(1) opacity(0.75)}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-resources">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Map Work — Resources and Development</h1>
+  <p>Class X · Geography Ch.1 · CBSE Board Map Work · Interactive</p>
+</header>
+<div class="wrap">
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('learn')">📖 Learn Mode</button>
+    <button class="mode-btn" onclick="setMode('test')">✍️ Test Yourself</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="setTab('soil')">🌍 Soil Types</button>
+    <button class="tab-btn" onclick="setTab('resource')">💎 Resource Regions</button>
+    <button class="tab-btn" onclick="setTab('degrade')">⚠️ Land Degradation</button>
+  </div>
+  <div class="map-area" id="mapArea">
+    <div class="feedback-flash" id="fbFlash"></div>
+    <svg viewBox="0 0 666.67 777.33" id="mapSvg">
+      <image id="indiaBase" href="../ch02_nationalism/India_outline.svg" x="0" y="0" width="666.67" height="777.33"/>
+    </svg>
+  </div>
+  <div class="legend" id="legendArea"></div>
+  <div class="info-panel" id="infoPanel">
+    <div class="info-title" id="infoTitle">Click any pin to learn about it</div>
+    <div class="info-desc" id="infoDesc">Explore <strong>soil types</strong>, <strong>resource-rich regions</strong>, and <strong>land degradation areas</strong> across India. CBSE Board asks map questions on major soil types distribution.</div>
+  </div>
+  <div class="quiz-bar" id="quizBar" style="display:none">
+    <div class="quiz-q" id="quizQ">Loading...</div>
+    <div class="quiz-score" id="quizScore">0/0</div>
+    <button class="quiz-btn" onclick="skipQ()">Skip →</button>
+  </div>
+</div>
+
+<script>
+const TABS = {
+  soil: {
+    legend: [
+      {color:'#fbbf24',name:'Alluvial Soil'},{color:'#1a1a1a',name:'Black Soil (Regur)'},
+      {color:'#f87171',name:'Red & Yellow Soil'},{color:'#fb923c',name:'Laterite Soil'},
+      {color:'#a78bfa',name:'Arid Soil'},{color:'#34d399',name:'Forest Soil'}
+    ],
+    places: [
+      { id:'alluvial_north', x:274, y:229, color:'#fbbf24', label:'N.Indian Plains',
+        info:'<strong>Alluvial Soil — Northern Plains</strong> (Punjab, Haryana, UP, Bihar). Deposited by rivers (Indus, Ganga, Brahmaputra). Most fertile and widespread soil. Two types: <strong>Khadar</strong> (new alluvium, near river) and <strong>Bangar</strong> (old alluvium, higher up). Rich in potash, phosphoric acid, lime. Ideal for paddy, wheat, sugarcane.' },
+      { id:'alluvial_delta', x:430, y:398, color:'#fbbf24', label:'Deltas',
+        info:'<strong>Alluvial Soil — Coastal & Delta Regions</strong>. Found in river deltas of Mahanadi, Godavari, Krishna, Kaveri. Very fertile — supports intensive rice cultivation. Also found in parts of Gujarat and Rajasthan. Alluvial soils cover about 40% of India\'s total land area.' },
+      { id:'black_deccan', x:232, y:485, color:'#1a1a1a', label:'Deccan Plateau',
+        info:'<strong>Black Soil (Regur)</strong> — Deccan Trap region (Maharashtra, MP, Gujarat, AP). Formed from volcanic basalt lava. Also called <strong>"black cotton soil"</strong> as ideal for cotton. Rich in calcium carbonate, magnesium, potash; poor in phosphorus. Can hold moisture — self-ploughing: develops cracks when dry. Covers parts of Maharashtra, Gujarat, MP, Karnataka.' },
+      { id:'red_south', x:295, y:559, color:'#f87171', label:'S.Deccan & Odisha',
+        info:'<strong>Red & Yellow Soil</strong> — Found in low-rainfall areas of Deccan Plateau, Odisha, Chhattisgarh, south Gangetic plain. Red colour due to <strong>iron oxide</strong> (diffusion of iron in crystalline/metamorphic rocks). Yellow colour when hydrated. Generally less fertile; poor in nitrogen, phosphorus, humus. Found on eastern & southern Deccan plateau.' },
+      { id:'laterite', x:107, y:515, color:'#fb923c', label:'W.Ghats/Kerala',
+        info:'<strong>Laterite Soil</strong> — Found in high rainfall areas: Karnataka, Kerala, Tamil Nadu, MP, Assam, Odisha hills. Formed by <strong>intense leaching</strong> due to tropical rain. Rich in iron oxide & aluminium; poor in organic matter. Red in colour. Good for tea, coffee, cashew after manuring. Name from Latin "later" = brick — hardens when exposed to air.' },
+      { id:'arid_raj', x:123, y:339, color:'#a78bfa', label:'Rajasthan',
+        info:'<strong>Arid (Desert) Soil</strong> — Found in W. Rajasthan. Sandy texture, saline, poor in humus and moisture. Colour ranges from red to brown. Contains high % of soluble salts but low in organic matter. <strong>Kankar (calcium carbonate)</strong> layer restricts water infiltration. With irrigation (Indira Gandhi Canal), can become productive. Bajra, pulses, and coarse grains grow here.' },
+      { id:'forest_him', x:295, y:148, color:'#34d399', label:'Himalayas',
+        info:'<strong>Forest/Mountain Soil</strong> — Found in hilly and mountainous areas: Himalayas, Western & Eastern Ghats. Formed by deposition of organic matter from forest cover. <strong>Acidic with low humus</strong> in upper slopes (snow-covered), fertile in lower valleys. Texture varies — loamy/silty in valleys, coarse-grained on upper slopes. Supports tea, coffee, spices, tropical fruits.' },
+    ]
+  },
+  resource: {
+    legend: [
+      {color:'#f5c842',name:'Mineral Rich'},{color:'#60a5fa',name:'Water Resources'},
+      {color:'#4ade80',name:'Agricultural'},{color:'#fb923c',name:'Energy'}
+    ],
+    places: [
+      { id:'chota_nagpur', x:398, y:361, color:'#f5c842', label:'Chota Nagpur',
+        info:'<strong>Chota Nagpur Plateau</strong> (Jharkhand, Odisha, Chhattisgarh, W.Bengal) — India\'s richest mineral belt. Has iron ore (Singhbhum), coal (Jharia, Bokaro, Raniganj), copper, mica, bauxite, manganese. Called the "<strong>Ruhr of India</strong>". Yet one of the poorest regions — classic example of resource-rich but economically backward region. Raises questions about equitable resource distribution.' },
+      { id:'rajasthan_mineral', x:153, y:339, color:'#f5c842', label:'Rajasthan',
+        info:'<strong>Rajasthan</strong> — Rich in <strong>non-ferrous minerals</strong>: copper (Khetri), zinc (Zawar), lead, marble, sandstone, limestone. Also has mica. Despite mineral wealth, parts of Rajasthan are resource-poor in terms of water. Example of how resource planning must consider the nature and type of resources in development strategies.' },
+      { id:'krishna_godavari', x:323, y:515, color:'#fb923c', label:'KG Basin',
+        info:'<strong>Krishna-Godavari Basin</strong> (offshore Andhra Pradesh) — Major <strong>natural gas</strong> reserves. Important for India\'s energy security. Also oil reserves in Mumbai High (offshore Maharashtra) and Assam (Digboi — oldest oil field). Resource development requires proper planning as these are non-renewable resources.' },
+      { id:'gangetic', x:323, y:287, color:'#4ade80', label:'Gangetic Plain',
+        info:'<strong>Indo-Gangetic Plains</strong> — India\'s most agriculturally productive region due to alluvial soil, flat terrain, and water availability. Produces wheat, rice, sugarcane, pulses. Contains renewable resources like soil and water, but <strong>overexploitation</strong> (excessive irrigation, groundwater depletion) threatens sustainability. Example of why resource planning is essential.' },
+      { id:'western_ghats', x:157, y:559, color:'#60a5fa', label:'Western Ghats',
+        info:'<strong>Western Ghats</strong> — Biodiversity hotspot and major source of <strong>rivers</strong> (Godavari, Krishna, Kaveri, Tungabhadra). Rich in forest resources, medicinal plants. Receives heavy rainfall — hydroelectric potential. Iron ore in Goa. Bauxite on plateaus. But deforestation and mining threaten this resource-rich region. Conservation is critical.' },
+      { id:'ne_states', x:507, y:251, color:'#4ade80', label:'North East',
+        info:'<strong>North Eastern States</strong> — Rich in forest resources, water resources (Brahmaputra), crude oil (Assam), biodiversity. Despite resource richness, the region remains economically underdeveloped due to inaccessibility, poor infrastructure. Illustrates the <strong>disconnect between resource availability and development</strong> — a key concept in the chapter.' },
+    ]
+  },
+  degrade: {
+    legend: [
+      {color:'#f87171',name:'Soil Erosion'},{color:'#fb923c',name:'Mining Degradation'},
+      {color:'#a78bfa',name:'Over-irrigation'},{color:'#fbbf24',name:'Deforestation'}
+    ],
+    places: [
+      { id:'chambal', x:220, y:375, color:'#f87171', label:'Chambal Ravines',
+        info:'<strong>Chambal Ravines, MP/Rajasthan</strong> — Severe <strong>gully erosion</strong> by the Chambal and its tributaries. Running water cuts deep channels (ravines/gullies) in the landscape, making land uncultivable. The Chambal badlands cover thousands of hectares. Caused by deforestation, overgrazing, and the natural slope of the land. Soil conservation measures include building check dams and planting vegetation.' },
+      { id:'jharkhand_mine', x:382, y:353, color:'#fb923c', label:'Jharkhand Mines',
+        info:'<strong>Jharkhand/Odisha Mining Areas</strong> — Land degradation due to <strong>mining activities</strong>. Open-cast mining (coal, iron ore) destroys topsoil, vegetation, and pollutes water. Jharia coal mines have been burning underground for decades. Mining creates huge wastelands. <strong>Rehabilitation of mined land</strong> is a major challenge. Companies are now required to restore mined areas.' },
+      { id:'punjab_irr', x:207, y:221, color:'#a78bfa', label:'Punjab/Haryana',
+        info:'<strong>Punjab, Haryana</strong> — <strong>Over-irrigation</strong> has led to waterlogging and soil salinity. Excessive use of canal water raises the water table, bringing dissolved salts to the surface. <strong>Salinisation</strong> makes soil infertile. Also groundwater depletion from excessive tubewell use. Green Revolution\'s negative side-effect — the very region that feeds India faces soil degradation.' },
+      { id:'gujarat_coastal', x:100, y:456, color:'#f87171', label:'Gujarat Coast',
+        info:'<strong>Gujarat Coastal Areas</strong> — <strong>Coastal erosion</strong> and salinisation. Overexploitation of groundwater in coastal areas leads to <strong>seawater intrusion</strong>. Industrial effluents and sea-level changes add to degradation. The Rann of Kutch area faces unique challenges of arid/saline conditions. Wind erosion also significant in parts of Gujarat and Rajasthan.' },
+      { id:'madhya_pradesh', x:265, y:427, color:'#fb923c', label:'MP Mines',
+        info:'<strong>Madhya Pradesh</strong> — Degradation from <strong>mining and deforestation</strong>. Rich in minerals (diamond-Panna, limestone, manganese) but mining causes land degradation. Deforestation in Vindhya and Satpura ranges for timber and agriculture reduces soil binding capacity. Sheet erosion removes topsoil. Need for afforestation and sustainable mining practices.' },
+      { id:'odisha', x:415, y:449, color:'#fb923c', label:'Odisha',
+        info:'<strong>Odisha</strong> — Mining (iron ore, chromite, bauxite) and <strong>deforestation</strong> cause land degradation. Mineral-rich areas in Koraput, Keonjhar, Mayurbhanj districts face environmental damage. Tribal communities most affected — they depend on forests. Also faces cyclone-related coastal erosion. Conservation efforts include Joint Forest Management and community-based approaches.' },
+      { id:'himachal', x:265, y:163, color:'#fbbf24', label:'Himachal/Uttarakhand',
+        info:'<strong>Himalayan States</strong> — <strong>Deforestation</strong> on steep slopes causes landslides and soil erosion. Terrace farming disruption, road construction, and dam building add to degradation. The <strong>Chipko Movement</strong> (1970s, Uttarakhand) was a response to commercial logging destroying Himalayan forests. Soil conservation: contour ploughing, terrace farming, shelter belts.' },
+    ]
+  }
+};
+
+let mode='learn', tab='soil', quizIdx=0, quizOrder=[], score=0, total=0;
+const svg=document.getElementById('mapSvg');
+
+function setTab(t){
+  tab=t;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['soil','resource','degrade'][i]===t));
+  buildPins();
+  buildLegend();
+  document.getElementById('infoTitle').textContent='Click any pin to learn about it';
+  document.getElementById('infoDesc').innerHTML=TABS[t].places[0].info;
+  if(mode==='test'){ score=0;total=0;quizOrder=[...Array(TABS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function buildLegend(){
+  const area=document.getElementById('legendArea');
+  area.innerHTML=TABS[tab].legend.map(l=>`<div class="leg-item"><div class="leg-dot" style="background:${l.color}"></div>${l.name}</div>`).join('');
+}
+
+function buildPins(){
+  document.querySelectorAll('.pin').forEach(p=>p.remove());
+  TABS[tab].places.forEach(p=>{
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('pin'); g.id='pin-'+p.id;
+    g.innerHTML=`<circle cx="${p.x}" cy="${p.y}" r="5" fill="${p.color}" stroke="#000" stroke-width="1"/>
+      <text x="${p.x}" y="${p.y-9}" text-anchor="middle" fill="${p.color}">${p.label}</text>`;
+    g.addEventListener('click',()=>handleClick(p));
+    svg.appendChild(g);
+  });
+}
+
+function handleClick(place){
+  if(mode==='learn'){
+    document.getElementById('infoTitle').innerHTML=`📍 ${place.label}`;
+    document.getElementById('infoDesc').innerHTML=place.info;
+    document.querySelectorAll('.pin circle').forEach(c=>c.setAttribute('stroke-width','1'));
+    document.querySelector('#pin-'+place.id+' circle').setAttribute('stroke-width','3');
+  } else { checkAnswer(place); }
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.mode-btn:${m==='learn'?'first':'last'}-child`).classList.add('active');
+  document.getElementById('infoPanel').style.display=m==='learn'?'block':'none';
+  document.getElementById('quizBar').style.display=m==='test'?'flex':'none';
+  document.querySelectorAll('.pin text').forEach(t=>t.style.opacity=m==='learn'?'':'0');
+  if(m==='test'){ score=0;total=0;quizOrder=[...Array(TABS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function showQuestion(){
+  const places=TABS[tab].places;
+  if(quizIdx>=quizOrder.length){ quizIdx=0;quizOrder.sort(()=>Math.random()-.5); }
+  const p=places[quizOrder[quizIdx]];
+  document.getElementById('quizQ').innerHTML=`📍 Click on: <strong>${p.label}</strong>`;
+  document.getElementById('quizScore').textContent=`${score}/${total}`;
+  document.querySelectorAll('.pin').forEach(g=>g.classList.remove('highlight'));
+  document.querySelectorAll('.pin text').forEach(t=>{t.style.opacity='0';});
+}
+
+function checkAnswer(place){
+  const places=TABS[tab].places;
+  const expected=places[quizOrder[quizIdx]]; total++;
+  const flash=document.getElementById('fbFlash');
+  if(place.id===expected.id){ score++;flash.textContent='✓';flash.style.color='#4ade80'; }
+  else{ flash.textContent='✗';flash.style.color='#f87171';
+    document.querySelector('#pin-'+expected.id)?.classList.add('highlight');
+    setTimeout(()=>document.querySelector('#pin-'+expected.id)?.classList.remove('highlight'),1500);
+  }
+  flash.style.opacity='1'; setTimeout(()=>{flash.style.opacity='0';},800);
+  quizIdx++; setTimeout(showQuestion,1000);
+}
+
+function skipQ(){ quizIdx++; showQuestion(); }
+
+buildPins(); buildLegend();
+</script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Power Sharing</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#080612; --card:#0e0a1e; --card2:#140f26;
+    --border:#1e1640; --text:#e2d9f3; --muted:#4a3a7a;
+    --ps:#7c3aed; --violet:#a78bfa; --indigo:#818cf8;
+    --blue:#60a5fa; --green:#4ade80; --amber:#fbbf24;
+    --red:#f87171; --teal:#34d399; --pink:#f472b6; --cyan:#38bdf8; --orange:#fb923c;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; padding:1.2rem; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 40% at 10% 5%,rgba(124,58,237,.04) 0%,transparent 60%),
+               radial-gradient(ellipse 50% 30% at 90% 90%,rgba(96,165,250,.03) 0%,transparent 50%); }
+
+  .site-nav { display:flex; align-items:center; justify-content:space-between;
+    padding:.4rem 1.2rem; background:rgba(8,6,18,.95); border-bottom:1px solid var(--border);
+    border-radius:10px; margin:-1.2rem -1.2rem 1.2rem; position:sticky; top:0; z-index:100;
+    backdrop-filter:blur(10px); }
+  .site-nav a.logo img { height:26px; }
+  .site-nav a.back { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted);
+    text-decoration:none; border:1px solid var(--border); border-radius:99px;
+    padding:.2rem .65rem; transition:all .2s; }
+  .site-nav a.back:hover { color:var(--violet); border-color:var(--ps); }
+
+  header { text-align:center; padding:.8rem 0 1.4rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.1rem); font-weight:900; color:var(--violet); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:.9rem; max-width:1100px; margin:0 auto; }
+
+  .panel { background:var(--card); border-radius:12px; border:1px solid var(--border); overflow:hidden; }
+  .panel-head { display:flex; align-items:center; gap:.55rem; padding:.75rem 1rem;
+    border-bottom:1px solid var(--border); font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; }
+  .panel-body { padding:.8rem 1rem; }
+
+  .ph-bel .panel-head  { background:rgba(96,165,250,.08);  color:var(--blue); }
+  .ph-sl  .panel-head  { background:rgba(248,113,113,.08); color:var(--red); }
+  .ph-why .panel-head  { background:rgba(52,211,153,.08);  color:var(--teal); }
+  .ph-h   .panel-head  { background:rgba(129,140,248,.08); color:var(--indigo); }
+  .ph-v   .panel-head  { background:rgba(74,222,128,.08);  color:var(--green); }
+  .ph-s   .panel-head  { background:rgba(244,114,182,.08); color:var(--pink); }
+  .ph-p   .panel-head  { background:rgba(251,191,36,.08);  color:var(--amber); }
+  .ph-key .panel-head  { background:rgba(167,139,250,.08); color:var(--violet); }
+  .ph-cmp .panel-head  { background:rgba(56,189,248,.08);  color:var(--cyan); }
+  .ph-mem .panel-head  { background:rgba(251,191,36,.06);  color:var(--amber); }
+
+  table { width:100%; border-collapse:collapse; font-size:.78rem; }
+  th { font-family:'DM Mono',monospace; font-size:.67rem; padding:.45rem .6rem;
+    background:var(--card2); color:var(--muted); text-align:left; }
+  td { padding:.4rem .6rem; border-top:1px solid var(--border); line-height:1.5; vertical-align:top; }
+  tr:hover td { background:rgba(124,58,237,.03); }
+
+  .fact { display:flex; gap:.5rem; font-size:.8rem; padding:.28rem 0; line-height:1.55; border-top:1px solid var(--border); }
+  .fact:first-child { border-top:none; }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  .hbox { border-left:3px solid; border-radius:0 6px 6px 0; padding:.5rem .75rem;
+    margin:.3rem 0; font-size:.8rem; line-height:1.6; }
+  .hbox strong { display:block; font-size:.82rem; margin-bottom:.15rem; }
+
+  .trick { background:var(--card2); border-radius:8px; padding:.55rem .75rem; margin:.35rem 0; font-size:.78rem; }
+  .trick strong { color:var(--amber); font-family:'Playfair Display',serif; font-size:.85rem; }
+  .trick p { color:var(--muted); font-size:.72rem; margin-top:.15rem; }
+
+  .form-strip { border-left:3px solid; padding:.45rem .7rem; margin:.3rem 0; border-radius:0 6px 6px 0; font-size:.8rem; line-height:1.55; }
+  .form-strip .fs-num { font-family:'DM Mono',monospace; font-size:.66rem; margin-bottom:.18rem; }
+  .form-strip strong { display:block; font-size:.84rem; margin-bottom:.12rem; }
+
+  .vi { color:var(--violet); } .bl { color:var(--blue); } .rd { color:var(--red); }
+  .gr { color:var(--green); } .am { color:var(--amber); } .te { color:var(--teal); }
+  .pk { color:var(--pink); } .cy { color:var(--cyan); } .in { color:var(--indigo); }
+  .hl { font-family:'DM Mono',monospace; font-size:.75rem; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-power">&#8592; Back to Portal</a>
+</nav>
+
+<header>
+  <h1>Power Sharing</h1>
+  <p>Class X · Civics Ch.1 · Quick Revision Cheat Sheet — 12 Panels</p>
+</header>
+
+<div class="grid">
+
+  <!-- 1. Belgium Story -->
+  <div class="panel ph-bel">
+    <div class="panel-head">🇧🇪 Belgium — Accommodation</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div>Ethnic composition: <strong class="bl">59% Dutch (Flemish, north)</strong>, 40% French (Walloon, south), 1% German (east)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div>Brussels (capital): <strong class="bl">80% French + 20% Dutch</strong> — in a Dutch-speaking region — creating tension</div></div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><div>Solution: <strong class="te">4 constitutional amendments (1970–1993)</strong> transforming Belgium into a federal state</div></div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><div>Central cabinet: equal Dutch &amp; French ministers by constitutional law</div></div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><div>3 levels: Federal + Regional (Flanders/Wallonia/Brussels) + Community Govts (cultural/education)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div>Result: <strong class="gr">Peaceful coexistence</strong> — Belgium is headquarters of the EU today</div></div>
+    </div>
+  </div>
+
+  <!-- 2. Sri Lanka Story -->
+  <div class="panel ph-sl">
+    <div class="panel-head">🇱🇰 Sri Lanka — Majoritarianism</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><div>Ethnic composition: <strong class="rd">Sinhala 74%</strong>, Sri Lankan Tamil 11%, Indian Tamil 7%, Moors 7%</div></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><div><strong class="rd">1956: Sinhala Only Act</strong> — declared Sinhala the only official language; Tamil excluded</div></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><div>University quotas &amp; government jobs heavily favoured Sinhala; Buddhism made state religion</div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong class="am">1976: LTTE founded</strong> — Liberation Tigers of Tamil Eelam; demanded independent "Eelam"</div></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><div><strong class="rd">Civil war 1983–2009</strong> — 26 years, 70,000–100,000 dead, millions displaced</div></div>
+      <div class="fact"><div class="dot" style="background:var(--orange)"></div><div>Lesson: Majoritarianism alienates minorities and ultimately destroys the nation</div></div>
+    </div>
+  </div>
+
+  <!-- 3. Belgium vs Sri Lanka Comparison -->
+  <div class="panel ph-cmp">
+    <div class="panel-head">⚖️ Belgium vs Sri Lanka</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Aspect</th><th style="color:var(--blue)">Belgium</th><th style="color:var(--red)">Sri Lanka</th></tr>
+        <tr><td>Approach</td><td class="gr">Accommodation</td><td class="rd">Majoritarianism</td></tr>
+        <tr><td>Language</td><td>Both Dutch &amp; French equal</td><td>Sinhala only (1956)</td></tr>
+        <tr><td>Cabinet</td><td>Equal community reps</td><td>Sinhala dominant</td></tr>
+        <tr><td>System</td><td>Federal (3 tiers)</td><td>Unitary state</td></tr>
+        <tr><td>Outcome</td><td class="gr">EU HQ, peaceful</td><td class="rd">Civil war (26 yrs)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. Why Share Power -->
+  <div class="panel ph-why">
+    <div class="panel-head">💡 Why Share Power?</div>
+    <div class="panel-body">
+      <div class="hbox" style="border-color:var(--teal);background:rgba(52,211,153,.06)">
+        <strong class="te">🧠 Prudential Reasons (practical):</strong>
+        Sharing power reduces conflict and ensures political stability. Civil wars are costly for everyone — even the majority loses. Social peace enables economic development.
+      </div>
+      <div class="hbox" style="border-color:var(--green);background:rgba(74,222,128,.06)">
+        <strong class="gr">⚖️ Moral Reasons (principled):</strong>
+        Democracy = rule by ALL the people, not just 50%+1. Every citizen has a right to participate. Majoritarianism is tyranny — anti-democratic in spirit.
+      </div>
+      <div class="fact" style="margin-top:.4rem"><div class="dot" style="background:var(--violet)"></div><div>Power sharing is the <strong class="vi">very spirit of democracy</strong> — it respects the dignity of ALL citizens</div></div>
+    </div>
+  </div>
+
+  <!-- 5. Horizontal Distribution -->
+  <div class="panel ph-h">
+    <div class="panel-head">🏛️ Form 1 — Horizontal (Organs of Govt)</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--indigo)"></div><div>Power shared among <strong class="in">Legislature, Executive, Judiciary</strong> — the 3 organs — at the same level</div></div>
+      <div class="fact"><div class="dot" style="background:var(--indigo)"></div><div>Each organ can <strong>check and balance</strong> the others — no single organ can dominate</div></div>
+      <div class="hbox" style="border-color:var(--indigo);background:rgba(129,140,248,.06)">
+        <strong class="in">India examples:</strong>
+        Judiciary can strike down unconstitutional laws (judicial review) · President cannot make laws · Parliament cannot deliver verdicts
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--muted)"></div><div>Also called <strong class="hl">Separation of Powers</strong></div></div>
+    </div>
+  </div>
+
+  <!-- 6. Vertical Distribution -->
+  <div class="panel ph-v">
+    <div class="panel-head">🗺️ Form 2 — Vertical (Levels of Govt)</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div>Power divided among <strong class="gr">Central, State, and Local</strong> governments — federalism</div></div>
+      <table style="margin-top:.5rem">
+        <tr><th>Level</th><th>India Example</th></tr>
+        <tr><td>Central</td><td>Union List — defence, foreign affairs, currency (97 subjects)</td></tr>
+        <tr><td>State</td><td>State List — police, agriculture, health (66 subjects)</td></tr>
+        <tr><td>Both</td><td>Concurrent List — education, forests, trade unions (47 subjects)</td></tr>
+        <tr><td>Local</td><td>Panchayats &amp; Municipalities (73rd &amp; 74th Amendments, 1992)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 7. Social Groups -->
+  <div class="panel ph-s">
+    <div class="panel-head">🫂 Form 3 — Social Groups</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--pink)"></div><div>Power shared with <strong class="pk">religious, linguistic, and other minority communities</strong></div></div>
+      <div class="fact"><div class="dot" style="background:var(--pink)"></div><div>Prevents social exclusion and ensures marginalised groups have a voice in governance</div></div>
+      <div class="hbox" style="border-color:var(--pink);background:rgba(244,114,182,.06)">
+        <strong class="pk">India:</strong> Reserved seats for SC/ST in Parliament &amp; State Assemblies · 1/3 reservation for women in Panchayats · Minority Commission · Right to run own educational institutions
+      </div>
+      <div class="hbox" style="border-color:var(--blue);background:rgba(96,165,250,.05)">
+        <strong class="bl">Belgium:</strong> Equal French &amp; Dutch representation in cabinet &nbsp;|&nbsp; <strong class="rd">Lebanon:</strong> President = Christian, PM = Sunni, Speaker = Shia
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Political Parties & Movements -->
+  <div class="panel ph-p">
+    <div class="panel-head">🗳️ Form 4 — Political Parties &amp; Movements</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong class="am">Multi-party system</strong> prevents monopoly — parties must compete and negotiate</div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong class="am">Coalition government:</strong> two or more parties share power — example: most Indian govts since 1989 (NDA, UPA)</div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong>Pressure groups</strong> — trade unions, farmers' bodies, student unions — influence govt decisions</div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong>Civil society &amp; free media</strong> — keep government accountable; 4th estate</div></div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><div>Even within parties, different factions ensure power is not concentrated in one person</div></div>
+    </div>
+  </div>
+
+  <!-- 9. Key Definitions -->
+  <div class="panel ph-key">
+    <div class="panel-head">📖 Key Definitions</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--violet)"></div><div><strong class="vi">Majoritarianism:</strong> majority community rules however it wants, ignoring minority wishes</div></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><div><strong class="bl">Ethnic group:</strong> social group with common cultural tradition, language, history, or religion</div></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><div><strong class="rd">Civil war:</strong> armed internal conflict between govt and a section of its own people</div></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><div><strong class="am">Coalition govt:</strong> government formed by 2+ parties agreeing to cooperate and share power</div></div>
+      <div class="fact"><div class="dot" style="background:var(--cyan)"></div><div><strong class="cy">Federalism:</strong> power divided between central authority and constituent state/regional units</div></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><div><strong class="gr">Decentralisation:</strong> transfer of power from central/state to local bodies (Panchayats, Municipalities)</div></div>
+    </div>
+  </div>
+
+  <!-- 10. Four Forms Summary -->
+  <div class="panel" style="border-color:#1e1640">
+    <div class="panel-head" style="background:rgba(167,139,250,.08);color:var(--violet)">📋 Four Forms — Quick Summary</div>
+    <div class="panel-body">
+      <div class="form-strip" style="border-color:var(--blue);background:rgba(96,165,250,.05)">
+        <div class="fs-num" style="color:var(--blue)">FORM 1 · HORIZONTAL</div>
+        <strong class="bl">Among organs of govt</strong> Legislature + Executive + Judiciary · Checks &amp; Balances
+      </div>
+      <div class="form-strip" style="border-color:var(--green);background:rgba(74,222,128,.05)">
+        <div class="fs-num" style="color:var(--green)">FORM 2 · VERTICAL</div>
+        <strong class="gr">Among levels of govt</strong> Central + State + Local · Federalism + Decentralisation
+      </div>
+      <div class="form-strip" style="border-color:var(--pink);background:rgba(244,114,182,.05)">
+        <div class="fs-num" style="color:var(--pink)">FORM 3 · SOCIAL GROUPS</div>
+        <strong class="pk">Among communities</strong> Reservations + Minority rights + Community representation
+      </div>
+      <div class="form-strip" style="border-color:var(--amber);background:rgba(251,191,36,.05)">
+        <div class="fs-num" style="color:var(--amber)">FORM 4 · POLITICAL PARTIES</div>
+        <strong class="am">Among parties &amp; movements</strong> Multi-party + Coalition + Pressure groups + Media
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. Important Dates & Facts -->
+  <div class="panel ph-bel">
+    <div class="panel-head">📅 Important Dates &amp; Numbers</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Year/Number</th><th>Significance</th></tr>
+        <tr><td class="hl am">1956</td><td>Sri Lanka — Sinhala Only Act</td></tr>
+        <tr><td class="hl am">1970–1993</td><td>Belgium — 4 constitutional amendments</td></tr>
+        <tr><td class="hl am">1976</td><td>LTTE founded in Sri Lanka</td></tr>
+        <tr><td class="hl am">1983–2009</td><td>Sri Lanka civil war — 26 years</td></tr>
+        <tr><td class="hl am">1992</td><td>India — 73rd &amp; 74th Amendments (Local self-govt)</td></tr>
+        <tr><td class="hl am">59% / 40%</td><td>Dutch / French composition in Belgium</td></tr>
+        <tr><td class="hl am">74% / 18%</td><td>Sinhala / Tamil composition in Sri Lanka</td></tr>
+        <tr><td class="hl am">97 / 66 / 47</td><td>Union / State / Concurrent List (India)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 12. Memory Tricks -->
+  <div class="panel ph-mem">
+    <div class="panel-head">🧠 Memory Tricks</div>
+    <div class="panel-body">
+      <div class="trick">
+        <strong>4 Forms = HVSP</strong>
+        <p>Horizontal (organs) · Vertical (levels) · Social groups · Political parties</p>
+      </div>
+      <div class="trick">
+        <strong>Belgium's 3 Govts = FRC</strong>
+        <p>Federal (central) · Regional (Flanders/Wallonia/Brussels) · Community (language-based)</p>
+      </div>
+      <div class="trick">
+        <strong>Belgium = B for Better outcome; Sri Lanka = S for Suppression → Suffering</strong>
+        <p>Accommodation vs Majoritarianism — completely different outcomes</p>
+      </div>
+      <div class="trick">
+        <strong>Prudential = Practical · Moral = Principle</strong>
+        <p>Prudential: sharing power prevents conflict (outcome-based) · Moral: it is simply right and just (principle-based)</p>
+      </div>
+      <div class="trick">
+        <strong>Coalition: C = Cooperate + Compromise</strong>
+        <p>Two or more parties must cooperate and compromise — this IS power sharing in practice</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /grid -->
+</body>
+</html>

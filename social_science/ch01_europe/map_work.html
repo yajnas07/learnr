@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Work — Rise of Nationalism in Europe · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0a04;--card:#1a1208;--card2:#241a0c;--border:#3a2e1a;--text:#f5e6c8;--muted:#7a6a4a;
+  --gold:#f5c842;--amber:#fbbf24;--blue:#60a5fa;--red:#f87171;--green:#4ade80;--teal:#34d399;--purple:#a78bfa;--pink:#f472b6;--orange:#fb923c;--cyan:#38bdf8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.2rem;background:rgba(14,10,4,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem;transition:all .2s}
+.site-nav a.back:hover{color:var(--gold);border-color:var(--gold)}
+header{text-align:center;padding:1.4rem 1rem .8rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3.5vw,1.8rem);font-weight:900;color:var(--gold)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+.wrap{max-width:960px;margin:0 auto;padding:0 1rem 3rem}
+.mode-bar{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem}
+.mode-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;padding:.45rem 1.2rem;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.mode-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.08)}
+.map-area{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;aspect-ratio:16/10;max-height:540px}
+.map-area svg{width:100%;height:100%;display:block}
+#europeBase{filter:brightness(0.18) sepia(1) saturate(3) hue-rotate(10deg);}
+.pin{cursor:pointer;transition:all .2s}
+.pin circle{transition:all .2s}
+.pin:hover circle{r:8;filter:drop-shadow(0 0 8px currentColor)}
+.pin text{font-family:'DM Mono',monospace;font-size:14px;fill:var(--text);pointer-events:none;opacity:0;transition:opacity .2s}
+.pin:hover text{opacity:1}
+.pin.highlight circle{animation:ping 1s ease infinite}
+@keyframes ping{0%,100%{r:5;opacity:1}50%{r:10;opacity:.5}}
+.info-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:1rem;min-height:80px}
+.info-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.info-desc{font-size:.84rem;color:var(--muted);line-height:1.65}
+.info-desc strong{color:var(--text)}
+.quiz-bar{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:1rem}
+.quiz-q{flex:1;font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem}
+.quiz-score{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.quiz-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:4px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s}
+.quiz-btn:hover{border-color:var(--gold);color:var(--gold)}
+.feedback-flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;pointer-events:none;opacity:0;transition:opacity .3s;z-index:10;text-shadow:0 0 20px #000}
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-europe">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Map Work — Rise of Nationalism in Europe</h1>
+  <p>Class X · History Ch.1 · CBSE Board Map Work · Interactive</p>
+</header>
+<div class="wrap">
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('learn')">📖 Learn Mode</button>
+    <button class="mode-btn" onclick="setMode('test')">✍️ Test Yourself</button>
+  </div>
+  <div class="map-area" id="mapArea">
+    <div class="feedback-flash" id="fbFlash"></div>
+    <svg viewBox="0 0 1000 684" id="mapSvg">
+      <!-- Full Europe map loaded from downloaded SVG file -->
+      <image id="europeBase" href="europe.svg" x="0" y="0" width="1000" height="684"/>
+      <!-- Pins injected by JS below -->
+    </svg>
+  </div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#f5c842"></div>Key Cities</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#60a5fa"></div>Unification Sites</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f87171"></div>Revolution/Battle</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#4ade80"></div>Treaty/Congress</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#a78bfa"></div>Empire/Territory</div>
+  </div>
+  <div class="info-panel" id="infoPanel">
+    <div class="info-title" id="infoTitle">Click any pin on the map to learn about it</div>
+    <div class="info-desc" id="infoDesc">In <strong>Learn Mode</strong>, click pins to see details. In <strong>Test Mode</strong>, you'll be asked to identify locations. CBSE Board exam typically asks 2-3 map questions from this chapter.</div>
+  </div>
+  <div class="quiz-bar" id="quizBar" style="display:none">
+    <div class="quiz-q" id="quizQ">Loading...</div>
+    <div class="quiz-score" id="quizScore">0/0</div>
+    <button class="quiz-btn" onclick="skipQ()">Skip →</button>
+  </div>
+</div>
+
+<script>
+const PLACES = [
+  // Key Cities - Updated to match real map coordinates (viewBox: 0 0 1000 684)
+  { id:'paris', x:460, y:445, color:'#f5c842', label:'Paris', cat:'city',
+    info:'<strong>Paris, France</strong> — Centre of the French Revolution (1789). The revolution introduced ideas of liberty, equality, and fraternity. Napoleon rose to power here. The National Assembly, Bastille, and Jacobin Club were all based in Paris. Starting point of modern nationalism in Europe.' },
+  { id:'vienna', x:610, y:420, color:'#4ade80', label:'Vienna', cat:'treaty',
+    info:'<strong>Vienna, Austria</strong> — Site of the <strong>Congress of Vienna (1815)</strong> hosted by Austrian Chancellor Metternich. After Napoleon\'s defeat, European monarchs met here to restore the old order and undo the changes of the Napoleonic era. Drew new boundaries of Europe. Established the principle of "legitimacy" — restoring deposed royal families.' },
+  { id:'london', x:380, y:350, color:'#f5c842', label:'London', cat:'city',
+    info:'<strong>London, Britain</strong> — Capital of the United Kingdom. Britain was a constitutional monarchy and did not experience the same revolutionary upheaval. The English Parliament (1688 Glorious Revolution) was already a model of limited monarchy. Many exiled nationalists (like Mazzini) took refuge in London.' },
+  { id:'berlin', x:580, y:350, color:'#60a5fa', label:'Berlin', cat:'unify',
+    info:'<strong>Berlin, Prussia/Germany</strong> — Capital of the unified German Empire proclaimed in 1871. <strong>Otto von Bismarck</strong>, the Prussian Chief Minister, engineered German unification through three wars (with Denmark, Austria, and France). The German Empire was proclaimed at the Palace of Versailles after defeating France. Berlin became the seat of Kaiser Wilhelm I.' },
+  { id:'rome', x:560, y:520, color:'#60a5fa', label:'Rome', cat:'unify',
+    info:'<strong>Rome, Italy</strong> — Capital of unified Italy. Italian unification (Risorgimento) completed in 1870 when Rome was taken from the Pope. Three key leaders: <strong>Mazzini</strong> (ideological inspiration, Young Italy), <strong>Cavour</strong> (diplomatic strategy from Sardinia-Piedmont), <strong>Garibaldi</strong> (military campaigns in South Italy). Rome was declared capital of the Kingdom of Italy.' },
+  // Unification Sites
+  { id:'sardinia', x:530, y:490, color:'#60a5fa', label:'Sardinia-\nPiedmont', cat:'unify',
+    info:'<strong>Kingdom of Sardinia-Piedmont</strong> — The leading state in Italian unification. Ruled by King Victor Emmanuel II with <strong>Count Cavour</strong> as Chief Minister. Cavour used diplomacy — allied with France against Austria (1859) — to annex northern Italian states. This was the nucleus around which Italy was unified.' },
+  { id:'prussia', x:590, y:330, color:'#60a5fa', label:'Prussia', cat:'unify',
+    info:'<strong>Prussia</strong> — The most powerful German state that led German unification under <strong>Otto von Bismarck</strong>. Bismarck\'s policy of "blood and iron" — military force and diplomatic cunning — unified Germany through three wars: vs Denmark (1864), vs Austria (1866), vs France (1870–71). The German Empire was proclaimed in January 1871.' },
+  { id:'sicily', x:590, y:580, color:'#f87171', label:'Sicily', cat:'battle',
+    info:'<strong>Sicily, Southern Italy</strong> — Where <strong>Garibaldi</strong> and his Red Shirts (Expedition of the Thousand, 1860) landed and liberated the Kingdom of the Two Sicilies from Bourbon rule. Garibaldi then marched north and handed over the south to King Victor Emmanuel II — completing most of Italian unification from below (popular revolt).' },
+  // Revolution Sites
+  { id:'greece', x:710, y:560, color:'#f87171', label:'Greece', cat:'battle',
+    info:'<strong>Greece</strong> — <strong>Greek War of Independence (1821–1832)</strong> from the Ottoman Empire. First successful nationalist revolution in Europe post-Congress of Vienna. Greece was supported by Western European liberals, poets (Lord Byron), and Russia. The Treaty of Constantinople (1832) recognised Greek independence — a major victory for nationalist ideas.' },
+  { id:'frankfurt', x:540, y:390, color:'#f87171', label:'Frankfurt', cat:'battle',
+    info:'<strong>Frankfurt, Germany</strong> — Site of the <strong>Frankfurt Parliament (1848)</strong>. German liberals met in the Church of St Paul to draft a constitution for a united Germany. They offered the crown to Prussian King Friedrich Wilhelm IV, who rejected it — calling it a "crown from the gutter". The parliament was dissolved. Revolution failed but planted seeds for later unification.' },
+  { id:'warsaw', x:710, y:350, color:'#f87171', label:'Warsaw', cat:'battle',
+    info:'<strong>Warsaw, Poland</strong> — Poland was partitioned between Russia, Prussia, and Austria (1772–1795). Poles rose in revolt multiple times (1830, 1863) but were crushed. Warsaw became a symbol of failed nationalist struggles. Napoleon briefly created the Duchy of Warsaw but it was dissolved after the Congress of Vienna. Polish nationalism survived underground.' },
+  // Napoleon's Territory
+  { id:'moscow', x:900, y:240, color:'#a78bfa', label:'Moscow', cat:'empire',
+    info:'<strong>Moscow, Russia</strong> — Napoleon invaded Russia in 1812 and reached Moscow, but the city was burned and abandoned. The disastrous retreat from Moscow destroyed Napoleon\'s Grande Armée and marked the beginning of his downfall. Russia\'s resistance inspired other European nations to resist French domination.' },
+  { id:'waterloo', x:465, y:400, color:'#f87171', label:'Waterloo', cat:'battle',
+    info:'<strong>Waterloo, Belgium</strong> — Site of Napoleon\'s <strong>final defeat (June 18, 1815)</strong> by British (Wellington) and Prussian (Blücher) forces. After escaping exile from Elba, Napoleon rallied France for 100 days before being crushed here. He was exiled to St Helena. This ended the Napoleonic era and led to the Congress of Vienna.' },
+  { id:'versailles', x:450, y:450, color:'#a78bfa', label:'Versailles', cat:'empire',
+    info:'<strong>Versailles, France</strong> — The German Empire was proclaimed here in the Hall of Mirrors on <strong>January 18, 1871</strong>, after Prussia defeated France in the Franco-Prussian War. Kaiser Wilhelm I was crowned. This was a deliberate humiliation of France — and a major source of French resentment leading to WW1.' },
+  { id:'naples', x:595, y:550, color:'#60a5fa', label:'Naples', cat:'unify',
+    info:'<strong>Naples / Kingdom of the Two Sicilies</strong> — Ruled by the Spanish Bourbon dynasty. Liberated by Garibaldi\'s Red Shirts in 1860. The Bourbon rulers were unpopular and the local population supported Garibaldi. After liberation, the Kingdom was merged with Sardinia-Piedmont to form the Kingdom of Italy.' },
+  { id:'strasbourg', x:510, y:430, color:'#a78bfa', label:'Strasbourg', cat:'empire',
+    info:'<strong>Strasbourg / Alsace-Lorraine</strong> — Border region between France and Germany, contested for centuries. Taken by Germany after the Franco-Prussian War (1871). Its loss was a source of deep French nationalism and desire for revenge — a factor leading to WW1. The famous allegory "The Last Lesson" by Alphonse Daudet is set here.' },
+];
+
+let mode='learn', quizIdx=0, quizOrder=[], score=0, total=0;
+const svg=document.getElementById('mapSvg');
+
+function buildPins(){
+  document.querySelectorAll('.pin').forEach(p=>p.remove());
+  PLACES.forEach(p=>{
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('pin');
+    g.id='pin-'+p.id;
+    g.innerHTML=`<circle cx="${p.x}" cy="${p.y}" r="5" fill="${p.color}" stroke="#000" stroke-width="1"/>
+      <text x="${p.x}" y="${p.y-10}" text-anchor="middle" font-size="7" fill="${p.color}">${p.label.replace(/\n/g,' ')}</text>`;
+    g.addEventListener('click',()=>handleClick(p));
+    svg.appendChild(g);
+  });
+}
+
+function handleClick(place){
+  if(mode==='learn'){
+    document.getElementById('infoTitle').innerHTML=`📍 ${place.label.replace(/\n/g,' ')}`;
+    document.getElementById('infoDesc').innerHTML=place.info;
+    document.querySelectorAll('.pin circle').forEach(c=>c.setAttribute('stroke-width','1'));
+    document.querySelector('#pin-'+place.id+' circle').setAttribute('stroke-width','3');
+  } else {
+    checkAnswer(place);
+  }
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.mode-btn:${m==='learn'?'first':'last'}-child`).classList.add('active');
+  document.getElementById('infoPanel').style.display=m==='learn'?'block':'none';
+  document.getElementById('quizBar').style.display=m==='test'?'flex':'none';
+  document.querySelectorAll('.pin text').forEach(t=>t.style.opacity=m==='learn'?'':'0');
+  if(m==='test'){
+    score=0; total=0;
+    quizOrder=[...Array(PLACES.length).keys()].sort(()=>Math.random()-.5);
+    quizIdx=0;
+    showQuestion();
+  }
+}
+
+function showQuestion(){
+  if(quizIdx>=quizOrder.length){ quizIdx=0; quizOrder.sort(()=>Math.random()-.5); }
+  const p=PLACES[quizOrder[quizIdx]];
+  document.getElementById('quizQ').innerHTML=`📍 Click on: <strong>${p.label.replace(/\n/g,' ')}</strong>`;
+  document.getElementById('quizScore').textContent=`${score}/${total}`;
+  document.querySelectorAll('.pin').forEach(g=>{g.classList.remove('highlight');});
+  // hide labels in test mode
+  document.querySelectorAll('.pin text').forEach(t=>{t.style.opacity='0';});
+}
+
+function checkAnswer(place){
+  const expected=PLACES[quizOrder[quizIdx]];
+  total++;
+  const flash=document.getElementById('fbFlash');
+  if(place.id===expected.id){
+    score++;
+    flash.textContent='✓';flash.style.color='#4ade80';
+  } else {
+    flash.textContent='✗';flash.style.color='#f87171';
+    // highlight correct
+    document.querySelector('#pin-'+expected.id)?.classList.add('highlight');
+    setTimeout(()=>document.querySelector('#pin-'+expected.id)?.classList.remove('highlight'),1500);
+  }
+  flash.style.opacity='1';
+  setTimeout(()=>{flash.style.opacity='0';},800);
+  quizIdx++;
+  setTimeout(showQuestion,1000);
+}
+
+function skipQ(){ quizIdx++; showQuestion(); }
+
+buildPins();
+</script>
+</body>
+</html>

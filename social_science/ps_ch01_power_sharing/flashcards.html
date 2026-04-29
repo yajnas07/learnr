@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Power Sharing</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#080612; --card:#0e0a1e; --card2:#140f26;
+    --border:#1e1640; --text:#e2d9f3; --muted:#4a3a7a;
+    --ps:#7c3aed; --violet:#a78bfa; --indigo:#818cf8;
+    --blue:#60a5fa; --green:#4ade80; --amber:#fbbf24;
+    --red:#f87171; --teal:#34d399; --pink:#f472b6; --cyan:#38bdf8;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(124,58,237,.05) 0%,transparent 60%); }
+
+  .site-nav { display:flex; align-items:center; justify-content:space-between; width:100%;
+    padding:.4rem 1.4rem; background:rgba(8,6,18,.95); border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:100; backdrop-filter:blur(10px); }
+  .site-nav a.logo img { height:26px; }
+  .site-nav a.back { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted);
+    text-decoration:none; border:1px solid var(--border); border-radius:99px;
+    padding:.2rem .65rem; transition:all .2s; }
+  .site-nav a.back:hover { color:var(--violet); border-color:var(--ps); }
+
+  header { text-align:center; padding:1.6rem 1rem .7rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.3rem,4vw,2rem); font-weight:900; color:var(--violet); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .prog-row { display:flex; align-items:center; gap:1rem; padding:.5rem 1rem .8rem; width:100%; max-width:560px; }
+  .prog-bar { flex:1; height:5px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:99px;
+    background:linear-gradient(90deg,var(--ps),var(--violet)); transition:width .4s ease; }
+  .prog-text { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); white-space:nowrap; }
+
+  .filters { display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center; padding:.2rem 1rem .8rem; }
+  .f-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.72rem;
+    padding:.3rem .9rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .f-btn:hover { color:var(--text); }
+  .f-btn.on { color:#04020e; border-color:transparent; }
+  .f-all.on   { background:var(--muted); color:var(--text) !important; }
+  .f-bel.on   { background:var(--blue); }
+  .f-sl.on    { background:var(--red); }
+  .f-why.on   { background:var(--teal); }
+  .f-forms.on { background:var(--violet); color:#fff !important; }
+  .f-key.on   { background:var(--amber); }
+
+  .stage { width:100%; max-width:560px; padding:0 1rem; perspective:1200px; }
+
+  .fc-wrap { width:100%; aspect-ratio:3/2; position:relative; cursor:pointer;
+    transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1); }
+  .fc-wrap.flipped { transform:rotateY(180deg); }
+
+  .fc-face { position:absolute; inset:0; border-radius:16px;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:1.4rem; text-align:center; }
+  .fc-front { background:var(--card); border:1px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.6); }
+  .fc-back  { transform:rotateY(180deg); background:var(--card2); border:1px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.6); }
+
+  .fc-tag { font-family:'DM Mono',monospace; font-size:.65rem; font-weight:500;
+    padding:.18rem .65rem; border-radius:2px; margin-bottom:.7rem; }
+  .tag-bel   { background:rgba(96,165,250,.15);  color:var(--blue); }
+  .tag-sl    { background:rgba(248,113,113,.15);  color:var(--red); }
+  .tag-why   { background:rgba(52,211,153,.15);   color:var(--teal); }
+  .tag-forms { background:rgba(167,139,250,.15);  color:var(--violet); }
+  .tag-key   { background:rgba(251,191,36,.15);   color:var(--amber); }
+
+  .fc-q { font-family:'Playfair Display',serif; font-size:clamp(.88rem,2.4vw,1.1rem);
+    font-weight:700; line-height:1.45; }
+  .fc-hint { font-size:.68rem; color:var(--muted); margin-top:.5rem; font-family:'DM Mono',monospace; }
+  .fc-flip-hint { position:absolute; bottom:.75rem; font-size:.65rem;
+    font-family:'DM Mono',monospace; color:rgba(60,40,100,.8); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  .fc-ans-lbl { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--violet); margin-bottom:.5rem; }
+  .fc-ans { font-size:clamp(.78rem,2vw,.95rem); line-height:1.65; color:var(--text); }
+  .fc-ans strong { color:var(--amber); }
+  .fc-ans em { color:var(--teal); font-style:normal; }
+
+  .known-badge { position:absolute; top:.7rem; right:.7rem;
+    font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .45rem; border-radius:2px; }
+  .known   { background:rgba(74,222,128,.15); color:#4ade80; }
+  .unknown { background:rgba(239,68,68,.1);   color:#f87171; }
+
+  .nav-row { display:flex; gap:.7rem; align-items:center; padding:1rem; }
+  .nav-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.85rem;
+    padding:.5rem 1.3rem; border-radius:4px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .nav-btn:hover:not(:disabled) { border-color:#2a1e4a; color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; }
+  .card-ctr { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--muted); min-width:70px; text-align:center; }
+
+  .bottom-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem 2rem; }
+  .bot-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.75rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .bot-btn:hover { border-color:var(--violet); color:var(--violet); }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-power">&#8592; Back to Portal</a>
+</nav>
+
+<header>
+  <h1>Power Sharing</h1>
+  <p>Class X · Civics Ch.1 · 40 Flashcards — Click to flip</p>
+</header>
+
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <div class="prog-text" id="progText">0 / 40 known</div>
+</div>
+
+<div class="filters">
+  <button class="f-btn f-all on"  onclick="setFilter('all')">All (40)</button>
+  <button class="f-btn f-bel"    onclick="setFilter('bel')">🇧🇪 Belgium (8)</button>
+  <button class="f-btn f-sl"     onclick="setFilter('sl')">🇱🇰 Sri Lanka (8)</button>
+  <button class="f-btn f-why"    onclick="setFilter('why')">💡 Why Share (7)</button>
+  <button class="f-btn f-forms"  onclick="setFilter('forms')">🏛️ Four Forms (10)</button>
+  <button class="f-btn f-key"    onclick="setFilter('key')">📖 Key Terms (7)</button>
+</div>
+
+<div class="stage">
+  <div class="fc-wrap" id="fcWrap" onclick="flipCard()">
+    <div class="fc-face fc-front" id="fcFront">
+      <span class="fc-tag" id="fcTag"></span>
+      <div class="fc-q" id="fcQ"></div>
+      <div class="fc-hint" id="fcHint"></div>
+      <div class="fc-flip-hint">tap to reveal ↓</div>
+      <span class="known-badge" id="knownBadge"></span>
+    </div>
+    <div class="fc-face fc-back" id="fcBack">
+      <div class="fc-ans-lbl">✦ ANSWER</div>
+      <div class="fc-ans" id="fcAns"></div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" onclick="go(-1)">&#8592; Prev</button>
+  <div class="card-ctr" id="cardCtr">1 / 40</div>
+  <button class="nav-btn" onclick="go(1)">Next &#8594;</button>
+  <button class="nav-btn" onclick="markKnown()" id="knowBtn" title="Mark known (K)">★</button>
+</div>
+
+<div class="bottom-row">
+  <button class="bot-btn" onclick="shuffleDeck()">⇄ Shuffle</button>
+  <button class="bot-btn" onclick="resetKnown()">↺ Reset</button>
+</div>
+
+<script>
+const CARDS = [
+  // ── BELGIUM ──
+  { cat:'bel', q:'What percentage of Belgium\'s population is Dutch-speaking (Flemish)?', hint:'Northern region', a:'<strong>59%</strong> of Belgium is Dutch-speaking (Flemish), living mainly in the northern Flanders region. French-speaking Walloons make up 40% (south), and 1% are German-speaking (east).' },
+  { cat:'bel', q:'What is the ethnic/linguistic composition of Brussels, Belgium\'s capital?', hint:'Note: it sits in Flemish region', a:'Brussels is <strong>80% French-speaking</strong> and 20% Dutch-speaking — yet it is located in the Dutch-speaking Flemish region. This created a key tension that made power-sharing constitutional amendments necessary.' },
+  { cat:'bel', q:'How many constitutional amendments did Belgium make to prevent civil war, and over what period?', hint:'1970–1993', a:'Belgium made <strong>4 constitutional amendments</strong> between <strong>1970 and 1993</strong> to gradually transform from a unitary state into a federal one with elaborate power-sharing at every level.' },
+  { cat:'bel', q:'What rule did Belgium establish for its central cabinet?', hint:'Equal representation', a:'Belgium\'s constitution mandates that the central cabinet must have <strong>equal numbers of French and Dutch-speaking ministers</strong>. The Prime Minister is the only exception. Neither community can dominate national governance.' },
+  { cat:'bel', q:'What are the three levels of government in Belgium\'s federal system?', hint:'FRC', a:'1. <strong>Federal Government</strong> (central — handles defence, foreign affairs, finance)<br>2. <strong>Regional Governments</strong> (Flanders, Wallonia, Brussels — economic/local matters)<br>3. <strong>Community Governments</strong> (Dutch, French, German — cultural, educational, language affairs — not geography-based)' },
+  { cat:'bel', q:'What is the special status of Brussels as a region?', hint:'Bilingual, separate govt', a:'Brussels is a <strong>separate bilingual region</strong> with its own government that gives equal representation to both Dutch and French-speaking communities — even though it is geographically inside Flanders. It is the third region alongside Flanders and Wallonia.' },
+  { cat:'bel', q:'What is the significance of Belgium\'s power-sharing model globally?', hint:'EU headquarters', a:'Belgium avoided ethnic civil war through accommodation and is today the <strong>headquarters of the European Union (EU)</strong> — a symbol of multi-ethnic cooperation. It shows that even complex multi-community societies can maintain peace through power sharing.' },
+  { cat:'bel', q:'What lesson does Belgium\'s experience teach about handling ethnic diversity?', hint:'Compare outcome with Sri Lanka', a:'Belgium shows that <strong>accommodation of all communities is better than imposing the majority\'s will</strong>. Despite the complexity of arrangements, Belgium remained peaceful. Rigid majoritarianism (Sri Lanka\'s approach) leads to civil war. Flexibility and respect prevent conflict.' },
+
+  // ── SRI LANKA ──
+  { cat:'sl', q:'What is the ethnic composition of Sri Lanka?', hint:'Sinhala is the majority', a:'<strong>Sinhala 74%</strong>, Sri Lankan Tamil 11%, Indian Tamil 7%, Moors (Muslim) 7%, Others 1%. Tamils are concentrated in the northern and eastern regions.' },
+  { cat:'sl', q:'What was the Sinhala Only Act of 1956?', hint:'Language law', a:'The <strong>Official Language Act (1956)</strong> declared Sinhala as the only official language of Sri Lanka, replacing English. It excluded Tamil speakers from government jobs and higher education, making Tamils feel like second-class citizens.' },
+  { cat:'sl', q:'What is majoritarianism? Give an example from Sri Lanka.', hint:'Majority imposes its will', a:'<strong>Majoritarianism</strong> = the belief that the majority community should rule in whatever way it wants, ignoring minority interests.<br>Example: Sri Lanka\'s Sinhala-only language policy; university quotas favouring Sinhala students; government jobs dominated by Sinhalese; Buddhism declared state religion.' },
+  { cat:'sl', q:'What is the LTTE? When was it founded?', hint:'Tamil separatist organisation', a:'The <strong>Liberation Tigers of Tamil Eelam (LTTE)</strong>, founded in <strong>1976</strong>, was an armed Tamil separatist organisation. It demanded an independent Tamil homeland "Eelam" in the north and east of Sri Lanka. It was designated a terrorist organisation by India, the US, and the EU.' },
+  { cat:'sl', q:'When did Sri Lanka\'s civil war begin and end? How long did it last?', hint:'1983–2009', a:'Sri Lanka\'s civil war began in <strong>1983</strong> (after the anti-Tamil Black July riots) and ended in <strong>2009</strong> when the Sri Lankan military defeated the LTTE. It lasted <strong>26 years</strong>, killing 70,000–100,000 people and displacing millions.' },
+  { cat:'sl', q:'What policies led to Tamil alienation in Sri Lanka?', hint:'Four main policies', a:'1. <strong>Sinhala Only Act (1956)</strong> — excluded Tamil from official use<br>2. University <strong>admission quotas</strong> favouring Sinhala<br>3. Government jobs <strong>dominated by Sinhalese</strong><br>4. <strong>Buddhism</strong> made the state religion, marginalising Hindu/Christian Tamils<br>→ Tamils felt systematically excluded from political and economic life.' },
+  { cat:'sl', q:'What is a civil war?', hint:'Internal armed conflict', a:'A <strong>civil war</strong> is an armed conflict between the government and a section of its own citizens, or between two groups within a country. Sri Lanka\'s civil war (1983–2009) between the state and LTTE is the chapter\'s key example.' },
+  { cat:'sl', q:'What is the key lesson from Sri Lanka\'s experience?', hint:'Majoritarianism\'s consequences', a:'Majoritarianism creates alienation in minorities → leads to political demands being ignored → escalates to armed conflict → civil war → destruction for ALL, including the majority.<br><strong>Lesson:</strong> A country that does not accommodate minorities will face internal conflict and instability.' },
+
+  // ── WHY SHARE POWER ──
+  { cat:'why', q:'What are the two kinds of reasons for power sharing?', hint:'Prudential and Moral', a:'1. <strong>Prudential reasons</strong> — based on practical wisdom; power sharing reduces conflict and ensures stability, benefiting everyone including the majority.<br>2. <strong>Moral reasons</strong> — based on principle; power sharing is the spirit of democracy; all citizens have an equal right to participate in governance.' },
+  { cat:'why', q:'Explain the prudential reasons for power sharing.', hint:'Practical, outcome-based', a:'<strong>Prudential = practical wisdom</strong>:<br>• Prevents violent social conflict<br>• Maintains political stability<br>• Enables economic development<br>• Even the majority benefits from minority goodwill and cooperation<br>• Civil wars are extremely costly — Sri Lanka\'s 26-year war destroyed its economy<br>So even if you don\'t believe in it morally, sharing power is the smart thing to do.' },
+  { cat:'why', q:'Explain the moral reasons for power sharing.', hint:'Principle-based, regardless of outcomes', a:'<strong>Moral = based on right and wrong</strong>:<br>• Democracy = rule by ALL the people, not just 50%+1<br>• Every citizen has a right to be consulted on matters affecting them<br>• Majoritarianism = tyranny of the majority = NOT democratic in spirit<br>• Power sharing respects the <em>dignity</em> of all communities<br>It is intrinsically right — not just because it produces good outcomes.' },
+  { cat:'why', q:'What is the difference between prudential and moral reasons for power sharing?', hint:'Outcome vs principle', a:'<strong>Prudential</strong>: sharing power is desirable because of its good <em>outcomes</em> (stability, peace, development). You share power because it works.<br><strong>Moral</strong>: sharing power is desirable on <em>principle</em> — it is right regardless of outcomes. It is the spirit of democracy itself.' },
+  { cat:'why', q:'Why does power sharing reduce the chance of conflict?', hint:'Inclusion vs exclusion', a:'When all groups feel included and represented, they have no reason to rebel. Their interests are heard through legitimate political channels.<br>When power is concentrated in one group, others feel excluded and turn to protests, movements, or armed conflict.<br>Power sharing = inclusion = peace. Exclusion = resentment = conflict.' },
+  { cat:'why', q:'Give three examples of countries where power sharing maintained social peace.', hint:'NI, Lebanon, India', a:'1. <strong>Northern Ireland</strong> (UK): power-sharing between Catholic and Protestant communities ended decades of violence<br>2. <strong>Lebanon</strong>: constitution requires President = Christian, PM = Sunni, Speaker = Shia<br>3. <strong>India</strong>: reserved constituencies for SC/ST ensure their voice in Parliament<br>4. <strong>Belgium</strong>: constitutional power sharing prevented civil war' },
+  { cat:'why', q:'Why is power sharing considered the "spirit of democracy"?', hint:'What democracy truly means', a:'Democracy literally means "rule by the people" — ALL the people, not just the majority. True democracy requires that every citizen can participate in governance and have their interests protected.<br>Power sharing makes democracy real and meaningful for all citizens, not just the numerically dominant community.' },
+
+  // ── FOUR FORMS ──
+  { cat:'forms', q:'What is horizontal distribution of power? Give an example.', hint:'Same level, different organs', a:'<strong>Horizontal distribution</strong> = power shared among the three organs of government — Legislature, Executive, Judiciary — at the same level, so each can check the others.<br>Example: India\'s Supreme Court can strike down unconstitutional laws (judicial review); Parliament cannot deliver verdicts; President cannot make laws.' },
+  { cat:'forms', q:'What are the three organs of government in horizontal power sharing?', hint:'LEJ', a:'1. <strong>Legislature</strong> — makes laws (Parliament, State Assemblies)<br>2. <strong>Executive</strong> — implements laws (Cabinet, PM/CM, bureaucracy)<br>3. <strong>Judiciary</strong> — interprets laws and checks constitutionality (Supreme Court, High Courts)<br>This separation of powers prevents any single organ from becoming all-powerful.' },
+  { cat:'forms', q:'What is vertical distribution of power?', hint:'Different levels of government', a:'<strong>Vertical distribution</strong> = power shared between central government and state/regional governments, and further to local bodies — this is <strong>federalism</strong>.<br>India: Union List (97 subjects), State List (66 subjects), Concurrent List (47 subjects).<br>Also includes Panchayati Raj (73rd Amendment) and Municipalities (74th Amendment, 1992).' },
+  { cat:'forms', q:'What is federalism?', hint:'Central + State division of powers', a:'<strong>Federalism</strong> = a political system in which powers are divided between a central authority and constituent unit governments (states), each with its own jurisdiction.<br>Examples: India (Centre + 28 States + 8 UTs), Belgium, USA, Australia, Germany.<br>Higher and lower levels each govern separately in their own spheres.' },
+  { cat:'forms', q:'What is decentralisation?', hint:'Power to local bodies', a:'<strong>Decentralisation</strong> = transfer of power from the central or state government to local bodies (Panchayats, Municipalities) to bring governance closer to citizens.<br>India: <strong>73rd Amendment (1992)</strong> — Panchayati Raj institutions; <strong>74th Amendment (1992)</strong> — Urban Local Bodies (Municipalities).<br>At least 1/3 of seats reserved for women.' },
+  { cat:'forms', q:'What is power sharing among social groups? Give examples.', hint:'Minorities, reservations', a:'Power sharing with religious, linguistic, and minority communities through reservations and rights.<br>India examples:<br>• <strong>Reserved seats</strong> for SC/ST in Parliament and State Assemblies<br>• <strong>1/3 reservation</strong> for women in Panchayats<br>• Minority right to run own educational institutions<br>Belgium: equal French/Dutch cabinet representation<br>Lebanon: religious community quotas for top offices' },
+  { cat:'forms', q:'What is power sharing among political parties and movements?', hint:'Multi-party, coalitions, pressure groups', a:'Power shared through:<br>• <strong>Multi-party system</strong> — multiple parties compete; no monopoly<br>• <strong>Coalition government</strong> — two or more parties share power (India since 1989)<br>• <strong>Pressure groups</strong> — trade unions, farmers\' bodies influence decisions<br>• <strong>Civil society movements</strong> — raise issues, keep government accountable<br>• <strong>Free media</strong> — 4th estate; checks government power' },
+  { cat:'forms', q:'What is a coalition government?', hint:'Two or more parties', a:'A <strong>coalition government</strong> is formed when two or more political parties agree to cooperate and share power — usually when no single party wins a majority.<br>This is power sharing in practice — different parties with different social bases must negotiate and compromise.<br>Example: Most Indian governments since 1989 (NDA, UPA alliances) have been coalitions.' },
+  { cat:'forms', q:'What is the principle of "checks and balances"?', hint:'Each organ limits the others', a:'<strong>Checks and balances</strong> = each organ of government has powers that can limit the other two:<br>• Legislature makes laws but judiciary can declare them unconstitutional<br>• Executive implements policy but legislature controls the budget<br>• Judiciary interprets laws but cannot initiate legislation<br>This prevents any single organ from accumulating too much power — it is horizontal power sharing.' },
+
+  // ── KEY TERMS ──
+  { cat:'key', q:'Define: Ethnic group', hint:'Cultural, not racial', a:'An <strong>ethnic group</strong> is a social group with a common cultural tradition, history, language, or religion. The term refers to cultural identity, NOT racial identity.<br>Examples: Flemish and Walloons in Belgium (language-based); Sinhala and Tamils in Sri Lanka (language + religion + history).' },
+  { cat:'key', q:'Define: Majoritarianism', hint:'Majority imposes its will', a:'<strong>Majoritarianism</strong> = the belief that the majority community should be able to rule a country in whatever way it wants, disregarding the wishes and interests of the minority.<br>It is the opposite of power sharing. It leads to minority alienation, resentment, and ultimately civil conflict.<br>Example: Sri Lanka\'s Sinhala-only language policy.' },
+  { cat:'key', q:'Define: Civil war', hint:'Internal armed conflict', a:'A <strong>civil war</strong> is an armed conflict between the government (or state) and a section of its own people, or between two groups within a country over political power or territory.<br>Example: Sri Lanka civil war (1983–2009) — LTTE vs Sri Lankan military.' },
+  { cat:'key', q:'What is the difference between "majority rule" and "majoritarianism"?', hint:'One is democratic, one is not', a:'<strong>Majority rule</strong>: In a democracy, decisions are made by the majority — this is normal and necessary.<br><strong>Majoritarianism</strong>: The majority uses its dominance to oppress or marginalise minorities — this is <em>not</em> democratic.<br>True democracy allows majority to govern while <em>protecting minority rights</em>. Majoritarianism ignores those protections.' },
+  { cat:'key', q:'What does "accommodation" mean in the context of power sharing?', hint:'Belgium\'s approach', a:'<strong>Accommodation</strong> = recognising and accepting the interests of different ethnic, linguistic, or religious communities and making constitutional arrangements to ensure all feel included in governance.<br>Belgium is the model — Dutch, French, and German communities all have representation at every level of government.' },
+  { cat:'key', q:'What is the "tyranny of the majority"?', hint:'When 50%+1 oppresses the rest', a:'<strong>Tyranny of the majority</strong> = when the numerically dominant group uses democratic elections to gain power and then uses that power to suppress, exclude, or harm minority groups.<br>It appears democratic on the surface (majority voted for it) but violates democratic principles (protection of rights for all).<br>Sri Lanka is the textbook example.' },
+  { cat:'key', q:'Why are power sharing arrangements sometimes complex? Is complexity a problem?', hint:'Think of Belgium', a:'Power sharing can be complex because different communities have different interests that must all be accommodated. Belgium\'s three-tier system is complex but it works.<br>Complexity is <strong>not</strong> a problem if it maintains peace and includes everyone. The alternative — a simple majority-rule system that excludes minorities — creates far worse problems (civil war, instability).<br>Complexity = accommodation = peace.' },
+];
+
+let deck=[...CARDS], filterCat='all', current=0;
+const knownSet=new Set();
+
+function setFilter(cat){
+  filterCat=cat;
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelector('.f-'+cat).classList.add('on');
+  deck=cat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===cat);
+  current=0;
+  document.getElementById('fcWrap').classList.remove('flipped');
+  render();
+}
+
+function render(){
+  if(!deck.length)return;
+  const c=deck[current];
+  document.getElementById('fcTag').textContent=({bel:'🇧🇪 Belgium',sl:'🇱🇰 Sri Lanka',why:'💡 Why Share Power',forms:'🏛️ Four Forms',key:'📖 Key Terms'}[c.cat]||c.cat);
+  document.getElementById('fcTag').className='fc-tag tag-'+c.cat;
+  document.getElementById('fcQ').textContent=c.q;
+  document.getElementById('fcHint').textContent=c.hint?'Hint: '+c.hint:'';
+  document.getElementById('fcAns').innerHTML=c.a;
+  const kb=document.getElementById('knownBadge');
+  const idx=CARDS.indexOf(c);
+  kb.textContent=knownSet.has(idx)?'✓ Known':'';
+  kb.className='known-badge '+(knownSet.has(idx)?'known':'unknown');
+  if(!knownSet.has(idx))kb.textContent='';
+  document.getElementById('cardCtr').textContent=(current+1)+' / '+deck.length;
+  const total=filterCat==='all'?CARDS.length:deck.length;
+  const known=filterCat==='all'?knownSet.size:[...knownSet].filter(i=>CARDS[i]&&CARDS[i].cat===filterCat).length;
+  document.getElementById('progFill').style.width=(known/total*100)+'%';
+  document.getElementById('progText').textContent=known+' / '+total+' known';
+  document.querySelector('nav.filters .f-btn').textContent;
+}
+
+function go(dir){
+  document.getElementById('fcWrap').classList.remove('flipped');
+  setTimeout(()=>{current=(current+dir+deck.length)%deck.length;render();},120);
+}
+function flipCard(){ document.getElementById('fcWrap').classList.toggle('flipped'); }
+function markKnown(){
+  const idx=CARDS.indexOf(deck[current]);
+  if(knownSet.has(idx))knownSet.delete(idx); else knownSet.add(idx);
+  render();
+}
+function shuffleDeck(){
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  current=0; document.getElementById('fcWrap').classList.remove('flipped'); render();
+}
+function resetKnown(){ knownSet.clear(); render(); }
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='l')go(1);
+  if(e.key==='ArrowLeft'||e.key==='h')go(-1);
+  if(e.key===' '){e.preventDefault();flipCard();}
+  if(e.key==='k'||e.key==='K')markKnown();
+});
+
+render();
+</script>
+</body>
+</html>

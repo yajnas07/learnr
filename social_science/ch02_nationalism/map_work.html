@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Work — Nationalism in India · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0a04;--card:#1a1208;--card2:#241a0c;--border:#3a2e1a;--text:#f5e6c8;--muted:#7a6a4a;
+  --gold:#f5c842;--amber:#fbbf24;--blue:#60a5fa;--red:#f87171;--green:#4ade80;--teal:#34d399;--purple:#a78bfa;--pink:#f472b6;--orange:#fb923c;--cyan:#38bdf8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.2rem;background:rgba(14,10,4,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem;transition:all .2s}
+.site-nav a.back:hover{color:var(--gold);border-color:var(--gold)}
+header{text-align:center;padding:1.4rem 1rem .8rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3.5vw,1.8rem);font-weight:900;color:var(--gold)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+.wrap{max-width:960px;margin:0 auto;padding:0 1rem 3rem}
+.mode-bar{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem}
+.mode-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;padding:.45rem 1.2rem;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.mode-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.08)}
+.map-area{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;aspect-ratio:6/7;max-height:630px;margin:0 auto;max-width:540px}
+.map-area svg{width:100%;height:100%;display:block}
+.pin{cursor:pointer;transition:all .2s}
+.pin circle{transition:all .2s}
+.pin:hover circle{r:7;filter:drop-shadow(0 0 8px currentColor)}
+.pin text{font-family:'DM Mono',monospace;font-size:12px;fill:var(--text);pointer-events:none;opacity:0;transition:opacity .2s}
+.pin:hover text{opacity:1}
+.pin.highlight circle{animation:ping 1s ease infinite}
+@keyframes ping{0%,100%{r:5;opacity:1}50%{r:10;opacity:.5}}
+.info-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:1rem;min-height:80px}
+.info-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.info-desc{font-size:.84rem;color:var(--muted);line-height:1.65}
+.info-desc strong{color:var(--text)}
+.quiz-bar{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:1rem;flex-wrap:wrap}
+.quiz-q{flex:1;font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;min-width:200px}
+.quiz-score{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.quiz-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:4px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s}
+.quiz-btn:hover{border-color:var(--gold);color:var(--gold)}
+.feedback-flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;pointer-events:none;opacity:0;transition:opacity .3s;z-index:10;text-shadow:0 0 20px #000}
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+#indiaBase{filter:invert(1) opacity(0.75)}
+/* Dandi march route */
+.route{stroke-dasharray:4 3;animation:dash 20s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-200}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-nationalism">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Map Work — Nationalism in India</h1>
+  <p>Class X · History Ch.2 · CBSE Board Map Work · Interactive</p>
+</header>
+<div class="wrap">
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('learn')">📖 Learn Mode</button>
+    <button class="mode-btn" onclick="setMode('test')">✍️ Test Yourself</button>
+  </div>
+  <div class="map-area" id="mapArea">
+    <div class="feedback-flash" id="fbFlash"></div>
+    <svg viewBox="0 0 666.67 777.33" id="mapSvg">
+      <!-- Full India map loaded from downloaded SVG file -->
+      <image id="indiaBase" href="India_outline.svg" x="0" y="0" width="666.67" height="777.33"/>
+      <!-- Dandi March Route (animated dashed line): Sabarmati→Dandi -->
+      <line x1="115" y1="385" x2="78" y2="425" class="route" stroke="#f5c842" stroke-width="2" opacity=".7"/>
+    </svg>
+  </div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#f5c842"></div>Satyagraha Sites</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f87171"></div>Massacre/Revolt</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#60a5fa"></div>Congress Sessions</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#4ade80"></div>Movements</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#a78bfa"></div>Tribal/Peasant</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><span style="font-style:italic">--- Dandi March</span></div>
+  </div>
+  <div class="info-panel" id="infoPanel">
+    <div class="info-title" id="infoTitle">Click any pin on the map to learn about it</div>
+    <div class="info-desc" id="infoDesc">In <strong>Learn Mode</strong>, click pins to see historical details. In <strong>Test Mode</strong>, locate places on the map. <strong>CBSE Board</strong> typically asks 2–3 map questions from Indian National Movement.</div>
+  </div>
+  <div class="quiz-bar" id="quizBar" style="display:none">
+    <div class="quiz-q" id="quizQ">Loading...</div>
+    <div class="quiz-score" id="quizScore">0/0</div>
+    <button class="quiz-btn" onclick="skipQ()">Skip →</button>
+  </div>
+</div>
+
+<script>
+const PLACES = [
+  // Satyagrahas
+  { id:'champaran', x:378, y:278, color:'#f5c842', label:'Champaran',
+    info:'<strong>Champaran, Bihar (1917)</strong> — Gandhi\'s <strong>first Satyagraha in India</strong>. Indigo planters were forced by European planters to grow indigo under the oppressive <em>tinkathia</em> system. Gandhi went to Champaran, investigated conditions, and the government was forced to set up a commission. The planters agreed to give refunds. This established Satyagraha as an effective method of struggle.' },
+  { id:'kheda', x:120, y:410, color:'#f5c842', label:'Kheda',
+    info:'<strong>Kheda, Gujarat (1917)</strong> — Peasants could not pay revenue due to crop failure. Gandhi launched a Satyagraha demanding revenue suspension. The government relented and instructed that revenue should only be collected from those who could afford it. <strong>Vallabhbhai Patel</strong> played a key role in organising peasants.' },
+  { id:'ahmedabad', x:115, y:385, color:'#f5c842', label:'Ahmedabad',
+    info:'<strong>Ahmedabad Mill Strike, Gujarat (1918)</strong> — Gandhi intervened in a dispute between cotton mill workers and owners over the plague bonus. He went on a <strong>fast</strong> — his first — to support the workers. The mill owners agreed to a 35% wage increase. This was significant as Gandhi used fasting as a weapon of Satyagraha for the first time.' },
+  { id:'sabarmati', x:118, y:385, color:'#f5c842', label:'Sabarmati',
+    info:'<strong>Sabarmati Ashram, Ahmedabad</strong> — Gandhi\'s ashram and the <strong>starting point of the Dandi March (12 March 1930)</strong>. Gandhi and 78 followers began the 385 km march to Dandi to break the salt law. The march took 24 days and was a defining moment of the Civil Disobedience Movement.' },
+  { id:'dandi', x:78, y:425, color:'#f5c842', label:'Dandi',
+    info:'<strong>Dandi, Gujarat (6 April 1930)</strong> — <strong>End point of the Salt March</strong>. Gandhi picked up a fistful of salt, symbolically breaking the British salt law. This launched the <strong>Civil Disobedience Movement</strong> across India. People began manufacturing salt illegally, boycotting foreign cloth, and refusing to pay taxes. The British responded with repression.' },
+  // Massacre/Revolt
+  { id:'amritsar', x:190, y:148, color:'#f87171', label:'Amritsar',
+    info:'<strong>Jallianwala Bagh Massacre, Amritsar (13 April 1919)</strong> — General Dyer ordered troops to fire on a peaceful gathering in Jallianwala Bagh. <strong>Hundreds killed, over 1000 wounded.</strong> People had assembled to protest the Rowlatt Act. This massacre turned millions of Indians against British rule. Rabindranath Tagore returned his knighthood in protest.' },
+  { id:'chauri_chaura', x:345, y:278, color:'#f87171', label:'Chauri Chaura',
+    info:'<strong>Chauri Chaura, Gorakhpur, UP (February 1922)</strong> — A violent incident where a mob set fire to a police station, killing 22 policemen. <strong>Gandhi called off the Non-Cooperation Movement</strong> after this, saying the movement had become violent and people were not ready for mass struggle. This decision was controversial — many leaders like Subhas Chandra Bose and Jawaharlal Nehru were critical.' },
+  // Congress Sessions
+  { id:'calcutta', x:470, y:390, color:'#60a5fa', label:'Calcutta',
+    info:'<strong>Calcutta (Kolkata)</strong> — Site of the <strong>Congress Session (1920)</strong> where the <strong>Non-Cooperation Movement</strong> was approved. Key decisions: boycott of British institutions, courts, legislatures, schools; promotion of khadi, hand-spinning; surrender of government titles. Also the hub of the Swadeshi Movement (1905) during the anti-Partition agitation.' },
+  { id:'nagpur', x:257, y:393, color:'#60a5fa', label:'Nagpur',
+    info:'<strong>Nagpur Congress Session (December 1920)</strong> — The Non-Cooperation programme was formally adopted here. The Congress also reorganised itself — <strong>provincial Congress committees</strong> were set up on linguistic lines. A hierarchy of committees was established from village to provincial level to make the movement more organised. Membership fee reduced to 4 annas to make Congress a mass organisation.' },
+  { id:'madras', x:285, y:585, color:'#60a5fa', label:'Madras',
+    info:'<strong>Madras (Chennai)</strong> — Important centre of Indian nationalism. The <strong>Justice Party</strong> and non-Brahmin movements were active here. Many plantation workers participated in the Non-Cooperation Movement — they left plantations in Assam and tried to return home. Congress sessions were also held here at various times.' },
+  { id:'lahore', x:155, y:140, color:'#60a5fa', label:'Lahore',
+    info:'<strong>Lahore Congress Session (December 1929)</strong> — Under president <strong>Jawaharlal Nehru</strong>, the Congress declared <strong>Purna Swaraj (Complete Independence)</strong> as its goal. <strong>26 January 1930</strong> was celebrated as Independence Day across India. This session set the stage for the Civil Disobedience Movement and the Dandi March.' },
+  // Movements
+  { id:'bombay', x:120, y:465, color:'#4ade80', label:'Bombay',
+    info:'<strong>Bombay (Mumbai)</strong> — Major centre of Indian nationalism. <strong>Quit India Movement launched here (8 August 1942)</strong> at the Gowalia Tank Maidan (now August Kranti Maidan). Gandhi gave the call "Do or Die". Also the hub of textile mill workers, trade unions, and the 1908 trial of Bal Gangadhar Tilak which led to a major workers\' strike.' },
+  { id:'delhi', x:232, y:205, color:'#4ade80', label:'Delhi',
+    info:'<strong>Delhi</strong> — Capital of British India (shifted from Calcutta in 1911). Centre of political power. Many demonstrations, hartals, and protests took place here. Significant during the Khilafat and Non-Cooperation Movements. Later, the Quit India Movement saw mass protests in Delhi. Became the capital of independent India in 1947.' },
+  // Tribal/Peasant
+  { id:'gudem', x:315, y:469, color:'#a78bfa', label:'Gudem Hills',
+    info:'<strong>Gudem Hills, Andhra Pradesh</strong> — <strong>Alluri Sitarama Raju</strong> led a militant guerrilla movement (1922–24) against the British. Tribal people were angry because the colonial government restricted their access to forests under the 1882 Forest Act. Raju was inspired by the Non-Cooperation Movement but used armed resistance. He was captured and executed in 1924.' },
+  { id:'awadh', x:300, y:262, color:'#a78bfa', label:'Awadh',
+    info:'<strong>Awadh (Oudh), UP</strong> — <strong>Baba Ramchandra</strong> led the peasant movement here (1920–21). Peasants (many of them from the Pasi community) were suffering under <em>talukdars</em> and landlords — high rents, begar (forced labour). They demanded reduction of revenue, abolition of begar, and boycott of landlords. The movement sometimes went beyond Congress\'s limits — houses of talukdars were attacked.' },
+  { id:'midnapore', x:452, y:323, color:'#a78bfa', label:'Midnapore',
+    info:'<strong>Midnapore, Bengal</strong> — During the Civil Disobedience Movement, a <strong>forest Satyagraha</strong> was organised. Tribal people violated forest laws as an act of defiance against British restrictions on forest use. Also significant during the Quit India Movement (1942) when parallel governments (<em>tamluk jatiya sarkar</em>) were set up in parts of Midnapore.' },
+  { id:'peshawar', x:108, y:100, color:'#4ade80', label:'Peshawar',
+    info:'<strong>Peshawar (NWFP)</strong> — <strong>Khan Abdul Ghaffar Khan</strong> (Frontier Gandhi) founded the <strong>Khudai Khidmatgar (Servants of God)</strong> movement — a Pashtun non-violent resistance movement. During the Civil Disobedience Movement, British troops refused to fire on unarmed protestors in Peshawar. Ghaffar Khan was closely associated with Congress and Gandhian non-violence.' },
+];
+
+let mode='learn', quizIdx=0, quizOrder=[], score=0, total=0;
+const svg=document.getElementById('mapSvg');
+
+function buildPins(){
+  PLACES.forEach(p=>{
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('pin'); g.id='pin-'+p.id;
+    g.innerHTML=`<circle cx="${p.x}" cy="${p.y}" r="5" fill="${p.color}" stroke="#000" stroke-width="1"/>
+      <text x="${p.x}" y="${p.y-9}" text-anchor="middle" fill="${p.color}">${p.label}</text>`;
+    g.addEventListener('click',()=>handleClick(p));
+    svg.appendChild(g);
+  });
+}
+
+function handleClick(place){
+  if(mode==='learn'){
+    document.getElementById('infoTitle').innerHTML=`📍 ${place.label}`;
+    document.getElementById('infoDesc').innerHTML=place.info;
+    document.querySelectorAll('.pin circle').forEach(c=>c.setAttribute('stroke-width','1'));
+    document.querySelector('#pin-'+place.id+' circle').setAttribute('stroke-width','3');
+  } else { checkAnswer(place); }
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.mode-btn:${m==='learn'?'first':'last'}-child`).classList.add('active');
+  document.getElementById('infoPanel').style.display=m==='learn'?'block':'none';
+  document.getElementById('quizBar').style.display=m==='test'?'flex':'none';
+  document.querySelectorAll('.pin text').forEach(t=>t.style.opacity=m==='learn'?'':'0');
+  if(m==='test'){ score=0;total=0;quizOrder=[...Array(PLACES.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function showQuestion(){
+  if(quizIdx>=quizOrder.length){ quizIdx=0;quizOrder.sort(()=>Math.random()-.5); }
+  const p=PLACES[quizOrder[quizIdx]];
+  document.getElementById('quizQ').innerHTML=`📍 Click on: <strong>${p.label}</strong>`;
+  document.getElementById('quizScore').textContent=`${score}/${total}`;
+  document.querySelectorAll('.pin').forEach(g=>g.classList.remove('highlight'));
+  document.querySelectorAll('.pin text').forEach(t=>{t.style.opacity='0';});
+}
+
+function checkAnswer(place){
+  const expected=PLACES[quizOrder[quizIdx]]; total++;
+  const flash=document.getElementById('fbFlash');
+  if(place.id===expected.id){ score++;flash.textContent='✓';flash.style.color='#4ade80'; }
+  else{ flash.textContent='✗';flash.style.color='#f87171';
+    document.querySelector('#pin-'+expected.id)?.classList.add('highlight');
+    setTimeout(()=>document.querySelector('#pin-'+expected.id)?.classList.remove('highlight'),1500);
+  }
+  flash.style.opacity='1'; setTimeout(()=>{flash.style.opacity='0';},800);
+  quizIdx++; setTimeout(showQuestion,1000);
+}
+
+function skipQ(){ quizIdx++; showQuestion(); }
+
+buildPins();
+</script>
+</body>
+</html>

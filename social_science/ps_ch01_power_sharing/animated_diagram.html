@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Power Sharing · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080612; --card:#0e0a1e; --card2:#140f26;
+  --border:#1e1640; --text:#e2d9f3; --muted:#4a3a7a;
+  --ps:#7c3aed; --indigo:#818cf8; --violet:#a78bfa;
+  --blue:#60a5fa; --green:#4ade80; --amber:#fbbf24;
+  --red:#f87171; --teal:#34d399; --pink:#f472b6; --cyan:#38bdf8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+.top-nav{display:flex;align-items:center;gap:16px;padding:10px 22px;background:rgba(8,6,18,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:27px}
+.nav-bc{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.nav-bc a{color:var(--muted);text-decoration:none}.nav-bc a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-cur{color:var(--violet);font-weight:700}
+.nav-back{margin-left:auto;padding:5px 13px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:18px;color:var(--violet);font-size:.78rem;text-decoration:none;transition:all .2s}
+.nav-back:hover{background:rgba(124,58,237,.2)}
+
+.page-hdr{padding:28px 20px 16px;text-align:center}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.85rem;color:#fff;margin-bottom:5px}
+.page-hdr p{color:var(--muted);font-size:.9rem}
+.ch-badge{display:inline-block;padding:3px 10px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.35);border-radius:12px;color:var(--violet);font-size:.73rem;font-weight:700;margin-bottom:8px}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 56px}
+
+/* TABS */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:7px 16px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.tab.active{border-color:var(--violet);background:rgba(124,58,237,.1);color:var(--violet);font-weight:700}
+
+/* PANELS */
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.panel-title{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;color:var(--text)}
+.panel-body{padding:18px}
+
+/* INFO BOX */
+.ibox{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:12px}
+.ibox strong{color:var(--text)}
+.kw{color:var(--violet);font-weight:700}
+
+/* COMPARISON TABLE */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.83rem}
+.cmp-table th{padding:9px 12px;background:rgba(124,58,237,.1);border:1px solid var(--border);font-weight:700;text-align:center}
+.cmp-table th:first-child{background:rgba(255,255,255,.03);color:var(--muted);text-align:left}
+.cmp-table td{padding:9px 12px;border:1px solid rgba(30,22,64,.5);vertical-align:top;line-height:1.55}
+.cmp-table tr:hover td{background:rgba(124,58,237,.04)}
+.th-bel{color:var(--blue)}
+.th-sl{color:var(--red)}
+
+/* FORMS OF POWER SHARING */
+.forms-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:580px){.forms-grid{grid-template-columns:1fr}}
+.form-card{border-radius:12px;padding:16px;border:1px solid var(--border);position:relative;overflow:hidden;cursor:pointer;transition:all .25s}
+.form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.form-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.form-card h3{font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:4px}
+.form-card .form-num{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:8px}
+.form-card p{font-size:.8rem;color:var(--muted);line-height:1.6}
+.form-card .form-eg{font-size:.75rem;margin-top:8px;padding:.3rem .6rem;border-radius:6px;display:inline-block}
+.fc-h{border-color:#60a5fa44;background:rgba(96,165,250,.05)}
+.fc-h::before{background:var(--blue)}
+.fc-h h3{color:var(--blue)}
+.fc-h .form-eg{background:rgba(96,165,250,.1);color:var(--blue)}
+.fc-v{border-color:#4ade8044;background:rgba(74,222,128,.05)}
+.fc-v::before{background:var(--green)}
+.fc-v h3{color:var(--green)}
+.fc-v .form-eg{background:rgba(74,222,128,.1);color:var(--green)}
+.fc-s{border-color:#f4728044;background:rgba(244,114,182,.05)}
+.fc-s::before{background:var(--pink)}
+.fc-s h3{color:var(--pink)}
+.fc-s .form-eg{background:rgba(244,114,182,.1);color:var(--pink)}
+.fc-p{border-color:#fbbf2444;background:rgba(251,191,36,.05)}
+.fc-p::before{background:var(--amber)}
+.fc-p h3{color:var(--amber)}
+.fc-p .form-eg{background:rgba(251,191,36,.1);color:var(--amber)}
+
+/* TIMELINE */
+.tl-wrap{position:relative;padding-left:32px;margin-bottom:8px}
+.tl-wrap::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-dot{position:absolute;left:-27px;top:4px;width:14px;height:14px;border-radius:50%;border:2px solid;background:var(--card)}
+.tl-year{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:3px}
+.tl-title{font-weight:700;font-size:.88rem;margin-bottom:3px}
+.tl-desc{font-size:.8rem;color:var(--muted);line-height:1.6}
+
+/* BELGIUM MODEL DIAGRAM */
+.bel-model{display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0}
+.bel-level{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
+.bel-box{border-radius:10px;padding:12px 16px;text-align:center;border:1px solid;min-width:130px;flex:1;max-width:200px}
+.bel-box h4{font-size:.82rem;font-weight:700;margin-bottom:4px}
+.bel-box p{font-size:.72rem;line-height:1.5}
+.bel-arrow{font-size:1.4rem;color:var(--muted)}
+
+/* KEY CONCEPTS */
+.concepts-list{display:flex;flex-direction:column;gap:10px}
+.concept-row{display:flex;gap:12px;align-items:flex-start;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px}
+.concept-term{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;min-width:160px;flex-shrink:0;padding-top:2px}
+.concept-def{font-size:.82rem;color:var(--muted);line-height:1.65}
+.concept-eg{font-size:.75rem;margin-top:4px;color:var(--teal)}
+@media(max-width:500px){.concept-row{flex-direction:column;gap:6px}.concept-term{min-width:unset}}
+
+/* CTRL ROW */
+.ctrl-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.ctrl-btn{padding:6px 14px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.8rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.ctrl-btn.active,.ctrl-btn:hover{border-color:var(--violet);color:var(--violet);background:rgba(124,58,237,.08)}
+
+/* MAJORITY-O-METER */
+.meter-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+@media(max-width:520px){.meter-wrap{grid-template-columns:1fr}}
+.country-panel{border-radius:12px;padding:16px;border:1px solid var(--border);text-align:center}
+.country-flag{font-size:2.4rem;margin-bottom:8px}
+.country-name{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:10px}
+.pop-bar{display:flex;height:28px;border-radius:6px;overflow:hidden;margin-bottom:8px;border:1px solid var(--border)}
+.pop-seg{display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;font-family:'DM Mono',monospace;transition:width 1s ease;color:#000}
+.pop-legend{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:.7rem;color:var(--muted)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a class="nav-logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <div class="nav-bc">
+    <a href="../../index.html">Home</a><span class="nav-sep">/</span>
+    <a href="../../index.html#civics">Civics</a><span class="nav-sep">/</span>
+    <a href="../../index.html#ch-power">Ch.1 Power Sharing</a><span class="nav-sep">/</span>
+    <span class="nav-cur">Animated Diagrams</span>
+  </div>
+  <a class="nav-back" href="../../index.html#ch-power">&#8592; Back</a>
+</nav>
+
+<div class="page-hdr">
+  <div class="ch-badge">Civics · Ch.1</div>
+  <h1>Power Sharing</h1>
+  <p>Interactive diagrams · Click tabs to explore</p>
+</div>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(0)">🌍 Belgium vs Sri Lanka</button>
+    <button class="tab" onclick="switchTab(1)">🏛️ Four Forms</button>
+    <button class="tab" onclick="switchTab(2)">🕐 Sri Lanka Timeline</button>
+    <button class="tab" onclick="switchTab(3)">🇧🇪 Belgium Model</button>
+    <button class="tab" onclick="switchTab(4)">💡 Key Concepts</button>
+  </div>
+
+  <!-- TAB 0: Belgium vs Sri Lanka -->
+  <div class="panel active" id="t0">
+
+    <div class="panel-card">
+      <div class="panel-title">🌍 Ethnic Composition — Belgium &amp; Sri Lanka</div>
+      <div class="panel-body">
+        <div class="meter-wrap">
+          <div class="country-panel" style="border-color:#60a5fa44">
+            <div class="country-flag">🇧🇪</div>
+            <div class="country-name" style="color:var(--blue)">Belgium</div>
+            <div class="pop-bar" id="barBel"></div>
+            <div class="pop-legend" id="legBel"></div>
+          </div>
+          <div class="country-panel" style="border-color:#f8717144">
+            <div class="country-flag">🇱🇰</div>
+            <div class="country-name" style="color:var(--red)">Sri Lanka</div>
+            <div class="pop-bar" id="barSL"></div>
+            <div class="pop-legend" id="legSL"></div>
+          </div>
+        </div>
+        <div class="ibox">
+          <strong>Why These Two Countries?</strong><br>
+          Both Belgium and Sri Lanka are examples of ethnically diverse nations that responded to diversity in <em>very different ways</em>. Belgium chose <span class="kw">accommodation</span> — sharing power carefully through constitutional arrangements. Sri Lanka chose <span class="kw">majoritarianism</span> — letting the Sinhala majority impose its will. The outcomes were completely different: Belgium is today a peaceful federal democracy and HQ of the EU; Sri Lanka suffered 26 years of brutal civil war.
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-title">⚖️ Belgium vs Sri Lanka — Side-by-Side Comparison</div>
+      <div class="panel-body">
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th class="th-bel">🇧🇪 Belgium</th>
+              <th class="th-sl">🇱🇰 Sri Lanka</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Key majority group</strong></td>
+              <td>Dutch-speaking Flemish (59%)</td>
+              <td>Sinhala Buddhists (74%)</td>
+            </tr>
+            <tr>
+              <td><strong>Key minority group</strong></td>
+              <td>French-speaking Walloons (40%)</td>
+              <td>Tamil Hindus (18%)</td>
+            </tr>
+            <tr>
+              <td><strong>Majority's response to tension</strong></td>
+              <td style="color:var(--green)">Accommodation — power sharing agreements</td>
+              <td style="color:var(--red)">Majoritarianism — Sinhala-only policies</td>
+            </tr>
+            <tr>
+              <td><strong>Language policy</strong></td>
+              <td>Both Dutch &amp; French equal; German recognised. Brussels bilingual.</td>
+              <td>1956: Sinhala declared only official language; Tamil excluded</td>
+            </tr>
+            <tr>
+              <td><strong>Government type achieved</strong></td>
+              <td>Federal state with 3 tiers — central, regional, community governments</td>
+              <td>Unitary state with Sinhala dominance in all institutions</td>
+            </tr>
+            <tr>
+              <td><strong>Cabinet composition</strong></td>
+              <td>Equal Dutch &amp; French ministers by constitution</td>
+              <td>Dominated by Sinhala leaders</td>
+            </tr>
+            <tr>
+              <td><strong>Outcome</strong></td>
+              <td style="color:var(--green)">Peaceful coexistence; HQ of EU; economic prosperity</td>
+              <td style="color:var(--red)">Civil war 1983–2009; LTTE separatism; massive destruction</td>
+            </tr>
+            <tr>
+              <td><strong>Key lesson</strong></td>
+              <td>Power sharing prevents conflict even when communities disagree</td>
+              <td>Majoritarianism creates alienation, resentment, and armed conflict</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: Four Forms of Power Sharing -->
+  <div class="panel" id="t1">
+    <div class="panel-card">
+      <div class="panel-title">🏛️ Four Forms of Power Sharing</div>
+      <div class="panel-body">
+        <div class="forms-grid">
+          <div class="form-card fc-h">
+            <div class="form-num">FORM 1 · HORIZONTAL</div>
+            <h3>Among Organs of Government</h3>
+            <p>Power shared between the legislature, executive, and judiciary — the three organs of government at the <em>same level</em>. Each organ can check and balance the others.</p>
+            <span class="form-eg">⚖️ India: Supreme Court can strike down Parliament's laws (judicial review)</span>
+          </div>
+          <div class="form-card fc-v">
+            <div class="form-num">FORM 2 · VERTICAL</div>
+            <h3>Among Different Levels</h3>
+            <p>Power shared between central government, state governments, and local bodies. This is <em>federalism</em> — higher and lower levels each have their own jurisdiction.</p>
+            <span class="form-eg">🗺️ India: Centre (Union List), States (State List), Both (Concurrent List)</span>
+          </div>
+          <div class="form-card fc-s">
+            <div class="form-num">FORM 3 · SOCIAL GROUPS</div>
+            <h3>Among Social Communities</h3>
+            <p>Power shared with religious, linguistic, and other minority communities — through reservation, minority rights, and community representation.</p>
+            <span class="form-eg">🫂 India: Reserved SC/ST seats in Parliament; Belgium: Equal cabinet representation</span>
+          </div>
+          <div class="form-card fc-p">
+            <div class="form-num">FORM 4 · POLITICAL PARTIES</div>
+            <h3>Among Parties &amp; Movements</h3>
+            <p>Multi-party competition prevents monopoly. Coalition governments share power between parties. Pressure groups and movements also influence decisions.</p>
+            <span class="form-eg">🗳️ India: Coalition governments since 1989; trade unions, student groups</span>
+          </div>
+        </div>
+        <div class="ibox">
+          <strong>All four forms serve the same purpose:</strong> preventing dangerous concentration of power.<br><br>
+          <strong>Horizontal</strong> → <span class="kw">checks and balances</span> within government<br>
+          <strong>Vertical</strong> → <span class="kw">federalism</span> / decentralisation<br>
+          <strong>Social Groups</strong> → <span class="kw">inclusive governance</span> / minority rights<br>
+          <strong>Political Parties</strong> → <span class="kw">competition</span> / coalition / civil society
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-title">📊 Power Sharing in India — Examples by Form</div>
+      <div class="panel-body">
+        <table class="cmp-table">
+          <thead><tr><th>Form</th><th>Constitutional Provision</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--blue)"><strong>Horizontal</strong></td><td>Arts 50, 76, 124–147</td><td>Separation of legislature, executive, judiciary; President cannot legislate; courts can strike down unconstitutional laws</td></tr>
+            <tr><td style="color:var(--green)"><strong>Vertical</strong></td><td>7th Schedule; Arts 245–254</td><td>Union List (97), State List (66), Concurrent List (47); states govern education, health, agriculture independently</td></tr>
+            <tr><td style="color:var(--pink)"><strong>Social</strong></td><td>Arts 330, 332, 243D</td><td>Reserved seats for SC/ST in Lok Sabha &amp; State Assemblies; 1/3 reservation for women in Panchayats; Minority Commission</td></tr>
+            <tr><td style="color:var(--amber)"><strong>Political</strong></td><td>Art 19(1)(c), 19(1)(a)</td><td>Freedom to form parties and associations; free press; Right to Information Act; coalition governments</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Sri Lanka Timeline -->
+  <div class="panel" id="t2">
+    <div class="panel-card">
+      <div class="panel-title">🕐 Sri Lanka — Majority to Majoritarianism to Civil War</div>
+      <div class="panel-body">
+        <div class="tl-wrap">
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--cyan);background:#000a14"></div>
+            <div class="tl-year">1948</div>
+            <div class="tl-title" style="color:var(--cyan)">Independence from Britain</div>
+            <div class="tl-desc">Sri Lanka (Ceylon) gains independence. Sinhala community forms the first government. Initial promises of equality for all ethnic groups.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--amber);background:#100a00"></div>
+            <div class="tl-year">1956</div>
+            <div class="tl-title" style="color:var(--amber)">Sinhala Only Act</div>
+            <div class="tl-desc">Parliament passes the <strong>Official Language Act</strong> — declares Sinhala the only official language, replacing English. Tamil-speaking people (11% + 7% Indian Tamil) effectively barred from government jobs and higher education that required Sinhala proficiency.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--amber);background:#100a00"></div>
+            <div class="tl-year">1960s–70s</div>
+            <div class="tl-title" style="color:var(--amber)">Systematic Discrimination</div>
+            <div class="tl-desc">University admission quotas favour Sinhala students. Government employment overwhelmingly Sinhala. State patronage to Buddhism — Hindu and Christian Tamil culture marginalised. Tamils demand a federal system first, then a separate state.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--red);background:#1a0808"></div>
+            <div class="tl-year">1976</div>
+            <div class="tl-title" style="color:var(--red)">LTTE Founded</div>
+            <div class="tl-desc"><strong>Liberation Tigers of Tamil Eelam (LTTE)</strong> founded. Demands independent Tamil homeland "Eelam" in the north and east. Moves from political protest to armed militancy.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--red);background:#1a0808"></div>
+            <div class="tl-year">1983</div>
+            <div class="tl-title" style="color:var(--red)">Civil War Begins</div>
+            <div class="tl-desc">Anti-Tamil riots (Black July) — hundreds of Tamils killed by Sinhala mobs. Full-scale civil war erupts between LTTE and Sri Lankan armed forces. Thousands killed, millions displaced over the next 26 years.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--red);background:#1a0808"></div>
+            <div class="tl-year">1991</div>
+            <div class="tl-title" style="color:var(--red)">LTTE Assassinates Rajiv Gandhi</div>
+            <div class="tl-desc">Indian PM Rajiv Gandhi killed by an LTTE suicide bomber in Sriperumbudur, Tamil Nadu. India had earlier intervened to broker peace. LTTE designated a terrorist organisation by India, US, and EU.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--green);background:#001a0e"></div>
+            <div class="tl-year">2009</div>
+            <div class="tl-title" style="color:var(--green)">Civil War Ends</div>
+            <div class="tl-desc">Sri Lankan military defeats LTTE in a final offensive. LTTE leader Prabhakaran killed. Civil war ends after 26 years. Estimated 70,000–100,000 dead. Country now rebuilding but Tamil political rights still contested.</div>
+          </div>
+        </div>
+        <div class="ibox">
+          <strong>The Chain of Majoritarianism:</strong><br>
+          Majority wins election → uses power for own community → <span class="kw">discriminatory laws</span> → minority alienated → political demands ignored → <span class="kw">armed conflict</span> → civil war → destruction for ALL.<br><br>
+          <strong>Key insight:</strong> Majoritarianism harms not just the minority — it ultimately destroys the majority's own prosperity too.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Belgium Constitutional Model -->
+  <div class="panel" id="t3">
+    <div class="panel-card">
+      <div class="panel-title">🇧🇪 Belgium — Power Sharing Structure</div>
+      <div class="panel-body">
+        <div class="bel-model">
+
+          <div class="bel-level">
+            <div class="bel-box" style="border-color:#a78bfa88;background:rgba(167,139,250,.06);max-width:360px">
+              <h4 style="color:var(--violet)">🏛️ Central (Federal) Government</h4>
+              <p style="color:var(--muted)">Has equal numbers of Dutch and French-speaking ministers by constitutional law. Neither community can dominate the other at the central level. Handles national defence, foreign affairs, finance.</p>
+            </div>
+          </div>
+
+          <div class="bel-arrow">↕</div>
+
+          <div class="bel-level">
+            <div class="bel-box" style="border-color:#60a5fa66;background:rgba(96,165,250,.06)">
+              <h4 style="color:var(--blue)">🗺️ Regional Governments</h4>
+              <p style="color:var(--muted)">Flanders (Dutch, north), Wallonia (French, south), Brussels (bilingual). Each region has its own elected assembly and government. Handle: economic development, agriculture, trade.</p>
+            </div>
+            <div class="bel-box" style="border-color:#34d39966;background:rgba(52,211,153,.06)">
+              <h4 style="color:var(--teal)">👥 Community Governments</h4>
+              <p style="color:var(--muted)">Elected by people of each linguistic community regardless of region. Dutch, French, and German communities. Handle: cultural affairs, education, language issues — not geography-based.</p>
+            </div>
+            <div class="bel-box" style="border-color:#f8717166;background:rgba(248,113,113,.06)">
+              <h4 style="color:var(--red)">🏙️ Brussels (Special)</h4>
+              <p style="color:var(--muted)">Capital city, bilingual. Has own separate government with equal representation of Dutch and French-speaking people — even though it lies within Flanders region.</p>
+            </div>
+          </div>
+
+        </div>
+        <div class="ibox" style="margin-top:14px">
+          <strong>Why is Belgium's model unique?</strong><br>
+          Most countries share power geographically (like India's states). Belgium also shares power by <span class="kw">community</span> — based on language — regardless of where you live. A Dutch-speaker in Brussels participates in the Dutch community government; a French-speaker there participates in the French community government.<br><br>
+          This is called <span class="kw">consociationalism</span> — power sharing among distinct communities to prevent majority dominance.<br><br>
+          <strong>Result:</strong> Belgium avoided the kind of ethnic conflict that tore apart Yugoslavia (which had a similar multi-ethnic problem and did NOT share power).
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-title">📅 Timeline of Belgian Constitutional Amendments (1970–1993)</div>
+      <div class="panel-body">
+        <div class="tl-wrap">
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--blue);background:#080c1e"></div>
+            <div class="tl-year">1970</div>
+            <div class="tl-title" style="color:var(--blue)">First Amendment — Equal Cabinet Representation</div>
+            <div class="tl-desc">Constitution amended to require equal numbers of French and Dutch-speaking ministers in the central (federal) cabinet. PM is the only exception — (s)he need not be bilingual.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--violet);background:#0d0824"></div>
+            <div class="tl-year">1980</div>
+            <div class="tl-title" style="color:var(--violet)">Second Amendment — Regional Councils</div>
+            <div class="tl-desc">Regional governments established for Flanders and Wallonia with their own directly elected councils and executives. Power devolved from centre to regions for economic and local matters.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--teal);background:#001a0e"></div>
+            <div class="tl-year">1989</div>
+            <div class="tl-title" style="color:var(--teal)">Third Amendment — Brussels Region</div>
+            <div class="tl-desc">Brussels given its own regional government — with equal representation of both communities — making it neither simply Flemish nor Walloon. Brussels officially becomes the third region.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:var(--green);background:#001a0e"></div>
+            <div class="tl-year">1993</div>
+            <div class="tl-title" style="color:var(--green)">Fourth Amendment — Federal Constitution</div>
+            <div class="tl-desc">Belgium formally declared a <strong>federal state</strong>. Three levels clearly defined: federal, regional, community governments each with own powers and budgets. The transformation from unitary to federal state complete.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: Key Concepts -->
+  <div class="panel" id="t4">
+    <div class="panel-card">
+      <div class="panel-title">💡 Key Concepts &amp; Definitions</div>
+      <div class="panel-body">
+        <div class="concepts-list">
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--violet)">Power Sharing</div>
+            <div class="concept-def">
+              A system of distributing political power among different organs, levels, and communities so that no single person or group can monopolise power.
+              <div class="concept-eg">→ The very spirit of democracy; takes many different forms.</div>
+            </div>
+          </div>
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--red)">Majoritarianism</div>
+            <div class="concept-def">
+              The belief that the majority community should be able to rule a country in whatever way it wants, disregarding the wishes and interests of the minority.
+              <div class="concept-eg">→ Sri Lanka's Sinhala-only policy is the classic example. Leads to alienation and conflict.</div>
+            </div>
+          </div>
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--blue)">Ethnic Group</div>
+            <div class="concept-def">
+              A social group with a common cultural tradition, history, language, or religion. The term refers to cultural identity, not race.
+              <div class="concept-eg">→ Flemish &amp; Walloons (Belgium), Sinhala &amp; Tamils (Sri Lanka), Pashtun &amp; Hazara (Afghanistan).</div>
+            </div>
+          </div>
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--red)">Civil War</div>
+            <div class="concept-def">
+              An armed conflict between the government and a group of its own citizens, or between two groups within a country over political power.
+              <div class="concept-eg">→ Sri Lanka civil war (1983–2009). LTTE vs Sri Lankan state. 70,000+ dead.</div>
+            </div>
+          </div>
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--teal)">Prudential Reasons</div>
+            <div class="concept-def">
+              Arguments based on practical wisdom and desirable outcomes — not on moral principles. Power sharing is prudent because it prevents conflict and promotes stability, even if one doesn't believe in it morally.
+              <div class="concept-eg">→ "Even the majority benefits from power sharing — civil war is costly for everyone."</div>
+            </div>
+          </div>
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--green)">Moral Reasons</div>
+            <div class="concept-def">
+              Arguments based on principles of right and wrong. Power sharing is morally right because democracy means all people have an equal right to participate in governance, regardless of numbers.
+              <div class="concept-eg">→ "It is intrinsically wrong to exclude any citizen from political participation."</div>
+            </div>
+          </div>
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--amber)">Coalition Government</div>
+            <div class="concept-def">
+              A government formed by two or more political parties that agree to cooperate and share power — usually when no single party wins a majority. This is power sharing among political parties.
+              <div class="concept-eg">→ Most Indian governments since 1989 have been coalitions (NDA, UPA).</div>
+            </div>
+          </div>
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--cyan)">Federalism</div>
+            <div class="concept-def">
+              A political system in which powers and functions are divided between the central government and constituent unit governments (states/provinces), each with its own jurisdiction.
+              <div class="concept-eg">→ India (centre + 28 states + 8 UTs), Belgium (federal + regional + community governments).</div>
+            </div>
+          </div>
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--pink)">Decentralisation</div>
+            <div class="concept-def">
+              The transfer of power and resources from the central/state government to local bodies (Panchayats, Municipalities) to bring governance closer to ordinary citizens.
+              <div class="concept-eg">→ India's 73rd &amp; 74th Amendments (1992): Panchayati Raj and Urban Local Bodies.</div>
+            </div>
+          </div>
+
+          <div class="concept-row">
+            <div class="concept-term" style="color:var(--violet)">Checks &amp; Balances</div>
+            <div class="concept-def">
+              A system of horizontal power sharing where each organ of government (legislature, executive, judiciary) has the power to limit the actions of the other two.
+              <div class="concept-eg">→ Indian judiciary's power of judicial review; President cannot make laws; Parliament cannot deliver verdicts.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-title">📝 Why Power Sharing is Desirable — Summary</div>
+      <div class="panel-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.2);border-radius:10px;padding:14px">
+            <div style="color:var(--teal);font-weight:700;font-size:.9rem;margin-bottom:8px">🧠 Prudential Reasons</div>
+            <ul style="font-size:.8rem;color:var(--muted);line-height:1.8;padding-left:16px">
+              <li>Reduces possibility of conflict</li>
+              <li>Maintains social peace &amp; stability</li>
+              <li>Enables economic development</li>
+              <li>Majority also benefits from minority goodwill</li>
+              <li>Civil war is devastating for everyone</li>
+            </ul>
+          </div>
+          <div style="background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:14px">
+            <div style="color:var(--green);font-weight:700;font-size:.9rem;margin-bottom:8px">⚖️ Moral Reasons</div>
+            <ul style="font-size:.8rem;color:var(--muted);line-height:1.8;padding-left:16px">
+              <li>Democracy = rule by ALL the people</li>
+              <li>Every citizen has right to participate</li>
+              <li>Respects dignity of all communities</li>
+              <li>Majoritarianism = tyranny = anti-democratic</li>
+              <li>Power sharing is the spirit of democracy</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+function switchTab(i){
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',i===j));
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));
+  if(i===0) buildBars();
+}
+
+// Population bars
+const belGroups=[
+  {label:'Dutch (Flemish)',pct:59,color:'#60a5fa'},
+  {label:'French (Walloon)',pct:40,color:'#f87171'},
+  {label:'German',pct:1,color:'#fbbf24'},
+];
+const slGroups=[
+  {label:'Sinhala',pct:74,color:'#818cf8'},
+  {label:'Sri Lankan Tamil',pct:11,color:'#f97316'},
+  {label:'Indian Tamil',pct:7,color:'#fbbf24'},
+  {label:'Moors (Muslim)',pct:7,color:'#34d399'},
+  {label:'Others',pct:1,color:'#94a3b8'},
+];
+
+function buildBars(){
+  const barBel=document.getElementById('barBel');
+  const barSL=document.getElementById('barSL');
+  const legBel=document.getElementById('legBel');
+  const legSL=document.getElementById('legSL');
+  if(barBel.innerHTML) return; // already built
+
+  barBel.innerHTML = belGroups.map(g=>`<div class="pop-seg" style="width:${g.pct}%;background:${g.color}">${g.pct}%</div>`).join('');
+  barSL.innerHTML = slGroups.map(g=>`<div class="pop-seg" style="width:${g.pct}%;background:${g.color}">${g.pct>3?g.pct+'%':''}</div>`).join('');
+  legBel.innerHTML = belGroups.map(g=>`<div class="leg-item"><div class="leg-dot" style="background:${g.color}"></div>${g.label} ${g.pct}%</div>`).join('');
+  legSL.innerHTML = slGroups.map(g=>`<div class="leg-item"><div class="leg-dot" style="background:${g.color}"></div>${g.label} ${g.pct}%</div>`).join('');
+}
+
+buildBars();
+</script>
+</body>
+</html>

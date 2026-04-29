@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Work — Power Sharing · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080612;--card:#0e0a1e;--card2:#140f26;--border:#1e1640;--text:#e2d9f3;--muted:#4a3a7a;
+  --ps:#7c3aed;--violet:#a78bfa;--indigo:#818cf8;--blue:#60a5fa;--pink:#f472b6;--cyan:#38bdf8;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--orange:#fb923c;--teal:#34d399}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.2rem;background:rgba(8,6,18,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem;transition:all .2s}
+.site-nav a.back:hover{color:var(--violet);border-color:var(--violet)}
+header{text-align:center;padding:1.4rem 1rem .8rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3.5vw,1.8rem);font-weight:900;color:var(--violet)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+.wrap{max-width:960px;margin:0 auto;padding:0 1rem 3rem}
+.mode-bar{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem}
+.mode-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;padding:.45rem 1.2rem;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.mode-btn.active{border-color:var(--ps);color:var(--violet);background:rgba(124,58,237,.08)}
+.tab-bar{display:flex;gap:.4rem;justify-content:center;margin-bottom:1rem}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .9rem;border-radius:99px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tab-btn.active{border-color:var(--ps);color:var(--violet);background:rgba(124,58,237,.08)}
+.maps-row{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.map-area{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;flex:1;min-width:280px;max-width:420px}
+.map-area svg{width:100%;height:100%;display:block}
+.map-label{position:absolute;top:.5rem;left:50%;transform:translateX(-50%);font-family:'Playfair Display',serif;font-weight:700;font-size:.85rem;color:var(--violet);background:rgba(14,10,30,.85);padding:.2rem .7rem;border-radius:4px;z-index:2;white-space:nowrap}
+.region{cursor:pointer;transition:all .2s}
+.region:hover{filter:brightness(1.3);stroke-width:2}
+.region text{font-family:'DM Mono',monospace;pointer-events:none;transition:opacity .2s}
+.pin{cursor:pointer;transition:all .2s}
+.pin circle{transition:all .2s}
+.pin:hover circle{r:6;filter:drop-shadow(0 0 8px currentColor)}
+.pin text{font-family:'DM Mono',monospace;font-size:14px;pointer-events:none;opacity:0;transition:opacity .2s}
+.pin:hover text{opacity:1}
+.pin.highlight circle{animation:ping 1s ease infinite}
+@keyframes ping{0%,100%{r:4;opacity:1}50%{r:8;opacity:.5}}
+.info-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:1rem;min-height:80px}
+.info-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.info-desc{font-size:.84rem;color:var(--muted);line-height:1.65}
+.info-desc strong{color:var(--text)}
+.quiz-bar{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:1rem;flex-wrap:wrap}
+.quiz-q{flex:1;font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;min-width:200px}
+.quiz-score{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.quiz-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:4px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s}
+.quiz-btn:hover{border-color:var(--ps);color:var(--violet)}
+.feedback-flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;pointer-events:none;opacity:0;transition:opacity .3s;z-index:10;text-shadow:0 0 20px #000}
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-power">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Map Work — Power Sharing</h1>
+  <p>Class X · Civics Ch.1 · CBSE Board Map Work · Interactive</p>
+</header>
+<div class="wrap">
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('learn')">📖 Learn Mode</button>
+    <button class="mode-btn" onclick="setMode('test')">✍️ Test Yourself</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="setTab('belgium')">🇧🇪 Belgium</button>
+    <button class="tab-btn" onclick="setTab('srilanka')">🇱🇰 Sri Lanka</button>
+  </div>
+  <div class="maps-row">
+    <div class="map-area" id="mapArea">
+      <div class="map-label" id="mapLabel">Belgium</div>
+      <div class="feedback-flash" id="fbFlash"></div>
+      <svg viewBox="0 0 400 450" id="mapSvg"></svg>
+    </div>
+  </div>
+  <div class="legend" id="legendArea"></div>
+  <div class="info-panel" id="infoPanel">
+    <div class="info-title" id="infoTitle">Click any region or pin to learn</div>
+    <div class="info-desc" id="infoDesc">Explore the <strong>linguistic regions</strong> of Belgium and Sri Lanka — key to understanding why power sharing is needed. CBSE may ask you to identify regions and their linguistic/ethnic composition.</div>
+  </div>
+  <div class="quiz-bar" id="quizBar" style="display:none">
+    <div class="quiz-q" id="quizQ">Loading...</div>
+    <div class="quiz-score" id="quizScore">0/0</div>
+    <button class="quiz-btn" onclick="skipQ()">Skip →</button>
+  </div>
+</div>
+
+<script>
+const MAPS = {
+  belgium: {
+    label:'Belgium',
+    legend:[
+      {color:'#fbbf24',name:'Flanders (Dutch 59%)'},{color:'#60a5fa',name:'Wallonia (French 40%)'},
+      {color:'#4ade80',name:'Brussels (Bilingual)'},{color:'#a78bfa',name:'German-speaking (<1%)'}
+    ],
+    svg:`
+      <!-- Belgium simplified -->
+      <rect x="20" y="20" width="360" height="410" rx="14" fill="#0e0a1e" stroke="#1e1640" stroke-width="1"/>
+      <!-- Country outline -->
+      <path d="M80,80 L160,60 L240,70 L320,80 L330,120 L340,180 L320,240 L300,280 L260,320 L200,350 L140,330 L100,290 L80,240 L70,180 L70,120 Z"
+            fill="none" stroke="#3a2860" stroke-width="2"/>
+      <!-- Flanders (North) -->
+      <path d="M80,80 L160,60 L240,70 L320,80 L330,120 L320,160 L260,170 L200,175 L140,170 L80,160 L70,120 Z"
+            fill="rgba(251,191,36,.15)" stroke="#fbbf24" stroke-width="1.5" class="region" data-id="flanders"/>
+      <!-- Wallonia (South) -->
+      <path d="M80,160 L140,170 L200,175 L260,170 L320,160 L340,180 L320,240 L300,280 L260,320 L200,350 L140,330 L100,290 L80,240 L70,180 Z"
+            fill="rgba(96,165,250,.15)" stroke="#60a5fa" stroke-width="1.5" class="region" data-id="wallonia"/>
+      <!-- Brussels (circle in middle) -->
+      <circle cx="200" cy="155" r="18" fill="rgba(74,222,128,.2)" stroke="#4ade80" stroke-width="2" class="region" data-id="brussels"/>
+      <!-- German-speaking (small east) -->
+      <path d="M310,180 L340,180 L330,220 L310,210 Z"
+            fill="rgba(167,139,250,.15)" stroke="#a78bfa" stroke-width="1.5" class="region" data-id="german"/>
+      <!-- Labels -->
+      <text x="190" y="125" font-family="'Playfair Display',serif" font-size="16" font-weight="700" fill="#fbbf24" text-anchor="middle">FLANDERS</text>
+      <text x="190" y="142" font-family="'DM Mono',monospace" font-size="9" fill="#b8952a" text-anchor="middle">Dutch-speaking · 59%</text>
+      <text x="200" y="260" font-family="'Playfair Display',serif" font-size="16" font-weight="700" fill="#60a5fa" text-anchor="middle">WALLONIA</text>
+      <text x="200" y="277" font-family="'DM Mono',monospace" font-size="9" fill="#4a80c8" text-anchor="middle">French-speaking · 40%</text>
+      <text x="200" y="160" font-family="'DM Mono',monospace" font-size="8" fill="#4ade80" text-anchor="middle">Brussels</text>
+      <text x="332" y="200" font-family="'DM Mono',monospace" font-size="7" fill="#a78bfa" text-anchor="middle">DE</text>
+      <!-- North Sea label -->
+      <text x="90" y="75" font-family="'DM Mono',monospace" font-size="8" fill="#4a3a7a" font-style="italic">North Sea</text>
+      <!-- Borders -->
+      <text x="180" y="50" font-family="'DM Mono',monospace" font-size="7" fill="#4a3a7a">Netherlands →</text>
+      <text x="340" y="260" font-family="'DM Mono',monospace" font-size="7" fill="#4a3a7a">Lux.</text>
+      <text x="200" y="380" font-family="'DM Mono',monospace" font-size="7" fill="#4a3a7a">← France →</text>
+      <text x="350" y="140" font-family="'DM Mono',monospace" font-size="7" fill="#4a3a7a">Germany</text>
+    `,
+    places:[
+      { id:'flanders', x:190, y:115, color:'#fbbf24', label:'Flanders',
+        info:'<strong>Flanders (Northern Belgium)</strong> — Home to the <strong>Dutch-speaking (Flemish) community — 59%</strong> of Belgium\'s population. Historically poorer than Wallonia, but became economically prosperous after WWII. The Flemish community felt disadvantaged politically despite being the majority. Their demand for equality led to the <strong>Belgian model of power sharing</strong> — a federal structure with community governments.' },
+      { id:'wallonia', x:200, y:250, color:'#60a5fa', label:'Wallonia',
+        info:'<strong>Wallonia (Southern Belgium)</strong> — Home to the <strong>French-speaking community — 40%</strong> of Belgium\'s population. Was historically wealthier and more powerful (French was the elite language). The French community was a minority overall but was <strong>rich and powerful</strong>. The tension between Dutch-speaking majority and French-speaking minority was the key conflict that required power sharing.' },
+      { id:'brussels', x:200, y:155, color:'#4ade80', label:'Brussels',
+        info:'<strong>Brussels (Capital)</strong> — A <strong>bilingual capital</strong> with both Dutch and French speakers. <strong>80% French-speaking, 20% Dutch-speaking</strong>. Despite being in the Flemish region, Brussels is majority French-speaking — a unique complication. The Brussels government has <strong>equal representation</strong> for both communities. This is a key example of how power sharing works at the city level in the Belgian model.' },
+      { id:'german', x:325, y:195, color:'#a78bfa', label:'German Community',
+        info:'<strong>German-speaking Community (Eastern Belgium)</strong> — A small community (less than 1%) near the German border. Despite being tiny, they have their own <strong>Community Government</strong> with authority over education and cultural matters. This shows Belgium\'s commitment to accommodating ALL linguistic groups — no matter how small. An example of how true power sharing protects minorities.' },
+    ]
+  },
+  srilanka: {
+    label:'Sri Lanka',
+    legend:[
+      {color:'#fb923c',name:'Sinhala Majority (74%)'},{color:'#38bdf8',name:'Tamil Regions'},
+      {color:'#f472b6',name:'Key Cities'},{color:'#f87171',name:'Conflict Zones'}
+    ],
+    svg:`
+      <rect x="20" y="20" width="360" height="410" rx="14" fill="#0e0a1e" stroke="#1e1640" stroke-width="1"/>
+      <!-- Sri Lanka outline -->
+      <path d="M160,70 L200,55 L250,60 L280,80 L290,120 L300,170 L290,220 L275,270 L250,310 L220,350
+               L200,380 L185,370 L170,340 L155,300 L140,260 L130,220 L125,180 L130,140 L140,100 Z"
+            fill="none" stroke="#3a2860" stroke-width="2"/>
+      <!-- Sinhala regions (south & central) -->
+      <path d="M140,200 L200,190 L275,200 L290,220 L275,270 L250,310 L220,350 L200,380 L185,370 L170,340
+               L155,300 L140,260 L130,220 Z"
+            fill="rgba(251,146,60,.12)" stroke="#fb923c" stroke-width="1.5" class="region" data-id="sinhala"/>
+      <!-- Tamil North -->
+      <path d="M160,70 L200,55 L250,60 L265,75 L255,100 L230,120 L200,130 L170,120 L155,100 L140,100 Z"
+            fill="rgba(56,189,248,.12)" stroke="#38bdf8" stroke-width="1.5" class="region" data-id="north"/>
+      <!-- Tamil East -->
+      <path d="M255,100 L280,80 L290,120 L300,170 L290,200 L275,200 L260,180 L250,150 L248,120 Z"
+            fill="rgba(56,189,248,.12)" stroke="#38bdf8" stroke-width="1.5" class="region" data-id="east"/>
+      <!-- Central highlands -->
+      <path d="M170,170 L210,165 L240,175 L235,200 L210,210 L175,205 L160,190 Z"
+            fill="rgba(167,139,250,.08)" stroke="#a78bfa" stroke-width="1" class="region" data-id="central"/>
+      <!-- Labels -->
+      <text x="215" y="290" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#fb923c" text-anchor="middle">SINHALA</text>
+      <text x="215" y="305" font-family="'DM Mono',monospace" font-size="8" fill="#b86a3a" text-anchor="middle">Buddhist · 74%</text>
+      <text x="200" y="95" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#38bdf8" text-anchor="middle">TAMIL NORTH</text>
+      <text x="285" y="155" font-family="'DM Mono',monospace" font-size="8" fill="#2a8ab8" text-anchor="middle" transform="rotate(70,285,155)">Tamil East</text>
+      <text x="205" y="190" font-family="'DM Mono',monospace" font-size="7" fill="#a78bfa" text-anchor="middle">Central Highlands</text>
+      <!-- Indian Ocean -->
+      <text x="80" y="300" font-family="'DM Mono',monospace" font-size="8" fill="#4a3a7a" font-style="italic">Indian</text>
+      <text x="80" y="312" font-family="'DM Mono',monospace" font-size="8" fill="#4a3a7a" font-style="italic">Ocean</text>
+      <text x="180" y="50" font-family="'DM Mono',monospace" font-size="7" fill="#4a3a7a">← India (Palk Strait)</text>
+    `,
+    places:[
+      { id:'sinhala', x:215, y:280, color:'#fb923c', label:'Sinhala South',
+        info:'<strong>Sinhala-majority Regions (South & Central)</strong> — <strong>74% of Sri Lanka\'s population</strong> is Sinhala-speaking Buddhist. After independence (1948), the Sinhala community used its majority to dominate government. The <strong>1956 Act</strong> made Sinhala the only official language. Preferential policies in university admissions and government jobs favoured Sinhalas. This <strong>majoritarianism</strong> alienated the Tamil minority and led to civil war.' },
+      { id:'north', x:200, y:90, color:'#38bdf8', label:'Tamil North',
+        info:'<strong>Northern Province</strong> — <strong>Sri Lankan Tamil majority</strong>. The Tamil population (13%) is concentrated in the north and east. Tamils felt increasingly marginalised by Sinhala-majority policies. Demands for autonomy grew into a full <strong>civil war (1983–2009)</strong>. The LTTE (Liberation Tigers of Tamil Eelam) fought for an independent Tamil state called "Tamil Eelam". Tens of thousands killed.' },
+      { id:'east', x:280, y:150, color:'#38bdf8', label:'Tamil East',
+        info:'<strong>Eastern Province</strong> — Mixed population of <strong>Sri Lankan Tamils, Muslims, and Sinhalas</strong>. Also a contested region during the civil war. Indian Tamils (brought as plantation workers during colonial times) are concentrated in the central highlands — they are distinct from Sri Lankan Tamils. Together, Tamils make up about 18% of the population.' },
+      { id:'colombo', x:150, y:230, color:'#f472b6', label:'Colombo',
+        info:'<strong>Colombo (Capital)</strong> — Sri Lanka\'s political and economic centre. Seat of the central government. A cosmopolitan city with all communities, but politically dominated by the Sinhala majority. After the civil war ended (2009), reconciliation efforts have been slow. Sri Lanka\'s story is a <strong>cautionary tale</strong> of what happens when a majority community forces its dominance — the opposite of Belgium\'s accommodation model.' },
+      { id:'jaffna', x:195, y:68, color:'#f87171', label:'Jaffna',
+        info:'<strong>Jaffna</strong> — Cultural capital of Sri Lankan Tamils in the Northern Province. Was the de facto capital of the LTTE-controlled territory during the civil war. Heavily damaged during the conflict. Home to the University of Jaffna and historic Hindu temples. The <strong>Jaffna library burning (1981)</strong> by Sinhala mobs destroyed 97,000 books — a symbol of cultural destruction and ethnic tensions.' },
+      { id:'central', x:205, y:185, color:'#a78bfa', label:'Central Highlands',
+        info:'<strong>Central Highlands</strong> — Home to <strong>Indian Tamils</strong> (about 5% of population) — descendants of workers brought by the British to work on tea and coffee plantations. They are distinct from Sri Lankan Tamils. After independence, many were made stateless and denied citizenship. They faced double discrimination — from Sinhalas and even from Sri Lankan Tamils. Their situation highlights how power sharing must protect ALL minorities.' },
+    ]
+  }
+};
+
+let mode='learn', tab='belgium', quizIdx=0, quizOrder=[], score=0, total=0;
+const svg=document.getElementById('mapSvg');
+
+function setTab(t){
+  tab=t;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['belgium','srilanka'][i]===t));
+  document.getElementById('mapLabel').textContent=MAPS[t].label;
+  svg.innerHTML=MAPS[t].svg;
+  buildLegend();
+  buildPins();
+  // attach region click handlers
+  document.querySelectorAll('.region').forEach(r=>{
+    r.addEventListener('click',()=>{
+      const rid=r.dataset.id;
+      const place=MAPS[tab].places.find(p=>p.id===rid);
+      if(place) handleClick(place);
+    });
+  });
+  document.getElementById('infoTitle').textContent='Click any region or pin to learn';
+  document.getElementById('infoDesc').innerHTML=MAPS[t].places[0].info;
+  if(mode==='test'){ score=0;total=0;quizOrder=[...Array(MAPS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function buildLegend(){
+  document.getElementById('legendArea').innerHTML=MAPS[tab].legend.map(l=>`<div class="leg-item"><div class="leg-dot" style="background:${l.color}"></div>${l.name}</div>`).join('');
+}
+
+function buildPins(){
+  document.querySelectorAll('.pin').forEach(p=>p.remove());
+  MAPS[tab].places.forEach(p=>{
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('pin'); g.id='pin-'+p.id;
+    g.innerHTML=`<circle cx="${p.x}" cy="${p.y}" r="4" fill="${p.color}" stroke="#000" stroke-width="1"/>
+      <text x="${p.x}" y="${p.y-8}" text-anchor="middle" font-size="7" fill="${p.color}">${p.label}</text>`;
+    g.addEventListener('click',()=>handleClick(p));
+    svg.appendChild(g);
+  });
+}
+
+function handleClick(place){
+  if(mode==='learn'){
+    document.getElementById('infoTitle').innerHTML=`📍 ${place.label}`;
+    document.getElementById('infoDesc').innerHTML=place.info;
+    document.querySelectorAll('.pin circle').forEach(c=>c.setAttribute('stroke-width','1'));
+    const el=document.querySelector('#pin-'+place.id+' circle');
+    if(el) el.setAttribute('stroke-width','3');
+  } else { checkAnswer(place); }
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.mode-btn:${m==='learn'?'first':'last'}-child`).classList.add('active');
+  document.getElementById('infoPanel').style.display=m==='learn'?'block':'none';
+  document.getElementById('quizBar').style.display=m==='test'?'flex':'none';
+  if(m==='test'){ score=0;total=0;quizOrder=[...Array(MAPS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function showQuestion(){
+  const places=MAPS[tab].places;
+  if(quizIdx>=quizOrder.length){ quizIdx=0;quizOrder.sort(()=>Math.random()-.5); }
+  const p=places[quizOrder[quizIdx]];
+  document.getElementById('quizQ').innerHTML=`📍 Click on: <strong>${p.label}</strong>`;
+  document.getElementById('quizScore').textContent=`${score}/${total}`;
+  document.querySelectorAll('.pin').forEach(g=>g.classList.remove('highlight'));
+}
+
+function checkAnswer(place){
+  const places=MAPS[tab].places;
+  const expected=places[quizOrder[quizIdx]]; total++;
+  const flash=document.getElementById('fbFlash');
+  if(place.id===expected.id){ score++;flash.textContent='✓';flash.style.color='#4ade80'; }
+  else{ flash.textContent='✗';flash.style.color='#f87171';
+    document.querySelector('#pin-'+expected.id)?.classList.add('highlight');
+    setTimeout(()=>document.querySelector('#pin-'+expected.id)?.classList.remove('highlight'),1500);
+  }
+  flash.style.opacity='1'; setTimeout(()=>{flash.style.opacity='0';},800);
+  quizIdx++; setTimeout(showQuestion,1000);
+}
+
+function skipQ(){ quizIdx++; showQuestion(); }
+
+// Init
+setTab('belgium');
+</script>
+</body>
+</html>
