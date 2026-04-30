@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chemical Reactions & Equations — Class X Science</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #f97316; --amber: #f59e0b; --lime: #84cc16; --cyan: #22d3ee;
+    --purple: #a855f7; --red: #ef4444; --blue: #3b82f6; --green: #22c55e;
+    --bg: #0f172a; --card: #1e293b; --card2: #263148; --text: #e2e8f0;
+    --muted: #94a3b8; --border: #334155;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  /* ── site nav ── */
+  .site-nav { display:flex; align-items:center; justify-content:space-between; padding:.42rem 1.2rem; background:rgba(7,16,31,.95); backdrop-filter:blur(14px); border-bottom:1px solid rgba(26,45,69,.8); position:sticky; top:0; z-index:9999; }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; }
+  .site-nav-back { font-family:'DM Mono',monospace; font-size:.68rem; color:#7a9ab8; text-decoration:none; border:1px solid rgba(26,45,69,.9); border-radius:99px; padding:.2rem .65rem; }
+  .site-nav-back:hover { color:#dde6f5; }
+
+  /* ── header ── */
+  header { text-align:center; padding:2.5rem 1rem 1rem; position:relative; }
+  header::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(249,115,22,.15) 0%, transparent 70%); pointer-events:none; }
+  header h1 { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,5vw,3rem); font-weight:800; letter-spacing:-1px; background:linear-gradient(135deg,#f97316,#facc15,#22d3ee); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  header p { color:var(--muted); font-size:.95rem; margin-top:.4rem; font-family:'DM Mono',monospace; }
+
+  /* ── nav tabs ── */
+  nav.tabs { display:flex; justify-content:center; flex-wrap:wrap; gap:.5rem; padding:1.5rem 1rem .5rem; }
+  nav.tabs button { font-family:'Syne',sans-serif; font-weight:700; font-size:.82rem; padding:.5rem 1.2rem; border-radius:99px; border:2px solid var(--border); background:var(--card); color:var(--muted); cursor:pointer; transition:all .25s; }
+  nav.tabs button:hover { border-color:#64748b; color:var(--text); }
+  nav.tabs button.act-orange { border-color:var(--orange); color:var(--orange); background:rgba(249,115,22,.1); }
+  nav.tabs button.act-lime   { border-color:var(--lime);   color:var(--lime);   background:rgba(132,204,22,.1); }
+  nav.tabs button.act-blue   { border-color:var(--blue);   color:var(--blue);   background:rgba(59,130,246,.1); }
+  nav.tabs button.act-purple { border-color:var(--purple); color:var(--purple); background:rgba(168,85,247,.1); }
+  nav.tabs button.act-red    { border-color:var(--red);    color:var(--red);    background:rgba(239,68,68,.1); }
+  nav.tabs button.act-cyan   { border-color:var(--cyan);   color:var(--cyan);   background:rgba(34,211,238,.1); }
+
+  main { padding:1.5rem 1rem 4rem; max-width:900px; margin:0 auto; }
+  section { display:none; animation:fadeUp .4s ease; }
+  section.visible { display:block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  .sec-title { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; margin-bottom:.4rem; }
+  .sec-sub { color:var(--muted); font-family:'DM Mono',monospace; font-size:.8rem; margin-bottom:1.4rem; }
+
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+  .card { background:var(--card); border-radius:16px; padding:1.2rem; border:1px solid var(--border); transition:transform .2s,box-shadow .2s; }
+  .card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.4); }
+  .card-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
+  .card-body { font-size:.88rem; color:var(--muted); line-height:1.7; }
+  .card-body strong { color:var(--text); }
+  .equation { font-family:'DM Mono',monospace; background:var(--card2); border-radius:10px; padding:.7rem 1rem; font-size:.9rem; margin:.8rem 0; border-left:3px solid var(--orange); line-height:1.8; }
+
+  /* ── animation stage ── */
+  .stage { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.2rem; margin-bottom:1.5rem; }
+  .stage-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; margin-bottom:.8rem; display:flex; align-items:center; gap:.5rem; }
+  .stage canvas { width:100%; border-radius:10px; background:#0a1628; display:block; }
+  .stage-ctrl { display:flex; gap:.5rem; margin-top:.8rem; flex-wrap:wrap; }
+  .stage-btn { font-family:'Syne',sans-serif; font-weight:700; font-size:.75rem; padding:.35rem .9rem; border-radius:99px; border:1.5px solid var(--border); background:var(--card2); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .stage-btn:hover { border-color:#64748b; color:var(--text); }
+  .stage-btn.running { border-color:var(--orange); color:var(--orange); }
+
+  /* ── reaction table ── */
+  .rx-table { width:100%; border-collapse:collapse; font-size:.85rem; margin-top:1rem; }
+  .rx-table th { background:var(--card2); padding:.6rem .8rem; font-family:'Syne',sans-serif; font-size:.78rem; text-align:left; border-bottom:2px solid var(--border); }
+  .rx-table td { padding:.55rem .8rem; border-bottom:1px solid var(--border); font-family:'DM Mono',monospace; font-size:.78rem; line-height:1.6; }
+  .rx-table tr:hover td { background:rgba(255,255,255,.03); }
+
+  /* energy badge */
+  .badge { display:inline-block; font-family:'DM Mono',monospace; font-size:.7rem; padding:.15rem .55rem; border-radius:99px; font-weight:700; }
+  .badge-exo { background:rgba(239,68,68,.15); color:#f87171; border:1px solid rgba(239,68,68,.3); }
+  .badge-endo { background:rgba(59,130,246,.15); color:#93c5fd; border:1px solid rgba(59,130,246,.3); }
+
+  /* ── corrosion visual ── */
+  .rusting-demo { display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap; margin-top:1rem; }
+  .iron-bar { width:120px; height:40px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:.75rem; font-weight:700; transition:all 2s; }
+  .arrow-anim { font-size:1.5rem; color:var(--muted); }
+
+  /* Balancing exercise */
+  .balance-wrap { background:var(--card2); border-radius:12px; padding:1rem; margin-top:1rem; }
+  .balance-eq { font-family:'DM Mono',monospace; font-size:1rem; display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; margin-bottom:.8rem; }
+  .coeff-input { width:44px; height:32px; background:var(--card); border:1.5px solid var(--border); border-radius:6px; color:var(--text); font-family:'DM Mono',monospace; font-size:.95rem; text-align:center; }
+  .coeff-input:focus { outline:none; border-color:var(--orange); }
+  .check-btn { font-family:'Syne',sans-serif; font-weight:700; font-size:.8rem; padding:.4rem 1rem; border-radius:8px; border:none; background:var(--orange); color:#fff; cursor:pointer; }
+  .check-result { font-family:'DM Mono',monospace; font-size:.85rem; margin-top:.5rem; min-height:1.4rem; }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<header>
+  <h1>Chemical Reactions &amp; Equations</h1>
+  <p>Class X · CBSE Science Ch.1 · Interactive Diagrams</p>
+</header>
+
+<nav class="tabs">
+  <button onclick="show('intro','act-orange',this)" class="act-orange">⚗️ Intro</button>
+  <button onclick="show('combination','act-lime',this)">🔗 Combination</button>
+  <button onclick="show('decomposition','act-blue',this)">💥 Decomposition</button>
+  <button onclick="show('displacement','act-purple',this)">↔️ Displacement</button>
+  <button onclick="show('redox','act-red',this)">🔥 Redox</button>
+  <button onclick="show('balancing','act-cyan',this)">⚖️ Balancing</button>
+</nav>
+
+<main>
+
+<!-- ══════════════ INTRO ══════════════ -->
+<section id="intro" class="visible">
+  <div class="sec-title" style="color:var(--orange)">What is a Chemical Reaction?</div>
+  <div class="sec-sub">New substances with different properties are formed. Atoms rearrange — they are never created or destroyed.</div>
+
+  <div class="stage">
+    <div class="stage-title">🎬 Signs of a Chemical Reaction</div>
+    <canvas id="cvSigns" height="180"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn" id="btnSigns" onclick="toggleSigns()">▶ Play Animation</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-title" style="color:var(--orange)">📋 Writing Chemical Equations</div>
+      <div class="card-body">
+        <strong>Word equation:</strong> Magnesium + Oxygen → Magnesium oxide<br><br>
+        <strong>Symbolic (skeleton):</strong>
+        <div class="equation">Mg + O₂ → MgO</div>
+        <strong>Balanced equation:</strong>
+        <div class="equation">2Mg + O₂ → 2MgO</div>
+        Balancing ensures atoms of each element are equal on both sides — <strong>Law of Conservation of Mass</strong>.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--amber)">📌 State Symbols</div>
+      <div class="card-body">
+        Added in brackets to show physical state:<br><br>
+        <div class="equation">(s) = solid &nbsp; (l) = liquid<br>(g) = gas &nbsp; (aq) = aqueous</div>
+        <strong>Example:</strong>
+        <div class="equation">2H₂(g) + O₂(g) → 2H₂O(l)</div>
+        <strong>Gas evolved:</strong> ↑ &nbsp;&nbsp; <strong>Precipitate:</strong> ↓
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--lime)">⚡ Energy in Reactions</div>
+      <div class="card-body">
+        <span class="badge badge-exo">Exothermic</span> — Heat/light released<br>
+        Burning, respiration, neutralisation<br><br>
+        <span class="badge badge-endo">Endothermic</span> — Energy absorbed<br>
+        Photosynthesis, decomposition of CaCO₃<br><br>
+        <div class="equation">C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + Energy</div>
+      </div>
+    </div>
+  </div>
+
+  <table class="rx-table">
+    <thead><tr><th>Sign</th><th>Example</th><th>Observation</th></tr></thead>
+    <tbody>
+      <tr><td>Change in colour</td><td>2FeSO₄ → Fe₂O₃ + SO₂ + SO₃</td><td>Green → reddish brown</td></tr>
+      <tr><td>Gas evolved (↑)</td><td>Zn + H₂SO₄ → ZnSO₄ + H₂↑</td><td>Bubbles, pop sound with flame</td></tr>
+      <tr><td>Precipitate (↓)</td><td>Pb(NO₃)₂ + 2KI → PbI₂↓ + 2KNO₃</td><td>Yellow solid forms</td></tr>
+      <tr><td>Change in temp</td><td>CaO + H₂O → Ca(OH)₂</td><td>Gets very hot (exothermic)</td></tr>
+      <tr><td>Change in state</td><td>2Ag + S → Ag₂S</td><td>Silver tarnishes (solid product)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════════ COMBINATION ══════════════ -->
+<section id="combination">
+  <div class="sec-title" style="color:var(--lime)">🔗 Combination Reaction</div>
+  <div class="sec-sub">Two or more reactants combine → single product.&nbsp; A + B → AB</div>
+
+  <div class="stage">
+    <div class="stage-title">🎬 Magnesium Burns in Oxygen</div>
+    <canvas id="cvMgBurn" height="200"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn" id="btnMg" onclick="toggleMg()">▶ Ignite Magnesium</button>
+      <button class="stage-btn" onclick="resetMg()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-title" style="color:var(--lime)">Magnesium + Oxygen</div>
+      <div class="card-body">
+        <div class="equation">2Mg(s) + O₂(g) → 2MgO(s)</div>
+        <span class="badge badge-exo">Exothermic</span><br><br>
+        • Bright white flame<br>• White powder (MgO) formed<br>• Used in fireworks, photography<br>• MgO dissolves in water → Mg(OH)₂
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--lime)">Slaking of Lime</div>
+      <div class="card-body">
+        <div class="equation">CaO(s) + H₂O(l) → Ca(OH)₂(aq)</div>
+        <span class="badge badge-exo">Exothermic</span><br><br>
+        • Large amount of heat released<br>• CaO = quicklime; Ca(OH)₂ = slaked lime<br>• Used in construction, water treatment<br>• Turns red litmus blue (basic)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--lime)">Carbon Burns</div>
+      <div class="card-body">
+        <div class="equation">C(s) + O₂(g) → CO₂(g)</div>
+        <span class="badge badge-exo">Exothermic</span><br><br>
+        Incomplete combustion:
+        <div class="equation">2C + O₂ → 2CO (toxic!)</div>
+        CO is colourless, odourless — causes carbon monoxide poisoning.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--lime)">Formation of SO₃</div>
+      <div class="card-body">
+        <div class="equation">2SO₂(g) + O₂(g) → 2SO₃(g)</div>
+        Industrial process (Contact process for H₂SO₄).
+        <div class="equation">SO₃ + H₂O → H₂SO₄</div>
+        Sulphuric acid — the "king of chemicals".
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ DECOMPOSITION ══════════════ -->
+<section id="decomposition">
+  <div class="sec-title" style="color:var(--blue)">💥 Decomposition Reaction</div>
+  <div class="sec-sub">Single compound breaks into two or more simpler substances.&nbsp; AB → A + B</div>
+
+  <div class="stage">
+    <div class="stage-title">🎬 Electrolysis of Water</div>
+    <canvas id="cvElectro" height="220"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn" id="btnElectro" onclick="toggleElectro()">▶ Switch On Current</button>
+      <button class="stage-btn" onclick="resetElectro()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-title" style="color:var(--blue)">Thermal Decomposition</div>
+      <div class="card-body">
+        Heat causes breakdown:
+        <div class="equation">CaCO₃(s) → CaO(s) + CO₂(g)</div>
+        <span class="badge badge-endo">Endothermic</span><br><br>
+        <div class="equation">2Fe(OH)₃(s) → Fe₂O₃(s) + 3H₂O(g)</div>
+        <div class="equation">2Pb(NO₃)₂ → 2PbO + 4NO₂ + O₂</div>
+        Brown NO₂ gas; yellow PbO formed.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--blue)">Electrolytic Decomposition</div>
+      <div class="card-body">
+        Electric current breaks compounds:
+        <div class="equation">2H₂O(l) → 2H₂(g) + O₂(g)</div>
+        <span class="badge badge-endo">Endothermic</span><br><br>
+        • H₂ at cathode (−): <strong>2 vol</strong><br>• O₂ at anode (+): <strong>1 vol</strong><br>• Ratio H₂:O₂ = 2:1 by volume
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--blue)">Photodecomposition</div>
+      <div class="card-body">
+        Light energy causes decomposition:
+        <div class="equation">2AgCl(s) → 2Ag(s) + Cl₂(g)</div>
+        <div class="equation">2AgBr(s) → 2Ag(s) + Br₂(g)</div>
+        <span class="badge badge-endo">Endothermic</span><br><br>
+        • Used in <strong>black-and-white photography</strong><br>• AgCl: white → grey in sunlight<br>• Sun cream: similar principle
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--blue)">Heating FeSO₄</div>
+      <div class="card-body">
+        <div class="equation">2FeSO₄ → Fe₂O₃ + SO₂↑ + SO₃↑</div>
+        <span class="badge badge-endo">Endothermic</span><br><br>
+        Colour change: <strong>Green → Brown</strong><br>Smell: Burning sulphur (pungent)<br>This is used as a test to identify FeSO₄.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ DISPLACEMENT ══════════════ -->
+<section id="displacement">
+  <div class="sec-title" style="color:var(--purple)">↔️ Displacement Reactions</div>
+  <div class="sec-sub">More reactive element displaces less reactive one from its compound.</div>
+
+  <div class="stage">
+    <div class="stage-title">🎬 Iron Nail in Copper Sulphate Solution</div>
+    <canvas id="cvDisp" height="220"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn" id="btnDisp" onclick="toggleDisp()">▶ Drop Iron Nail</button>
+      <button class="stage-btn" onclick="resetDisp()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-title" style="color:var(--purple)">Single Displacement</div>
+      <div class="card-body">
+        <div class="equation">Fe(s) + CuSO₄(aq) → FeSO₄(aq) + Cu(s)</div>
+        Blue solution → <strong>green</strong><br>
+        Iron nail coated with <strong>red-brown copper</strong><br><br>
+        <div class="equation">Zn(s) + H₂SO₄(aq) → ZnSO₄(aq) + H₂↑</div>
+        Zinc displaces hydrogen — H₂ gas burns with pop sound.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--purple)">Double Displacement</div>
+      <div class="card-body">
+        Exchange of ions between two compounds:
+        <div class="equation">Na₂SO₄(aq) + BaCl₂(aq) → BaSO₄↓ + 2NaCl(aq)</div>
+        White precipitate of BaSO₄<br><br>
+        <div class="equation">Pb(NO₃)₂(aq) + 2KI(aq) → PbI₂↓ + 2KNO₃(aq)</div>
+        <strong>Yellow</strong> precipitate of lead iodide.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--purple)">Reactivity Series</div>
+      <div class="card-body">
+        <div class="equation" style="font-size:.75rem; line-height:1.9">
+          K &gt; Na &gt; Ca &gt; Mg &gt; Al &gt; Zn<br>
+          &gt; Fe &gt; Ni &gt; Sn &gt; Pb &gt; H<br>
+          &gt; Cu &gt; Hg &gt; Ag &gt; Au
+        </div>
+        Higher element displaces lower.<br>
+        Metals above H displace H from acids.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--purple)">Neutralisation</div>
+      <div class="card-body">
+        Acid + Base → Salt + Water
+        <div class="equation">HCl(aq) + NaOH(aq) → NaCl(aq) + H₂O(l)</div>
+        <span class="badge badge-exo">Exothermic</span><br><br>
+        Used in antacid tablets (Mg(OH)₂ neutralises excess HCl in stomach).
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ REDOX ══════════════ -->
+<section id="redox">
+  <div class="sec-title" style="color:var(--red)">🔥 Oxidation & Reduction (Redox)</div>
+  <div class="sec-sub">Oxidation and reduction always occur simultaneously in a reaction.</div>
+
+  <div class="stage">
+    <div class="stage-title">🎬 CuO reduced by Hydrogen</div>
+    <canvas id="cvRedox" height="200"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn" id="btnRedox" onclick="toggleRedox()">▶ Start Reaction</button>
+      <button class="stage-btn" onclick="resetRedox()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-title" style="color:var(--red)">Definitions</div>
+      <div class="card-body">
+        <strong>Oxidation:</strong><br>
+        • Gain of oxygen<br>• Loss of hydrogen<br>• Loss of electrons (OIL)<br><br>
+        <strong>Reduction:</strong><br>
+        • Loss of oxygen<br>• Gain of hydrogen<br>• Gain of electrons (RIG)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--red)">CuO + H₂ Reaction</div>
+      <div class="card-body">
+        <div class="equation">CuO(s) + H₂(g) → Cu(s) + H₂O(l)</div>
+        <strong>CuO is reduced</strong> (loses O) → Cu<br>
+        <strong>H₂ is oxidised</strong> (gains O) → H₂O<br><br>
+        Colour change: <strong>Black → Red-brown</strong><br>
+        H₂ = reducing agent; CuO = oxidising agent
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--red)">Corrosion</div>
+      <div class="card-body">
+        Slow oxidation of metals in moist air:
+        <div class="equation">4Fe(s) + 3O₂(g) + xH₂O → 2Fe₂O₃·xH₂O</div>
+        Iron → <strong>Rust</strong> (reddish-brown)<br><br>
+        Prevention: Painting, galvanisation (Zn coating), alloying, electroplating
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--red)">Rancidity</div>
+      <div class="card-body">
+        Oxidation of fats/oils in food → unpleasant smell and taste.
+        <div class="equation">Fats + O₂ → Rancid compounds</div>
+        Prevention:<br>
+        • Antioxidants (BHA, BHT)<br>
+        • Nitrogen flushing in packets<br>
+        • Refrigeration<br>
+        • Vacuum packaging
+      </div>
+    </div>
+  </div>
+
+  <!-- Rusting demo -->
+  <div class="stage" style="margin-top:1rem">
+    <div class="stage-title">🔴 Corrosion of Iron — Visual</div>
+    <div class="rusting-demo" id="rustDemo">
+      <div><div class="iron-bar" id="ironBar" style="background:#64748b;color:#f1f5f9">Fe (Iron)</div><div style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:.4rem;text-align:center">Fresh metal</div></div>
+      <div class="arrow-anim">→</div>
+      <div><div class="iron-bar" id="rustBar" style="background:#292524;color:#78716c;border:1px solid #44403c">…wait…</div><div style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:.4rem;text-align:center">After days</div></div>
+      <div class="arrow-anim">→</div>
+      <div><div class="iron-bar" style="background:#78350f;color:#fbbf24">Fe₂O₃·xH₂O</div><div style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:.4rem;text-align:center">Rust (reddish-brown)</div></div>
+    </div>
+    <div class="stage-ctrl"><button class="stage-btn" onclick="animateRust()">▶ Speed Up Time</button></div>
+  </div>
+</section>
+
+<!-- ══════════════ BALANCING ══════════════ -->
+<section id="balancing">
+  <div class="sec-title" style="color:var(--cyan)">⚖️ Balancing Chemical Equations</div>
+  <div class="sec-sub">Law of Conservation of Mass — atoms are neither created nor destroyed.</div>
+
+  <div class="stage">
+    <div class="stage-title">🎬 Atom Count Visualiser</div>
+    <canvas id="cvBalance" height="200"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn" id="btnBal" onclick="toggleBal()">▶ Animate</button>
+    </div>
+  </div>
+
+  <div class="balance-wrap">
+    <div class="card-title" style="color:var(--cyan);margin-bottom:.8rem">✏️ Practice: Balance these equations</div>
+
+    <!-- Q1 -->
+    <p style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--muted);margin-bottom:.5rem">1. Hydrogen + Oxygen → Water</p>
+    <div class="balance-eq">
+      <input class="coeff-input" id="q1a" placeholder="?"> H₂ &nbsp;+&nbsp;
+      <input class="coeff-input" id="q1b" placeholder="?"> O₂ &nbsp;→&nbsp;
+      <input class="coeff-input" id="q1c" placeholder="?"> H₂O
+    </div>
+    <button class="check-btn" onclick="checkQ1()">Check</button>
+    <div class="check-result" id="r1"></div>
+
+    <!-- Q2 -->
+    <p style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--muted);margin:1rem 0 .5rem">2. Iron + Water → Iron oxide + Hydrogen</p>
+    <div class="balance-eq">
+      <input class="coeff-input" id="q2a" placeholder="?"> Fe &nbsp;+&nbsp;
+      <input class="coeff-input" id="q2b" placeholder="?"> H₂O &nbsp;→&nbsp;
+      <input class="coeff-input" id="q2c" placeholder="?"> Fe₃O₄ &nbsp;+&nbsp;
+      <input class="coeff-input" id="q2d" placeholder="?"> H₂
+    </div>
+    <button class="check-btn" onclick="checkQ2()">Check</button>
+    <div class="check-result" id="r2"></div>
+
+    <!-- Q3 -->
+    <p style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--muted);margin:1rem 0 .5rem">3. Aluminium + Copper chloride → Aluminium chloride + Copper</p>
+    <div class="balance-eq">
+      <input class="coeff-input" id="q3a" placeholder="?"> Al &nbsp;+&nbsp;
+      <input class="coeff-input" id="q3b" placeholder="?"> CuCl₂ &nbsp;→&nbsp;
+      <input class="coeff-input" id="q3c" placeholder="?"> AlCl₃ &nbsp;+&nbsp;
+      <input class="coeff-input" id="q3d" placeholder="?"> Cu
+    </div>
+    <button class="check-btn" onclick="checkQ3()">Check</button>
+    <div class="check-result" id="r3"></div>
+  </div>
+
+  <div class="cards" style="margin-top:1.5rem">
+    <div class="card">
+      <div class="card-title" style="color:var(--cyan)">Steps to Balance</div>
+      <div class="card-body">
+        1. Write the <strong>skeletal equation</strong><br>
+        2. List atoms of each element on both sides<br>
+        3. Add <strong>coefficients</strong> (not subscripts)<br>
+        4. Start with the <strong>most complex formula</strong><br>
+        5. Balance H and O last<br>
+        6. Cross-check all atoms
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--cyan)">Common Mistakes</div>
+      <div class="card-body">
+        ❌ Changing subscripts (H₂O → H₃O)<br>
+        ❌ Forgetting diatomic molecules (O₂, H₂, N₂)<br>
+        ❌ Not updating all elements after adding coefficient<br><br>
+        ✅ Only change <strong>coefficients</strong> before formulae<br>
+        ✅ Diatomic: H₂, O₂, N₂, F₂, Cl₂, Br₂, I₂
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ── TAB SWITCHING ──
+const sections = ['intro','combination','decomposition','displacement','redox','balancing'];
+const btnClasses = ['act-orange','act-lime','act-blue','act-purple','act-red','act-cyan'];
+function show(id, cls, btn) {
+  sections.forEach(s => { document.getElementById(s).classList.remove('visible'); });
+  document.getElementById(id).classList.add('visible');
+  document.querySelectorAll('nav.tabs button').forEach(b => btnClasses.forEach(c => b.classList.remove(c)));
+  btn.classList.add(cls);
+  // re-init canvases
+  setTimeout(()=>{ initAllCanvases(); }, 50);
+}
+
+// ── CANVAS HELPERS ──
+function fitCanvas(id) {
+  const c = document.getElementById(id);
+  if (!c) return null;
+  const w = c.parentElement.clientWidth - 40;
+  c.width = Math.max(300, w);
+  return c;
+}
+
+// ══════════════════════════════
+// SIGNS ANIMATION (intro)
+// ══════════════════════════════
+let signsAnim = null, signsT = 0, signsRunning = false;
+function initSigns() {
+  const c = fitCanvas('cvSigns'); if(!c) return;
+  const ctx = c.getContext('2d');
+  drawSigns(ctx, c.width, c.height, 0);
+}
+function drawSigns(ctx, W, H, t) {
+  ctx.clearRect(0,0,W,H);
+  const signs = [
+    { icon:'🌡️', label:'Temp Change', color:'#f97316', x:.1 },
+    { icon:'💧', label:'Precipitate', color:'#3b82f6', x:.28 },
+    { icon:'💨', label:'Gas Evolved', color:'#22c55e', x:.46 },
+    { icon:'🎨', label:'Colour Change', color:'#a855f7', x:.64 },
+    { icon:'✨', label:'Light/Flame', color:'#facc15', x:.82 },
+  ];
+  signs.forEach((s, i) => {
+    const progress = Math.min(1, Math.max(0, (t - i * 20) / 30));
+    const x = s.x * W;
+    const y = H / 2;
+    const alpha = progress;
+    ctx.globalAlpha = alpha;
+    // glow circle
+    ctx.beginPath(); ctx.arc(x, y, 32, 0, Math.PI*2);
+    ctx.fillStyle = s.color + '22'; ctx.fill();
+    ctx.strokeStyle = s.color + '88'; ctx.lineWidth = 2; ctx.stroke();
+    // pulse ring
+    const pulse = (Math.sin(t * 0.05 + i) + 1) / 2;
+    ctx.beginPath(); ctx.arc(x, y, 32 + pulse * 10, 0, Math.PI*2);
+    ctx.strokeStyle = s.color + '44'; ctx.lineWidth = 1.5; ctx.stroke();
+    // icon
+    ctx.font = '22px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff'; ctx.fillText(s.icon, x, y - 4);
+    // label
+    ctx.font = '600 11px Nunito,sans-serif'; ctx.fillStyle = s.color;
+    ctx.fillText(s.label, x, y + 22);
+    ctx.globalAlpha = 1;
+  });
+}
+function toggleSigns() {
+  signsRunning = !signsRunning;
+  document.getElementById('btnSigns').textContent = signsRunning ? '⏸ Pause' : '▶ Play Animation';
+  document.getElementById('btnSigns').classList.toggle('running', signsRunning);
+  if (signsRunning) loopSigns();
+}
+function loopSigns() {
+  if (!signsRunning) return;
+  const c = document.getElementById('cvSigns'); if(!c) return;
+  drawSigns(c.getContext('2d'), c.width, c.height, signsT++);
+  if (signsT > 200) signsT = 0;
+  requestAnimationFrame(loopSigns);
+}
+
+// ══════════════════════════════
+// MG BURNING (combination)
+// ══════════════════════════════
+let mgT = 0, mgRunning = false, mgStarted = false;
+function toggleMg() {
+  mgRunning = !mgRunning; mgStarted = true;
+  document.getElementById('btnMg').textContent = mgRunning ? '⏸ Pause' : '▶ Ignite Magnesium';
+  document.getElementById('btnMg').classList.toggle('running', mgRunning);
+  if (mgRunning) loopMg();
+}
+function resetMg() { mgT = 0; mgRunning = false; mgStarted = false; document.getElementById('btnMg').textContent = '▶ Ignite Magnesium'; document.getElementById('btnMg').classList.remove('running'); initMg(); }
+function initMg() {
+  const c = fitCanvas('cvMgBurn'); if(!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  // Mg ribbon
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillRect(W/2-4, H*0.3, 8, H*0.5);
+  ctx.font = '600 12px Nunito,sans-serif'; ctx.fillStyle = '#cbd5e1'; ctx.textAlign = 'center';
+  ctx.fillText('Mg ribbon', W/2, H*0.85);
+  ctx.fillText('+ O₂ in air', W/2, H*0.95);
+}
+function loopMg() {
+  if (!mgRunning) return;
+  const c = document.getElementById('cvMgBurn'); if(!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  const phase = Math.min(mgT / 120, 1);
+  // Mg ribbon (shrinks)
+  ctx.fillStyle = `rgba(148,163,184,${1 - phase * 0.8})`;
+  ctx.fillRect(W/2-4, H*0.3 + phase*H*0.2, 8, H*0.5*(1-phase));
+  // flame
+  if (phase > 0.05) {
+    for (let i = 0; i < 12; i++) {
+      const angle = (mgT*0.04 + i * Math.PI*2/12);
+      const r = (20 + Math.sin(mgT*0.1+i)*8) * (phase < 0.1 ? phase*10 : 1);
+      const px = W/2 + Math.cos(angle)*r*0.3;
+      const py = H*0.3 + phase*H*0.2 - Math.sin(angle)*r;
+      ctx.beginPath(); ctx.arc(px, py, 6+Math.random()*4, 0, Math.PI*2);
+      const bright = Math.floor(200 + Math.random()*55);
+      ctx.fillStyle = `rgba(${bright},${bright},${Math.floor(bright*0.9)},0.85)`;
+      ctx.fill();
+    }
+    // white glow
+    const grd = ctx.createRadialGradient(W/2, H*0.3+phase*H*0.2, 0, W/2, H*0.3+phase*H*0.2, 60*phase);
+    grd.addColorStop(0, 'rgba(255,255,255,0.6)');
+    grd.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(W/2, H*0.3+phase*H*0.2, 80, 0, Math.PI*2); ctx.fill();
+  }
+  // MgO powder falling
+  if (phase > 0.3) {
+    for (let i = 0; i < Math.floor((phase-0.3)*30); i++) {
+      const px = W/2 + (Math.sin(i*7.3)*40);
+      const py = H*0.5 + i*(H*0.3/20) * ((phase-0.3)/0.7);
+      ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(226,232,240,0.8)'; ctx.fill();
+    }
+  }
+  // equation
+  ctx.font = '700 13px DM Mono,monospace'; ctx.textAlign = 'left'; ctx.fillStyle = '#84cc16';
+  ctx.fillText('2Mg + O₂ → 2MgO', 10, 20);
+  ctx.font = '600 11px Nunito,sans-serif'; ctx.fillStyle = '#94a3b8';
+  ctx.fillText(phase < 0.5 ? 'Burning...' : 'White MgO powder formed!', 10, H-10);
+  mgT++;
+  if (mgT > 180) { mgRunning = false; document.getElementById('btnMg').textContent = '▶ Ignite Magnesium'; document.getElementById('btnMg').classList.remove('running'); }
+  requestAnimationFrame(loopMg);
+}
+
+// ══════════════════════════════
+// ELECTROLYSIS (decomposition)
+// ══════════════════════════════
+let elT = 0, elRunning = false;
+function toggleElectro() {
+  elRunning = !elRunning;
+  document.getElementById('btnElectro').textContent = elRunning ? '⏸ Switch Off' : '▶ Switch On Current';
+  document.getElementById('btnElectro').classList.toggle('running', elRunning);
+  if (elRunning) loopElectro();
+}
+function resetElectro() { elT = 0; elRunning = false; document.getElementById('btnElectro').textContent = '▶ Switch On Current'; document.getElementById('btnElectro').classList.remove('running'); initElectro(); }
+function initElectro() {
+  const c = fitCanvas('cvElectro'); if(!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  drawElectroBase(ctx, W, H, [],[]);
+}
+function drawElectroBase(ctx, W, H, h2Bubbles, o2Bubbles) {
+  // water container
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+  ctx.strokeRect(W*0.2, H*0.15, W*0.6, H*0.7);
+  ctx.fillStyle = 'rgba(59,130,246,0.12)';
+  ctx.fillRect(W*0.2+1, H*0.15+1, W*0.6-2, H*0.7-2);
+  // electrodes
+  const ex1 = W*0.35, ex2 = W*0.65, ey = H*0.2, eh = H*0.55;
+  ctx.fillStyle = '#475569'; ctx.fillRect(ex1-4, ey, 8, eh);
+  ctx.fillStyle = '#475569'; ctx.fillRect(ex2-4, ey, 8, eh);
+  // labels
+  ctx.font = '700 13px DM Mono,monospace'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#f87171'; ctx.fillText('− Cathode', ex1, ey-8);
+  ctx.fillStyle = '#fb923c'; ctx.fillText('+ Anode', ex2, ey-8);
+  ctx.fillStyle = '#3b82f6'; ctx.font = '600 11px Nunito,sans-serif';
+  ctx.fillText('H₂O (acidulated)', W/2, H*0.92);
+  ctx.fillStyle = '#f87171'; ctx.font = '700 11px DM Mono,monospace';
+  ctx.fillText('H₂ ×2', ex1, H*0.1);
+  ctx.fillStyle = '#fb923c';
+  ctx.fillText('O₂ ×1', ex2, H*0.1);
+  // bubbles
+  h2Bubbles.forEach(b => {
+    ctx.beginPath(); ctx.arc(ex1 + (Math.random()-0.5)*6, b.y, b.r, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(148,163,184,0.7)'; ctx.lineWidth = 1.2; ctx.stroke();
+  });
+  o2Bubbles.forEach(b => {
+    ctx.beginPath(); ctx.arc(ex2 + (Math.random()-0.5)*4, b.y, b.r, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(251,146,60,0.7)'; ctx.lineWidth = 1.2; ctx.stroke();
+  });
+}
+const h2Bubbles = [], o2Bubbles = [];
+function loopElectro() {
+  if (!elRunning) return;
+  const c = document.getElementById('cvElectro'); if(!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  if (elT % 5 === 0) { h2Bubbles.push({y: H*0.72, r:3}); h2Bubbles.push({y: H*0.72, r:3}); }
+  if (elT % 10 === 0) { o2Bubbles.push({y: H*0.72, r:3}); }
+  h2Bubbles.forEach(b => { b.y -= 2.5; b.r = Math.min(b.r + 0.04, 5); });
+  o2Bubbles.forEach(b => { b.y -= 2.2; b.r = Math.min(b.r + 0.03, 5); });
+  // remove off-screen
+  while (h2Bubbles.length && h2Bubbles[0].y < H*0.15) h2Bubbles.shift();
+  while (o2Bubbles.length && o2Bubbles[0].y < H*0.15) o2Bubbles.shift();
+  ctx.clearRect(0,0,W,H);
+  drawElectroBase(ctx, W, H, h2Bubbles, o2Bubbles);
+  ctx.font = '700 12px DM Mono,monospace'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#22d3ee';
+  ctx.fillText('2H₂O → 2H₂ + O₂', 10, 18);
+  elT++;
+  requestAnimationFrame(loopElectro);
+}
+
+// ══════════════════════════════
+// DISPLACEMENT (Fe in CuSO₄)
+// ══════════════════════════════
+let dT = 0, dRunning = false;
+function toggleDisp() {
+  dRunning = !dRunning;
+  document.getElementById('btnDisp').textContent = dRunning ? '⏸ Pause' : '▶ Drop Iron Nail';
+  document.getElementById('btnDisp').classList.toggle('running', dRunning);
+  if (dRunning) loopDisp();
+}
+function resetDisp() { dT = 0; dRunning = false; document.getElementById('btnDisp').textContent = '▶ Drop Iron Nail'; document.getElementById('btnDisp').classList.remove('running'); initDisp(); }
+function initDisp() {
+  const c = fitCanvas('cvDisp'); if(!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  drawDispBase(ctx, W, H, 0);
+}
+function drawDispBase(ctx, W, H, progress) {
+  // beaker
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+  ctx.strokeRect(W*0.25, H*0.1, W*0.5, H*0.8);
+  // solution colour: blue → green
+  const r = Math.floor(59 + progress * (34-59));
+  const g = Math.floor(130 + progress * (197-130));
+  const b = Math.floor(246 + progress * (94-246));
+  ctx.fillStyle = `rgba(${r},${g},${b},0.25)`;
+  ctx.fillRect(W*0.25+1, H*0.1+1, W*0.5-2, H*0.8-2);
+  // iron nail (dropping)
+  const nailY = H*(-0.1) + progress * H*0.3;
+  ctx.fillStyle = progress < 0.5 ? '#94a3b8' : `rgb(${Math.floor(148+progress*50)},${Math.floor(163-progress*80)},${Math.floor(184-progress*100)})`;
+  ctx.fillRect(W/2-5, nailY, 10, H*0.4);
+  // copper deposit on nail
+  if (progress > 0.3) {
+    ctx.fillStyle = `rgba(180,83,9,${(progress-0.3)*1.4})`;
+    for (let i = 0; i < 8; i++) {
+      const yp = nailY + H*0.05 + i*(H*0.04);
+      ctx.beginPath(); ctx.arc(W/2 + (i%2===0?-8:8), yp, 4*(progress-0.3), 0, Math.PI*2); ctx.fill();
+    }
+  }
+  // labels
+  ctx.font = '600 11px Nunito,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillStyle = progress < 0.5 ? '#60a5fa' : '#4ade80';
+  ctx.fillText(progress < 0.5 ? 'CuSO₄ (blue)' : 'FeSO₄ (green)', W/2, H*0.95);
+  ctx.font = '700 12px DM Mono,monospace'; ctx.fillStyle = '#a855f7'; ctx.textAlign = 'left';
+  ctx.fillText('Fe + CuSO₄ → FeSO₄ + Cu', 8, 16);
+}
+function loopDisp() {
+  if (!dRunning) return;
+  const c = document.getElementById('cvDisp'); if(!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  const p = Math.min(dT/140, 1);
+  drawDispBase(ctx, W, H, p);
+  dT++;
+  if (dT > 180) { dRunning = false; document.getElementById('btnDisp').textContent = '▶ Drop Iron Nail'; document.getElementById('btnDisp').classList.remove('running'); }
+  requestAnimationFrame(loopDisp);
+}
+
+// ══════════════════════════════
+// REDOX — CuO + H₂
+// ══════════════════════════════
+let rxT = 0, rxRunning = false;
+function toggleRedox() {
+  rxRunning = !rxRunning;
+  document.getElementById('btnRedox').textContent = rxRunning ? '⏸ Pause' : '▶ Start Reaction';
+  document.getElementById('btnRedox').classList.toggle('running', rxRunning);
+  if (rxRunning) loopRedox();
+}
+function resetRedox() { rxT = 0; rxRunning = false; document.getElementById('btnRedox').textContent = '▶ Start Reaction'; document.getElementById('btnRedox').classList.remove('running'); initRedox(); }
+function initRedox() {
+  const c = fitCanvas('cvRedox'); if(!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  drawRedoxFrame(ctx, W, H, 0);
+}
+function drawRedoxFrame(ctx, W, H, p) {
+  // tube
+  ctx.strokeStyle = '#475569'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(W*0.15, H*0.3, W*0.7, H*0.4, 8); ctx.stroke();
+  // CuO powder → Cu
+  const cuoR = Math.floor(15 + p*180); // black → brown
+  const cuoG = Math.floor(15 + p*70);
+  const cuoB = Math.floor(15 + p*20);
+  ctx.fillStyle = `rgb(${cuoR},${cuoG},${cuoB})`;
+  ctx.fillRect(W*0.35, H*0.35, W*0.3, H*0.3);
+  // H₂ bubbles flowing in
+  for (let i = 0; i < 6; i++) {
+    const bx = W*0.15 + (((rxT*2 + i*25) % (W*0.7)));
+    const by = H*0.5 + Math.sin(rxT*0.1 + i)*10;
+    if (bx > W*0.35 && bx < W*0.65) continue;
+    ctx.beginPath(); ctx.arc(bx, by, 4, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(96,165,250,0.7)'; ctx.lineWidth=1.2; ctx.stroke();
+  }
+  // water droplets coming out right
+  if (p > 0.2) {
+    for (let i = 0; i < Math.floor((p-0.2)*8); i++) {
+      const bx = W*0.82 + i*8;
+      const by = H*0.65 + i*6;
+      ctx.beginPath(); ctx.arc(bx, by, 3, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(147,197,253,0.8)'; ctx.fill();
+    }
+  }
+  // labels
+  ctx.font = '700 11px DM Mono,monospace'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#60a5fa'; ctx.fillText('H₂(g) →', W*0.22, H*0.25);
+  ctx.fillStyle = p < 0.5 ? '#374151' : '#b45309';
+  ctx.fillText(p < 0.5 ? 'CuO (black)' : 'Cu (brown)', W/2, H*0.52);
+  ctx.fillStyle = '#93c5fd'; ctx.fillText('→ H₂O', W*0.88, H*0.25);
+  ctx.font = '700 12px DM Mono,monospace'; ctx.fillStyle = '#ef4444'; ctx.textAlign='left';
+  ctx.fillText('CuO + H₂ → Cu + H₂O', 8, 16);
+  ctx.font = '600 10px Nunito,sans-serif'; ctx.fillStyle = '#94a3b8';
+  ctx.textAlign='left';
+  ctx.fillText(p < 0.3 ? 'Heating tube with H₂ gas flowing...' : p < 0.7 ? 'CuO being reduced, H₂ oxidised...' : 'Black CuO → Red-brown Cu ✓', 8, H-8);
+}
+function loopRedox() {
+  if (!rxRunning) return;
+  const c = document.getElementById('cvRedox'); if(!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  drawRedoxFrame(ctx, W, H, Math.min(rxT/150, 1));
+  rxT++;
+  if (rxT > 190) { rxRunning = false; document.getElementById('btnRedox').textContent = '▶ Start Reaction'; document.getElementById('btnRedox').classList.remove('running'); }
+  requestAnimationFrame(loopRedox);
+}
+
+// ══════════════════════════════
+// BALANCE VISUALISER
+// ══════════════════════════════
+let balT = 0, balRunning = false;
+function toggleBal() {
+  balRunning = !balRunning;
+  document.getElementById('btnBal').textContent = balRunning ? '⏸ Pause' : '▶ Animate';
+  document.getElementById('btnBal').classList.toggle('running', balRunning);
+  if (balRunning) loopBal();
+}
+function initBal() {
+  const c = fitCanvas('cvBalance'); if(!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  drawBal(ctx, W, H, 0);
+}
+function drawBal(ctx, W, H, t) {
+  ctx.clearRect(0,0,W,H);
+  // show 2H₂ + O₂ → 2H₂O atom count animation
+  const reactions = [
+    { side:'left', atoms:[{sym:'H',n:4,col:'#60a5fa'},{sym:'O',n:2,col:'#f87171'}] },
+    { side:'right', atoms:[{sym:'H',n:4,col:'#60a5fa'},{sym:'O',n:2,col:'#f87171'}] },
+  ];
+  ctx.font = '700 13px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillStyle = '#94a3b8'; ctx.fillText('2H₂ + O₂ → 2H₂O', W/2, 20);
+
+  const sides = [
+    { label:'Reactants: 2H₂ + O₂', x: W*0.25, atoms:[{sym:'H',n:4,col:'#60a5fa'},{sym:'O',n:2,col:'#f87171'}] },
+    { label:'Products: 2H₂O', x: W*0.75, atoms:[{sym:'H',n:4,col:'#60a5fa'},{sym:'O',n:2,col:'#f87171'}] },
+  ];
+  sides.forEach(side => {
+    ctx.font = '600 11px Nunito,sans-serif'; ctx.fillStyle = '#64748b'; ctx.textAlign='center';
+    ctx.fillText(side.label, side.x, 40);
+    let ay = 65;
+    side.atoms.forEach(a => {
+      const progress = Math.min(1, Math.max(0, (t - 10) / 40));
+      for (let i = 0; i < a.n; i++) {
+        const ax = side.x + (i - (a.n-1)/2) * 28;
+        const bounce = Math.sin(t*0.08 + i*1.2) * 4 * progress;
+        ctx.beginPath(); ctx.arc(ax, ay + bounce, 14, 0, Math.PI*2);
+        ctx.fillStyle = a.col + '33'; ctx.fill();
+        ctx.strokeStyle = a.col; ctx.lineWidth = 2; ctx.stroke();
+        ctx.font = '700 11px DM Mono,monospace'; ctx.fillStyle = a.col; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(a.sym, ax, ay + bounce);
+        ctx.textBaseline='alphabetic';
+      }
+      ay += 50;
+    });
+  });
+  // balance arrow
+  const balanced = t > 50;
+  ctx.font = '700 14px Syne,sans-serif'; ctx.textAlign='center';
+  ctx.fillStyle = balanced ? '#22c55e' : '#f59e0b';
+  ctx.fillText(balanced ? '✓ BALANCED' : '…counting…', W/2, H*0.88);
+}
+function loopBal() {
+  if (!balRunning) return;
+  const c = document.getElementById('cvBalance'); if(!c) return;
+  drawBal(c.getContext('2d'), c.width, c.height, balT++);
+  if (balT > 200) balT = 0;
+  requestAnimationFrame(loopBal);
+}
+
+// ══════════════════════════════
+// RUST ANIMATION
+// ══════════════════════════════
+function animateRust() {
+  const bar = document.getElementById('rustBar');
+  bar.style.transition = 'all 2s';
+  bar.style.background = '#7c2d12';
+  bar.style.color = '#fbbf24';
+  bar.textContent = 'Fe₂O₃·H₂O';
+}
+
+// ══════════════════════════════
+// BALANCING CHECKS
+// ══════════════════════════════
+function checkQ1() {
+  const a=+document.getElementById('q1a').value, b=+document.getElementById('q1b').value, c=+document.getElementById('q1c').value;
+  const ok = (a===2 && b===1 && c===2) || (a===1 && b===0.5 && c===1);
+  document.getElementById('r1').innerHTML = ok
+    ? '<span style="color:#4ade80">✓ Correct! &nbsp; 2H₂ + O₂ → 2H₂O</span>'
+    : '<span style="color:#f87171">✗ Try again. Hint: H atoms on left = right.</span>';
+}
+function checkQ2() {
+  const a=+document.getElementById('q2a').value, b=+document.getElementById('q2b').value, c=+document.getElementById('q2c').value, d=+document.getElementById('q2d').value;
+  const ok = a===3 && b===4 && c===1 && d===4;
+  document.getElementById('r2').innerHTML = ok
+    ? '<span style="color:#4ade80">✓ Correct! &nbsp; 3Fe + 4H₂O → Fe₃O₄ + 4H₂</span>'
+    : '<span style="color:#f87171">✗ Try again. Hint: Fe₃O₄ has 3 Fe — balance Fe first.</span>';
+}
+function checkQ3() {
+  const a=+document.getElementById('q3a').value, b=+document.getElementById('q3b').value, c=+document.getElementById('q3c').value, d=+document.getElementById('q3d').value;
+  const ok = a===2 && b===3 && c===2 && d===3;
+  document.getElementById('r3').innerHTML = ok
+    ? '<span style="color:#4ade80">✓ Correct! &nbsp; 2Al + 3CuCl₂ → 2AlCl₃ + 3Cu</span>'
+    : '<span style="color:#f87171">✗ Try again. Hint: AlCl₃ needs 3 Cl — how many CuCl₂?</span>';
+}
+
+// ══════════════════════════════
+// INIT ALL
+// ══════════════════════════════
+function initAllCanvases() {
+  initSigns(); initMg(); initElectro(); initDisp(); initRedox(); initBal();
+}
+window.addEventListener('resize', ()=>{ setTimeout(initAllCanvases, 100); });
+initAllCanvases();
+</script>
+</body>
+</html>

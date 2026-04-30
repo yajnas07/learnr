@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Lab — Chemical Reactions & Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#07101f; --card:#111d2e; --card2:#162235;
+    --border:#1a2d45; --text:#dde6f5; --muted:#5a7a9a;
+    --orange:#f97316; --amber:#f59e0b; --lime:#84cc16; --cyan:#22d3ee;
+    --blue:#3b82f6; --purple:#a855f7; --red:#ef4444; --green:#10b981;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
+  header{text-align:center;padding:1.8rem 1rem 1rem;}
+  header h1{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#f97316,#facc15,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  header p{color:var(--muted);font-size:.78rem;font-family:'DM Mono',monospace;margin-top:.3rem;}
+
+  .lab{max-width:960px;margin:1rem auto;padding:0 .8rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  @media(max-width:650px){.lab{grid-template-columns:1fr;}}
+
+  /* Reagent Shelf */
+  .shelf{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem;grid-column:1/-1;}
+  .shelf h2{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--muted);margin-bottom:.8rem;}
+  .reagents{display:flex;flex-wrap:wrap;gap:.5rem;}
+  .reagent{display:flex;flex-direction:column;align-items:center;gap:.3rem;cursor:pointer;padding:.5rem .6rem;border-radius:12px;border:1.5px solid var(--border);background:var(--card2);transition:all .2s;user-select:none;min-width:72px;}
+  .reagent:hover{transform:translateY(-2px);}
+  .reagent.selected{box-shadow:0 0 0 2px var(--cyan);}
+  .reagent .vial{width:28px;height:44px;border-radius:3px 3px 8px 8px;border:2px solid;position:relative;overflow:hidden;}
+  .reagent .vial-liq{position:absolute;bottom:0;left:0;right:0;height:65%;border-radius:0 0 6px 6px;}
+  .reagent .r-name{font-size:.65rem;font-family:'DM Mono',monospace;color:var(--muted);text-align:center;}
+  .reagent .r-formula{font-size:.58rem;font-family:'DM Mono',monospace;color:var(--muted);}
+
+  /* Mixer */
+  .mixer{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem;}
+  .mixer h2{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--muted);margin-bottom:.8rem;}
+  .slots{display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap;}
+  .slot{width:85px;height:105px;border:2px dashed var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.7rem;color:var(--muted);font-family:'DM Mono',monospace;cursor:pointer;transition:all .2s;text-align:center;padding:.3rem;position:relative;overflow:hidden;}
+  .slot.filled{border-style:solid;}
+  .slot .slot-liq{position:absolute;bottom:0;left:0;right:0;border-radius:0 0 12px 12px;transition:height .5s ease;}
+  .slot .slot-label{position:relative;z-index:2;font-weight:700;font-size:.72rem;}
+  .slot .slot-formula{position:relative;z-index:2;font-size:.6rem;}
+  .plus{font-size:1.5rem;color:var(--muted);font-family:'Syne',sans-serif;}
+  .react-btn{width:100%;padding:.6rem;border-radius:99px;font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;border:none;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;box-shadow:0 4px 16px rgba(249,115,22,.3);}
+  .react-btn:hover{transform:scale(1.02);}
+  .react-btn:disabled{background:var(--border);color:var(--muted);box-shadow:none;transform:none;cursor:default;}
+  .clear-btn{width:100%;padding:.45rem;border-radius:99px;margin-top:.5rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;}
+  .clear-btn:hover{border-color:#64748b;color:var(--text);}
+
+  /* Observation Panel */
+  .obs-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem;display:flex;flex-direction:column;gap:.6rem;}
+  .obs-panel h2{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--muted);}
+  .result-beaker-wrap{display:flex;justify-content:center;padding:.5rem 0;}
+  .big-beaker{width:100px;height:120px;border:3px solid var(--border);border-top:none;border-radius:0 0 20px 20px;position:relative;overflow:hidden;transition:border-color .5s;}
+  .big-liq{position:absolute;bottom:0;left:0;right:0;height:0%;border-radius:0 0 17px 17px;transition:height .7s ease,background .7s ease;}
+  @keyframes bbl{0%{transform:translateY(0) scale(1);opacity:.7}100%{transform:translateY(-80px) scale(1.5);opacity:0}}
+  .bbl{position:absolute;bottom:10px;width:7px;height:7px;background:rgba(255,255,255,.4);border-radius:50%;display:none;}
+  .bbl.go{display:block;animation:bbl 1s ease-in infinite;}
+  .bbl:nth-child(2){left:20%;animation-delay:.25s;width:5px;height:5px}
+  .bbl:nth-child(3){left:55%;animation-delay:.55s;width:9px;height:9px}
+  .bbl:nth-child(4){left:75%;animation-delay:.8s;width:6px;height:6px}
+  @keyframes rise{0%{transform:translateY(0);opacity:.8}100%{transform:translateY(-40px);opacity:0}}
+  .gas-particle{position:absolute;width:12px;height:12px;border-radius:50%;display:none;font-size:.65rem;text-align:center;line-height:12px;}
+  .gas-particle.go{display:block;animation:rise 1.2s ease-in infinite;}
+  .obs-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+  .obs-eq{font-family:'DM Mono',monospace;font-size:.78rem;color:#34d399;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:.5rem .7rem;line-height:1.7;min-height:40px;}
+  .obs-details{font-size:.82rem;line-height:1.7;color:var(--text);}
+  .obs-details strong{color:#fcd34d;}
+  .obs-details em{color:#93c5fd;font-style:normal;}
+  .obs-tag{display:inline-block;font-size:.65rem;font-family:'DM Mono',monospace;padding:.12rem .5rem;border-radius:99px;margin:.2rem .2rem 0 0;}
+  .tag-exo{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+  .tag-endo{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
+  .tag-comb{background:rgba(132,204,22,.12);color:#84cc16;border:1px solid rgba(132,204,22,.2);}
+  .tag-decomp{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
+  .tag-disp{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2);}
+  .tag-redox{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+  .tag-precip{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
+
+  .empty-obs{text-align:center;color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;padding:2rem 1rem;}
+  .flame{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:40px;height:60px;display:none;}
+  .flame.go{display:block;}
+  .flame span{position:absolute;bottom:0;left:50%;width:16px;height:40px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;transform:translateX(-50%);animation:flicker .3s ease-in-out infinite alternate;}
+  .flame span:nth-child(1){background:rgba(255,255,255,.9);width:10px;height:28px;z-index:3;}
+  .flame span:nth-child(2){background:rgba(249,115,22,.8);width:18px;height:40px;z-index:2;}
+  .flame span:nth-child(3){background:rgba(239,68,68,.5);width:24px;height:50px;z-index:1;}
+  @keyframes flicker{0%{transform:translateX(-50%) scaleY(1) scaleX(1)}100%{transform:translateX(-50%) scaleY(1.1) scaleX(.9)}}
+
+  /* Precipitate */
+  .precipitate{position:absolute;bottom:0;left:0;right:0;height:0;transition:height .8s ease;border-radius:0 0 17px 17px;}
+  
+  /* History log */
+  .history{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem;grid-column:1/-1;max-height:250px;overflow-y:auto;}
+  .history h2{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--muted);margin-bottom:.6rem;}
+  .log-entry{padding:.5rem .7rem;border-radius:10px;background:var(--card2);margin-bottom:.4rem;font-size:.78rem;border:1px solid var(--border);}
+  .log-entry .log-eq{font-family:'DM Mono',monospace;color:#34d399;font-size:.72rem;}
+  .log-entry .log-type{font-size:.62rem;font-family:'DM Mono',monospace;color:var(--amber);}
+
+  /* Smart highlighting */
+  .reagent.compatible{border-color:#22d3ee !important;box-shadow:0 0 0 2.5px rgba(34,211,238,.35),0 0 12px rgba(34,211,238,.15);}
+  .reagent.compatible .r-name,.reagent.compatible .r-formula{color:#7dd3fc;}
+  .reagent.incompatible{opacity:.22;filter:grayscale(.7);cursor:not-allowed;}
+  .reagent.incompatible:hover{opacity:.38;transform:none !important;}
+  .reagent.selected{box-shadow:0 0 0 2.5px var(--cyan) !important;border-color:var(--cyan) !important;}
+  .shelf-hint{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--cyan);margin-bottom:.6rem;min-height:1.2em;transition:opacity .3s;}
+  .no-react-tooltip{position:fixed;background:#1e293b;border:1px solid #f87171;color:#f87171;font-family:'DM Mono',monospace;font-size:.68rem;padding:.28rem .65rem;border-radius:8px;pointer-events:none;z-index:9999;white-space:nowrap;display:none;box-shadow:0 4px 14px rgba(0,0,0,.5);}
+
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;background:rgba(7,16,31,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<header>
+  <h1>⚗️ Virtual Reaction Lab</h1>
+  <p>Chemical Reactions &amp; Equations · Pick reagents · Watch reactions · Learn observations</p>
+</header>
+
+<div class="lab">
+  <!-- Reagent Shelf -->
+  <div class="shelf">
+    <h2>🧪 Reagent Shelf — click to select</h2>
+    <div class="shelf-hint" id="shelf-hint">Pick any reagent to see compatible partners highlighted ✨</div>
+    <div class="reagents" id="shelf"></div>
+  </div>
+  <div class="no-react-tooltip" id="nr-tooltip"></div>
+
+  <!-- Mixing Area -->
+  <div class="mixer">
+    <h2>🔬 Mixing Area</h2>
+    <div class="slots">
+      <div class="slot" id="slot-a" onclick="clearSlot(0)"><span class="slot-label">Slot A</span><span class="slot-formula">tap reagent</span><div class="slot-liq"></div></div>
+      <div class="plus">+</div>
+      <div class="slot" id="slot-b" onclick="clearSlot(1)"><span class="slot-label">Slot B</span><span class="slot-formula">tap reagent</span><div class="slot-liq"></div></div>
+    </div>
+    <button class="react-btn" id="react-btn" onclick="react()" disabled>⚡ React!</button>
+    <button class="clear-btn" onclick="clearAll()">↺ Clear & Reset</button>
+  </div>
+
+  <!-- Observation Panel -->
+  <div class="obs-panel" id="obs-panel">
+    <h2>📋 Observation &amp; Result</h2>
+    <div class="result-beaker-wrap">
+      <div class="big-beaker" id="beaker">
+        <div class="big-liq" id="big-liq"></div>
+        <div class="bbl" style="left:30%"></div>
+        <div class="bbl"></div>
+        <div class="bbl"></div>
+        <div class="bbl"></div>
+        <div class="gas-particle" id="gas1" style="left:35%;top:10%">↑</div>
+        <div class="gas-particle" id="gas2" style="left:60%;top:5%">↑</div>
+        <div class="flame" id="flame"><span></span><span></span><span></span></div>
+        <div class="precipitate" id="precipitate"></div>
+      </div>
+    </div>
+    <div id="obs-content">
+      <div class="empty-obs">Select two reagents and hit React to see the magic! 🧙‍♂️</div>
+    </div>
+  </div>
+
+  <!-- Reaction History -->
+  <div class="history">
+    <h2>📜 Reaction History</h2>
+    <div id="history-log"><div class="empty-obs" style="padding:.8rem">No reactions yet. Start experimenting!</div></div>
+  </div>
+</div>
+
+<script>
+const REAGENTS = [
+  {id:'mg',    name:'Magnesium',    formula:'Mg',          color:'#94a3b8',              border:'#64748b', state:'ribbon'},
+  {id:'o2',    name:'Oxygen',       formula:'O₂',          color:'rgba(147,197,253,.3)', border:'#60a5fa', state:'gas'},
+  {id:'c',     name:'Carbon',       formula:'C',           color:'#374151',              border:'#6b7280', state:'powder'},
+  {id:'cao',   name:'Quicklime',    formula:'CaO',         color:'#e2e8f0',              border:'#94a3b8', state:'powder'},
+  {id:'h2o',   name:'Water',        formula:'H₂O',         color:'rgba(56,189,248,.4)',  border:'#38bdf8', state:'liquid'},
+  {id:'fe',    name:'Iron nail',    formula:'Fe',          color:'#78716c',              border:'#a8a29e', state:'solid'},
+  {id:'cuso4', name:'CuSO₄ soln',   formula:'CuSO₄(aq)',   color:'rgba(59,130,246,.6)',  border:'#3b82f6', state:'liquid'},
+  {id:'zn',    name:'Zinc',         formula:'Zn',          color:'#a1a1aa',              border:'#d4d4d8', state:'granules'},
+  {id:'al',    name:'Aluminium',    formula:'Al',          color:'#cbd5e1',              border:'#94a3b8', state:'foil'},
+  {id:'hcl',   name:'dil. HCl',     formula:'HCl(aq)',     color:'rgba(239,68,68,.3)',   border:'#f87171', state:'liquid'},
+  {id:'h2so4', name:'dil. H₂SO₄',   formula:'H₂SO₄(aq)',   color:'rgba(250,204,21,.25)', border:'#fbbf24', state:'liquid'},
+  {id:'pbno3', name:'Pb(NO₃)₂ soln',formula:'Pb(NO₃)₂(aq)',color:'rgba(255,255,255,.2)', border:'#e2e8f0', state:'liquid'},
+  {id:'ki',    name:'KI soln',      formula:'KI(aq)',       color:'rgba(255,255,255,.15)',border:'#fde68a', state:'liquid'},
+  {id:'na2so4',name:'Na₂SO₄ soln',  formula:'Na₂SO₄(aq)',  color:'rgba(255,255,255,.12)',border:'#e2e8f0', state:'liquid'},
+  {id:'bacl2', name:'BaCl₂ soln',   formula:'BaCl₂(aq)',   color:'rgba(255,255,255,.12)',border:'#d4d4d8', state:'liquid'},
+  {id:'agno3', name:'AgNO₃ soln',   formula:'AgNO₃(aq)',   color:'rgba(255,255,255,.12)',border:'#e2e8f0', state:'liquid'},
+  {id:'nacl',  name:'NaCl soln',    formula:'NaCl(aq)',    color:'rgba(255,255,255,.1)', border:'#94a3b8', state:'liquid'},
+  {id:'caco3', name:'CaCO₃',        formula:'CaCO₃',       color:'#e2e8f0',              border:'#94a3b8', state:'powder'},
+  {id:'feso4', name:'FeSO₄ (green)',formula:'FeSO₄',       color:'rgba(74,222,128,.35)', border:'#4ade80', state:'powder'},
+  {id:'heat',  name:'🔥 Heat',      formula:'Δ (Heat)',    color:'rgba(249,115,22,.4)',  border:'#f97316', state:'energy'},
+  {id:'light', name:'☀️ Sunlight',  formula:'hν (Light)',  color:'rgba(250,204,21,.3)',  border:'#fbbf24', state:'energy'},
+  {id:'h2',    name:'Hydrogen',     formula:'H₂',          color:'rgba(255,255,255,.15)',border:'#e2e8f0', state:'gas'},
+  {id:'cuo',   name:'CuO (black)',  formula:'CuO',         color:'#1c1917',              border:'#44403c', state:'powder'},
+  {id:'agbr',  name:'AgBr',         formula:'AgBr',        color:'rgba(250,204,21,.4)', border:'#fbbf24', state:'powder'},
+  {id:'fe2o3', name:'Fe₂O₃ (rust)', formula:'Fe₂O₃',       color:'rgba(194,65,12,.7)',  border:'#ea580c', state:'powder'},
+];
+
+const REACTIONS = {
+  // ── Combination ──
+  'mg+o2':       {eq:'2Mg(s) + O₂(g) → 2MgO(s)',                        product:'MgO (white powder)',        type:'Combination',            tags:['tag-comb','tag-exo'],          obs:'Magnesium burns with a <strong>dazzling white flame</strong>. A white powder (MgO) is formed. Highly exothermic.', liqColor:'#e2e8f0',              liqH:45, flame:true,  bubbles:false, precipColor:null},
+  'c+o2':        {eq:'C(s) + O₂(g) → CO₂(g)',                           product:'CO₂ gas',                  type:'Combination',            tags:['tag-comb','tag-exo'],          obs:'Carbon burns in oxygen producing <strong>colourless CO₂ gas</strong>. Turns lime water milky. Exothermic combustion.', liqColor:'rgba(255,255,255,.05)', liqH:20, flame:true,  bubbles:false, precipColor:null, gas:true},
+  'cao+h2o':     {eq:'CaO(s) + H₂O(l) → Ca(OH)₂(aq) + Heat',           product:'Ca(OH)₂ (slaked lime)',    type:'Combination',            tags:['tag-comb','tag-exo'],          obs:'Quicklime reacts vigorously with water releasing <strong>large heat</strong>. The milky white slaked lime Ca(OH)₂ is formed.', liqColor:'rgba(255,255,255,.5)',  liqH:65, flame:false, bubbles:true,  precipColor:null},
+  // ── Decomposition ──
+  'caco3+heat':  {eq:'CaCO₃(s) →[Δ] CaO(s) + CO₂↑',                   product:'CaO + CO₂ gas',            type:'Thermal Decomposition',  tags:['tag-decomp','tag-endo'],       obs:'CaCO₃ decomposes on <strong>strong heating</strong>. White CaO remains. CO₂ gas turns lime water milky. Endothermic.', liqColor:'#e2e8f0',              liqH:30, flame:true,  bubbles:false, precipColor:null, gas:true},
+  'feso4+heat':  {eq:'2FeSO₄(s) →[Δ] Fe₂O₃(s) + SO₂↑ + SO₃↑',        product:'Fe₂O₃ + SO₂ + SO₃',       type:'Thermal Decomposition',  tags:['tag-decomp','tag-endo'],       obs:'Green FeSO₄ crystals turn <strong>reddish-brown</strong> (Fe₂O₃). Pungent smell of burning sulphur (SO₂ and SO₃ gases evolved).', liqColor:'rgba(194,65,12,.5)', liqH:35, flame:true,  bubbles:false, precipColor:null, gas:true},
+  'h2o+heat':    {eq:'2H₂O(l) →[electricity] 2H₂↑ + O₂↑',             product:'H₂ gas + O₂ gas',         type:'Electrolytic Decomposition',tags:['tag-decomp','tag-endo'],      obs:'Water decomposes by electricity. <strong>H₂ at cathode (2× vol), O₂ at anode</strong>. Ratio H₂:O₂ = 2:1. Endothermic.', liqColor:'rgba(56,189,248,.3)',  liqH:40, flame:false, bubbles:true,  precipColor:null, gas:true},
+  'agbr+light':  {eq:'2AgBr(s) →[hν] 2Ag(s) + Br₂(g)',                 product:'Ag (grey) + Br₂',         type:'Photochemical Decomposition',tags:['tag-decomp'],               obs:'Pale yellow AgBr turns <strong>grey-black</strong> in sunlight as silver metal forms. Basis of <em>black-and-white photography</em>.', liqColor:'rgba(148,163,184,.4)', liqH:30, flame:false, bubbles:false, precipColor:'rgba(100,100,100,.6)'},
+  // ── Single Displacement ──
+  'fe+cuso4':    {eq:'Fe(s) + CuSO₄(aq) → FeSO₄(aq) + Cu(s)',          product:'FeSO₄ + Cu (red-brown)',  type:'Displacement',           tags:['tag-disp'],                   obs:'Blue CuSO₄ <strong>fades to pale green</strong> (FeSO₄). Iron nail is coated with <strong>reddish-brown copper</strong>. Fe is more reactive than Cu.', liqColor:'rgba(74,222,128,.35)',  liqH:60, flame:false, bubbles:false, precipColor:'rgba(180,83,9,.6)'},
+  'zn+cuso4':    {eq:'Zn(s) + CuSO₄(aq) → ZnSO₄(aq) + Cu(s)',         product:'ZnSO₄ + Cu (red-brown)',  type:'Displacement',           tags:['tag-disp'],                   obs:'Blue CuSO₄ fades to <strong>colourless ZnSO₄</strong>. Red-brown copper deposits on zinc. Zn is above Cu in reactivity series.', liqColor:'rgba(255,255,255,.2)',   liqH:55, flame:false, bubbles:false, precipColor:'rgba(180,83,9,.5)'},
+  'al+fe2o3':    {eq:'2Al(s) + Fe₂O₃(s) →[Δ] Al₂O₃(s) + 2Fe(l)',      product:'Al₂O₃ + molten Fe',      type:'Displacement (Thermite)', tags:['tag-disp','tag-exo'],         obs:'<strong>Thermite reaction</strong> — intense heat produced. Molten iron formed. Al is more reactive than Fe. Used in welding railway tracks!', liqColor:'rgba(249,115,22,.6)',   liqH:50, flame:true,  bubbles:false, precipColor:'rgba(120,80,40,.7)'},
+  'zn+hcl':      {eq:'Zn(s) + 2HCl(aq) → ZnCl₂(aq) + H₂↑',           product:'ZnCl₂ + H₂ gas',         type:'Displacement',           tags:['tag-disp'],                   obs:'Zinc dissolves with <strong>brisk effervescence</strong>. H₂ gas evolved (pop test). Colourless ZnCl₂ solution forms.', liqColor:'rgba(255,255,255,.2)',   liqH:55, flame:false, bubbles:true,  precipColor:null, gas:true},
+  'zn+h2so4':    {eq:'Zn(s) + H₂SO₄(aq) → ZnSO₄(aq) + H₂↑',          product:'ZnSO₄ + H₂ gas',         type:'Displacement',           tags:['tag-disp'],                   obs:'Zinc dissolves in dilute H₂SO₄ with <strong>vigorous fizzing</strong>. H₂ gas evolved. Standard lab preparation of hydrogen gas.', liqColor:'rgba(255,255,255,.2)',   liqH:55, flame:false, bubbles:true,  precipColor:null, gas:true},
+  'mg+hcl':      {eq:'Mg(s) + 2HCl(aq) → MgCl₂(aq) + H₂↑',           product:'MgCl₂ + H₂ gas',         type:'Displacement',           tags:['tag-disp'],                   obs:'Magnesium ribbon dissolves with <strong>vigorous fizzing</strong>. H₂ gas evolved rapidly. Colourless MgCl₂ solution.', liqColor:'rgba(255,255,255,.2)',   liqH:55, flame:false, bubbles:true,  precipColor:null, gas:true},
+  'fe+hcl':      {eq:'Fe(s) + 2HCl(aq) → FeCl₂(aq) + H₂↑',           product:'FeCl₂ + H₂ gas',         type:'Displacement',           tags:['tag-disp'],                   obs:'Iron reacts slowly with dilute HCl. <strong>H₂ gas evolved</strong> (moderately). Pale green FeCl₂ solution forms.', liqColor:'rgba(74,222,128,.25)',   liqH:50, flame:false, bubbles:true,  precipColor:null, gas:true},
+  'fe+h2so4':    {eq:'Fe(s) + H₂SO₄(aq) → FeSO₄(aq) + H₂↑',          product:'FeSO₄ + H₂ gas',         type:'Displacement',           tags:['tag-disp'],                   obs:'Iron dissolves slowly in dilute H₂SO₄. <strong>H₂ gas evolved</strong>. Pale green FeSO₄ solution forms.', liqColor:'rgba(74,222,128,.25)',   liqH:50, flame:false, bubbles:true,  precipColor:null, gas:true},
+  // ── Double Displacement / Precipitation ──
+  'pbno3+ki':    {eq:'Pb(NO₃)₂(aq) + 2KI(aq) → PbI₂↓(yellow) + 2KNO₃(aq)', product:'PbI₂ precipitate (yellow)', type:'Double Displacement', tags:['tag-disp','tag-precip'],   obs:'<strong>Bright yellow precipitate</strong> of lead iodide (PbI₂) forms immediately. Classic precipitation and double displacement.', liqColor:'rgba(253,224,71,.2)',   liqH:50, flame:false, bubbles:false, precipColor:'rgba(250,204,21,.75)'},
+  'na2so4+bacl2':{eq:'Na₂SO₄(aq) + BaCl₂(aq) → BaSO₄↓(white) + 2NaCl(aq)', product:'BaSO₄ precipitate (white)', type:'Double Displacement', tags:['tag-disp','tag-precip'],  obs:'<strong>White precipitate</strong> of barium sulphate (BaSO₄) forms instantly. Insoluble BaSO₄ settles at the bottom.', liqColor:'rgba(255,255,255,.15)',  liqH:50, flame:false, bubbles:false, precipColor:'rgba(226,232,240,.75)'},
+  'agno3+nacl':  {eq:'AgNO₃(aq) + NaCl(aq) → AgCl↓(white) + NaNO₃(aq)',     product:'AgCl precipitate (white)', type:'Double Displacement', tags:['tag-disp','tag-precip'],   obs:'<strong>White curdy precipitate</strong> of silver chloride (AgCl) forms immediately. AgCl is insoluble in water — turns grey on exposure to light.', liqColor:'rgba(255,255,255,.15)',  liqH:50, flame:false, bubbles:false, precipColor:'rgba(200,200,210,.8)'},
+  // ── Redox ──
+  'cuo+h2':      {eq:'CuO(s) + H₂(g) → Cu(s) + H₂O(l)',                product:'Cu (red-brown) + H₂O',   type:'Redox',                  tags:['tag-redox'],                  obs:'Black CuO turns <strong>red-brown</strong> as copper forms. Water droplets on cool surfaces. H₂ = reducing agent; CuO = oxidising agent.', liqColor:'rgba(180,83,9,.5)',     liqH:35, flame:false, bubbles:false, precipColor:'rgba(180,83,9,.8)'},
+};
+
+// Build adjacency map from REACTIONS for smart highlighting
+function getCompatible(id) {
+  const partners = new Set();
+  for (const key of Object.keys(REACTIONS)) {
+    const [a, b] = key.split('+');
+    if (a === id) partners.add(b);
+    if (b === id) partners.add(a);
+  }
+  return partners;
+}
+
+let slots = [null, null];
+let reacting = false;
+
+function renderShelf() {
+  const shelf = document.getElementById('shelf');
+  shelf.innerHTML = REAGENTS.map(r => `
+    <div class="reagent" id="rg-${r.id}"
+         onclick="pickReagent('${r.id}')"
+         onmouseenter="onHoverReagent(event,'${r.id}')"
+         onmouseleave="hideTooltip()">
+      <div class="vial" style="border-color:${r.border}">
+        <div class="vial-liq" style="background:${r.color};${r.state==='gas'?'height:100%;opacity:.4':r.state==='powder'||r.state==='solid'||r.state==='ribbon'||r.state==='foil'?'height:40%;border-radius:0':''}">
+        </div>
+      </div>
+      <div class="r-name">${r.name}</div>
+      <div class="r-formula">${r.formula}</div>
+    </div>
+  `).join('');
+}
+
+function updateShelfHighlights() {
+  const firstSlot = slots[0];
+  const hint = document.getElementById('shelf-hint');
+  if (!firstSlot) {
+    // No selection — reset all to normal
+    document.querySelectorAll('.reagent').forEach(el => {
+      el.classList.remove('compatible','incompatible','selected');
+    });
+    hint.textContent = 'Pick any reagent to see compatible partners highlighted ✨';
+    return;
+  }
+  // Slot A filled — highlight partners
+  const compatible = getCompatible(firstSlot.id);
+  let count = 0;
+  document.querySelectorAll('.reagent').forEach(el => {
+    const rid = el.id.replace('rg-','');
+    el.classList.remove('compatible','incompatible','selected');
+    if (rid === firstSlot.id) { el.classList.add('selected'); }
+    else if (compatible.has(rid)) { el.classList.add('compatible'); count++; }
+    else { el.classList.add('incompatible'); }
+  });
+  hint.textContent = count > 0
+    ? `✨ ${count} reagent${count>1?'s':''} can react with ${firstSlot.name} — glowing in cyan!`
+    : `No known reactions with ${firstSlot.name} in this lab. Try another!`;
+}
+
+function onHoverReagent(e, id) {
+  const el = document.getElementById('rg-'+id);
+  if (!el.classList.contains('incompatible')) return;
+  const firstSlot = slots[0];
+  if (!firstSlot) return;
+  const tip = document.getElementById('nr-tooltip');
+  tip.textContent = `❌ ${REAGENTS.find(r=>r.id===id)?.name || id} does not react with ${firstSlot.name}`;
+  tip.style.display = 'block';
+  moveTip(e);
+  el.addEventListener('mousemove', moveTip);
+}
+
+function moveTip(e) {
+  const tip = document.getElementById('nr-tooltip');
+  tip.style.left = (e.clientX + 12) + 'px';
+  tip.style.top  = (e.clientY + 12) + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('nr-tooltip').style.display = 'none';
+}
+
+function pickReagent(id) {
+  if (reacting) return;
+  const el = document.getElementById('rg-'+id);
+  // Block click on incompatible when slot A is filled
+  if (el.classList.contains('incompatible') && slots[0]) return;
+  const r = REAGENTS.find(x => x.id === id);
+  if (!r) return;
+  if (!slots[0]) {
+    slots[0] = r; updateSlot(0);
+    updateShelfHighlights();
+  } else if (!slots[1]) {
+    slots[1] = r; updateSlot(1);
+    document.getElementById('react-btn').disabled = false;
+    // Mark both selected
+    document.querySelectorAll('.reagent').forEach(el => el.classList.remove('compatible','incompatible'));
+    slots.forEach(s => { if(s) document.getElementById('rg-'+s.id)?.classList.add('selected'); });
+    document.getElementById('shelf-hint').textContent = 'Both slots filled — hit ⚡ React!';
+  } else {
+    // Replace slot B
+    slots[1] = r; updateSlot(1);
+    document.getElementById('react-btn').disabled = false;
+    document.querySelectorAll('.reagent').forEach(el => el.classList.remove('compatible','incompatible'));
+    slots.forEach(s => { if(s) document.getElementById('rg-'+s.id)?.classList.add('selected'); });
+    document.getElementById('shelf-hint').textContent = 'Both slots filled — hit ⚡ React!';
+  }
+}
+
+function updateSlot(i) {
+  const el = document.getElementById(i===0?'slot-a':'slot-b');
+  const r = slots[i];
+  if (!r) {
+    el.innerHTML = '<span class="slot-label">Slot '+(i===0?'A':'B')+'</span><span class="slot-formula">tap reagent</span><div class="slot-liq"></div>';
+    el.classList.remove('filled'); return;
+  }
+  el.classList.add('filled');
+  el.innerHTML = `<span class="slot-label" style="color:${r.border}">${r.name}</span><span class="slot-formula">${r.formula}</span><div class="slot-liq" style="background:${r.color};height:50%"></div>`;
+}
+
+function clearSlot(i) {
+  slots[i] = null; updateSlot(i);
+  document.getElementById('react-btn').disabled = true;
+  updateShelfHighlights();
+}
+
+function clearAll() {
+  slots = [null, null]; updateSlot(0); updateSlot(1);
+  document.getElementById('react-btn').disabled = true;
+  updateShelfHighlights();
+  resetBeaker();
+  document.getElementById('obs-content').innerHTML = '<div class="empty-obs">Select two reagents and hit React to see the magic! 🧙‍♂️</div>';
+  reacting = false;
+}
+
+function resetBeaker() {
+  document.getElementById('big-liq').style.height = '0%';
+  document.getElementById('big-liq').style.background = 'transparent';
+  document.querySelectorAll('.bbl').forEach(b => b.classList.remove('go'));
+  document.querySelectorAll('.gas-particle').forEach(g => g.classList.remove('go'));
+  document.getElementById('flame').classList.remove('go');
+  document.getElementById('precipitate').style.height = '0';
+  document.getElementById('beaker').style.borderColor = 'var(--border)';
+}
+
+function react() {
+  if (!slots[0] || !slots[1] || reacting) return;
+  reacting = true;
+  const key1 = slots[0].id + '+' + slots[1].id;
+  const key2 = slots[1].id + '+' + slots[0].id;
+  const rxn = REACTIONS[key1] || REACTIONS[key2];
+  resetBeaker();
+  if (!rxn) {
+    document.getElementById('obs-content').innerHTML = `
+      <div class="obs-title" style="color:var(--muted)">❌ No Reaction</div>
+      <div class="obs-details" style="margin-top:.4rem">These substances do not react under normal conditions. <strong>Tip:</strong> Use the cyan glow to pick compatible partners!</div>`;
+    setTimeout(() => { reacting = false; }, 500);
+    return;
+  }
+  const liq = document.getElementById('big-liq');
+  const precip = document.getElementById('precipitate');
+  setTimeout(() => {
+    liq.style.background = rxn.liqColor;
+    liq.style.height = rxn.liqH + '%';
+    if (rxn.flame)      document.getElementById('flame').classList.add('go');
+    if (rxn.bubbles)    document.querySelectorAll('.bbl').forEach(b => b.classList.add('go'));
+    if (rxn.gas)        document.querySelectorAll('.gas-particle').forEach(g => g.classList.add('go'));
+    if (rxn.precipColor){ precip.style.background = rxn.precipColor; precip.style.height = '18%'; }
+    document.getElementById('beaker').style.borderColor = rxn.tags.includes('tag-exo') ? 'var(--orange)' : rxn.tags.includes('tag-precip') ? 'var(--amber)' : 'var(--cyan)';
+  }, 300);
+  setTimeout(() => {
+    document.getElementById('obs-content').innerHTML = `
+      <div class="obs-title">${rxn.product}</div>
+      <div class="obs-eq">${rxn.eq}</div>
+      <div class="obs-details">${rxn.obs}</div>
+      <div style="margin-top:.4rem">${rxn.tags.map(t=>`<span class="obs-tag ${t}">${t.replace('tag-','').toUpperCase()}</span>`).join('')}<span class="obs-tag" style="background:rgba(34,211,238,.1);color:var(--cyan);border:1px solid rgba(34,211,238,.2)">${rxn.type}</span></div>`;
+    addToHistory(rxn);
+    reacting = false;
+  }, 900);
+}
+
+function addToHistory(rxn) {
+  const log = document.getElementById('history-log');
+  if (log.querySelector('.empty-obs')) log.innerHTML = '';
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-type">${rxn.type}</span> <span class="log-eq">${rxn.eq}</span>`;
+  log.prepend(entry);
+}
+
+renderShelf();
+</script>
+</body>
+</html>

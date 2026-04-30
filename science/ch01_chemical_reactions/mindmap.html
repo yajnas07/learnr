@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Chemical Reactions & Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #080f1e; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#f97316,#facc15,#22d3ee);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 260px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,45,69,.75);
+  position:sticky; top:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a9ab8; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(26,45,69,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<div id="ui">
+  <div>
+    <h1>Chemical Reactions &amp; Equations</h1>
+    <p>Class X · CBSE · Mind Map — drag &amp; hover to explore</p>
+  </div>
+</div>
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale = 1, ox = 0, oy = 0;
+let dragging = false, dragStart = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2 + 30;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+// ── NODE DATA ──
+const CENTER = {
+  id:'c', label:'Chemical\nReactions &\nEquations', x:0, y:0, r:62,
+  color:'#1c1917', stroke:'#f97316', textColor:'#fed7aa', fontSize:12
+};
+
+const BRANCHES = [
+  {
+    id:'chem_change', label:'Chemical\nChange', x:-300, y:-200, r:44,
+    color:'#431407', stroke:'#f97316', textColor:'#fdba74',
+    info:'A change where new substances form with different properties. Cannot be easily reversed.',
+    children:[
+      { id:'cc1', label:'Signs of\nChemical Rx', x:-500, y:-300, r:36,
+        color:'#431407', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'• Change in state\n• Change in colour\n• Evolution of gas\n• Change in temperature\n• Formation of precipitate' },
+      { id:'cc2', label:'vs Physical\nChange', x:-520, y:-160, r:36,
+        color:'#431407', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'Physical change: No new substance formed.\nChemical change: New substance(s) formed.\nEx: Burning (chem), melting (physical)' },
+      { id:'cc3', label:'Reactants &\nProducts', x:-340, y:-360, r:36,
+        color:'#431407', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'Reactants: Substances that undergo change (left side of arrow).\nProducts: New substances formed (right side of arrow).' },
+    ]
+  },
+  {
+    id:'equation', label:'Chemical\nEquation', x:-300, y:200, r:44,
+    color:'#1a2e05', stroke:'#84cc16', textColor:'#d9f99d',
+    info:'Symbolic representation of a chemical reaction using formulae of reactants and products.',
+    children:[
+      { id:'eq1', label:'Word\nEquation', x:-520, y:120, r:36,
+        color:'#1a2e05', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'Magnesium + Oxygen → Magnesium oxide\nAll names written in words.\nShows direction but not quantities.' },
+      { id:'eq2', label:'Balanced\nEquation', x:-540, y:240, r:36,
+        color:'#1a2e05', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'2Mg + O₂ → 2MgO\nAtoms of each element equal on both sides.\nBased on Law of Conservation of Mass.' },
+      { id:'eq3', label:'Balancing\nEquations', x:-420, y:360, r:36,
+        color:'#1a2e05', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'Hit & Trial method:\n1. Write skeletal equation\n2. Count atoms on each side\n3. Add coefficients to balance\n4. Never change formulae!' },
+      { id:'eq4', label:'State\nSymbols', x:-240, y:390, r:36,
+        color:'#1a2e05', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'(s) = solid\n(l) = liquid\n(g) = gas\n(aq) = aqueous solution\nEx: 2H₂(g) + O₂(g) → 2H₂O(l)' },
+    ]
+  },
+  {
+    id:'combination', label:'Combination\nReaction', x:0, y:-300, r:44,
+    color:'#0c1a4f', stroke:'#3b82f6', textColor:'#93c5fd',
+    info:'Two or more substances combine to form a single product.\nA + B → AB',
+    children:[
+      { id:'cn1', label:'Examples', x:-180, y:-440, r:36,
+        color:'#0c1a4f', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'2Mg + O₂ → 2MgO (Magnesium burns)\nCaO + H₂O → Ca(OH)₂ (Slaking of lime)\nC + O₂ → CO₂\nSO₃ + H₂O → H₂SO₄' },
+      { id:'cn2', label:'Exothermic\n& Endothermic', x:0, y:-470, r:36,
+        color:'#0c1a4f', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'Exothermic: Energy released (heat/light)\n• Burning, respiration, neutralisation\nEndothermic: Energy absorbed\n• Photosynthesis, decomposition of CaCO₃' },
+      { id:'cn3', label:'Decomposition\nReaction', x:180, y:-440, r:36,
+        color:'#0c1a4f', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'Single compound breaks into two or more.\nAB → A + B\n2FeSO₄ → Fe₂O₃ + SO₂ + SO₃\n2PbO → 2Pb + O₂ (Thermal decomp.)' },
+    ]
+  },
+  {
+    id:'displacement', label:'Displacement\nReaction', x:300, y:-200, r:44,
+    color:'#240a45', stroke:'#a855f7', textColor:'#d8b4fe',
+    info:'More reactive element displaces less reactive element from its compound.\nA + BC → AC + B',
+    children:[
+      { id:'d1', label:'Single\nDisplacement', x:480, y:-320, r:36,
+        color:'#240a45', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'Fe + CuSO₄ → FeSO₄ + Cu\n(Iron displaces copper)\nZn + H₂SO₄ → ZnSO₄ + H₂↑\n(Zinc displaces hydrogen)' },
+      { id:'d2', label:'Double\nDisplacement', x:540, y:-180, r:36,
+        color:'#240a45', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'AB + CD → AD + CB\nExchange of ions between two compounds.\nNa₂SO₄ + BaCl₂ → BaSO₄↓ + 2NaCl\nPrecipitate formed: BaSO₄ (white)' },
+      { id:'d3', label:'Reactivity\nSeries', x:510, y:-50, r:36,
+        color:'#240a45', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'K > Na > Ca > Mg > Al > Zn > Fe > Ni > Sn > Pb > H > Cu > Hg > Ag > Au\nHigher = more reactive = displaces elements below it.' },
+    ]
+  },
+  {
+    id:'oxidation', label:'Oxidation &\nReduction', x:300, y:200, r:44,
+    color:'#1f0f0a', stroke:'#ef4444', textColor:'#fca5a5',
+    info:'Redox reactions involve simultaneous oxidation and reduction.',
+    children:[
+      { id:'o1', label:'Oxidation', x:500, y:100, r:36,
+        color:'#1f0f0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Gain of oxygen OR loss of hydrogen OR loss of electrons.\nCu + O₂ → 2CuO (Cu is oxidised)\nOxidising agent: gains electrons.' },
+      { id:'o2', label:'Reduction', x:540, y:230, r:36,
+        color:'#1f0f0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Loss of oxygen OR gain of hydrogen OR gain of electrons.\nCuO + H₂ → Cu + H₂O (CuO reduced)\nReducing agent: loses electrons.' },
+      { id:'o3', label:'Rancidity &\nCorrosion', x:430, y:350, r:36,
+        color:'#1f0f0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Corrosion: Metals oxidised by moist air.\n4Fe + 3O₂ + xH₂O → 2Fe₂O₃·xH₂O (rust)\nRancidity: Oxidation of fats/oils → bad smell/taste.\nAntioxidants (BHA) and nitrogen flushing prevent it.' },
+      { id:'o4', label:'Prevention', x:270, y:400, r:36,
+        color:'#1f0f0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Corrosion prevention:\n• Painting/oiling\n• Galvanisation (Zn coating)\n• Alloying (stainless steel)\n• Electroplating\nRancidity prevention:\n• Refrigeration\n• Antioxidants\n• Vacuum/N₂ packaging' },
+    ]
+  },
+  {
+    id:'precipitation', label:'Precipitation\n& Other Types', x:0, y:300, r:44,
+    color:'#082f3a', stroke:'#22d3ee', textColor:'#a5f3fc',
+    info:'Precipitation: Insoluble product (precipitate) formed when two solutions react.',
+    children:[
+      { id:'p1', label:'Precipitation\nExamples', x:-200, y:430, r:36,
+        color:'#082f3a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Na₂SO₄ + BaCl₂ → BaSO₄↓ + 2NaCl\nAgNO₃ + NaCl → AgCl↓ + NaNO₃\nPb(NO₃)₂ + 2KI → PbI₂↓ + 2KNO₃\n(Yellow precipitate of lead iodide)' },
+      { id:'p2', label:'Thermal\nDecomp.', x:0, y:470, r:36,
+        color:'#082f3a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Heat causes decomposition.\nCaCO₃ → CaO + CO₂↑\n(Calcination)\n2Fe(OH)₃ → Fe₂O₃ + 3H₂O\n2AgBr → 2Ag + Br₂ (Photo decomp.)' },
+      { id:'p3', label:'Electrolytic\nDecomp.', x:200, y:430, r:36,
+        color:'#082f3a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Electric current causes decomposition.\n2H₂O → 2H₂ + O₂ (Electrolysis)\nH₂ at cathode (−), O₂ at anode (+)\nH₂ : O₂ = 2 : 1 by volume' },
+    ]
+  },
+];
+
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+function getNode(id) { return allNodes.find(n=>n.id===id); }
+
+// pan/zoom
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { ox=dragOrigin.x+(e.clientX-dragStart.x); oy=dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>dragging=false);
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:0.91; zoomAt(f,e.clientX,e.clientY); },{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }});
+canvas.addEventListener('touchmove',e=>{ e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d; }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.3,Math.min(2.5,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+30; draw(); }
+
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy);
+  ctx.scale(scale,scale);
+
+  // background grid
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.025)';
+  ctx.lineWidth=1;
+  for(let x=-1000;x<1000;x+=60){ ctx.beginPath();ctx.moveTo(x,-1000);ctx.lineTo(x,1000);ctx.stroke(); }
+  for(let y=-1000;y<1000;y+=60){ ctx.beginPath();ctx.moveTo(-1000,y);ctx.lineTo(1000,y);ctx.stroke(); }
+  ctx.restore();
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'88');
+    grd.addColorStop(1,b.stroke+'44');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2-30;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[4,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?30:16;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||11}px Nunito,sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=14;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

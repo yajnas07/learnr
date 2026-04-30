@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Chemical Reactions & Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange:#f97316; --amber:#f59e0b; --cyan:#22d3ee; --lime:#84cc16;
+    --bg:#0f172a; --card:#1e293b; --card2:#263148; --text:#e2e8f0; --muted:#94a3b8; --border:#334155;
+    --correct:#10b981; --wrong:#ef4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(249,115,22,.06) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(34,211,238,.05) 0%,transparent 60%);pointer-events:none;z-index:0;}
+  header{text-align:center;padding:2.5rem 1rem 1.5rem;position:relative;z-index:1;}
+  .back-chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;font-family:'DM Mono',monospace;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:99px;padding:.3rem .9rem;margin-bottom:1rem;}
+  header h1{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.6rem);font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#f97316 0%,#facc15 50%,#22d3ee 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  header p{color:var(--muted);font-size:.88rem;margin-top:.3rem;font-family:'DM Mono',monospace;}
+  .dashboard{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:0 1rem 1.5rem;position:relative;z-index:1;}
+  .dash-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:.7rem 1.4rem;text-align:center;min-width:90px;}
+  .dash-val{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;}
+  .dash-lbl{font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:.1rem;}
+  nav{display:flex;justify-content:center;flex-wrap:wrap;gap:.5rem;padding:0 1rem 1.5rem;position:relative;z-index:1;}
+  nav button{font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;padding:.45rem 1.1rem;border-radius:99px;border:2px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;letter-spacing:.3px;}
+  nav button:hover{color:var(--text);border-color:#64748b;}
+  nav button.active{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,.1);}
+  main{max-width:820px;margin:0 auto;padding:0 1rem 5rem;position:relative;z-index:1;}
+  .q-card{background:var(--card);border:1px solid var(--border);border-radius:18px;margin-bottom:1.2rem;overflow:hidden;transition:box-shadow .2s;animation:slideIn .35s ease both;}
+  .q-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.4);}
+  @keyframes slideIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .q-header{display:flex;align-items:flex-start;gap:.8rem;padding:1.1rem 1.2rem .8rem;cursor:pointer;}
+  .q-num{font-family:'DM Mono',monospace;font-size:.72rem;font-weight:500;min-width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+  .q-text{font-size:.93rem;font-weight:600;line-height:1.5;flex:1;}
+  .q-meta{display:flex;gap:.4rem;flex-wrap:wrap;padding:0 1.2rem .8rem 4rem;}
+  .badge{font-size:.68rem;font-family:'DM Mono',monospace;padding:.15rem .55rem;border-radius:99px;font-weight:500;}
+  .badge-mcq{background:rgba(59,130,246,.15);color:#60a5fa;}
+  .badge-short{background:rgba(16,185,129,.15);color:#34d399;}
+  .badge-long{background:rgba(245,158,11,.15);color:#fbbf24;}
+  .badge-assert{background:rgba(168,85,247,.15);color:#c084fc;}
+  .badge-1m{background:rgba(148,163,184,.1);color:var(--muted);}
+  .badge-2m{background:rgba(245,158,11,.1);color:#fcd34d;}
+  .badge-3m{background:rgba(255,77,77,.1);color:#fca5a5;}
+  .badge-5m{background:rgba(239,68,68,.15);color:#f87171;}
+  .strip-comb   {border-left:4px solid var(--lime);}
+  .strip-decomp {border-left:4px solid #60a5fa;}
+  .strip-disp   {border-left:4px solid #c084fc;}
+  .strip-redox  {border-left:4px solid #f87171;}
+  .strip-eq     {border-left:4px solid var(--cyan);}
+  .strip-general{border-left:4px solid #64748b;}
+  .mcq-body{padding:0 1.2rem .5rem 1.2rem;}
+  .mcq-opts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem;}
+  @media(max-width:480px){.mcq-opts{grid-template-columns:1fr;}}
+  .opt-btn{display:flex;align-items:center;gap:.6rem;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:.6rem .8rem;cursor:pointer;transition:all .18s;text-align:left;color:var(--text);font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:600;}
+  .opt-btn:hover:not(:disabled){border-color:#64748b;background:#2d3f57;}
+  .opt-btn .opt-label{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);min-width:18px;}
+  .opt-btn.correct{border-color:var(--correct);background:rgba(16,185,129,.12);color:#6ee7b7;}
+  .opt-btn.wrong{border-color:var(--wrong);background:rgba(239,68,68,.1);color:#fca5a5;}
+  .opt-btn.reveal{border-color:var(--correct);background:rgba(16,185,129,.08);color:#6ee7b7;}
+  .ans-reveal{overflow:hidden;max-height:0;transition:max-height .4s ease;}
+  .ans-reveal.open{max-height:700px;}
+  .ans-body{padding:.8rem 1.2rem 1.1rem 1.2rem;border-top:1px solid var(--border);}
+  .ans-label{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--correct);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem;}
+  .ans-text{font-size:.88rem;color:var(--text);line-height:1.7;}
+  .ans-text strong{color:#fcd34d;}
+  .ans-text em{color:#93c5fd;font-style:normal;}
+  .chemical{font-family:'DM Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.5rem .8rem;font-size:.82rem;margin:.5rem 0;color:#34d399;line-height:1.8;}
+  .hint{font-size:.78rem;color:#fb923c;background:rgba(251,146,60,.08);border-left:3px solid #fb923c;border-radius:0 6px 6px 0;padding:.4rem .7rem;margin-top:.6rem;}
+  .show-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;padding:.4rem 1rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;margin:.2rem 0 .8rem 1.2rem;}
+  .show-btn:hover{color:var(--text);border-color:#64748b;}
+  .show-btn.active{color:var(--correct);border-color:var(--correct);background:rgba(16,185,129,.08);}
+  .feedback{font-size:.8rem;font-family:'DM Mono',monospace;padding:.4rem .8rem;border-radius:8px;margin:.3rem 0 .6rem;display:none;}
+  .feedback.correct{background:rgba(16,185,129,.1);color:#34d399;display:block;}
+  .feedback.wrong{background:rgba(239,68,68,.1);color:#f87171;display:block;}
+  .reset-bar{text-align:center;padding:1rem;position:relative;z-index:1;}
+  .reset-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;padding:.6rem 1.8rem;border-radius:99px;border:2px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .reset-btn:hover{border-color:var(--orange);color:var(--orange);}
+  .empty{text-align:center;padding:3rem;color:var(--muted);font-family:'DM Mono',monospace;font-size:.88rem;}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;background:rgba(7,16,31,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<header>
+  <div class="back-chip">📘 Class X · CBSE · Science Ch.1</div>
+  <h1>Question Bank</h1>
+  <p>Chemical Reactions &amp; Equations &nbsp;|&nbsp; 30 Questions</p>
+</header>
+<div class="dashboard">
+  <div class="dash-card"><div class="dash-val" id="d-total">30</div><div class="dash-lbl">Total</div></div>
+  <div class="dash-card"><div class="dash-val" id="d-attempted" style="color:var(--amber)">0</div><div class="dash-lbl">Attempted</div></div>
+  <div class="dash-card"><div class="dash-val" id="d-correct" style="color:var(--correct)">0</div><div class="dash-lbl">Correct</div></div>
+  <div class="dash-card"><div class="dash-val" id="d-score" style="color:#a855f7">0%</div><div class="dash-lbl">Score</div></div>
+</div>
+<nav>
+  <button class="active" onclick="filterQ('all',this)">All (30)</button>
+  <button onclick="filterQ('mcq',this)">MCQ</button>
+  <button onclick="filterQ('short',this)">Short Answer</button>
+  <button onclick="filterQ('long',this)">Long Answer</button>
+  <button onclick="filterQ('assert',this)">Assertion–Reason</button>
+</nav>
+<main id="qlist"></main>
+<div class="reset-bar"><button class="reset-btn" onclick="resetAll()">↺ Reset All Answers</button></div>
+
+<script>
+const Q = [
+  // ───── MCQ (10) ─────
+  {id:1,type:'mcq',topic:'eq',marks:1,
+   q:'Which of the following is NOT a sign of a chemical reaction?',
+   opts:['Change of colour','Change of state without energy','Evolution of a gas','Change in temperature'],
+   ans:1,
+   explain:'Change of state without any energy exchange (like ice melting) is a physical change, not a chemical reaction. Signs of chemical reactions include colour change, gas evolution, precipitate formation, temperature change, and light emission.'},
+  {id:2,type:'mcq',topic:'comb',marks:1,
+   q:'The reaction 2Mg + O₂ → 2MgO is an example of:',
+   opts:['Decomposition reaction','Displacement reaction','Combination reaction','Double displacement'],
+   ans:2,
+   explain:'Two reactants (Mg and O₂) combine to form a single product (MgO) — this is a combination (synthesis) reaction. It is also exothermic.'},
+  {id:3,type:'mcq',topic:'decomp',marks:1,
+   q:'Electrolysis of water produces H₂ and O₂ in the volume ratio:',
+   opts:['1:2','1:1','2:1','3:1'],
+   ans:2,
+   explain:'In electrolysis of water: 2H₂O → 2H₂ + O₂. Two molecules of H₂ are produced for every one molecule of O₂, so the volume ratio H₂:O₂ = 2:1.'},
+  {id:4,type:'mcq',topic:'disp',marks:1,
+   q:'When an iron nail is placed in copper sulphate solution, the blue colour of the solution:',
+   opts:['Deepens','Fades to pale green','Disappears completely','Turns red'],
+   ans:1,
+   explain:'Fe displaces Cu from CuSO₄ (Fe is more reactive). Blue CuSO₄ is replaced by pale green FeSO₄. The iron nail gets coated with reddish-brown copper.'},
+  {id:5,type:'mcq',topic:'redox',marks:1,
+   q:'In the reaction CuO + H₂ → Cu + H₂O, which substance is the reducing agent?',
+   opts:['CuO','Cu','H₂O','H₂'],
+   ans:3,
+   explain:'H₂ is oxidised (gains O to form H₂O), so H₂ is the reducing agent. CuO is reduced (loses O to form Cu), so CuO is the oxidising agent.'},
+  {id:6,type:'mcq',topic:'eq',marks:1,
+   q:'The Law of Conservation of Mass states that in a chemical reaction:',
+   opts:['Products are always more massive than reactants','Mass of reactants equals mass of products','Mass of products is less than reactants','New atoms are created'],
+   ans:1,
+   explain:'Antoine Lavoisier (1774) established that mass is conserved in a chemical reaction. Total mass of reactants = total mass of products. This is why we must balance equations.'},
+  {id:7,type:'mcq',topic:'decomp',marks:1,
+   q:'Which type of decomposition is used in black-and-white photography?',
+   opts:['Thermal decomposition','Electrolytic decomposition','Photochemical decomposition','Catalytic decomposition'],
+   ans:2,
+   explain:'AgBr (silver bromide) undergoes photodecomposition: 2AgBr → 2Ag + Br₂ when exposed to light. The silver produced darkens the film. This is photochemical decomposition.'},
+  {id:8,type:'mcq',topic:'redox',marks:1,
+   q:'Rancidity in food is caused by:',
+   opts:['Hydrolysis of fats','Oxidation of fats and oils','Reduction of vitamins','Action of salt'],
+   ans:1,
+   explain:'Rancidity occurs when fats and oils are oxidised by atmospheric oxygen, producing compounds with unpleasant smell and taste. It is essentially slow oxidation.'},
+  {id:9,type:'mcq',topic:'eq',marks:1,
+   q:'What are the state symbols used in a balanced chemical equation?',
+   opts:['(s), (l), (g), (w)','(s), (l), (g), (aq)','(sol), (liq), (gas), (aq)','(s), (f), (g), (aq)'],
+   ans:1,
+   explain:'The standard state symbols are: (s) = solid, (l) = liquid, (g) = gas, (aq) = aqueous (dissolved in water). (w) is NOT a standard symbol.'},
+  {id:10,type:'mcq',topic:'comb',marks:1,
+   q:'Which of the following reactions releases heat?',
+   opts:['Decomposition of CaCO₃','Electrolysis of water','Burning of magnesium','Photodecomposition of AgCl'],
+   ans:2,
+   explain:'Burning of Mg is a combination reaction AND exothermic (releases heat as dazzling white flame). The other three all require energy input (endothermic).'},
+
+  // ───── Assertion–Reason (3) ─────
+  {id:11,type:'assert',topic:'eq',marks:1,
+   q:'Assertion (A): A balanced chemical equation has equal numbers of atoms of each element on both sides.\nReason (R): This is based on the Law of Conservation of Mass.',
+   opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both statements are true and R directly explains A. We balance equations (equal atoms both sides) because mass is conserved — atoms cannot be created or destroyed.'},
+  {id:12,type:'assert',topic:'redox',marks:1,
+   q:'Assertion (A): Chips are packed in nitrogen gas to prevent rancidity.\nReason (R): Nitrogen is an inert gas and does not react with fats.',
+   opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both statements are true. Chips are packed in N₂ to displace oxygen; since N₂ is inert, it prevents oxidation (rancidity) of fats in the chips.'},
+  {id:13,type:'assert',topic:'decomp',marks:1,
+   q:'Assertion (A): Decomposition reactions are opposite of combination reactions.\nReason (R): In decomposition, two substances combine; in combination, one substance breaks down.',
+   opts:['Both A and R are true; R is the correct explanation of A','Both A and R are true; R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],
+   ans:2,
+   explain:'A is true — decomposition and combination are indeed opposite processes. But R is false — it has the definitions reversed. In COMBINATION, two substances combine. In DECOMPOSITION, one substance breaks down.'},
+
+  // ───── Short Answer (12) ─────
+  {id:14,type:'short',topic:'eq',marks:2,
+   q:'What is the difference between a skeletal equation and a balanced chemical equation? Give one example.',
+   answer:'A <strong>skeletal equation</strong> shows reactants and products by their formulae but the number of atoms is NOT equal on both sides.\nA <strong>balanced equation</strong> has coefficients added so atoms of each element are equal on both sides, satisfying the Law of Conservation of Mass.',
+   chem:'Skeletal: Mg + O₂ → MgO\nBalanced: 2Mg(s) + O₂(g) → 2MgO(s)',
+   hint:'You change COEFFICIENTS (numbers before formulae), NEVER subscripts within formulae.'},
+  {id:15,type:'short',topic:'comb',marks:2,
+   q:'Define a combination reaction. Write one equation for an exothermic combination reaction observed in everyday life.',
+   answer:'A <strong>combination reaction</strong> is one in which two or more substances combine to form a single product: A + B → AB.\nMost combination reactions are <strong>exothermic</strong>.',
+   chem:'CaO(s) + H₂O(l) → Ca(OH)₂(aq) + Heat\n(Quicklime + water → slaked lime; heat is released)',
+   hint:'Count the products — if only ONE, it is a combination reaction.'},
+  {id:16,type:'short',topic:'decomp',marks:2,
+   q:'Distinguish between thermal, electrolytic, and photochemical decomposition. Give one example of each.',
+   answer:'<strong>Thermal:</strong> Energy from heat causes decomposition.\n<strong>Electrolytic:</strong> Electrical energy causes decomposition.\n<strong>Photochemical:</strong> Light energy causes decomposition.',
+   chem:'Thermal:       CaCO₃ → CaO + CO₂\nElectrolytic:  2H₂O → 2H₂ + O₂\nPhotochemical: 2AgCl → 2Ag + Cl₂',
+   hint:'Mnemonic: TEP — Thermal, Electric, Photochemical'},
+  {id:17,type:'short',topic:'disp',marks:2,
+   q:'Why does the colour of copper sulphate solution change when an iron nail is placed in it? Write the equation.',
+   answer:'Iron is <strong>more reactive</strong> than copper (higher in the reactivity series). Fe displaces Cu from CuSO₄ solution. Blue CuSO₄ is replaced by pale green FeSO₄. The iron nail is coated with reddish-brown copper.',
+   chem:'Fe(s) + CuSO₄(aq) → FeSO₄(aq) + Cu(s)',
+   hint:'This is a single displacement reaction driven by relative reactivity.'},
+  {id:18,type:'short',topic:'disp',marks:2,
+   q:'What is a precipitation reaction? Give one example with equation.',
+   answer:'A <strong>precipitation reaction</strong> is one in which two solutions react to form an insoluble product called a <strong>precipitate</strong>. It is a type of double displacement reaction.',
+   chem:'Pb(NO₃)₂(aq) + 2KI(aq) → PbI₂↓(yellow) + 2KNO₃(aq)',
+   hint:'The ↓ symbol indicates a precipitate. Other examples: BaSO₄↓(white), AgCl↓(white).'},
+  {id:19,type:'short',topic:'redox',marks:2,
+   q:'What is OIL RIG? Explain oxidation and reduction in terms of electron transfer.',
+   answer:'<strong>OIL RIG</strong> is a mnemonic:\n• <strong>O</strong>xidation <strong>I</strong>s <strong>L</strong>oss (of electrons)\n• <strong>R</strong>eduction <strong>I</strong>s <strong>G</strong>ain (of electrons)\n\nA substance that loses electrons is oxidised; a substance that gains electrons is reduced. Both always occur together (REDOX).'},
+  {id:20,type:'short',topic:'redox',marks:2,
+   q:'What is corrosion? How can rusting of iron be prevented? Name any two methods.',
+   answer:'<strong>Corrosion</strong> is the slow oxidation of metals by exposure to moist air or water, causing surface deterioration.\n\nPrevention of rusting:\n1. <strong>Galvanisation</strong> — coating iron with zinc (Zn is more reactive; provides sacrificial protection)\n2. <strong>Painting/oiling</strong> — creates a physical barrier, preventing contact with moisture and O₂\nOther methods: alloying (stainless steel), electroplating.',
+   chem:'4Fe + 3O₂ + xH₂O → 2Fe₂O₃·xH₂O\n(reddish-brown rust)'},
+  {id:21,type:'short',topic:'comb',marks:2,
+   q:'Write the observation and equation for burning of magnesium in air. Name the type of reaction.',
+   answer:'<strong>Observation:</strong> Magnesium burns with a bright, dazzling white flame. A white powder (MgO) is formed.\n\nThis is a <strong>combination reaction</strong> and also an <strong>exothermic reaction</strong>.',
+   chem:'2Mg(s) + O₂(g) → 2MgO(s)',
+   hint:'MgO dissolves in water to form Mg(OH)₂ — a basic solution.'},
+  {id:22,type:'short',topic:'eq',marks:2,
+   q:'What are state symbols? Write the balanced equation for the reaction between hydrogen and oxygen with correct state symbols.',
+   answer:'<strong>State symbols</strong> indicate the physical state of each substance in a reaction:\n(s) = solid | (l) = liquid | (g) = gas | (aq) = aqueous',
+   chem:'2H₂(g) + O₂(g) → 2H₂O(l)',
+   hint:'Water formed is liquid (l) at room temperature, not (g).'},
+  {id:23,type:'short',topic:'decomp',marks:2,
+   q:'What is observed when ferrous sulphate crystals are heated? Write the equation.',
+   answer:'<strong>Observations:</strong>\n• Green colour of FeSO₄ changes to reddish-brown (Fe₂O₃)\n• Smell of burning sulphur — pungent odour (SO₂ and SO₃ gases evolved)',
+   chem:'2FeSO₄(s) → Fe₂O₃(s) + SO₂(g) + SO₃(g)',
+   hint:'Ferrous sulphate is green; ferric oxide (Fe₂O₃) is brown/reddish.'},
+  {id:24,type:'short',topic:'redox',marks:2,
+   q:'Identify the oxidising agent and reducing agent in: 2Al + Fe₂O₃ → Al₂O₃ + 2Fe',
+   answer:'<strong>Al</strong> is the <em>reducing agent</em> — it loses electrons (gets oxidised; gains O to form Al₂O₃).\n<strong>Fe₂O₃</strong> is the <em>oxidising agent</em> — it loses O (Fe³⁺ is reduced to Fe⁰).\n\nThis is the thermite reaction — used in welding railway tracks.',
+   hint:'OIL RIG: The substance that gets oxidised IS the reducing agent.'},
+  {id:25,type:'short',topic:'eq',marks:2,
+   q:'Balance the following equation and add state symbols:\n  Fe + H₂O → Fe₃O₄ + H₂',
+   answer:'Balance Fe: multiply Fe by 3\nBalance O: multiply H₂O by 4\nBalance H: 4H₂O → 4H₂',
+   chem:'3Fe(s) + 4H₂O(g) → Fe₃O₄(s) + 4H₂(g)',
+   hint:'Start with Fe (×3), then O (×4 H₂O), then H (×4 H₂). Verify: Fe=3, O=4, H=8 on both sides.'},
+
+  // ───── Long Answer (5) ─────
+  {id:26,type:'long',topic:'decomp',marks:5,
+   q:'Explain the three types of decomposition reactions with one chemical equation for each. Mention the energy source required.',
+   answer:'Decomposition reactions break a single compound into simpler substances. Three types based on energy:\n\n<strong>1. Thermal Decomposition</strong> (Heat energy):\nCalcium carbonate decomposes on strong heating.\nUsed in the cement industry.\n\n<strong>2. Electrolytic Decomposition</strong> (Electrical energy):\nWater is decomposed by passing electric current.\nH₂ collects at cathode (2× volume), O₂ at anode.\n\n<strong>3. Photochemical Decomposition</strong> (Light energy):\nSilver salts decompose in sunlight.\nUsed in black-and-white photography.',
+   chem:'1. CaCO₃(s) → CaO(s) + CO₂(g)\n2. 2H₂O(l) → 2H₂(g) + O₂(g)\n3. 2AgCl(s) → 2Ag(s) + Cl₂(g)',
+   hint:'All decomposition reactions are generally ENDOTHERMIC (require energy input).'},
+  {id:27,type:'long',topic:'redox',marks:5,
+   q:'(a) Define oxidation, reduction, oxidising agent, and reducing agent.\n(b) Identify each in the reaction: CuO + H₂ → Cu + H₂O\n(c) Give the experimental observation for this reaction.',
+   answer:'<strong>(a) Definitions:</strong>\n<em>Oxidation:</em> Gain of O / loss of H / loss of electrons.\n<em>Reduction:</em> Loss of O / gain of H / gain of electrons.\n<em>Oxidising agent:</em> Causes oxidation in others; itself gets reduced.\n<em>Reducing agent:</em> Causes reduction in others; itself gets oxidised.\n\n<strong>(b) In CuO + H₂ → Cu + H₂O:</strong>\n• H₂ is OXIDISED (gains O) → H₂ is the reducing agent.\n• CuO is REDUCED (loses O) → CuO is the oxidising agent.\n\n<strong>(c) Observations:</strong>\nBlack copper oxide (CuO) turns red-brown as copper (Cu) is formed.\nCondensation/water droplets seen on cooler parts of apparatus.',
+   chem:'CuO(s) + H₂(g) → Cu(s) + H₂O(l)\nBlack solid     →  Red-brown solid'},
+  {id:28,type:'long',topic:'disp',marks:5,
+   q:'(a) Distinguish between single displacement and double displacement reactions.\n(b) Give two equations for each.\n(c) What is the importance of the reactivity series in displacement reactions?',
+   answer:'<strong>(a) Single Displacement:</strong> One element displaces another from its compound (A + BC → AC + B). More reactive element displaces less reactive.\n<strong>Double Displacement:</strong> Two compounds exchange ions to form two new compounds. Usually produces a precipitate or water.\n\n<strong>(b) Single Displacement:</strong>\n\n<strong>Double Displacement:</strong>\n\n<strong>(c) Reactivity Series:</strong>\nK > Na > Ca > Mg > Al > Zn > Fe > Ni > Sn > Pb > H > Cu > Hg > Ag > Au\nA metal displaces any metal BELOW it from salt solutions. Metals above H displace hydrogen from dilute acids.',
+   chem:'Single Displacement:\n  Fe(s) + CuSO₄(aq) → FeSO₄(aq) + Cu(s)\n  Zn(s) + 2HCl(aq) → ZnCl₂(aq) + H₂(g)\n\nDouble Displacement:\n  Na₂SO₄(aq) + BaCl₂(aq) → BaSO₄↓ + 2NaCl(aq)\n  Pb(NO₃)₂(aq) + 2KI(aq) → PbI₂↓ + 2KNO₃(aq)'},
+  {id:29,type:'long',topic:'redox',marks:5,
+   q:'What are corrosion and rancidity? Explain with examples how they are chemically similar. Describe two methods to prevent each.',
+   answer:'<strong>Corrosion:</strong> Slow oxidation of metals on exposure to moist air/water causing surface damage.\n<em>Example:</em> Rusting of iron, green patina on copper.\n\n<strong>Rancidity:</strong> Oxidation of fats and oils in food, producing bad smell and taste.\n<em>Example:</em> Stale butter, spoilt chips, old cooking oil.\n\n<strong>Chemical similarity:</strong> Both involve slow OXIDATION by atmospheric oxygen.\n\n<strong>Preventing Corrosion:</strong>\n1. Galvanisation (Zn coating — sacrificial protection)\n2. Alloying (stainless steel — Cr + Ni resist oxidation)\n\n<strong>Preventing Rancidity:</strong>\n1. Adding antioxidants (BHA, BHT) to food\n2. Nitrogen flushing in packets (inert atmosphere)',
+   chem:'Rusting: 4Fe + 3O₂ + xH₂O → 2Fe₂O₃·xH₂O\nCopper: 2Cu + O₂ + CO₂ + H₂O → Cu(OH)₂·CuCO₃'},
+  {id:30,type:'long',topic:'eq',marks:5,
+   q:'(a) State the Law of Conservation of Mass.\n(b) Explain the steps to balance a chemical equation using the hit-and-trial method.\n(c) Balance the equation: Al + HCl → AlCl₃ + H₂',
+   answer:'<strong>(a) Law of Conservation of Mass (Lavoisier, 1774):</strong>\nMass is neither created nor destroyed in a chemical reaction. Total mass of reactants = total mass of products.\n\n<strong>(b) Steps for Hit-and-Trial Balancing:</strong>\n1. Write the word equation.\n2. Write skeletal equation using chemical formulae.\n3. Count atoms of each element on both sides.\n4. Add coefficients (NEVER change subscripts) to balance.\n5. Balance metals first, then non-metals, then H, finally O.\n6. Verify: atom count equal on both sides.\n7. Add state symbols.\n\n<strong>(c) Balancing Al + HCl → AlCl₃ + H₂:</strong>\nStep 1: Balance Al (already 1 on each side) ✓\nStep 2: Balance Cl — need 3 on left: Al + 3HCl → AlCl₃ + H₂\nStep 3: H check — left=3, right=2. Make H₂ into 3/2 H₂, or multiply all by 2.',
+   chem:'Skeletal: Al + HCl → AlCl₃ + H₂\nBalanced: 2Al(s) + 6HCl(aq) → 2AlCl₃(aq) + 3H₂(g)',
+   hint:'Final check: Al=2, H=6, Cl=6 on both sides. ✓'}
+];
+
+let attempted = new Set(), correct = new Set(), curFilter = 'all';
+
+function filterQ(f, btn) {
+  curFilter = f;
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQ();
+}
+
+function renderQ() {
+  const list = document.getElementById('qlist');
+  const filtered = curFilter === 'all' ? Q : Q.filter(q => q.type === curFilter);
+  if (!filtered.length) { list.innerHTML = '<div class="empty">No questions found.</div>'; return; }
+
+  const topicStrip = {comb:'strip-comb',decomp:'strip-decomp',disp:'strip-disp',redox:'strip-redox',eq:'strip-eq',general:'strip-general'};
+  const typeBadge = {mcq:'badge-mcq',short:'badge-short',long:'badge-long',assert:'badge-assert'};
+  const typeLabel = {mcq:'MCQ',short:'Short Answer',long:'Long Answer',assert:'Assertion–Reason'};
+  const marksBadge = {1:'badge-1m',2:'badge-2m',3:'badge-3m',5:'badge-5m'};
+  const numBg = {comb:'rgba(132,204,22,.15)',decomp:'rgba(59,130,246,.15)',disp:'rgba(168,85,247,.15)',redox:'rgba(239,68,68,.15)',eq:'rgba(34,211,238,.15)',general:'rgba(100,116,139,.15)'};
+  const numColor = {comb:'#84cc16',decomp:'#60a5fa',disp:'#c084fc',redox:'#f87171',eq:'#22d3ee',general:'#64748b'};
+
+  list.innerHTML = filtered.map((q, i) => {
+    const strip = topicStrip[q.topic] || 'strip-general';
+    const isMCQ = q.type === 'mcq' || q.type === 'assert';
+    const labels = ['A','B','C','D'];
+    const optsHTML = isMCQ ? `<div class="mcq-body">
+      <div class="mcq-opts">
+        ${q.opts.map((o,j) => `<button class="opt-btn" id="opt-${q.id}-${j}" onclick="pickOpt(${q.id},${j},${q.ans})" title="${o}">
+          <span class="opt-label">${labels[j]}</span>${o}</button>`).join('')}
+      </div>
+      <div class="feedback" id="fb-${q.id}"></div>
+      <div class="ans-reveal" id="ar-${q.id}">
+        <div class="ans-body"><div class="ans-label">✅ Explanation</div>
+          <div class="ans-text">${q.explain||''}</div></div></div>
+    </div>` : `
+    <button class="show-btn" id="sb-${q.id}" onclick="toggleAns(${q.id})">👁 Show Answer</button>
+    <div class="ans-reveal" id="ar-${q.id}">
+      <div class="ans-body">
+        <div class="ans-label">✅ Model Answer</div>
+        <div class="ans-text">${(q.answer||'').replace(/\n/g,'<br>')}</div>
+        ${q.chem ? `<div class="chemical">${q.chem.replace(/\n/g,'<br>')}</div>` : ''}
+        ${q.hint ? `<div class="hint">💡 ${q.hint}</div>` : ''}
+      </div></div>`;
+
+    return `<div class="q-card ${strip}" id="qcard-${q.id}" style="animation-delay:${i*.04}s">
+      <div class="q-header" onclick="${isMCQ?'':'toggleAns('+q.id+')'}">
+        <div class="q-num" style="background:${numBg[q.topic]};color:${numColor[q.topic]}">${i+1}</div>
+        <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge ${typeBadge[q.type]}">${typeLabel[q.type]}</span>
+        <span class="badge ${marksBadge[q.marks]}">${q.marks}M</span>
+      </div>
+      ${optsHTML}
+    </div>`;
+  }).join('');
+}
+
+function pickOpt(qid, chosen, correct_idx) {
+  const q = Q.find(x => x.id === qid);
+  if (attempted.has(qid)) return;
+  attempted.add(qid);
+  const fb = document.getElementById(`fb-${qid}`);
+  for (let j = 0; j < 4; j++) {
+    const btn = document.getElementById(`opt-${qid}-${j}`);
+    if (!btn) continue;
+    btn.disabled = true;
+    if (j === correct_idx) btn.classList.add(chosen === j ? 'correct' : 'reveal');
+    else if (j === chosen) btn.classList.add('wrong');
+  }
+  if (chosen === correct_idx) {
+    correct.add(qid);
+    fb.className = 'feedback correct';
+    fb.textContent = '✓ Correct!';
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = `✗ Incorrect. Answer: ${['A','B','C','D'][correct_idx]}`;
+  }
+  document.getElementById(`ar-${qid}`).classList.add('open');
+  updateDash();
+}
+
+function toggleAns(qid) {
+  const ar = document.getElementById(`ar-${qid}`);
+  const sb = document.getElementById(`sb-${qid}`);
+  const isOpen = ar.classList.toggle('open');
+  if (sb) { sb.classList.toggle('active', isOpen); sb.textContent = isOpen ? '🙈 Hide Answer' : '👁 Show Answer'; }
+  if (!attempted.has(qid)) { attempted.add(qid); updateDash(); }
+}
+
+function updateDash() {
+  const a = attempted.size, c = correct.size;
+  document.getElementById('d-attempted').textContent = a;
+  document.getElementById('d-correct').textContent = c;
+  const mcqAttempted = [...attempted].filter(id => {
+    const q = Q.find(x => x.id === id);
+    return q && (q.type === 'mcq' || q.type === 'assert');
+  }).length;
+  document.getElementById('d-score').textContent = mcqAttempted ? Math.round((c/mcqAttempted)*100)+'%' : '—';
+}
+
+function resetAll() {
+  attempted.clear(); correct.clear();
+  document.querySelectorAll('.opt-btn').forEach(b => { b.disabled=false; b.className='opt-btn'; });
+  document.querySelectorAll('.ans-reveal').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('.feedback').forEach(el => { el.className='feedback'; el.textContent=''; });
+  document.querySelectorAll('.show-btn').forEach(b => { b.classList.remove('active'); b.textContent='👁 Show Answer'; });
+  updateDash();
+}
+
+renderQ();
+</script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Chemical Reactions & Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f172a; --card:#1e293b; --border:#334155; --text:#e2e8f0; --muted:#94a3b8;
+    --orange:#f97316; --lime:#84cc16; --blue:#3b82f6; --purple:#a855f7; --red:#ef4444; --cyan:#22d3ee;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(249,115,22,.06) 0%, transparent 60%); }
+  header { text-align:center; padding:2rem 1rem 1rem; }
+  header h1 { font-family:'Syne',sans-serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:800; background:linear-gradient(135deg,#f97316,#facc15,#22d3ee); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.78rem; margin-top:.3rem; }
+  .prog-row { display:flex; align-items:center; gap:1rem; padding:.5rem 1rem 1rem; width:100%; max-width:560px; }
+  .prog-bar { flex:1; height:6px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--orange),var(--cyan)); transition:width .4s ease; }
+  .prog-text { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--muted); white-space:nowrap; }
+  .filters { display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem .8rem; }
+  .f-btn { font-family:'Syne',sans-serif; font-weight:700; font-size:.72rem; padding:.3rem .9rem; border-radius:99px; border:1.5px solid var(--border); background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .f-btn:hover { color:var(--text); }
+  .f-btn.on { color:#0f172a; border-color:transparent; }
+  .f-all.on     { background:var(--muted); }
+  .f-comb.on    { background:var(--lime); }
+  .f-decomp.on  { background:var(--blue); }
+  .f-disp.on    { background:var(--purple); }
+  .f-redox.on   { background:var(--red); }
+  .f-eq.on      { background:var(--cyan); color:#0f172a !important; }
+  .stage { width:100%; max-width:560px; padding:0 1rem; perspective:1200px; }
+  .fc-wrap { width:100%; aspect-ratio:3/2; position:relative; cursor:pointer; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1); }
+  .fc-wrap.flipped { transform:rotateY(180deg); }
+  .fc-face { position:absolute; inset:0; border-radius:20px; backface-visibility:hidden; -webkit-backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; text-align:center; }
+  .fc-front { background:var(--card); border:1.5px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.5); }
+  .fc-back  { transform:rotateY(180deg); background:var(--card); border:1.5px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.5); }
+  .fc-tag { font-family:'DM Mono',monospace; font-size:.68rem; font-weight:500; padding:.2rem .7rem; border-radius:99px; margin-bottom:.8rem; align-self:center; }
+  .fc-q { font-family:'Syne',sans-serif; font-size:clamp(.9rem,2.5vw,1.15rem); font-weight:700; line-height:1.4; }
+  .fc-hint { font-size:.72rem; color:var(--muted); margin-top:.6rem; font-family:'DM Mono',monospace; }
+  .fc-flip-hint { position:absolute; bottom:.8rem; font-size:.68rem; font-family:'DM Mono',monospace; color:#334155; animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+  .fc-ans-label { font-family:'DM Mono',monospace; font-size:.68rem; color:#22d3ee; margin-bottom:.6rem; }
+  .fc-ans { font-size:clamp(.82rem,2.2vw,1rem); line-height:1.6; color:var(--text); }
+  .fc-ans strong { color:#fcd34d; }
+  .fc-ans em { color:#93c5fd; font-style:normal; }
+  .chem { font-family:'DM Mono',monospace; background:#0f172a; border:1px solid var(--border); border-radius:8px; padding:.4rem .7rem; font-size:.8rem; color:#34d399; margin:.4rem 0; }
+  .nav-row { display:flex; gap:.8rem; align-items:center; padding:1rem; }
+  .nav-btn { font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem; padding:.55rem 1.4rem; border-radius:99px; border:2px solid var(--border); background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .nav-btn:hover:not(:disabled) { border-color:#64748b; color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; }
+  .card-counter { font-family:'DM Mono',monospace; font-size:.82rem; color:var(--muted); min-width:70px; text-align:center; }
+  .bottom-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem 2rem; }
+  .bot-btn { font-family:'Syne',sans-serif; font-weight:700; font-size:.78rem; padding:.4rem 1.1rem; border-radius:99px; border:1.5px solid var(--border); background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .bot-btn:hover { border-color:var(--orange); color:var(--orange); }
+  .known-badge { position:absolute; top:.8rem; right:.8rem; font-size:.68rem; font-family:'DM Mono',monospace; padding:.15rem .5rem; border-radius:99px; }
+  .known   { background:rgba(34,197,94,.15); color:#4ade80; }
+  .unknown { background:rgba(239,68,68,.1);  color:#f87171; }
+  .site-nav { display:flex; align-items:center; justify-content:space-between; padding:.42rem 1.2rem; width:100%; background:rgba(7,16,31,.9); backdrop-filter:blur(14px); border-bottom:1px solid rgba(26,45,69,.75); position:sticky; top:0; z-index:9999; }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; }
+  .site-nav-back { font-family:'DM Mono',monospace; font-size:.68rem; color:#7a9ab8; text-decoration:none; border:1px solid rgba(26,45,69,.9); border-radius:99px; padding:.2rem .65rem; }
+  .site-nav-back:hover { color:#dde6f5; }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<header>
+  <h1>Flashcard Deck</h1>
+  <p>Chemical Reactions &amp; Equations · 36 Cards · Tap to flip</p>
+</header>
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 36</div>
+</div>
+<div class="filters">
+  <button class="f-btn f-all on" onclick="setFilter('all',this)">All (36)</button>
+  <button class="f-btn f-eq"    onclick="setFilter('eq',this)">⚖️ Equations</button>
+  <button class="f-btn f-comb"  onclick="setFilter('comb',this)">🔗 Combination</button>
+  <button class="f-btn f-decomp" onclick="setFilter('decomp',this)">💥 Decomposition</button>
+  <button class="f-btn f-disp"  onclick="setFilter('disp',this)">↔️ Displacement</button>
+  <button class="f-btn f-redox" onclick="setFilter('redox',this)">🔥 Redox</button>
+</div>
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flip()">
+    <div class="fc-face fc-front" id="fc-front">
+      <div class="fc-tag" id="fc-tag"></div>
+      <div class="fc-q" id="fc-q"></div>
+      <div class="fc-hint" id="fc-hint"></div>
+      <div class="fc-flip-hint">tap to reveal →</div>
+    </div>
+    <div class="fc-face fc-back" id="fc-back">
+      <div class="fc-tag" id="fc-tag-b"></div>
+      <div class="fc-ans-label">✅ Answer</div>
+      <div class="fc-ans" id="fc-ans"></div>
+      <div id="fc-chem"></div>
+      <div class="known-badge" id="known-badge" style="display:none"></div>
+    </div>
+  </div>
+</div>
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="move(-1)" disabled>← Prev</button>
+  <div class="card-counter" id="counter">1 / 36</div>
+  <button class="nav-btn" id="next-btn" onclick="move(1)">Next →</button>
+</div>
+<div class="bottom-row">
+  <button class="bot-btn" onclick="markKnown(true)">✓ Know it</button>
+  <button class="bot-btn" onclick="markKnown(false)">✗ Still learning</button>
+  <button class="bot-btn" onclick="shuffle()">⇄ Shuffle</button>
+  <button class="bot-btn" onclick="resetDeck()">↺ Reset</button>
+</div>
+
+<script>
+const CARDS = [
+  // ── EQUATIONS & BALANCING ──
+  { cat:'eq', q:'What is a chemical equation? What information does it convey?', a:'A <strong>symbolic representation</strong> of a chemical reaction using formulae.\nIt shows: reactants, products, their states, and the direction of reaction.', hint:'Skeleton equation → Balanced equation' },
+  { cat:'eq', q:'State the Law of Conservation of Mass. Who proposed it?', a:'Mass is <strong>neither created nor destroyed</strong> in a chemical reaction. Total mass of reactants = total mass of products.\nProposed by <strong>Antoine Lavoisier (1774)</strong>.', hint:'This is why we must BALANCE equations' },
+  { cat:'eq', q:'Balance the equation: Mg + O₂ → MgO', a:'<strong>2Mg + O₂ → 2MgO</strong>\n\nLeft: 2 Mg, 2 O\nRight: 2 Mg, 2 O ✓', chem:'2Mg(s) + O₂(g) → 2MgO(s)' },
+  { cat:'eq', q:'Balance: Fe + H₂O → Fe₃O₄ + H₂', a:'<strong>3Fe + 4H₂O → Fe₃O₄ + 4H₂</strong>\n\nBalance Fe first (×3), then O (×4), then H (×4 H₂)', chem:'3Fe(s) + 4H₂O(g) → Fe₃O₄(s) + 4H₂(g)' },
+  { cat:'eq', q:'What do the state symbols (s), (l), (g), (aq) mean? Give an example.', a:'(s) = solid | (l) = liquid | (g) = gas | (aq) = aqueous (dissolved in water)', chem:'2H₂(g) + O₂(g) → 2H₂O(l)' },
+  { cat:'eq', q:'What is the difference between a skeletal equation and a balanced equation?', a:'<strong>Skeletal equation:</strong> Formulae written but atoms are NOT balanced (unequal).\n<strong>Balanced equation:</strong> Coefficients added so atoms of each element are equal on both sides.', hint:'Never change subscripts — only change coefficients!' },
+  { cat:'eq', q:'What is a word equation? Convert to symbolic: Hydrogen + Oxygen → Water', a:'Word equation uses names of substances, not formulae.\n<strong>Symbolic:</strong> 2H₂ + O₂ → 2H₂O\n2 molecules of H₂ and 1 O₂ react to form 2 H₂O.', chem:'2H₂(g) + O₂(g) → 2H₂O(l)' },
+
+  // ── COMBINATION REACTIONS ──
+  { cat:'comb', q:'Define a combination reaction. Give the general form.', a:'Two or more reactants combine to form a <strong>single product</strong>.\nGeneral form: <strong>A + B → AB</strong>', hint:'Always check: is one product formed?' },
+  { cat:'comb', q:'Write the equation for burning of magnesium. What is observed?', a:'Bright <strong>white dazzling flame</strong>; white powder MgO formed.\n<span class="badge exo">Exothermic</span>', chem:'2Mg(s) + O₂(g) → 2MgO(s)', hint:'MgO dissolves in water to give Mg(OH)₂ — basic' },
+  { cat:'comb', q:'What is slaking of lime? Write the equation and mention the type of reaction.', a:'Adding water to quicklime (CaO) to form slaked lime Ca(OH)₂. Large heat is released — <strong>Exothermic combination</strong>.', chem:'CaO(s) + H₂O(l) → Ca(OH)₂(aq) + Heat' },
+  { cat:'comb', q:'Write the equation for formation of SO₃ (Contact process). What is its significance?', a:'SO₃ is an intermediate in manufacturing <strong>sulphuric acid</strong> (Contact process).', chem:'2SO₂(g) + O₂(g) → 2SO₃(g)\nSO₃ + H₂O → H₂SO₄' },
+  { cat:'comb', q:'Is burning always a combination reaction? Justify with C + O₂.', a:'Burning of carbon IS a combination reaction (C + O₂ → CO₂ — one product).\nBut NOT all combustion is combination — hydrocarbons burning give CO₂ AND H₂O.', chem:'C(s) + O₂(g) → CO₂(g)' },
+
+  // ── DECOMPOSITION ──
+  { cat:'decomp', q:'Define decomposition reaction. What is the opposite of combination?', a:'A single compound breaks down into <strong>two or more simpler substances</strong>.\nGeneral form: <strong>AB → A + B</strong>\nOpposite of combination.', hint:'Energy is usually absorbed — endothermic' },
+  { cat:'decomp', q:'What happens when calcium carbonate is heated? Name the type.', a:'CaCO₃ decomposes on heating (thermal decomposition). <strong>Endothermic</strong>.\nUsed in cement industry.', chem:'CaCO₃(s) → CaO(s) + CO₂(g)' },
+  { cat:'decomp', q:'Write the equation for electrolysis of water. What collects at each electrode?', a:'H₂ at cathode (−), O₂ at anode (+). Ratio H₂:O₂ = <strong>2:1 by volume</strong>.', chem:'2H₂O(l) → 2H₂(g) + O₂(g)', hint:'OHHO: Oxidation H₂ at catHode — H₂ = 2 vol' },
+  { cat:'decomp', q:'What is photodecomposition? Give one example with equation.', a:'Decomposition caused by <strong>light energy</strong>.', chem:'2AgCl(s) → 2Ag(s) + Cl₂(g)\n(white → grey in sunlight)', hint:'Used in black-and-white photography' },
+  { cat:'decomp', q:'What is observed when lead nitrate is heated? Write the equation.', a:'Brown fumes of <strong>NO₂</strong> and colourless O₂ are evolved; yellow residue of PbO formed.', chem:'2Pb(NO₃)₂(s) → 2PbO(s) + 4NO₂(g) + O₂(g)' },
+  { cat:'decomp', q:'What happens when ferrous sulphate crystals are heated?', a:'Green FeSO₄ decomposes — smell of burning sulphur (pungent); <strong>colour changes green → brown</strong>.', chem:'2FeSO₄(s) → Fe₂O₃(s) + SO₂(g) + SO₃(g)' },
+
+  // ── DISPLACEMENT ──
+  { cat:'disp', q:'Define displacement reaction. Give the general form.', a:'A <strong>more reactive element displaces a less reactive element</strong> from its compound in solution.\nGeneral: <strong>A + BC → AC + B</strong>', hint:'Uses the Reactivity Series — higher displaces lower' },
+  { cat:'disp', q:'What happens when an iron nail is placed in copper sulphate solution?', a:'Blue colour of CuSO₄ fades to <strong>pale green</strong> (FeSO₄). Iron nail is coated with <strong>red-brown copper</strong>.\nFe is more reactive than Cu.', chem:'Fe(s) + CuSO₄(aq) → FeSO₄(aq) + Cu(s)' },
+  { cat:'disp', q:'Define double displacement reaction. Give one example with precipitate.', a:'Two compounds exchange ions to form two new compounds. One product is usually a <strong>precipitate</strong>.', chem:'Pb(NO₃)₂(aq) + 2KI(aq) → PbI₂↓ + 2KNO₃(aq)\n(Yellow precipitate of lead iodide)' },
+  { cat:'disp', q:'Write the reactivity series from K to Au (at least 10 elements).', a:'<strong>K > Na > Ca > Mg > Al > Zn > Fe > Ni > Sn > Pb > H > Cu > Hg > Ag > Au</strong>\n\nHigher element displaces lower from compounds.', hint:'Mnemonic: King Needs Clever Minds — Always Zoom Fearlessly' },
+  { cat:'disp', q:'What is a precipitation reaction? How is BaSO₄ precipitate formed?', a:'Reaction in which an <strong>insoluble precipitate</strong> forms when two solutions are mixed.', chem:'Na₂SO₄(aq) + BaCl₂(aq) → BaSO₄↓ + 2NaCl(aq)\n(White precipitate of BaSO₄)' },
+  { cat:'disp', q:'Why is zinc added to dilute H₂SO₄ in the lab to prepare H₂?', a:'Zinc is <strong>above hydrogen</strong> in the reactivity series, so it displaces hydrogen from dilute acid.', chem:'Zn(s) + H₂SO₄(aq) → ZnSO₄(aq) + H₂↑', hint:'H₂ burns with a pop sound — test with burning splint' },
+  { cat:'disp', q:'Is neutralisation a type of displacement? Explain.', a:'Yes — neutralisation is a <strong>double displacement</strong> reaction. H⁺ from acid and OH⁻ from base exchange to form water and salt.', chem:'HCl + NaOH → NaCl + H₂O\nH⁺ + Cl⁻ + Na⁺ + OH⁻ → Na⁺ + Cl⁻ + H₂O' },
+
+  // ── REDOX & CORROSION ──
+  { cat:'redox', q:'Define oxidation in terms of: (a) oxygen (b) hydrogen (c) electrons', a:'(a) <strong>Gain of oxygen</strong>\n(b) <strong>Loss of hydrogen</strong>\n(c) <strong>Loss of electrons</strong> (OIL — Oxidation Is Loss)', hint:'Reducing agent loses electrons and gets oxidised' },
+  { cat:'redox', q:'Define reduction in terms of: (a) oxygen (b) hydrogen (c) electrons', a:'(a) <strong>Loss of oxygen</strong>\n(b) <strong>Gain of hydrogen</strong>\n(c) <strong>Gain of electrons</strong> (RIG — Reduction Is Gain)', hint:'Oxidising agent gains electrons and gets reduced' },
+  { cat:'redox', q:'In CuO + H₂ → Cu + H₂O, identify what is oxidised and what is reduced.', a:'<strong>H₂ is oxidised</strong> (gains O → forms H₂O).\n<strong>CuO is reduced</strong> (loses O → forms Cu).\nColour change: <em>Black CuO → Red-brown Cu</em>', chem:'CuO(s) + H₂(g) → Cu(s) + H₂O(l)' },
+  { cat:'redox', q:'What is corrosion? Write the equation for rusting of iron.', a:'Slow oxidation of metals when exposed to moist air/water, damaging their surface.\nRust = hydrated iron(III) oxide', chem:'4Fe(s) + 3O₂(g) + xH₂O → 2Fe₂O₃·xH₂O\n(reddish-brown rust)' },
+  { cat:'redox', q:'Name four methods to prevent corrosion of iron.', a:'1. <strong>Painting/oiling</strong> — keeps moisture out\n2. <strong>Galvanisation</strong> — zinc coating\n3. <strong>Alloying</strong> — stainless steel (Cr, Ni added)\n4. <strong>Electroplating</strong> — coat with Sn, Cr, Ag' },
+  { cat:'redox', q:'What is rancidity? How can it be prevented?', a:'<strong>Oxidation of fats and oils</strong> in food — produces unpleasant smell and taste.\n\nPrevention:\n• Antioxidants (BHA, BHT)\n• <strong>Nitrogen flushing</strong> in chip packets\n• Refrigeration\n• Vacuum/airtight packaging' },
+  { cat:'redox', q:'Why are chips packets filled with nitrogen gas?', a:'Nitrogen is an <strong>inert gas</strong> — it prevents the chips from reacting with oxygen in air.\nOxidation (rancidity) would make chips stale/smelly. N₂ displaces O₂ in the packet.', hint:'This is an application of preventing rancidity' },
+  { cat:'redox', q:'What is the difference between an oxidising agent and a reducing agent?', a:'<strong>Oxidising agent:</strong> gains electrons (gets reduced), causes oxidation in others.\nEx: CuO, KMnO₄, O₂\n\n<strong>Reducing agent:</strong> loses electrons (gets oxidised), causes reduction in others.\nEx: H₂, C, CO' },
+  { cat:'redox', q:'In the reaction: 2Mg + O₂ → 2MgO — identify oxidising and reducing agents.', a:'<strong>Mg is the reducing agent</strong> (loses electrons, gets oxidised — gains O).\n<strong>O₂ is the oxidising agent</strong> (gains electrons, gets reduced — O⁰ → O²⁻).', chem:'Mg → Mg²⁺ + 2e⁻ (oxidation)\nO₂ + 4e⁻ → 2O²⁻ (reduction)' },
+];
+
+let deck = [...CARDS];
+let idx = 0, filter = 'all', known = {}, isFlipped = false;
+
+function filtered() { return filter === 'all' ? deck : deck.filter(c => c.cat === filter); }
+
+function setFilter(f, btn) {
+  filter = f; idx = 0; isFlipped = false;
+  document.getElementById('fc').classList.remove('flipped');
+  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  updateCard();
+}
+
+function updateCard() {
+  const cards = filtered();
+  if (!cards.length) return;
+  const c = cards[idx % cards.length];
+  const total = cards.length, cur = (idx % total) + 1;
+
+  const tagStyle = {
+    eq:    'background:rgba(34,211,238,.15);color:#22d3ee',
+    comb:  'background:rgba(132,204,22,.15);color:#84cc16',
+    decomp:'background:rgba(59,130,246,.15);color:#60a5fa',
+    disp:  'background:rgba(168,85,247,.15);color:#c084fc',
+    redox: 'background:rgba(239,68,68,.15);color:#f87171',
+  };
+  const tagLabel = { eq:'⚖️ Equations', comb:'🔗 Combination', decomp:'💥 Decomposition', disp:'↔️ Displacement', redox:'🔥 Redox' };
+
+  ['fc-tag','fc-tag-b'].forEach(id => {
+    document.getElementById(id).style.cssText = tagStyle[c.cat];
+    document.getElementById(id).textContent = tagLabel[c.cat];
+  });
+  document.getElementById('fc-q').textContent = c.q;
+  document.getElementById('fc-hint').textContent = c.hint ? '💡 '+c.hint : '';
+  document.getElementById('fc-ans').innerHTML = (c.a||'').replace(/\n/g,'<br>');
+  document.getElementById('fc-chem').innerHTML = c.chem ? `<div class="chem">${c.chem.replace(/\n/g,'<br>')}</div>` : '';
+
+  const kb = document.getElementById('known-badge');
+  const id = deck.indexOf(c);
+  if (known[id]===true)       { kb.style.display='block'; kb.className='known-badge known';   kb.textContent='✓ Known'; }
+  else if (known[id]===false) { kb.style.display='block'; kb.className='known-badge unknown'; kb.textContent='Still learning'; }
+  else kb.style.display='none';
+
+  document.getElementById('counter').textContent = `${cur} / ${total}`;
+  document.getElementById('prog-text').textContent = `${cur} / ${total}`;
+  document.getElementById('prog-fill').style.width = `${(cur/total)*100}%`;
+  document.getElementById('prev-btn').disabled = idx === 0;
+  document.getElementById('next-btn').disabled = idx >= total-1;
+}
+
+function flip() { isFlipped = !isFlipped; document.getElementById('fc').classList.toggle('flipped', isFlipped); }
+
+function move(dir) {
+  const total = filtered().length;
+  idx = Math.max(0, Math.min(total-1, idx+dir));
+  isFlipped = false; document.getElementById('fc').classList.remove('flipped'); updateCard();
+}
+
+function markKnown(val) {
+  const c = filtered()[idx % filtered().length];
+  known[deck.indexOf(c)] = val; updateCard();
+  if (val) setTimeout(() => move(1), 400);
+}
+
+function shuffle() {
+  for (let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
+  idx=0; isFlipped=false; document.getElementById('fc').classList.remove('flipped'); updateCard();
+}
+
+function resetDeck() { deck=[...CARDS]; known={}; idx=0; isFlipped=false; document.getElementById('fc').classList.remove('flipped'); updateCard(); }
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight') move(1);
+  else if (e.key==='ArrowLeft') move(-1);
+  else if (e.key===' ') { e.preventDefault(); flip(); }
+});
+
+updateCard();
+</script>
+</body>
+</html>
