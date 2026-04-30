@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Federalism</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080612;--card:#0e0a1e;--card2:#140f26;
+  --border:#1e1640;--text:#e2d9f3;--muted:#4a3a7a;
+  --ps:#7c3aed;--violet:#a78bfa;--indigo:#818cf8;
+  --blue:#60a5fa;--green:#4ade80;--amber:#fbbf24;
+  --red:#f87171;--teal:#34d399;--pink:#f472b6;--cyan:#38bdf8;--orange:#fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;padding:1.2rem}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 40% at 10% 5%,rgba(124,58,237,.04) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 30% at 90% 90%,rgba(96,165,250,.03) 0%,transparent 50%)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.2rem;background:rgba(8,6,18,.95);border-bottom:1px solid var(--border);border-radius:10px;margin:-1.2rem -1.2rem 1.2rem;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem}
+.site-nav a.back:hover{color:var(--violet);border-color:var(--ps)}
+
+header{text-align:center;padding:.8rem 0 1.4rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2.1rem);font-weight:900;color:var(--violet)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:.9rem;max-width:1100px;margin:0 auto}
+.wide{grid-column:1/-1}
+
+.panel{background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.panel-head{display:flex;align-items:center;gap:.55rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem}
+.panel-body{padding:.8rem 1rem}
+
+.ph-def .panel-head{background:rgba(167,139,250,.08);color:var(--violet)}
+.ph-feat .panel-head{background:rgba(96,165,250,.08);color:var(--blue)}
+.ph-list .panel-head{background:rgba(74,222,128,.08);color:var(--green)}
+.ph-types .panel-head{background:rgba(52,211,153,.08);color:var(--teal)}
+.ph-lang .panel-head{background:rgba(244,114,182,.08);color:var(--pink)}
+.ph-decent .panel-head{background:rgba(251,191,36,.08);color:var(--amber)}
+.ph-pract .panel-head{background:rgba(129,140,248,.08);color:var(--indigo)}
+.ph-cmp .panel-head{background:rgba(56,189,248,.08);color:var(--cyan)}
+.ph-mem .panel-head{background:rgba(251,146,60,.08);color:var(--orange)}
+.ph-key .panel-head{background:rgba(248,113,113,.08);color:var(--red)}
+
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{font-family:'DM Mono',monospace;font-size:.67rem;padding:.45rem .6rem;background:var(--card2);color:var(--muted);text-align:left}
+td{padding:.4rem .6rem;border-top:1px solid var(--border);line-height:1.5;vertical-align:top}
+tr:hover td{background:rgba(124,58,237,.03)}
+
+.fact{display:flex;gap:.5rem;font-size:.8rem;padding:.28rem 0;line-height:1.55;border-top:1px solid var(--border)}
+.fact:first-child{border-top:none}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:.45rem}
+
+.hbox{border-left:3px solid;border-radius:0 6px 6px 0;padding:.5rem .75rem;margin:.3rem 0;font-size:.8rem;line-height:1.6}
+.hbox strong{display:block;font-size:.82rem;margin-bottom:.15rem}
+
+.trick{background:var(--card2);border-radius:8px;padding:.55rem .75rem;margin:.35rem 0;font-size:.78rem}
+.trick strong{color:var(--amber);font-family:'Playfair Display',serif;font-size:.85rem}
+.trick p{color:var(--muted);font-size:.72rem;margin-top:.15rem}
+
+.vi{color:var(--violet)}.bl{color:var(--blue)}.rd{color:var(--red)}
+.gr{color:var(--green)}.am{color:var(--amber)}.te{color:var(--teal)}
+.pk{color:var(--pink)}.cy{color:var(--cyan)}.in{color:var(--indigo)}.or{color:var(--orange)}
+.hl{font-family:'DM Mono',monospace;font-size:.75rem}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Federalism</h1>
+  <p>Cheat Sheet · CBSE Class X · Civics Chapter 2</p>
+</header>
+
+<div class="grid">
+
+<!-- 1 What is Federalism -->
+<div class="panel ph-def">
+  <div class="panel-head">📜 What is Federalism?</div>
+  <div class="panel-body">
+    <p style="font-size:.82rem;line-height:1.65;color:var(--muted)">A system of government where <strong style="color:var(--text)">power is divided</strong> between a central authority and constituent units (states/provinces).</p>
+    <div class="fact"><span class="dot" style="background:var(--violet)"></span><span>Two or more <strong>levels of government</strong> exist</span></div>
+    <div class="fact"><span class="dot" style="background:var(--violet)"></span><span>Each level has its own <strong>jurisdiction</strong></span></div>
+    <div class="fact"><span class="dot" style="background:var(--violet)"></span><span>Powers <strong>specified in writing</strong> in Constitution</span></div>
+    <div class="fact"><span class="dot" style="background:var(--violet)"></span><span><strong>Cannot be changed unilaterally</strong> by one level</span></div>
+    <div class="fact"><span class="dot" style="background:var(--violet)"></span><span><strong>Independent judiciary</strong> resolves disputes</span></div>
+    <div class="fact"><span class="dot" style="background:var(--violet)"></span><span>Each tier has <strong>own revenue sources</strong></span></div>
+  </div>
+</div>
+
+<!-- 2 5 Features -->
+<div class="panel ph-feat">
+  <div class="panel-head">✅ 5 Features of Federalism</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>#</th><th>Feature</th></tr>
+      <tr><td>1</td><td><strong>Two or more levels</strong> of government</td></tr>
+      <tr><td>2</td><td>Each level has <strong>specified jurisdiction</strong></td></tr>
+      <tr><td>3</td><td>Powers <strong>guaranteed by Constitution</strong></td></tr>
+      <tr><td>4</td><td><strong>Courts</strong> are guardians; resolve disputes</td></tr>
+      <tr><td>5</td><td><strong>Financial autonomy</strong> — own revenue sources</td></tr>
+    </table>
+    <div class="trick"><strong>🔑 Mnemonic: "LIPCF"</strong><p>Levels · Independent jurisdictions · Permanent (constitutional) · Courts decide · Finance separate</p></div>
+  </div>
+</div>
+
+<!-- 3 Three Lists (wide) -->
+<div class="panel ph-list wide">
+  <div class="panel-head">📋 7th Schedule — 3 Lists Division of Subjects</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>List</th><th>Count</th><th>Who Legislates</th><th>Examples</th></tr>
+      <tr><td><strong class="vi">Union List</strong></td><td>97</td><td>Centre <em>only</em></td><td>Defence, Foreign Affairs, Banking, Currency, Atomic Energy, Railways, Communication</td></tr>
+      <tr><td><strong class="bl">State List</strong></td><td>66</td><td>States <em>only</em></td><td>Police, Trade, Commerce, Agriculture, Irrigation, Public Health</td></tr>
+      <tr><td><strong class="gr">Concurrent List</strong></td><td>47</td><td><em>Both</em> (Central law wins on conflict)</td><td>Education, Forests, Trade Unions, Marriage, Adoption, Succession</td></tr>
+      <tr><td><strong class="am">Residuary</strong></td><td>—</td><td>Centre <em>only</em></td><td>Computer software, e-commerce, cyber laws (subjects not in any list)</td></tr>
+    </table>
+    <div class="trick" style="margin-top:.6rem"><strong>📌 India vs USA</strong><p>USA: residuary → states (states stronger). India: residuary → Union (Centre-leaning). This makes India <strong>quasi-federal</strong>.</p></div>
+  </div>
+</div>
+
+<!-- 4 Coming vs Holding -->
+<div class="panel ph-types">
+  <div class="panel-head">🤝 Coming vs Holding Together</div>
+  <div class="panel-body">
+    <table>
+      <tr><th></th><th class="te">Coming Together</th><th class="bl">Holding Together</th></tr>
+      <tr><td><strong>How</strong></td><td>Independent states unite</td><td>Big country divides power</td></tr>
+      <tr><td><strong>Centre</strong></td><td>Weaker</td><td>Stronger</td></tr>
+      <tr><td><strong>States</strong></td><td>Equal power</td><td>May be unequal</td></tr>
+      <tr><td><strong>Examples</strong></td><td>USA, Switzerland, Australia</td><td><strong>India</strong>, Spain, Belgium</td></tr>
+    </table>
+    <div class="hbox" style="border-color:var(--blue);background:rgba(96,165,250,.05);color:var(--text);margin-top:.5rem">
+      <strong class="bl">🇮🇳 India</strong>"Holding Together" type. Centre is dominant. J&amp;K (until 2019) had special status. UTs directly under Centre. Hence India is <strong>quasi-federal</strong> (mix of federal + unitary).
+    </div>
+  </div>
+</div>
+
+<!-- 5 Quasi-Federal -->
+<div class="panel ph-pract">
+  <div class="panel-head">🏛️ Why India is Quasi-Federal</div>
+  <div class="panel-body">
+    <p style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">India has <strong style="color:var(--text)">UNITARY features</strong> mixed with federal:</p>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span>Single <strong>Constitution</strong> for whole country</span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span>Single <strong>citizenship</strong> (no state citizenship)</span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span>Centre can <strong>change state boundaries</strong></span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span><strong>Governor</strong> appointed by President (not elected)</span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span><strong>Article 356</strong> — President's Rule on states</span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span><strong>Residuary powers</strong> with Centre</span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span><strong>All-India Services</strong> (IAS, IPS) common to Centre & States</span></div>
+  </div>
+</div>
+
+<!-- 6 Linguistic States -->
+<div class="panel ph-lang">
+  <div class="panel-head">🗣️ Linguistic States & Language Policy</div>
+  <div class="panel-body">
+    <div class="hbox" style="border-color:var(--pink);background:rgba(244,114,182,.05);color:var(--text)">
+      <strong class="pk">📅 1956 — States Reorganisation</strong>States redrawn on <strong>linguistic basis</strong>. Initially feared to cause disintegration, but actually <strong>strengthened unity</strong>.
+    </div>
+    <div class="hbox" style="border-color:var(--pink);background:rgba(244,114,182,.05);color:var(--text)">
+      <strong class="pk">🚫 No National Language</strong>India has <strong>NO national language</strong>. Hindi is OFFICIAL (not national). 22 Scheduled Languages recognised by Constitution.
+    </div>
+    <div class="hbox" style="border-color:var(--pink);background:rgba(244,114,182,.05);color:var(--text)">
+      <strong class="pk">📖 Three Language Formula</strong>Schools teach 3 languages: Mother tongue + Hindi + English (or another modern Indian language).
+    </div>
+    <div class="trick"><strong>⚠️ Common Mistake</strong><p>Hindi is OFFICIAL language of Union, NOT national language. English is associate official language.</p></div>
+  </div>
+</div>
+
+<!-- 7 73rd & 74th -->
+<div class="panel ph-decent wide">
+  <div class="panel-head">🏘️ Decentralisation — 73rd & 74th Amendments (1992)</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Provision</th><th class="am">73rd Amendment (Rural)</th><th class="am">74th Amendment (Urban)</th></tr>
+      <tr><td><strong>Bodies</strong></td><td>Panchayati Raj — 3 tiers</td><td>Municipal Corporation / Municipality / Nagar Panchayat</td></tr>
+      <tr><td><strong>Tiers</strong></td><td>Gram Panchayat → Block → Zilla Parishad</td><td>Single tier (varies by city size)</td></tr>
+      <tr><td><strong>Women reservation</strong></td><td>1/3 of seats</td><td>1/3 of seats</td></tr>
+      <tr><td><strong>SC/ST reservation</strong></td><td>Proportional to population</td><td>Proportional to population</td></tr>
+      <tr><td><strong>Elections</strong></td><td>Every <strong>5 years</strong> mandatory</td><td>Every <strong>5 years</strong> mandatory</td></tr>
+      <tr><td><strong>Conducted by</strong></td><td>State Election Commission</td><td>State Election Commission</td></tr>
+      <tr><td><strong>Funds</strong></td><td>State Finance Commission</td><td>State Finance Commission</td></tr>
+    </table>
+    <div class="hbox" style="border-color:var(--green);background:rgba(74,222,128,.05);color:var(--text);margin-top:.5rem">
+      <strong class="gr">🌟 Gram Sabha</strong>All adult voters of a village = Gram Sabha. Direct democracy. Approves Gram Panchayat budget &amp; reviews its work.
+    </div>
+  </div>
+</div>
+
+<!-- 8 Centre-State Era -->
+<div class="panel ph-pract">
+  <div class="panel-head">📜 Centre-State Relations Over Time</div>
+  <div class="panel-body">
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span><strong>1950–1989:</strong> Congress dominance. Article 356 misused to dismiss state govts.</span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span><strong>1989+:</strong> Coalition era begins. Regional parties become powerful. Centre forced to respect states.</span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span><strong>1992:</strong> 73rd &amp; 74th Amendments → Local govt becomes constitutional.</span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span><strong>1994:</strong> SR Bommai case → SC restricts misuse of Article 356.</span></div>
+    <div class="fact"><span class="dot" style="background:var(--indigo)"></span><span><strong>2000s+:</strong> "Cooperative federalism" — GST Council, NITI Aayog.</span></div>
+  </div>
+</div>
+
+<!-- 9 Key Concepts -->
+<div class="panel ph-key">
+  <div class="panel-head">🔑 Must-Know Concepts</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td><strong class="rd">Federation</strong></td><td>Two-level government sharing power</td></tr>
+      <tr><td><strong class="rd">Unitary</strong></td><td>Single level of government (opposite of federal)</td></tr>
+      <tr><td><strong class="rd">Jurisdiction</strong></td><td>Area within which authority can be exercised</td></tr>
+      <tr><td><strong class="rd">Coalition</strong></td><td>Alliance of parties forming a government</td></tr>
+      <tr><td><strong class="rd">Decentralisation</strong></td><td>Transfer of power from Centre/State to Local</td></tr>
+      <tr><td><strong class="rd">Article 356</strong></td><td>President's Rule (state emergency)</td></tr>
+      <tr><td><strong class="rd">Article 370</strong></td><td>Special status to J&amp;K (abrogated 2019)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 10 Memory Tricks -->
+<div class="panel ph-mem">
+  <div class="panel-head">🧠 Memory Tricks</div>
+  <div class="panel-body">
+    <div class="trick"><strong>📋 List counts: "97-66-47"</strong><p>Union <strong>97</strong>, State <strong>66</strong>, Concurrent <strong>47</strong>. Decreasing order.</p></div>
+    <div class="trick"><strong>🏛️ "TIER 3"</strong><p><strong>T</strong>op (Union) · <strong>I</strong>ntermediate (State) · <strong>E</strong>arth-level (Local) — 3 tiers in India.</p></div>
+    <div class="trick"><strong>🤝 "Holding India"</strong><p>India = <strong>Holding</strong> Together. USA = <strong>Coming</strong> Together. Easy clue: India was 1 country first, USA was 13 colonies first.</p></div>
+    <div class="trick"><strong>📅 "73-74 in 92"</strong><p><strong>73rd</strong> = Rural (Panchayats), <strong>74th</strong> = Urban (Municipalities). Both passed in <strong>1992</strong>.</p></div>
+    <div class="trick"><strong>⚖️ "Hindi is OFFICIAL not NATIONAL"</strong><p>India has NO national language. Hindi is OFFICIAL language. Don't confuse the two!</p></div>
+  </div>
+</div>
+
+<!-- 11 Boards Quick Fire -->
+<div class="panel ph-cmp wide">
+  <div class="panel-head">⚡ Board Exam Quick-Fire Facts</div>
+  <div class="panel-body">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.5rem">
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>3 lists in 7th Schedule:</strong> Union (97), State (66), Concurrent (47)</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>Residuary subjects → Centre</strong> in India</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>Coming Together:</strong> USA, Switzerland, Australia</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>Holding Together:</strong> India, Spain, Belgium</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>1956:</strong> States Reorganisation (linguistic basis)</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>1989:</strong> Coalition era begins</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>1992:</strong> 73rd &amp; 74th Amendments</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>22 Scheduled Languages</strong> recognised</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>1/3 women reservation</strong> in local bodies</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>5-year</strong> term mandatory for local bodies</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>SR Bommai (1994):</strong> Limited Article 356 misuse</span></div>
+      <div class="fact"><span class="dot" style="background:var(--cyan)"></span><span><strong>India = Quasi-federal</strong> (federal + unitary)</span></div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

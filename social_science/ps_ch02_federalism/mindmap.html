@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Federalism (Civics Ch.2)</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #080612; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#a78bfa,#7c3aed,#60a5fa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #4a3a7a; margin-top: .1rem; }
+
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #1e1640; background: rgba(14,10,30,.9);
+  color: #4a3a7a; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #7c3aed; color: #a78bfa; }
+
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #0e0a1e; border: 1px solid #1e1640;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 270px; font-size: .82rem; color: #e2d9f3;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; color: #a78bfa; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; flex-shrink:0;
+  background:rgba(8,6,18,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(30,22,64,.75);
+  position:sticky; top:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a6ab8; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(30,22,64,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#dde6f5; border-color:#7c3aed; background:rgba(124,58,237,.08); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<div id="ui">
+  <div>
+    <h1>Federalism — Civics Ch.2</h1>
+    <p>Class X · CBSE · Mind Map — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+
+let W, H, scale = 1, ox = 0, oy = 0;
+let dragging = false, dragStart = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2 + 20;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Federalism', x:0, y:0, r:60,
+  color:'#1a0a2e', stroke:'#7c3aed', textColor:'#c4b5fd', fontSize:14
+};
+
+const BRANCHES = [
+  {
+    id:'def', label:'What is\nFederalism?', x:0, y:-300, r:44,
+    color:'#1a0a2e', stroke:'#a78bfa', textColor:'#ddd6fe',
+    info:'A system of government where power is divided between a central authority and constituent units (states/provinces).\nTwo or more levels of government rule the same citizens.\nEach level has its own JURISDICTION specified in the Constitution.',
+    children:[
+      { id:'df1', label:'Two or More\nLevels', x:-180, y:-420, r:34, color:'#1a0a2e', stroke:'#a78bfa', textColor:'#e9d5ff',
+        info:'Two or more levels of government exist.\nIn India: Union (Centre) + State + Local.\nEach has clearly defined powers.\nNot a hierarchy — each is supreme in its own sphere.' },
+      { id:'df2', label:'Same Citizens\n— Different\nJurisdictions', x:0, y:-450, r:36, color:'#1a0a2e', stroke:'#a78bfa', textColor:'#e9d5ff',
+        info:'Same citizens governed by different tiers.\nEach tier has its own subjects (defence, education, sanitation etc).\nE.g., a person in Delhi is governed by:\n• Union (defence, currency)\n• State (police, agriculture)\n• Local (water, roads)' },
+      { id:'df3', label:'Written\nConstitution', x:180, y:-420, r:34, color:'#1a0a2e', stroke:'#a78bfa', textColor:'#e9d5ff',
+        info:'Powers of each level are SPECIFIED in writing.\nConstitution is supreme.\nCannot be unilaterally changed by one level alone.\nDisputes settled by an INDEPENDENT JUDICIARY.\nFinancial autonomy for each tier (own taxes/revenue).' },
+    ]
+  },
+  {
+    id:'feat', label:'Key\nFeatures', x:-310, y:-180, r:44,
+    color:'#0a1428', stroke:'#60a5fa', textColor:'#bfdbfe',
+    info:'Five essential features of a federal system.\nDistinguishes federalism from a unitary government.\nIndia has a quasi-federal system with strong Centre.',
+    children:[
+      { id:'ft1', label:'Multiple\nTiers', x:-510, y:-300, r:34, color:'#0a1428', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Two or more levels of government.\nIndia: 3 tiers — Union, State, Local.\nEach tier has its own elected legislature.\nDifferent powers for different levels.' },
+      { id:'ft2', label:'Specified\nJurisdictions', x:-560, y:-180, r:34, color:'#0a1428', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Subjects are clearly listed.\nUnion List (97 subjects) — Centre alone.\nState List (66 subjects) — States alone.\nConcurrent List (47 subjects) — both.\nResiduary — Centre.' },
+      { id:'ft3', label:'Constitutional\nGuarantee', x:-510, y:-60, r:34, color:'#0a1428', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Powers cannot be changed unilaterally.\nAmendment needs:\n• 2/3 majority of Parliament\n• Plus ratification by half the states (for federal provisions).\nProtects autonomy of states.' },
+      { id:'ft4', label:'Courts\nResolve\nDisputes', x:-340, y:-360, r:34, color:'#0a1428', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Supreme Court is the final interpreter.\nCan strike down laws that violate the Constitution.\nResolves disputes between Centre and States.\nIndependent judiciary essential for federalism.' },
+      { id:'ft5', label:'Financial\nAutonomy', x:-180, y:-380, r:34, color:'#0a1428', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Each level has its own revenue sources.\nUnion: income tax, customs, excise.\nState: sales tax, land revenue, stamp duty.\nFinance Commission decides Centre-State revenue sharing every 5 years.' },
+    ]
+  },
+  {
+    id:'lists', label:'3 Lists\n(7th Schedule)', x:310, y:-180, r:44,
+    color:'#0a2818', stroke:'#4ade80', textColor:'#bbf7d0',
+    info:'Constitution divides subjects into 3 LISTS in the 7th Schedule.\nUnion List, State List, Concurrent List.\nResiduary subjects → Union (unlike USA where it goes to states).',
+    children:[
+      { id:'lt1', label:'Union List\n(97)', x:510, y:-300, r:34, color:'#0a2818', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'97 subjects of NATIONAL importance.\nOnly Centre can make laws.\nIncludes: Defence, Foreign Affairs, Banking, Currency, Communication, Atomic Energy, Railways.\nFor uniform policy across India.' },
+      { id:'lt2', label:'State List\n(66)', x:560, y:-180, r:34, color:'#0a2818', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'66 subjects of STATE & local importance.\nOnly states can make laws.\nIncludes: Police, Trade, Commerce, Agriculture, Irrigation, Public Health.\nStates have full control here.' },
+      { id:'lt3', label:'Concurrent\nList (47)', x:510, y:-60, r:34, color:'#0a2818', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'47 subjects of COMMON interest.\nBoth Centre & States can make laws.\nIncludes: Education, Forests, Trade Unions, Marriage, Adoption, Succession.\nIf conflict → Central law prevails.' },
+      { id:'lt4', label:'Residuary\nSubjects', x:340, y:-360, r:34, color:'#0a2818', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'Subjects not in any of the 3 lists.\nIn India: ONLY Centre can legislate.\nExamples: Computer software, e-commerce.\nUnlike USA where residuary powers go to states.\nMakes Indian federalism Centre-leaning.' },
+    ]
+  },
+  {
+    id:'types', label:'Routes to\nFederation', x:-310, y:185, r:44,
+    color:'#001a18', stroke:'#34d399', textColor:'#a7f3d0',
+    info:'Federations are formed in two ways depending on history.\n"Coming together" type (USA, Australia, Switzerland) vs "Holding together" type (India, Spain, Belgium).',
+    children:[
+      { id:'ty1', label:'Coming\nTogether', x:-510, y:80, r:34, color:'#001a18', stroke:'#34d399', textColor:'#ccfbf1',
+        info:'Independent states come TOGETHER.\nForm a bigger unit by pooling sovereignty.\nKeep significant autonomy.\nAll states usually have EQUAL power.\nExamples: USA, Switzerland, Australia.' },
+      { id:'ty2', label:'Holding\nTogether', x:-560, y:210, r:34, color:'#001a18', stroke:'#34d399', textColor:'#ccfbf1',
+        info:'Large country DECIDES to divide power.\nBetween constituent states & national govt.\nCentral govt is usually MORE powerful.\nStates may have UNEQUAL powers.\nExamples: India, Spain, Belgium.' },
+      { id:'ty3', label:'Indian\nFederation', x:-500, y:340, r:34, color:'#001a18', stroke:'#34d399', textColor:'#ccfbf1',
+        info:'Holding together type.\nSome states (Jammu-Kashmir until 2019) had special status under Article 370.\nUTs are directly under Centre.\nNagaland, Mizoram have special provisions.\nPower-shared but Centre is dominant.' },
+      { id:'ty4', label:'Quasi-\nFederal', x:-320, y:380, r:34, color:'#001a18', stroke:'#34d399', textColor:'#ccfbf1',
+        info:'India = quasi-federal (federal + unitary features).\nUnitary features:\n• Strong Centre\n• Single Constitution\n• Single citizenship\n• Centre can change state boundaries\n• Governor appointed by President.' },
+    ]
+  },
+  {
+    id:'lang', label:'Linguistic\nStates &\nLanguage Policy', x:310, y:185, r:46,
+    color:'#1a0010', stroke:'#f472b6', textColor:'#fbcfe8',
+    info:'1956: States Reorganisation on linguistic basis.\nMade administration easier & promoted democracy.\nLanguage policy: Hindi as Official Language + 22 Scheduled Languages.\nNO national language — Hindi is OFFICIAL not national.',
+    children:[
+      { id:'lg1', label:'Linguistic\nStates (1956)', x:510, y:80, r:34, color:'#1a0010', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'States created on basis of LANGUAGE.\nFeared it would lead to disintegration.\nActually made country MORE united.\nMade administration easier.\nPeople could speak in their mother tongue.' },
+      { id:'lg2', label:'No National\nLanguage', x:560, y:210, r:34, color:'#1a0010', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'India has NO national language.\nHindi is an OFFICIAL language (along with English).\nConstitution recognizes 22 Scheduled Languages.\nStates choose their own official language.\nMother tongue is constitutionally protected.' },
+      { id:'lg3', label:'Hindi & Other\nOfficial Langs', x:510, y:340, r:34, color:'#1a0010', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Hindi: official language of Union.\n22 Scheduled Languages: includes Bengali, Telugu, Marathi, Tamil, Urdu etc.\nEnglish continues as associate official language.\nState govts use their own state languages.' },
+      { id:'lg4', label:'Three\nLanguage\nFormula', x:330, y:380, r:34, color:'#1a0010', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Schools should teach 3 languages:\n• Mother tongue / regional language\n• Hindi\n• English (or another modern Indian language)\nAimed to promote national integration.\nFlexibility allowed to states.' },
+    ]
+  },
+  {
+    id:'decent', label:'Decentralisation\n(73rd & 74th)', x:0, y:300, r:46,
+    color:'#1a1400', stroke:'#fbbf24', textColor:'#fde68a',
+    info:'1992: 73rd & 74th Constitutional Amendments.\nMade Local Self-Government a CONSTITUTIONAL requirement.\n3rd tier of government — Panchayats (rural) & Municipalities (urban).\nReservation for SC/ST/Women (1/3 seats).',
+    children:[
+      { id:'dc1', label:'Why\nDecentralise?', x:-180, y:420, r:34, color:'#1a1400', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Local people know local problems best.\nPeople can DIRECTLY participate.\nReduces burden on Centre & States.\nDeepens democracy.\nFaster decision-making at local level.' },
+      { id:'dc2', label:'73rd Amend.\n(Rural)', x:0, y:460, r:34, color:'#1a1400', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Created PANCHAYATI RAJ system.\n3-tier: Gram Panchayat → Block Panchayat → Zilla Parishad.\nElections every 5 years.\n1/3 seats reserved for women.\nReservation for SC/ST proportional to population.' },
+      { id:'dc3', label:'74th Amend.\n(Urban)', x:180, y:420, r:34, color:'#1a1400', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Created Urban Local Bodies.\nMunicipal Corporations (large cities).\nMunicipalities (small cities/towns).\nNagar Panchayats (transitional).\nReservations same as 73rd Amendment.' },
+      { id:'dc4', label:'State Election\nCommission', x:200, y:530, r:34, color:'#1a1400', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Independent body in each state.\nConducts Panchayat & Municipal elections.\nState Finance Commission decides revenue sharing between state & local bodies.\nEnsures local bodies are not controlled by state govt.' },
+    ]
+  },
+  {
+    id:'pract', label:'Federalism\nin Practice', x:0, y:-180, r:42,
+    color:'#0a0028', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'How federalism actually works in India.\nLinguistic states (1956), Centre-State relations, Coalition era (1990s onwards).\nSuccess: India remained united despite huge diversity.',
+    children:[
+      { id:'pr1', label:'Coalition\nEra (1989+)', x:-150, y:-260, r:32, color:'#0a0028', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'After 1989 → era of coalition govts at Centre.\nNo single party had majority.\nCentre had to RESPECT states more.\nRegional parties became powerful.\nStrengthened federalism in practice.' },
+      { id:'pr2', label:'Centre-State\nRelations', x:0, y:-280, r:32, color:'#0a0028', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Earlier: Centre often imposed President\'s Rule on states.\nMisuse of Article 356 (state emergency).\n1994 SR Bommai case: SC restricted misuse.\nAfter coalitions: more harmonious relations.' },
+      { id:'pr3', label:'Successful\nIndian Federation', x:150, y:-260, r:34, color:'#0a0028', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'India remains united despite:\n• 22 official languages\n• Many religions\n• Diverse cultures\nCredits to:\n• Linguistic states\n• Power sharing\n• Constitutional safeguards\n• Decentralisation.' },
+    ]
+  }
+];
+
+// Build flat list
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+
+function getNode(id) { return allNodes.find(n=>n.id===id); }
+
+// Pan & zoom
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { ox = dragOrigin.x+(e.clientX-dragStart.x); oy = dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>dragging=false);
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:0.91; zoomAt(f,e.clientX,e.clientY); },{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }});
+canvas.addEventListener('touchmove',e=>{ e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d; }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.3,Math.min(2.5,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+20; draw(); }
+
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy);
+  ctx.scale(scale,scale);
+
+  ctx.save();
+  ctx.strokeStyle='rgba(167,139,250,.02)';
+  ctx.lineWidth=1;
+  for(let x=-1000;x<1000;x+=60){ ctx.beginPath();ctx.moveTo(x,-1000);ctx.lineTo(x,1000);ctx.stroke(); }
+  for(let y=-1000;y<1000;y+=60){ ctx.beginPath();ctx.moveTo(-1000,y);ctx.lineTo(1000,y);ctx.stroke(); }
+  ctx.restore();
+
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'88');
+    grd.addColorStop(1,b.stroke+'44');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2-30;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[4,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?30:16;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||11}px Nunito,sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=14;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

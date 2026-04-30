@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Federalism</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080612;--card:#0e0a1e;--card2:#140f26;
+  --border:#1e1640;--text:#e2d9f3;--muted:#4a3a7a;
+  --ps:#7c3aed;--violet:#a78bfa;--indigo:#818cf8;
+  --blue:#60a5fa;--green:#4ade80;--amber:#fbbf24;
+  --red:#f87171;--teal:#34d399;--pink:#f472b6;--cyan:#38bdf8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(124,58,237,.05) 0%,transparent 60%)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;width:100%;padding:.4rem 1.4rem;background:rgba(8,6,18,.95);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem;transition:all .2s}
+.site-nav a.back:hover{color:var(--violet);border-color:var(--ps)}
+
+header{text-align:center;padding:1.6rem 1rem .7rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--violet)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.prog-row{display:flex;align-items:center;gap:1rem;padding:.5rem 1rem .8rem;width:100%;max-width:560px}
+.prog-bar{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ps),var(--violet));transition:width .4s ease}
+.prog-text{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap}
+
+.filters{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;padding:.2rem 1rem .8rem}
+.f-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.72rem;padding:.3rem .9rem;border-radius:3px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.f-btn:hover{color:var(--text)}
+.f-btn.on{color:#04020e;border-color:transparent}
+.f-all.on{background:var(--muted);color:var(--text)!important}
+.f-def.on{background:var(--violet);color:#fff!important}
+.f-list.on{background:var(--green)}
+.f-types.on{background:var(--teal)}
+.f-lang.on{background:var(--pink)}
+.f-decent.on{background:var(--amber)}
+.f-key.on{background:var(--cyan)}
+
+.stage{width:100%;max-width:560px;padding:0 1rem;perspective:1200px}
+.fc-wrap{width:100%;aspect-ratio:3/2;position:relative;cursor:pointer;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.fc-wrap.flipped{transform:rotateY(180deg)}
+
+.fc-face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.4rem;text-align:center}
+.fc-front{background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.fc-back{transform:rotateY(180deg);background:var(--card2);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.6)}
+
+.fc-tag{font-family:'DM Mono',monospace;font-size:.65rem;font-weight:500;padding:.18rem .65rem;border-radius:2px;margin-bottom:.7rem}
+.tag-def{background:rgba(167,139,250,.15);color:var(--violet)}
+.tag-list{background:rgba(74,222,128,.15);color:var(--green)}
+.tag-types{background:rgba(52,211,153,.15);color:var(--teal)}
+.tag-lang{background:rgba(244,114,182,.15);color:var(--pink)}
+.tag-decent{background:rgba(251,191,36,.15);color:var(--amber)}
+.tag-key{background:rgba(56,189,248,.15);color:var(--cyan)}
+
+.fc-q{font-family:'Playfair Display',serif;font-size:clamp(.88rem,2.4vw,1.1rem);font-weight:700;line-height:1.45}
+.fc-flip-hint{position:absolute;bottom:.75rem;font-size:.65rem;font-family:'DM Mono',monospace;color:rgba(60,40,100,.8);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+.fc-ans-lbl{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--violet);margin-bottom:.5rem}
+.fc-ans{font-size:clamp(.78rem,2vw,.95rem);line-height:1.65;color:var(--text)}
+.fc-ans strong{color:var(--amber)}
+.fc-ans em{color:var(--teal);font-style:normal}
+
+.known-badge{position:absolute;top:.7rem;right:.7rem;font-size:.62rem;font-family:'DM Mono',monospace;padding:.12rem .45rem;border-radius:2px}
+.known{background:rgba(74,222,128,.15);color:#4ade80}
+.unknown{background:rgba(239,68,68,.1);color:#f87171}
+
+.nav-row{display:flex;gap:.7rem;align-items:center;padding:1rem}
+.nav-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.85rem;padding:.5rem 1.3rem;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.nav-btn:hover:not(:disabled){border-color:#2a1e4a;color:var(--text)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+.card-ctr{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);min-width:70px;text-align:center}
+
+.bottom-row{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;padding:.3rem 1rem 2rem}
+.action-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.4rem .9rem;border-radius:3px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.action-btn:hover{color:var(--violet);border-color:var(--ps)}
+.action-btn.mark-known{color:var(--green);border-color:rgba(74,222,128,.3)}
+.action-btn.mark-known:hover{background:rgba(74,222,128,.08)}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Federalism — Flashcards</h1>
+  <p>CBSE Class X · Civics Chapter 2 · Click card to flip</p>
+</header>
+
+<div class="prog-row">
+  <span class="prog-text" id="prog-num">0 / 0</span>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <span class="prog-text" id="prog-known">0 known</span>
+</div>
+
+<div class="filters">
+  <button class="f-btn f-all on" data-cat="all">All</button>
+  <button class="f-btn f-def" data-cat="def">Definition</button>
+  <button class="f-btn f-list" data-cat="list">7th Schedule</button>
+  <button class="f-btn f-types" data-cat="types">Types</button>
+  <button class="f-btn f-lang" data-cat="lang">Language</button>
+  <button class="f-btn f-decent" data-cat="decent">Decentralisation</button>
+  <button class="f-btn f-key" data-cat="key">Key Facts</button>
+</div>
+
+<div class="stage">
+  <div class="fc-wrap" id="fc">
+    <div class="fc-face fc-front">
+      <span class="known-badge unknown" id="badge">UNSEEN</span>
+      <div class="fc-tag" id="tag">DEFINITION</div>
+      <div class="fc-q" id="q">Loading…</div>
+      <div class="fc-flip-hint">▾ click to flip ▾</div>
+    </div>
+    <div class="fc-face fc-back">
+      <div class="fc-ans-lbl">ANSWER</div>
+      <div class="fc-ans" id="a">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prev">← Prev</button>
+  <span class="card-ctr" id="ctr">1 / 1</span>
+  <button class="nav-btn" id="next">Next →</button>
+</div>
+
+<div class="bottom-row">
+  <button class="action-btn mark-known" id="mark">✓ Mark Known</button>
+  <button class="action-btn" onclick="shuffle()">🔀 Shuffle</button>
+  <button class="action-btn" onclick="reset()">↺ Reset</button>
+</div>
+
+<script>
+const cards=[
+  // DEFINITION (8)
+  {cat:'def',q:'What is federalism?',a:'A system of government where <strong>power is divided between a central authority and constituent units</strong> (states/provinces). Two or more levels of government rule the same citizens, each with its own jurisdiction.'},
+  {cat:'def',q:'Name the 5 features of a federal government.',a:'<strong>1.</strong> Two or more levels of government<br><strong>2.</strong> Each level has specified jurisdiction<br><strong>3.</strong> Powers guaranteed by the Constitution<br><strong>4.</strong> Independent courts resolve disputes<br><strong>5.</strong> Financial autonomy at each level'},
+  {cat:'def',q:'How many tiers does Indian federalism have?',a:'<strong>3 tiers</strong>: <em>Union (Centre)</em>, <em>State Governments</em>, and <em>Local Self-Governments</em> (Panchayats &amp; Municipalities).'},
+  {cat:'def',q:'What is the difference between unitary and federal government?',a:'<strong>Unitary:</strong> Single level of government — Centre is supreme.<br><strong>Federal:</strong> Two or more levels share power constitutionally — neither can override the other in their sphere.'},
+  {cat:'def',q:'Why is India called "quasi-federal"?',a:'India has both <strong>federal</strong> and <strong>unitary</strong> features. Federal: 3 tiers, division of powers. Unitary: single Constitution, single citizenship, strong Centre, residuary powers with Centre, Article 356.'},
+  {cat:'def',q:'Who is the guardian of the Indian Constitution?',a:'The <strong>Supreme Court</strong>. It is the final interpreter of the Constitution and resolves disputes between Centre and States.'},
+  {cat:'def',q:'What is "jurisdiction" in federalism?',a:'The <strong>area within which authority can legally be exercised</strong>. Each tier of government has its own jurisdiction (subjects on which it can make laws).'},
+  {cat:'def',q:'How is the federal nature of the Indian Constitution protected?',a:'(1) Powers are <strong>specified in writing</strong> (7th Schedule).<br>(2) Cannot be unilaterally changed — needs <strong>2/3 of Parliament + ratification by half the states</strong>.<br>(3) Independent <strong>judiciary</strong> resolves disputes.'},
+
+  // 7TH SCHEDULE LISTS (8)
+  {cat:'list',q:'How many subjects are in the Union List?',a:'<strong>97 subjects</strong>. Only the Centre can make laws on these. Examples: Defence, Foreign Affairs, Banking, Currency, Atomic Energy, Railways.'},
+  {cat:'list',q:'How many subjects are in the State List?',a:'<strong>66 subjects</strong>. Only state governments can legislate. Examples: Police, Trade, Commerce, Agriculture, Irrigation, Public Health.'},
+  {cat:'list',q:'How many subjects are in the Concurrent List?',a:'<strong>47 subjects</strong>. Both Centre and States can make laws. If conflict — <em>Central law prevails</em>. Examples: Education, Forests, Marriage, Adoption, Succession.'},
+  {cat:'list',q:'What are residuary subjects? Who legislates on them in India?',a:'Subjects <strong>not mentioned in any of the 3 lists</strong> (e.g., computer software, e-commerce). In India, the <strong>Union Government</strong> has power to legislate on residuary subjects.'},
+  {cat:'list',q:'How does India differ from USA on residuary powers?',a:'<strong>USA:</strong> Residuary powers go to <em>states</em> (states are stronger).<br><strong>India:</strong> Residuary powers go to <em>Centre</em> — making India a Centre-leaning quasi-federation.'},
+  {cat:'list',q:'Which Schedule of the Constitution contains the 3 lists?',a:'The <strong>7th Schedule</strong> of the Constitution.'},
+  {cat:'list',q:'Give 4 examples of subjects under the Concurrent List.',a:'<strong>Education, Forests, Trade Unions, Marriage</strong> (also Adoption, Succession). Both Centre and States can legislate; Central law prevails on conflict.'},
+  {cat:'list',q:'Which list includes "Police" and "Public Health"?',a:'The <strong>State List</strong>. These are subjects of state and local importance, hence states have full control.'},
+
+  // TYPES OF FEDERATION (6)
+  {cat:'types',q:'What are the two routes to forming a federation?',a:'<strong>1. Coming Together:</strong> Independent states unite (USA, Switzerland, Australia).<br><strong>2. Holding Together:</strong> Big country divides power (India, Spain, Belgium).'},
+  {cat:'types',q:'Which type of federation is India?',a:'India is a <strong>"Holding Together"</strong> federation. The Constitution divided power between Centre and States to keep the country united despite huge diversity.'},
+  {cat:'types',q:'In Coming Together federations, are all states equal?',a:'<strong>Yes</strong> — all states usually have <em>equal power</em> and the Centre is comparatively weaker. Example: USA — every state has 2 Senators regardless of size.'},
+  {cat:'types',q:'In Holding Together federations, are all states equal?',a:'<strong>Not necessarily</strong>. States may have <em>unequal powers</em>. In India, Jammu &amp; Kashmir had special status under Article 370 (until 2019); UTs are directly under the Centre.'},
+  {cat:'types',q:'Give 3 unitary features in the Indian Constitution.',a:'(1) <strong>Single Constitution</strong> &amp; single citizenship.<br>(2) Centre can <strong>change state boundaries</strong>.<br>(3) <strong>Article 356</strong> — President\'s Rule on states. Also: Governor appointed by President, residuary powers with Centre.'},
+  {cat:'types',q:'What are All-India Services?',a:'Civil services like <strong>IAS</strong> and <strong>IPS</strong> that are <em>common to Centre and States</em>. Officers are recruited by the Centre but serve in states. A unitary feature.'},
+
+  // LANGUAGE POLICY (5)
+  {cat:'lang',q:'When were states reorganised on linguistic basis?',a:'<strong>1956</strong> — through the <em>States Reorganisation Act</em>. Initially feared to cause disintegration, but it actually <strong>strengthened Indian unity</strong>.'},
+  {cat:'lang',q:'Does India have a national language?',a:'<strong>No</strong>. India has <em>NO national language</em>. <strong>Hindi</strong> is the <em>OFFICIAL language</em> of the Union (along with English as associate official). The Constitution recognises <strong>22 Scheduled Languages</strong>.'},
+  {cat:'lang',q:'What is the Three Language Formula?',a:'A school education policy where students learn <strong>3 languages</strong>: (1) Mother tongue / regional language, (2) Hindi, (3) English (or another modern Indian language). Aim: promote national integration.'},
+  {cat:'lang',q:'How many languages are recognised by the Constitution?',a:'<strong>22 Scheduled Languages</strong> are listed in the <em>8th Schedule</em>. Includes Bengali, Telugu, Marathi, Tamil, Urdu, Punjabi, etc.'},
+  {cat:'lang',q:'Why was the formation of linguistic states feared initially?',a:'It was feared that giving states based on language would lead to <strong>regionalism and disintegration</strong> of India. In reality, it made administration easier and <em>strengthened</em> the country.'},
+
+  // DECENTRALISATION (8)
+  {cat:'decent',q:'What is decentralisation?',a:'The <strong>transfer of power from Centre and State to local bodies</strong>. Allows local people to make decisions on local issues, deepening democracy.'},
+  {cat:'decent',q:'When were the 73rd and 74th Constitutional Amendments passed?',a:'In <strong>1992</strong>. They gave constitutional status to local self-government.'},
+  {cat:'decent',q:'What did the 73rd Amendment establish?',a:'Created the <strong>Panchayati Raj system</strong> for <em>rural areas</em>. 3-tier structure: <strong>Gram Panchayat → Block Panchayat → Zilla Parishad</strong>.'},
+  {cat:'decent',q:'What did the 74th Amendment establish?',a:'Created <strong>Urban Local Bodies</strong>: Municipal Corporations (large cities), Municipalities (towns), and Nagar Panchayats (transitional areas).'},
+  {cat:'decent',q:'What is the reservation for women in local bodies?',a:'<strong>1/3 (one-third) of seats</strong> are reserved for women in both Panchayats and Municipalities. SC/ST reservation is proportional to their population.'},
+  {cat:'decent',q:'What is a Gram Sabha?',a:'A body of <strong>all adult citizens</strong> registered as voters in a village. It supervises the Gram Panchayat, approves its budget, and reviews its work — a form of <em>direct democracy</em>.'},
+  {cat:'decent',q:'How often must elections to local bodies be held?',a:'Every <strong>5 years</strong>, mandatory under the 73rd &amp; 74th Amendments. Elections are conducted by the <strong>State Election Commission</strong>.'},
+  {cat:'decent',q:'Who decides revenue sharing between state and local bodies?',a:'The <strong>State Finance Commission</strong>, set up in each state. It is independent and recommends how state revenue should be shared with Panchayats and Municipalities.'},
+
+  // KEY FACTS (5)
+  {cat:'key',q:'What is Article 356 of the Indian Constitution?',a:'Allows the President to impose <strong>President\'s Rule</strong> on a state when its government cannot function as per the Constitution. Often misused historically; restricted by SR Bommai case (1994).'},
+  {cat:'key',q:'What was the significance of the SR Bommai case (1994)?',a:'The Supreme Court <strong>restricted misuse of Article 356</strong>. President\'s Rule cannot be imposed arbitrarily — the President\'s satisfaction is subject to <em>judicial review</em>. A landmark for federalism.'},
+  {cat:'key',q:'What changed in Centre-State relations after 1989?',a:'Era of <strong>coalition governments</strong> began at the Centre. No single party had majority. <em>Regional parties became powerful</em>. Centre had to consult and respect states more — federalism strengthened in practice.'},
+  {cat:'key',q:'Name 2 cooperative federalism institutions in India today.',a:'<strong>1.</strong> <em>GST Council</em> — Centre &amp; states jointly decide GST rates.<br><strong>2.</strong> <em>NITI Aayog</em> — replaced Planning Commission; promotes cooperative federalism between Centre &amp; states.'},
+  {cat:'key',q:'How many states and UTs does India have today?',a:'<strong>28 states</strong> and <strong>8 Union Territories</strong> (after the reorganisation of Jammu &amp; Kashmir into 2 UTs in 2019).'},
+];
+
+let active=cards.slice(),idx=0,known=new Set(),seen=new Set();
+const fc=document.getElementById('fc'),tag=document.getElementById('tag'),q=document.getElementById('q'),a=document.getElementById('a'),
+ctr=document.getElementById('ctr'),badge=document.getElementById('badge'),
+prog=document.getElementById('prog-fill'),pnum=document.getElementById('prog-num'),pknown=document.getElementById('prog-known');
+const tagLabels={def:'DEFINITION',list:'7TH SCHEDULE',types:'TYPES',lang:'LANGUAGE',decent:'DECENTRALISATION',key:'KEY FACT'};
+
+function render(){
+  if(!active.length){q.innerHTML='No cards in this filter';a.innerHTML='—';return;}
+  fc.classList.remove('flipped');
+  setTimeout(()=>{
+    const c=active[idx];
+    tag.className='fc-tag tag-'+c.cat;
+    tag.textContent=tagLabels[c.cat];
+    q.innerHTML=c.q;a.innerHTML=c.a;
+    ctr.textContent=(idx+1)+' / '+active.length;
+    seen.add(cards.indexOf(c));
+    const isKnown=known.has(cards.indexOf(c));
+    badge.className='known-badge '+(isKnown?'known':'unknown');
+    badge.textContent=isKnown?'KNOWN':(seen.has(cards.indexOf(c))?'SEEN':'UNSEEN');
+    document.getElementById('prev').disabled=idx===0;
+    document.getElementById('next').disabled=idx===active.length-1;
+    pnum.textContent=(idx+1)+' / '+active.length;
+    prog.style.width=((idx+1)/active.length*100)+'%';
+    pknown.textContent=known.size+' known';
+  },80);
+}
+fc.addEventListener('click',()=>fc.classList.toggle('flipped'));
+document.getElementById('prev').addEventListener('click',()=>{if(idx>0){idx--;render();}});
+document.getElementById('next').addEventListener('click',()=>{if(idx<active.length-1){idx++;render();}});
+document.getElementById('mark').addEventListener('click',()=>{
+  const c=active[idx],i=cards.indexOf(c);
+  if(known.has(i))known.delete(i);else known.add(i);
+  render();
+});
+document.querySelectorAll('.f-btn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.f-btn').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  const cat=b.dataset.cat;
+  active=cat==='all'?cards.slice():cards.filter(c=>c.cat===cat);
+  idx=0;render();
+}));
+function shuffle(){for(let i=active.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[active[i],active[j]]=[active[j],active[i]];}idx=0;render();}
+function reset(){known.clear();seen.clear();idx=0;active=cards.slice();document.querySelectorAll('.f-btn').forEach(x=>x.classList.remove('on'));document.querySelector('.f-all').classList.add('on');render();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'&&idx>0){idx--;render();}else if(e.key==='ArrowRight'&&idx<active.length-1){idx++;render();}else if(e.key===' '){e.preventDefault();fc.classList.toggle('flipped');}});
+render();
+</script>
+</body>
+</html>

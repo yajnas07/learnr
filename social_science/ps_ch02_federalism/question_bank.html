@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Federalism</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080612;--card:#0e0a1e;--card2:#140f26;
+  --border:#1e1640;--text:#e2d9f3;--muted:#4a3a7a;
+  --ps:#7c3aed;--violet:#a78bfa;--indigo:#818cf8;
+  --blue:#60a5fa;--green:#4ade80;--amber:#fbbf24;
+  --red:#f87171;--teal:#34d399;--pink:#f472b6;--cyan:#38bdf8;
+  --correct:#22c55e;--wrong:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(124,58,237,.04) 0%,transparent 60%)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.4rem;background:rgba(8,6,18,.95);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem;transition:all .2s}
+.site-nav a.back:hover{color:var(--violet);border-color:var(--ps)}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--violet)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.dash{display:flex;justify-content:center;gap:.9rem;flex-wrap:wrap;padding:.8rem 1rem 1.2rem}
+.dcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.6rem 1.2rem;text-align:center;min-width:84px}
+.dval{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900}
+.dlbl{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.1rem}
+
+nav.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.45rem;padding:0 1rem 1.2rem}
+nav.filters button{font-family:'Playfair Display',serif;font-weight:700;font-size:.76rem;padding:.38rem 1rem;border-radius:3px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+nav.filters button:hover{color:var(--text)}
+nav.filters button.active{border-color:var(--violet);color:var(--violet);background:rgba(124,58,237,.08)}
+
+main{max-width:800px;margin:0 auto;padding:0 1rem 4rem}
+
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:1rem;overflow:hidden;transition:box-shadow .2s;animation:slideIn .3s ease both}
+.q-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.5)}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.q-header{display:flex;align-items:flex-start;gap:.7rem;padding:1rem 1.1rem .7rem}
+.q-num{font-family:'DM Mono',monospace;font-size:.68rem;min-width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;background:var(--card2);color:var(--violet)}
+.q-text{font-family:'Playfair Display',serif;font-size:.92rem;font-weight:700;line-height:1.45;flex:1}
+.q-meta{display:flex;gap:.35rem;flex-wrap:wrap;padding:0 1.1rem .7rem 4rem}
+
+.badge{font-size:.62rem;font-family:'DM Mono',monospace;padding:.12rem .48rem;border-radius:2px}
+.b-mcq{background:rgba(96,165,250,.12);color:var(--blue)}
+.b-short{background:rgba(74,222,128,.12);color:var(--green)}
+.b-long{background:rgba(251,191,36,.12);color:var(--amber)}
+.b-assert{background:rgba(167,139,250,.12);color:var(--violet)}
+.b-1m{background:rgba(148,163,184,.08);color:#94a3b8}
+.b-2m{background:rgba(251,191,36,.1);color:#fde68a}
+.b-3m{background:rgba(251,146,60,.1);color:#fed7aa}
+.b-5m{background:rgba(248,113,113,.12);color:#fca5a5}
+
+.strip-def{border-left:4px solid var(--violet)}
+.strip-list{border-left:4px solid var(--green)}
+.strip-types{border-left:4px solid var(--teal)}
+.strip-lang{border-left:4px solid var(--pink)}
+.strip-decent{border-left:4px solid var(--amber)}
+.strip-key{border-left:4px solid var(--cyan)}
+
+.mcq-body{padding:0 1.1rem .6rem}
+.mcq-opts{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem}
+@media(max-width:480px){.mcq-opts{grid-template-columns:1fr}}
+.opt{padding:.55rem .8rem;border:1px solid var(--border);border-radius:8px;background:var(--card2);font-size:.8rem;cursor:pointer;transition:all .15s;display:flex;gap:.5rem;align-items:flex-start}
+.opt:hover{border-color:var(--violet)}
+.opt-letter{font-family:'DM Mono',monospace;font-weight:700;color:var(--muted);flex-shrink:0}
+.opt.correct{background:rgba(34,197,94,.1);border-color:var(--correct);color:#86efac}
+.opt.correct .opt-letter{color:var(--correct)}
+.opt.wrong{background:rgba(239,68,68,.1);border-color:var(--wrong);color:#fca5a5}
+.opt.wrong .opt-letter{color:var(--wrong)}
+
+.reveal-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.35rem .8rem;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;margin:0 1.1rem 1rem;transition:all .2s}
+.reveal-btn:hover{color:var(--violet);border-color:var(--ps)}
+
+.answer-box{padding:0 1.1rem 1rem;display:none;animation:slideIn .25s ease}
+.answer-box.show{display:block}
+.ans-lbl{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--violet);margin-bottom:.4rem;letter-spacing:.05em}
+.ans-text{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:.75rem .9rem;font-size:.83rem;line-height:1.7;color:var(--text)}
+.ans-text strong{color:var(--amber)}
+.ans-text em{color:var(--teal);font-style:normal}
+.ans-text ul{margin-left:1.1rem;margin-top:.3rem}
+.ans-text li{margin:.18rem 0}
+.tip-box{margin-top:.5rem;padding:.5rem .7rem;background:rgba(167,139,250,.06);border-left:3px solid var(--violet);border-radius:0 6px 6px 0;font-size:.74rem;color:var(--muted)}
+.tip-box strong{color:var(--violet)}
+
+footer{text-align:center;padding:30px 20px;color:var(--muted);font-size:.75rem;border-top:1px solid var(--border);margin-top:2rem}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Federalism — Question Bank</h1>
+  <p>CBSE Class X · Civics Chapter 2 · 30 questions in board pattern</p>
+</header>
+
+<div class="dash">
+  <div class="dcard"><div class="dval" style="color:var(--blue)" id="d-mcq">10</div><div class="dlbl">MCQ</div></div>
+  <div class="dcard"><div class="dval" style="color:var(--violet)" id="d-ar">4</div><div class="dlbl">Assert-Reason</div></div>
+  <div class="dcard"><div class="dval" style="color:var(--green)" id="d-sa">12</div><div class="dlbl">Short Ans</div></div>
+  <div class="dcard"><div class="dval" style="color:var(--amber)" id="d-la">4</div><div class="dlbl">Long Ans</div></div>
+  <div class="dcard"><div class="dval" style="color:var(--violet)" id="d-tot">30</div><div class="dlbl">Total</div></div>
+</div>
+
+<nav class="filters">
+  <button class="active" data-f="all">All</button>
+  <button data-f="mcq">MCQ (10)</button>
+  <button data-f="assert">Assert-Reason (4)</button>
+  <button data-f="short">Short (12)</button>
+  <button data-f="long">Long (4)</button>
+</nav>
+
+<main id="qlist"></main>
+
+<footer>Federalism · Civics Class X · LearnR · 2026</footer>
+
+<script>
+const Q=[
+// ── MCQ (10) ──
+{n:1,type:'mcq',marks:1,topic:'def',q:'Which of the following is a feature of a federal government?',opts:['Single level of government with all powers','Two or more levels of government with specified powers','All states have unequal powers','Only the Centre can make laws'],correct:1,ans:'<strong>(b)</strong> Two or more levels of government with specified powers. Other key features: constitutional guarantee, independent judiciary, financial autonomy, courts to settle disputes.'},
+{n:2,type:'mcq',marks:1,topic:'list',q:'How many subjects are in the Union List?',opts:['66','97','47','40'],correct:1,ans:'<strong>(b) 97 subjects.</strong> Includes Defence, Foreign Affairs, Banking, Currency, Atomic Energy, Railways. Only Centre can make laws.'},
+{n:3,type:'mcq',marks:1,topic:'list',q:'Subjects on which both Centre and States can make laws are in the:',opts:['Union List','State List','Concurrent List','Residuary List'],correct:2,ans:'<strong>(c) Concurrent List</strong> (47 subjects). Includes Education, Forests, Marriage, Adoption. If Central and State laws conflict, <em>Central law prevails</em>.'},
+{n:4,type:'mcq',marks:1,topic:'types',q:'Which type of federation is India?',opts:['Coming Together','Holding Together','Confederation','Unitary'],correct:1,ans:'<strong>(b) Holding Together.</strong> A large country (India) decided to share power between Centre and States to keep the country united. Centre is dominant. Examples of similar type: Spain, Belgium.'},
+{n:5,type:'mcq',marks:1,topic:'list',q:'Residuary subjects in India belong to:',opts:['State Government','Union Government','Local Government','Concurrent List'],correct:1,ans:'<strong>(b) Union Government.</strong> Subjects not mentioned in any list (e.g., computer software, e-commerce) are with the Centre. In USA, residuary powers go to states.'},
+{n:6,type:'mcq',marks:1,topic:'lang',q:'How many languages are recognised in the 8th Schedule of the Constitution?',opts:['18','22','15','20'],correct:1,ans:'<strong>(b) 22 Scheduled Languages.</strong> Includes Bengali, Telugu, Marathi, Tamil, Urdu, Punjabi etc. India has NO national language.'},
+{n:7,type:'mcq',marks:1,topic:'decent',q:'Which Constitutional Amendment created Panchayati Raj?',opts:['72nd Amendment','73rd Amendment','74th Amendment','75th Amendment'],correct:1,ans:'<strong>(b) 73rd Amendment, 1992.</strong> Created the 3-tier Panchayati Raj for rural areas: Gram Panchayat → Block → Zilla Parishad. The 74th Amendment did the same for urban bodies (Municipalities).'},
+{n:8,type:'mcq',marks:1,topic:'decent',q:'What is the reservation for women in local bodies?',opts:['1/4 of seats','1/3 of seats','1/2 of seats','No reservation'],correct:1,ans:'<strong>(b) 1/3 (one-third) of seats.</strong> Mandated by both 73rd and 74th Amendments. SC/ST reservation is proportional to their population.'},
+{n:9,type:'mcq',marks:1,topic:'lang',q:'When were states reorganised on linguistic basis in India?',opts:['1947','1950','1956','1962'],correct:2,ans:'<strong>(c) 1956 — States Reorganisation Act.</strong> Initially feared to cause disintegration, but actually <em>strengthened Indian unity</em> and made administration easier.'},
+{n:10,type:'mcq',marks:1,topic:'key',q:'The judgement that restricted misuse of Article 356 (President\'s Rule) was:',opts:['Kesavananda Bharati case','SR Bommai case','Minerva Mills case','Golak Nath case'],correct:1,ans:'<strong>(b) SR Bommai case (1994).</strong> Supreme Court ruled that President\'s Rule cannot be imposed arbitrarily — President\'s satisfaction is subject to <em>judicial review</em>. A landmark for federalism.'},
+
+// ── ASSERTION-REASON (4) ──
+{n:11,type:'assert',marks:1,topic:'types',q:'<strong>Assertion (A):</strong> India is a quasi-federal country.<br><strong>Reason (R):</strong> The Indian Constitution has both federal and unitary features.',opts:['Both A and R are true, and R is the correct explanation of A','Both A and R are true, but R is NOT the correct explanation of A','A is true, R is false','A is false, R is true'],correct:0,ans:'<strong>(a) Both A and R are true, and R correctly explains A.</strong><br>Federal features: 3 tiers, division of powers, written constitution. Unitary features: single citizenship, strong Centre, residuary powers with Centre, Article 356.'},
+{n:12,type:'assert',marks:1,topic:'list',q:'<strong>Assertion (A):</strong> Subjects in the Concurrent List are decided only by State governments.<br><strong>Reason (R):</strong> Education and Forests are in the Concurrent List.',opts:['Both A and R are true, and R is the correct explanation of A','Both A and R are true, but R is NOT the correct explanation of A','A is true, R is false','A is false, R is true'],correct:3,ans:'<strong>(d) A is false, R is true.</strong><br>Both Centre AND States can legislate on Concurrent List subjects. Education and Forests are indeed in this list. If laws conflict, Central law prevails.'},
+{n:13,type:'assert',marks:1,topic:'lang',q:'<strong>Assertion (A):</strong> Hindi is the national language of India.<br><strong>Reason (R):</strong> The Constitution recognises 22 scheduled languages.',opts:['Both A and R are true, and R is the correct explanation of A','Both A and R are true, but R is NOT the correct explanation of A','A is true, R is false','A is false, R is true'],correct:3,ans:'<strong>(d) A is false, R is true.</strong><br>India has <em>NO national language</em>. Hindi is the OFFICIAL language of the Union (along with English as associate official). The 8th Schedule does recognise 22 languages.'},
+{n:14,type:'assert',marks:1,topic:'decent',q:'<strong>Assertion (A):</strong> The 73rd Amendment made local self-government a constitutional requirement.<br><strong>Reason (R):</strong> Decentralisation deepens democracy by allowing local people to make local decisions.',opts:['Both A and R are true, and R is the correct explanation of A','Both A and R are true, but R is NOT the correct explanation of A','A is true, R is false','A is false, R is true'],correct:0,ans:'<strong>(a) Both A and R are true, and R correctly explains A.</strong><br>The 73rd (and 74th) Amendments of 1992 gave constitutional status to Panchayats and Municipalities precisely BECAUSE decentralisation deepens democracy at the grassroots.'},
+
+// ── SHORT ANSWER (12) ──
+{n:15,type:'short',marks:3,topic:'def',q:'Define federalism. Mention any two features.',ans:'<strong>Federalism</strong> is a system of government in which <em>power is divided between a central authority and various constituent units</em> (states/provinces). Two or more levels of government rule the same citizens.<br><br><strong>Two features:</strong><ul><li>Each level has its own jurisdiction in legislation, taxation and administration.</li><li>The Constitution guarantees the powers of each level — they cannot be unilaterally changed.</li></ul>',tip:'Mention "two or more levels" + "specified powers" for full marks.'},
+{n:16,type:'short',marks:3,topic:'def',q:'List any three federal features of the Indian Constitution.',ans:'<ul><li><strong>Three-tier government:</strong> Union, State, and Local self-government.</li><li><strong>Division of powers:</strong> Subjects divided into Union List (97), State List (66), and Concurrent List (47) under the 7th Schedule.</li><li><strong>Independent judiciary:</strong> Supreme Court is the final interpreter and resolves Centre-State disputes.</li></ul><br>Other federal features: written Constitution, dual government, financial autonomy.',tip:'Don\'t confuse federal features with unitary features. Three-tier and 3-list system are clearly federal.'},
+{n:17,type:'short',marks:3,topic:'list',q:'Distinguish between Union List and State List with examples.',ans:'<table style="width:100%;font-size:.78rem;border-collapse:collapse;margin-top:.3rem"><tr><th style="text-align:left;padding:.3rem;border:1px solid var(--border)">Union List (97)</th><th style="text-align:left;padding:.3rem;border:1px solid var(--border)">State List (66)</th></tr><tr><td style="padding:.3rem;border:1px solid var(--border)">Only Centre legislates</td><td style="padding:.3rem;border:1px solid var(--border)">Only States legislate</td></tr><tr><td style="padding:.3rem;border:1px solid var(--border)">Subjects of national importance</td><td style="padding:.3rem;border:1px solid var(--border)">Subjects of state importance</td></tr><tr><td style="padding:.3rem;border:1px solid var(--border)">Defence, Foreign Affairs, Banking, Railways, Currency</td><td style="padding:.3rem;border:1px solid var(--border)">Police, Trade, Agriculture, Irrigation, Public Health</td></tr></table>',tip:'A clean comparison table fetches full marks. Always give 2-3 examples for each.'},
+{n:18,type:'short',marks:3,topic:'types',q:'Distinguish between "coming together" and "holding together" federations.',ans:'<strong>Coming Together:</strong> Independent states <em>unite</em> to form a bigger unit (e.g., USA, Switzerland, Australia). All states usually have <em>equal power</em>; Centre is comparatively weaker.<br><br><strong>Holding Together:</strong> A large country <em>decides to share power</em> between Centre and constituent states (e.g., India, Spain, Belgium). Centre is usually <em>more powerful</em>; states may have unequal powers.',tip:'India is "Holding Together" — remember this with 3 examples each.'},
+{n:19,type:'short',marks:3,topic:'lang',q:'Why was the formation of linguistic states a wise decision?',ans:'<ul><li><strong>Made administration easier</strong> — people could be governed in their mother tongue.</li><li><strong>Strengthened national unity</strong> — what was feared to cause disintegration actually brought groups together.</li><li><strong>Promoted democracy</strong> — citizens could participate in politics in their own language.</li></ul>The 1956 States Reorganisation Act is now seen as one of independent India\'s most successful policy decisions.',tip:'Mention 1956 + paradox (feared disintegration but caused unity).'},
+{n:20,type:'short',marks:3,topic:'lang',q:'Describe the language policy of India.',ans:'<ul><li><strong>No national language</strong>. Hindi is the official language of the Union (with English as associate official).</li><li>The Constitution recognises <strong>22 scheduled languages</strong> (8th Schedule).</li><li>States can choose their <strong>own state official language</strong>.</li><li><strong>Three Language Formula</strong> in schools: mother tongue + Hindi + English/another modern Indian language.</li><li>The policy is <strong>flexible and respects diversity</strong> — unlike Sri Lanka where Sinhala-only policy caused civil conflict.</li></ul>',tip:'Always emphasise: Hindi is OFFICIAL not NATIONAL. India\'s flexible policy is contrasted with Sri Lanka\'s rigid one.'},
+{n:21,type:'short',marks:3,topic:'decent',q:'What is decentralisation? Why is it necessary?',ans:'<strong>Decentralisation</strong> is the <em>transfer of power from Centre and State to local government bodies</em> (Panchayats, Municipalities).<br><br><strong>Why necessary:</strong><ul><li><strong>Local issues are best understood locally</strong>.</li><li>People can <strong>directly participate</strong> in decisions affecting them.</li><li><strong>Reduces burden</strong> on Central and State governments.</li><li>Habits of <strong>democratic participation</strong> are cultivated.</li></ul>',tip:'Always mention "people\'s participation" as a reason — it shows you understand the democratic value.'},
+{n:22,type:'short',marks:3,topic:'decent',q:'List the major steps taken towards decentralisation in 1992.',ans:'The <strong>73rd and 74th Constitutional Amendments (1992)</strong> brought:<ul><li><strong>Mandatory regular elections</strong> to local bodies — every 5 years.</li><li><strong>Reservations:</strong> 1/3 seats for women; SC/ST proportional to population.</li><li><strong>State Election Commission</strong> in each state to conduct local body elections.</li><li><strong>State Finance Commission</strong> to share revenue with local bodies.</li><li>State governments must share some powers and revenue with local bodies (constitutionally).</li></ul>',tip:'Mention BOTH 73rd (rural) and 74th (urban) amendments — and the year 1992.'},
+{n:23,type:'short',marks:3,topic:'key',q:'How did the era of coalition governments strengthen federalism in India?',ans:'After <strong>1989</strong>, no single party got a majority at the Centre. This led to the <strong>era of coalition governments</strong>:<ul><li><strong>Regional parties</strong> became important partners in coalitions.</li><li>Centre had to <strong>respect and consult states</strong> more.</li><li><strong>Misuse of Article 356</strong> (President\'s Rule) declined.</li><li>A new <strong>culture of power-sharing</strong> emerged.</li></ul>Federalism strengthened in PRACTICE even though the Constitution did not change.',tip:'Always mention "in practice, not in writing" — examiners reward this nuance.'},
+{n:24,type:'short',marks:3,topic:'list',q:'Explain the difference between Union List, State List and Concurrent List.',ans:'<ul><li><strong>Union List (97):</strong> Centre alone. Defence, Foreign Affairs, Banking. National importance.</li><li><strong>State List (66):</strong> States alone. Police, Trade, Agriculture. State importance.</li><li><strong>Concurrent List (47):</strong> Both. Education, Forests, Marriage. Common interest. <em>Central law prevails on conflict</em>.</li></ul>Subjects not in any list (e.g., computer software) = <strong>residuary</strong> = Centre alone.',tip:'Memorise counts: 97-66-47 (decreasing). Always mention residuary subjects.'},
+{n:25,type:'short',marks:3,topic:'def',q:'Describe the holding-together type of federation with examples.',ans:'A <strong>"holding together" federation</strong> is one where a <em>large country chooses to share power</em> between the central government and the constituent states.<br><br>Key features:<ul><li>Centre is usually <strong>more powerful</strong> than the states.</li><li>States may have <strong>unequal powers</strong>.</li><li>Country was already united; chose to decentralise to keep diversity together.</li></ul>Examples: <strong>India, Spain, Belgium</strong>.',tip:'Contrast with Coming Together (USA, Switzerland) for clarity.'},
+{n:26,type:'short',marks:3,topic:'decent',q:'What are the powers given to the Gram Sabha?',ans:'A <strong>Gram Sabha</strong> consists of all adult voters of a village. Its powers:<ul><li><strong>Supervise</strong> the work of the Gram Panchayat.</li><li><strong>Approve</strong> the annual budget of the Gram Panchayat.</li><li><strong>Review the use of funds</strong> by the Panchayat.</li><li><strong>Discuss and approve developmental plans</strong> for the village.</li><li>Acts as the <strong>foundation of grassroots democracy</strong>.</li></ul>',tip:'Stress "direct democracy" and "supervisory role" — Gram Sabha holds Panchayat accountable.'},
+
+// ── LONG ANSWER (4) ──
+{n:27,type:'long',marks:5,topic:'def',q:'What makes India a federal country? Explain with reference to the key features of Indian federalism.',ans:'India is a federal country because the Constitution establishes <strong>multiple levels of government</strong>, divides powers among them, and protects this division.<br><br><strong>Key federal features:</strong><ul><li><strong>Three tiers of government:</strong> Union, State, and Local. Each tier has its own elected legislature.</li><li><strong>Three lists in the 7th Schedule:</strong> Union List (97 subjects), State List (66), and Concurrent List (47). Each tier has clearly demarcated subjects.</li><li><strong>Constitutional guarantee:</strong> The federal arrangement cannot be unilaterally changed. Any change requires 2/3 majority in Parliament <em>plus</em> ratification by half the states.</li><li><strong>Independent judiciary:</strong> The Supreme Court is the highest court and the final interpreter of the Constitution. It resolves disputes between the Centre and states.</li><li><strong>Financial autonomy:</strong> Each tier has its own sources of revenue. The Finance Commission decides Centre-State revenue sharing every 5 years.</li><li><strong>Cultural and linguistic diversity:</strong> Linguistic states formed in 1956 enabled federalism to work in practice.</li></ul>However, India is also called <strong>quasi-federal</strong> because of strong unitary features (single Constitution, single citizenship, residuary powers with Centre, Article 356).',tip:'For 5 marks: give 5-6 features as bullet points. Mention quasi-federal at the end for completeness.'},
+{n:28,type:'long',marks:5,topic:'decent',q:'Explain the main provisions of the 73rd and 74th Constitutional Amendments (1992).',ans:'In 1992, two important amendments transformed local government in India:<br><br><strong>73rd Amendment (Rural — Panchayati Raj):</strong><ul><li>Created a <strong>3-tier structure:</strong> Gram Panchayat (village) → Block/Mandal Panchayat (group of villages) → Zilla Parishad (district).</li><li><strong>Mandatory elections</strong> every 5 years.</li><li><strong>1/3 of seats reserved for women</strong>; SC/ST reservation proportional to population.</li><li>State must constitute a <strong>State Election Commission</strong> to conduct elections.</li><li>State must constitute a <strong>State Finance Commission</strong> to share revenue with Panchayats.</li></ul><strong>74th Amendment (Urban — Municipalities):</strong><ul><li>Created <strong>3 categories of urban bodies:</strong> Nagar Panchayat (transitional), Municipality (small city), Municipal Corporation (large city).</li><li>Same provisions on <strong>elections, reservations and finance</strong> as in the 73rd Amendment.</li></ul><strong>Significance:</strong><ul><li>Made <strong>local self-government a constitutional necessity</strong>, not optional.</li><li>Created a true <strong>3-tier federation</strong>.</li><li>Brought <strong>women, SCs, STs</strong> into politics at grassroots level.</li><li>Deepened democracy by enabling <strong>direct citizen participation</strong>.</li></ul>',tip:'For 5 marks: cover BOTH amendments separately. Always include the 4 common provisions: elections, reservations, election commission, finance commission.'},
+{n:29,type:'long',marks:5,topic:'list',q:'Describe the division of powers between the Centre and the States in India.',ans:'The Constitution provides a clear division of powers in the <strong>7th Schedule</strong>, which contains three lists:<br><br><strong>1. Union List (97 subjects):</strong><ul><li>Subjects of <strong>national importance</strong>.</li><li>Only the <strong>Centre (Parliament)</strong> can make laws.</li><li>Examples: Defence, Foreign Affairs, Banking, Currency, Atomic Energy, Railways, Communication, Citizenship.</li><li>Aim: <em>Uniform policy across India</em>.</li></ul><strong>2. State List (66 subjects):</strong><ul><li>Subjects of <strong>state and local importance</strong>.</li><li>Only <strong>State Legislatures</strong> can make laws.</li><li>Examples: Police, Trade, Commerce, Agriculture, Irrigation, Public Health, Land Revenue.</li><li>Aim: <em>States have full control over local matters</em>.</li></ul><strong>3. Concurrent List (47 subjects):</strong><ul><li>Subjects of <strong>common interest</strong>.</li><li><strong>Both Centre and States</strong> can legislate.</li><li>Examples: Education, Forests, Trade Unions, Marriage, Adoption, Succession.</li><li>Rule: <em>If conflict arises, Central law prevails</em>.</li></ul><strong>Residuary powers:</strong> Subjects not mentioned in any list (e.g., computer software, e-commerce, cyber laws) are with the <strong>Centre</strong>. This is unlike the USA where residuary powers go to states. This makes India <em>centre-leaning quasi-federal</em>.',tip:'For 5 marks: cover all 4 categories (3 lists + residuary). Mention the count for each list and 3-4 examples. End with India-USA comparison.'},
+{n:30,type:'long',marks:5,topic:'lang',q:'How has India\'s language policy contributed to keeping the country united?',ans:'India is a country of remarkable linguistic diversity — 22 scheduled languages and hundreds of dialects. The language policy has been a key reason why India has remained united despite this diversity.<br><br><strong>Main features of the language policy:</strong><ul><li><strong>No national language:</strong> Hindi is the OFFICIAL language of the Union, NOT the national language. English continues as associate official language.</li><li><strong>22 Scheduled Languages</strong> in the 8th Schedule of the Constitution — including Bengali, Telugu, Marathi, Tamil, Urdu, Punjabi.</li><li><strong>States choose their own official language</strong> — typically the dominant regional language.</li><li><strong>Three Language Formula</strong>: every school student learns mother tongue + Hindi + English/another modern Indian language.</li></ul><strong>How this kept India united:</strong><ul><li><strong>Recognition of mother tongue</strong> made every language community feel respected.</li><li><strong>Linguistic states (1956)</strong> meant people could be governed in their own language — what was feared to cause disintegration actually <em>strengthened unity</em>.</li><li>Avoided the <strong>Sri Lankan mistake</strong>: imposing Sinhala-only policy in Sri Lanka caused 30 years of civil war. India\'s flexible policy avoided this.</li><li>The <strong>15-year transition</strong> (Hindi was supposed to replace English by 1965) was extended after southern states protested — showing the Centre listens to states.</li><li>Continued use of <strong>English</strong> ensured non-Hindi speaking states were not at a disadvantage.</li></ul>The language policy is a fine example of <strong>respectful accommodation of diversity</strong>, which is the essence of Indian federalism.',tip:'For 5 marks: give policy features + reasons + Sri Lanka contrast. Mention 1956 linguistic states. Always emphasise "Hindi = official, not national".'},
+];
+
+const list=document.getElementById('qlist');
+function strip(t){return t==='def'||t==='types'?'def':t==='list'?'list':t==='lang'?'lang':t==='decent'?'decent':t==='key'?'key':t}
+function render(filt='all'){
+  list.innerHTML='';
+  Q.filter(q=>filt==='all'||q.type===filt).forEach(q=>{
+    const optsHtml=q.opts?`<div class="mcq-opts">${q.opts.map((o,i)=>`<div class="opt" data-i="${i}" data-c="${q.correct}"><span class="opt-letter">${String.fromCharCode(65+i)}.</span><span>${o}</span></div>`).join('')}</div>`:'';
+    const tip=q.tip?`<div class="tip-box"><strong>📝 Tip:</strong> ${q.tip}</div>`:'';
+    list.insertAdjacentHTML('beforeend',`
+    <div class="q-card strip-${q.topic==='def'||q.topic==='types'?'def':q.topic}">
+      <div class="q-header">
+        <span class="q-num">${q.n}</span>
+        <div class="q-text">${q.q}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge b-${q.type}">${q.type==='mcq'?'MCQ':q.type==='assert'?'Assertion-Reason':q.type==='short'?'Short Ans':'Long Ans'}</span>
+        <span class="badge b-${q.marks}m">${q.marks} mark${q.marks>1?'s':''}</span>
+      </div>
+      ${optsHtml?`<div class="mcq-body">${optsHtml}</div>`:''}
+      <button class="reveal-btn" onclick="reveal(this)">▾ Show Answer</button>
+      <div class="answer-box">
+        <div class="ans-lbl">MODEL ANSWER</div>
+        <div class="ans-text">${q.ans}${tip}</div>
+      </div>
+    </div>`);
+  });
+  document.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{
+    const card=o.closest('.q-card');
+    if(card.dataset.done)return;
+    card.dataset.done='1';
+    const ci=+o.dataset.c;
+    card.querySelectorAll('.opt').forEach((x,i)=>{
+      if(i===ci)x.classList.add('correct');
+      else if(x===o)x.classList.add('wrong');
+    });
+  }));
+}
+function reveal(b){const ab=b.nextElementSibling;ab.classList.toggle('show');b.textContent=ab.classList.contains('show')?'▴ Hide Answer':'▾ Show Answer';}
+document.querySelectorAll('nav.filters button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav.filters button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');render(b.dataset.f);
+}));
+render();
+</script>
+</body>
+</html>

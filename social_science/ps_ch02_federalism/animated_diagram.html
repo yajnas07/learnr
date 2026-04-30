@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Federalism · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080612; --card:#0e0a1e; --card2:#140f26;
+  --border:#1e1640; --text:#e2d9f3; --muted:#4a3a7a;
+  --ps:#7c3aed; --indigo:#818cf8; --violet:#a78bfa;
+  --blue:#60a5fa; --green:#4ade80; --amber:#fbbf24;
+  --red:#f87171; --teal:#34d399; --pink:#f472b6; --cyan:#38bdf8; --orange:#fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+.top-nav{display:flex;align-items:center;gap:16px;padding:10px 22px;background:rgba(8,6,18,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:27px}
+.nav-bc{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.nav-bc a{color:var(--muted);text-decoration:none}.nav-bc a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-cur{color:var(--violet);font-weight:700}
+.nav-back{margin-left:auto;padding:5px 13px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:18px;color:var(--violet);font-size:.78rem;text-decoration:none}
+.nav-back:hover{background:rgba(124,58,237,.2)}
+
+.page-hdr{padding:28px 20px 16px;text-align:center}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.85rem;color:#fff;margin-bottom:5px}
+.page-hdr p{color:var(--muted);font-size:.9rem}
+.ch-badge{display:inline-block;padding:3px 10px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.35);border-radius:12px;color:var(--violet);font-size:.73rem;font-weight:700;margin-bottom:8px}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 56px}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:7px 16px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.tab.active{border-color:var(--violet);background:rgba(124,58,237,.1);color:var(--violet);font-weight:700}
+
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.panel-title{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;color:var(--text)}
+.panel-body{padding:18px}
+
+.ibox{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:12px}
+.ibox strong{color:var(--text)}
+.kw{color:var(--violet);font-weight:700}
+
+/* TIER PYRAMID */
+.pyramid{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 0}
+.tier{border-radius:12px;padding:18px 24px;text-align:center;border:1px solid;cursor:pointer;transition:all .3s;position:relative}
+.tier:hover{transform:scale(1.05);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.tier h3{font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:5px}
+.tier p{font-size:.78rem;line-height:1.5}
+.t-union{width:240px;border-color:#a78bfa;background:rgba(167,139,250,.08);color:var(--violet)}
+.t-state{width:340px;border-color:#60a5fa;background:rgba(96,165,250,.08);color:var(--blue)}
+.t-local{width:440px;border-color:#4ade80;background:rgba(74,222,128,.08);color:var(--green)}
+.tier-arrow{font-size:1.4rem;color:var(--muted)}
+
+.tier-detail{margin-top:18px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;color:var(--muted);line-height:1.7;display:none}
+.tier-detail.show{display:block;animation:fadeIn .3s ease}
+.tier-detail strong{color:var(--text)}
+
+/* LISTS */
+.list-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+.list-card{border-radius:12px;padding:14px;border:1px solid;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.list-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.list-card:hover{transform:translateY(-3px)}
+.list-card h3{font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:3px}
+.list-card .lc-num{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-bottom:6px}
+.list-card p{font-size:.76rem;color:var(--muted);line-height:1.55;margin-bottom:8px}
+.lc-eg{font-size:.72rem;padding:.3rem .6rem;border-radius:6px;display:inline-block;margin-right:4px;margin-bottom:4px}
+.lc-u{border-color:#a78bfa55;background:rgba(167,139,250,.05)}
+.lc-u::before{background:var(--violet)}
+.lc-u h3{color:var(--violet)}
+.lc-u .lc-eg{background:rgba(167,139,250,.12);color:var(--violet)}
+.lc-s{border-color:#60a5fa55;background:rgba(96,165,250,.05)}
+.lc-s::before{background:var(--blue)}
+.lc-s h3{color:var(--blue)}
+.lc-s .lc-eg{background:rgba(96,165,250,.12);color:var(--blue)}
+.lc-c{border-color:#4ade8055;background:rgba(74,222,128,.05)}
+.lc-c::before{background:var(--green)}
+.lc-c h3{color:var(--green)}
+.lc-c .lc-eg{background:rgba(74,222,128,.12);color:var(--green)}
+.lc-r{border-color:#fbbf2455;background:rgba(251,191,36,.05)}
+.lc-r::before{background:var(--amber)}
+.lc-r h3{color:var(--amber)}
+.lc-r .lc-eg{background:rgba(251,191,36,.12);color:var(--amber)}
+
+/* COMPARISON */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:12px 0}
+.cmp-table th{padding:9px 12px;background:rgba(124,58,237,.1);border:1px solid var(--border);font-weight:700;text-align:center}
+.cmp-table th:first-child{background:rgba(255,255,255,.03);color:var(--muted);text-align:left}
+.cmp-table td{padding:9px 12px;border:1px solid rgba(30,22,64,.5);vertical-align:top;line-height:1.55}
+.cmp-table tr:hover td{background:rgba(124,58,237,.04)}
+.th-ct{color:var(--green)}
+.th-ht{color:var(--blue)}
+
+/* TIMELINE */
+.tl-wrap{position:relative;padding-left:32px;margin:12px 0}
+.tl-wrap::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-dot{position:absolute;left:-27px;top:4px;width:14px;height:14px;border-radius:50%;border:2px solid;background:var(--card)}
+.tl-year{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:3px}
+.tl-title{font-weight:700;font-size:.88rem;margin-bottom:3px}
+.tl-desc{font-size:.8rem;color:var(--muted);line-height:1.6}
+
+/* PANCHAYAT TREE */
+.tree{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 0}
+.tree-node{border:1px solid;border-radius:10px;padding:10px 18px;text-align:center;min-width:200px;background:var(--card2)}
+.tree-node h4{font-size:.86rem;margin-bottom:3px}
+.tree-node p{font-size:.72rem;color:var(--muted);line-height:1.5}
+.tree-line{width:2px;height:20px;background:var(--border)}
+.tn-zp{border-color:var(--violet);color:var(--violet)}
+.tn-bp{border-color:var(--blue);color:var(--blue)}
+.tn-gp{border-color:var(--green);color:var(--green)}
+
+/* SLIDER (Centre power over time) */
+.slider-wrap{margin:14px 0}
+.slider-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.slider-row input[type=range]{flex:1;accent-color:var(--violet)}
+.slider-year{font-family:'DM Mono',monospace;color:var(--violet);font-weight:700;min-width:60px;text-align:center;font-size:.95rem}
+.slider-state{padding:14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;font-size:.84rem;line-height:1.6;color:var(--muted);min-height:90px}
+.slider-state strong{color:var(--text);display:block;margin-bottom:5px}
+
+/* LANGUAGE PIE/CHART */
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:580px){.lang-grid{grid-template-columns:1fr}}
+.lang-card{padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--card2)}
+.lang-card h4{font-size:.88rem;margin-bottom:6px;color:var(--violet);font-family:'Playfair Display',serif}
+.lang-card p{font-size:.78rem;color:var(--muted);line-height:1.6}
+.lang-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.lang-chip{padding:.18rem .55rem;background:rgba(167,139,250,.1);border-radius:99px;font-size:.7rem;color:var(--violet)}
+
+footer{text-align:center;padding:30px 20px;color:var(--muted);font-size:.78rem;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="../../index.html" class="nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <div class="nav-bc"><a href="../../index.html">Home</a><span class="nav-sep">/</span><span>Civics</span><span class="nav-sep">/</span><span class="nav-cur">Federalism</span></div>
+  <a href="../../index.html" class="nav-back">&larr; Portal</a>
+</nav>
+
+<div class="page-hdr">
+  <span class="ch-badge">CIVICS · CHAPTER 2</span>
+  <h1>Federalism</h1>
+  <p>Interactive diagrams · 5 themes · CBSE Class X</p>
+</div>
+
+<div class="wrap">
+
+<div class="tabs">
+  <button class="tab active" data-tab="tiers">3-Tier Government</button>
+  <button class="tab" data-tab="lists">7th Schedule Lists</button>
+  <button class="tab" data-tab="types">Coming vs Holding</button>
+  <button class="tab" data-tab="centre">Centre-State Era</button>
+  <button class="tab" data-tab="local">Decentralisation</button>
+</div>
+
+<!-- TAB 1: TIERS -->
+<div class="panel active" id="p-tiers">
+  <div class="panel-card">
+    <div class="panel-title">🏛️ Three Tiers of Indian Federalism</div>
+    <div class="panel-body">
+      <p style="color:var(--muted);font-size:.85rem;line-height:1.7;margin-bottom:8px">Click any tier to see what it does. India has 3 levels of government — each with clearly defined powers under the Constitution.</p>
+      <div class="pyramid">
+        <div class="tier t-union" onclick="showTier('union')">
+          <h3>UNION GOVERNMENT</h3>
+          <p>National level · Parliament & PM</p>
+        </div>
+        <div class="tier-arrow">▼</div>
+        <div class="tier t-state" onclick="showTier('state')">
+          <h3>STATE GOVERNMENTS</h3>
+          <p>28 States & 8 UTs · CMs & Legislative Assemblies</p>
+        </div>
+        <div class="tier-arrow">▼</div>
+        <div class="tier t-local" onclick="showTier('local')">
+          <h3>LOCAL GOVERNMENTS</h3>
+          <p>Panchayats (rural) + Municipalities (urban)</p>
+        </div>
+      </div>
+      <div id="tier-detail" class="tier-detail"></div>
+      <div class="ibox">
+        <strong>💡 Key Idea:</strong> Each tier has its own <span class="kw">elected legislature</span>, its own <span class="kw">jurisdiction</span> (subjects to legislate on), and its own <span class="kw">revenue sources</span>. They are NOT in a hierarchy — each is supreme in its own sphere.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: LISTS -->
+<div class="panel" id="p-lists">
+  <div class="panel-card">
+    <div class="panel-title">📋 Division of Powers — 7th Schedule</div>
+    <div class="panel-body">
+      <p style="color:var(--muted);font-size:.85rem;line-height:1.7;margin-bottom:8px">The Constitution divides subjects into <strong>3 lists</strong>. Click each card to explore.</p>
+      <div class="list-grid">
+        <div class="list-card lc-u">
+          <h3>UNION LIST</h3>
+          <div class="lc-num">97 subjects · Centre alone</div>
+          <p>Subjects of national importance — for uniform policy across India.</p>
+          <span class="lc-eg">Defence</span><span class="lc-eg">Foreign Affairs</span><span class="lc-eg">Banking</span><span class="lc-eg">Currency</span><span class="lc-eg">Atomic Energy</span><span class="lc-eg">Railways</span><span class="lc-eg">Communication</span>
+        </div>
+        <div class="list-card lc-s">
+          <h3>STATE LIST</h3>
+          <div class="lc-num">66 subjects · States alone</div>
+          <p>Subjects of state and local importance — states have full autonomy.</p>
+          <span class="lc-eg">Police</span><span class="lc-eg">Trade</span><span class="lc-eg">Commerce</span><span class="lc-eg">Agriculture</span><span class="lc-eg">Irrigation</span><span class="lc-eg">Public Health</span>
+        </div>
+        <div class="list-card lc-c">
+          <h3>CONCURRENT LIST</h3>
+          <div class="lc-num">47 subjects · Both can legislate</div>
+          <p>Common interest — but if Centre & State conflict, <strong>Central law prevails</strong>.</p>
+          <span class="lc-eg">Education</span><span class="lc-eg">Forests</span><span class="lc-eg">Trade Unions</span><span class="lc-eg">Marriage</span><span class="lc-eg">Adoption</span><span class="lc-eg">Succession</span>
+        </div>
+        <div class="list-card lc-r">
+          <h3>RESIDUARY</h3>
+          <div class="lc-num">Not in any list · Centre only</div>
+          <p>Subjects not mentioned in any list — power goes to <strong>Union</strong>.</p>
+          <span class="lc-eg">Computer Software</span><span class="lc-eg">E-commerce</span><span class="lc-eg">Cyber Laws</span>
+        </div>
+      </div>
+      <div class="ibox">
+        <strong>⚖️ India vs USA:</strong> In USA, residuary powers go to STATES (states are stronger). In India, residuary powers go to the UNION — making India a <span class="kw">Centre-leaning federation</span> (quasi-federal).
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: TYPES -->
+<div class="panel" id="p-types">
+  <div class="panel-card">
+    <div class="panel-title">🤝 Coming Together vs Holding Together</div>
+    <div class="panel-body">
+      <p style="color:var(--muted);font-size:.85rem;line-height:1.7;margin-bottom:10px">Federations are formed in <strong>two ways</strong> based on history and circumstances.</p>
+      <table class="cmp-table">
+        <tr><th>Feature</th><th class="th-ct">Coming Together</th><th class="th-ht">Holding Together</th></tr>
+        <tr><td><strong>How formed</strong></td><td>Independent states unite</td><td>Large country divides power</td></tr>
+        <tr><td><strong>Power of Centre</strong></td><td>Weaker — states keep autonomy</td><td>Stronger — Centre dominates</td></tr>
+        <tr><td><strong>Equality of states</strong></td><td>All states usually EQUAL</td><td>States may be UNEQUAL</td></tr>
+        <tr><td><strong>Examples</strong></td><td>USA, Switzerland, Australia</td><td>India, Spain, Belgium</td></tr>
+        <tr><td><strong>Direction</strong></td><td>Bottom-up</td><td>Top-down</td></tr>
+      </table>
+      <div class="ibox">
+        <strong>🇮🇳 India's case:</strong> India is a <span class="kw">"Holding Together"</span> federation. After independence, the country chose to share power between Centre and States. Some states like J&amp;K (until 2019) and Nagaland have/had special provisions — showing states are NOT equal.
+      </div>
+      <div class="ibox" style="border-color:rgba(167,139,250,.3)">
+        <strong>📌 Why "Quasi-Federal"?</strong> India has <span class="kw">unitary features</span> mixed with federal:
+        <ul style="margin-left:1.2rem;margin-top:6px;font-size:.78rem">
+          <li>Single Constitution for whole country</li>
+          <li>Single citizenship (no state citizenship)</li>
+          <li>Centre can change state boundaries</li>
+          <li>Governor appointed by President (not elected)</li>
+          <li>Article 356: President's Rule on states</li>
+          <li>Residuary powers with Centre</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: CENTRE-STATE TIMELINE -->
+<div class="panel" id="p-centre">
+  <div class="panel-card">
+    <div class="panel-title">📜 Centre-State Relations — Evolution Over Time</div>
+    <div class="panel-body">
+      <div class="slider-wrap">
+        <div class="slider-row">
+          <span>1950</span>
+          <input type="range" min="0" max="4" value="0" id="era-slider" oninput="changeEra(this.value)">
+          <span>2020s</span>
+          <span class="slider-year" id="era-year">1950s</span>
+        </div>
+        <div class="slider-state" id="era-state">
+          <strong>1950s — Building the Nation</strong>
+          Early years of Indian federalism. Constitution adopted in 1950. Strong Congress at Centre and most states. Linguistic states formation began. Power shared but Centre dominant due to single party rule.
+        </div>
+      </div>
+      <div class="tl-wrap">
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:var(--violet)"></div>
+          <div class="tl-year">1956</div>
+          <div class="tl-title" style="color:var(--violet)">States Reorganisation Act</div>
+          <div class="tl-desc">States redrawn on linguistic basis. Initially feared to cause disintegration, but actually strengthened Indian unity by giving people governance in their mother tongue.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:var(--blue)"></div>
+          <div class="tl-year">1950s–1980s</div>
+          <div class="tl-title" style="color:var(--blue)">Era of Congress Dominance</div>
+          <div class="tl-desc">Same party (Congress) ruled at Centre and in most states. Centre often imposed its will. Article 356 (President's Rule) was misused several times to dismiss state governments.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:var(--amber)"></div>
+          <div class="tl-year">1989</div>
+          <div class="tl-title" style="color:var(--amber)">Beginning of Coalition Era</div>
+          <div class="tl-desc">No single party got majority at Centre. Regional parties became powerful kingmakers. Centre had to consult and respect states more — federalism strengthened in practice.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:var(--green)"></div>
+          <div class="tl-year">1992</div>
+          <div class="tl-title" style="color:var(--green)">73rd & 74th Amendments</div>
+          <div class="tl-desc">Created 3rd tier — Local Self-Government became a constitutional requirement. Panchayats (rural) and Municipalities (urban) given constitutional status with mandatory elections.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:var(--red)"></div>
+          <div class="tl-year">1994</div>
+          <div class="tl-title" style="color:var(--red)">SR Bommai Case</div>
+          <div class="tl-desc">Supreme Court restricted misuse of Article 356. President's Rule cannot be imposed arbitrarily — must be justified and is subject to judicial review. Major win for federalism.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 5: LOCAL/DECENTRALISATION -->
+<div class="panel" id="p-local">
+  <div class="panel-card">
+    <div class="panel-title">🏘️ Decentralisation — Panchayati Raj Structure</div>
+    <div class="panel-body">
+      <p style="color:var(--muted);font-size:.85rem;line-height:1.7;margin-bottom:10px">After 73rd Amendment (1992), every state must have a 3-tier Panchayati Raj system in rural areas.</p>
+      <div class="tree">
+        <div class="tree-node tn-zp">
+          <h4>ZILLA PARISHAD</h4>
+          <p>District-level body · Coordinates Block Panchayats</p>
+        </div>
+        <div class="tree-line"></div>
+        <div class="tree-node tn-bp">
+          <h4>BLOCK / MANDAL PANCHAYAT</h4>
+          <p>Group of villages · Intermediate level</p>
+        </div>
+        <div class="tree-line"></div>
+        <div class="tree-node tn-gp">
+          <h4>GRAM PANCHAYAT</h4>
+          <p>Village level · Headed by Sarpanch · Gram Sabha = all voters</p>
+        </div>
+      </div>
+      <table class="cmp-table" style="margin-top:14px">
+        <tr><th>Provision</th><th>73rd Amendment (Rural)</th><th>74th Amendment (Urban)</th></tr>
+        <tr><td><strong>Bodies created</strong></td><td>Panchayats</td><td>Municipalities</td></tr>
+        <tr><td><strong>Reservation (women)</strong></td><td>1/3 seats</td><td>1/3 seats</td></tr>
+        <tr><td><strong>SC/ST reservation</strong></td><td>Proportional to population</td><td>Proportional to population</td></tr>
+        <tr><td><strong>Elections every</strong></td><td>5 years (mandatory)</td><td>5 years (mandatory)</td></tr>
+        <tr><td><strong>Conducted by</strong></td><td>State Election Commission</td><td>State Election Commission</td></tr>
+        <tr><td><strong>Funds</strong></td><td>State Finance Commission</td><td>State Finance Commission</td></tr>
+      </table>
+      <div class="ibox">
+        <strong>🌟 Why Decentralisation?</strong> Local people know local problems best. Direct participation deepens democracy. Faster decision-making. Reduces burden on Centre &amp; States. Makes <span class="kw">"government of the people, by the people, for the people"</span> a reality at the grassroots.
+      </div>
+      <div class="ibox" style="border-color:rgba(74,222,128,.3)">
+        <strong>📌 Gram Sabha:</strong> All adult citizens of a village registered as voters form the Gram Sabha. It supervises the Gram Panchayat, approves its budget, and reviews its work. This is <strong>direct democracy</strong> at its finest.
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  Federalism · Civics Class X · LearnR · 2026
+</footer>
+
+<script>
+// Tabs
+const tabs=document.querySelectorAll('.tab');
+const panels=document.querySelectorAll('.panel');
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.remove('active'));
+  panels.forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById('p-'+t.dataset.tab).classList.add('active');
+}));
+
+// Tier details
+const tierData={
+  union:{
+    title:'🏛️ Union Government (Centre)',
+    body:'<strong>Headed by:</strong> Prime Minister · President is constitutional head.<br><strong>Legislature:</strong> Parliament — Lok Sabha (lower) + Rajya Sabha (upper).<br><strong>Subjects:</strong> Union List (97) + Concurrent List (47) + Residuary.<br><strong>Examples of work:</strong> Defence, foreign policy, currency, banking, atomic energy, railways, post & telegraph, communication, citizenship.<br><strong>Revenue:</strong> Income tax, customs duty, excise duty.'
+  },
+  state:{
+    title:'🏛️ State Governments',
+    body:'<strong>Headed by:</strong> Chief Minister · Governor is constitutional head (appointed by President).<br><strong>Legislature:</strong> State Legislative Assembly (Vidhan Sabha) ± Vidhan Parishad in some states.<br><strong>Subjects:</strong> State List (66) + Concurrent List (47).<br><strong>Examples of work:</strong> Police, agriculture, irrigation, public health, sanitation, fisheries, state taxation, prisons.<br><strong>Revenue:</strong> Sales tax/GST, land revenue, stamp duty, state excise.<br><strong>States in India:</strong> 28 states + 8 Union Territories.'
+  },
+  local:{
+    title:'🏘️ Local Governments',
+    body:'<strong>Created by:</strong> 73rd & 74th Constitutional Amendments (1992).<br><strong>Rural (Panchayati Raj):</strong> 3 tiers — Gram Panchayat → Block Panchayat → Zilla Parishad.<br><strong>Urban:</strong> Municipal Corporations (large cities), Municipalities (towns), Nagar Panchayats (transitional areas).<br><strong>Subjects:</strong> Decided by State Government — typically water, sanitation, street lights, local roads, primary schools, health centres.<br><strong>Reservations:</strong> 1/3 seats for WOMEN, proportional reservation for SC/ST.<br><strong>Elections:</strong> Every 5 years, conducted by State Election Commission.'
+  }
+};
+function showTier(id){
+  const d=document.getElementById('tier-detail');
+  const t=tierData[id];
+  d.innerHTML='<strong style="color:var(--violet);font-family:Playfair Display,serif;font-size:1rem">'+t.title+'</strong><br><br>'+t.body;
+  d.classList.add('show');
+}
+
+// Era slider
+const eras=[
+  {y:'1950s',t:'Building the Nation',d:'Early years of Indian federalism. Constitution adopted in 1950. Strong Congress at Centre and most states. Linguistic states formation began. Power shared but Centre dominant due to single-party rule.'},
+  {y:'1960s–70s',t:'Linguistic States & Centralisation',d:'States Reorganisation Act (1956) created linguistic states. Period of Congress dominance. Centre frequently imposed President\'s Rule on Opposition-ruled states. Article 356 misused multiple times.'},
+  {y:'1989+',t:'Coalition Era Begins',d:'No single party got majority at Centre. Era of coalition governments. Regional parties became kingmakers. Centre had to RESPECT states. Federalism strengthened in PRACTICE, even though Constitution stayed the same.'},
+  {y:'1992',t:'Local Government Constitutionalised',d:'73rd & 74th Amendments. Panchayats and Municipalities became Constitutional bodies. Mandatory elections every 5 years. 1/3 seats reserved for women. India became a true 3-tier federation.'},
+  {y:'2000s–Now',t:'Cooperative Federalism',d:'GST Council brings Centre-States together. NITI Aayog replaces Planning Commission. State Reorganisation continues (Telangana 2014, J&K 2019). Centre-State relations now more cooperative & negotiated.'}
+];
+function changeEra(i){
+  const e=eras[i];
+  document.getElementById('era-year').textContent=e.y;
+  document.getElementById('era-state').innerHTML='<strong>'+e.y+' — '+e.t+'</strong>'+e.d;
+}
+</script>
+</body>
+</html>
