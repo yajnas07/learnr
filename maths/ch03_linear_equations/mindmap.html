@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Pair of Linear Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#040810;font-family:'Lato',sans-serif;overflow:hidden;width:100vw;height:100vh;}
+canvas{position:absolute;inset:0;}
+#ui{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.8rem 1.2rem;z-index:10;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(4,8,16,.92) 0%,transparent 100%);
+}
+#ui h1{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:#f59e0b;letter-spacing:.5px;}
+#ui p{font-family:'DM Mono',monospace;font-size:.65rem;color:#3a5a78;margin-top:.1rem;}
+.ctrl-bar{
+  position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);
+  display:flex;gap:.5rem;z-index:10;
+}
+.ctrl-btn{
+  font-family:'DM Mono',monospace;font-weight:500;font-size:.72rem;
+  padding:.4rem 1rem;border-radius:99px;
+  border:1px solid #1a2d45;background:rgba(4,10,20,.85);
+  color:#3a5a78;cursor:pointer;transition:all .2s;pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover{border-color:#f59e0b;color:#f59e0b;}
+#tooltip{
+  position:absolute;z-index:20;pointer-events:none;
+  background:#0a1422;border:1px solid #1e3550;
+  border-radius:10px;padding:.7rem 1rem;
+  max-width:300px;font-size:.8rem;color:#9cc0e0;
+  line-height:1.65;display:none;
+  box-shadow:0 8px 28px rgba(0,0,0,.85);
+}
+#tooltip strong{font-family:'Playfair Display',serif;display:block;margin-bottom:.3rem;color:#f59e0b;font-size:.9rem;}
+.site-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.42rem 1.2rem;width:100%;align-self:stretch;flex-shrink:0;
+  background:rgba(7,16,31,.9);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,45,69,.75);
+  position:sticky;top:0;z-index:9999;
+}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;width:auto;display:block;border-radius:4px;}
+.site-nav-back{
+  font-family:'DM Mono',monospace;font-size:.68rem;
+  color:#7a9ab8;text-decoration:none;transition:all .2s;
+  border:1px solid rgba(26,45,69,.9);border-radius:99px;
+  padding:.2rem .65rem;white-space:nowrap;
+}
+.site-nav-back:hover{color:#dde6f5;border-color:#2a4060;background:rgba(255,255,255,.04);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<div id="ui">
+  <div>
+    <h1>Pair of Linear Equations in Two Variables</h1>
+    <p>Class X · Mathematics Ch.3 — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2+40; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Linear\nEquations\nin 2 Vars',
+  x:0, y:0, r:68, color:'#050e1c', stroke:'#f59e0b', textColor:'#f59e0b', fontSize:13
+};
+
+const BRANCHES = [
+  // ── Standard Form ──
+  {
+    id:'std', label:'Standard\nForm', x:-350, y:-230, r:48,
+    color:'#0a1000', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'General form: ax + by + c = 0\nwhere a, b, c are real numbers and a² + b² ≠ 0\n(meaning at least one of a, b is non-zero)\n\nA solution (x, y) satisfies BOTH equations.\nEach equation represents a straight line.\nThe pair of equations together = "system" or "simultaneous equations".',
+    children:[
+      { id:'sf1', label:'ax+by\n+c=0', x:-590, y:-355, r:36, color:'#0a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'a₁x + b₁y + c₁ = 0\na₂x + b₂y + c₂ = 0\n\nRewrite in this form before applying any method!\nExample: 2x = 5 − 3y → 2x + 3y − 5 = 0\n∴ a=2, b=3, c=−5\n\nCondition: a² + b² ≠ 0 ensures it is not a trivial equation like 0 = 0.' },
+      { id:'sf2', label:'Slope &\nIntercept', x:-595, y:-198, r:36, color:'#0a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'From ax + by + c = 0 (b ≠ 0):\nSlope = −a/b\nY-intercept = −c/b\nX-intercept = −c/a (a ≠ 0)\n\nNote: Two lines have the SAME slope (−a₁/b₁ = −a₂/b₂) means they are parallel OR coincident.\nSame slope AND same intercept → coincident. Same slope different intercept → parallel.' },
+      { id:'sf3', label:'Table of\nValues', x:-505, y:-62, r:36, color:'#0a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'To plot a linear equation, find at least 2 points:\nSet x=0 → find y (y-intercept)\nSet y=0 → find x (x-intercept)\nPlot both & draw line through them.\n\nExample: x + 2y = 6\n→ (0, 3) and (6, 0)\nWhy 2 points? A straight line is uniquely determined by any 2 distinct points.' },
+      { id:'sf4', label:'Solution\nMeaning', x:-372, y:-395, r:36, color:'#0a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'A solution (x, y) = (h, k) satisfies both equations:\na₁h + b₁k + c₁ = 0 AND a₂h + b₂k + c₂ = 0\n\nGeometrically: (h, k) is the point of intersection of the two lines.\nA pair of linear equations can have 0, 1, or ∞ solutions.\nVerification: always substitute back into BOTH equations!' },
+    ]
+  },
+
+  // ── Graphical Method ──
+  {
+    id:'graph', label:'Graphical\nMethod', x:0, y:-330, r:48,
+    color:'#00101a', stroke:'#38bdf8', textColor:'#bae6fd',
+    info:'Plot both equations on the same coordinate plane.\nThe solution = point(s) of intersection.\n\nSteps:\n1. Create table of values for each equation\n2. Plot both lines on same axes\n3. Find intersection point(s)\n4. Read off coordinates as solution\n\nDisadvantage: only gives approximate answers if intersection is not at integer coordinates.',
+    children:[
+      { id:'g1', label:'Intersecting\nLines', x:-185, y:-480, r:34, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Condition: a₁/a₂ ≠ b₁/b₂\n\nLines cross at EXACTLY ONE point.\nUnique solution — the point of intersection.\nSystem: Consistent & Independent.\n\nExample: x + y = 5 and 2x − y = 1\na₁/a₂ = 1/2 ≠ b₁/b₂ = 1/(−1)\n→ Intersect at (2, 3)\nThe solution is x=2, y=3.' },
+      { id:'g2', label:'Parallel\nLines', x:0, y:-505, r:34, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Condition: a₁/a₂ = b₁/b₂ ≠ c₁/c₂\n\nLines are parallel — NEVER intersect.\nNO solution exists.\nSystem: Inconsistent.\n\nExample: x + y = 5 and x + y = 8\na₁/a₂ = b₁/b₂ = 1 but c₁/c₂ = −5/−8 ≠ 1\n→ Same slope, different y-intercept = parallel lines.\nThis system has NO solution.' },
+      { id:'g3', label:'Coincident\nLines', x:185, y:-480, r:34, color:'#00091a', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Condition: a₁/a₂ = b₁/b₂ = c₁/c₂\n\nLines are IDENTICAL — every point on one line is also on the other.\nINFINITE solutions.\nSystem: Consistent & Dependent.\n\nExample: x + y = 5 and 2x + 2y = 10\na₁/a₂ = b₁/b₂ = c₁/c₂ = 1/2\n→ Second eq is just first eq × 2.\nAll (x, y) satisfying x + y = 5 are solutions.' },
+    ]
+  },
+
+  // ── Consistency Conditions ──
+  {
+    id:'cons', label:'Consistency\nConditions', x:350, y:-230, r:48,
+    color:'#00091a', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'For a₁x + b₁y + c₁ = 0 and a₂x + b₂y + c₂ = 0:\n\nCompare three ratios: a₁/a₂, b₁/b₂, c₁/c₂\n\nRule of thumb:\n• First ratio ≠ Second → unique solution (intersect)\n• All three equal → infinite solutions (coincide)\n• First two equal, third different → no solution (parallel)\n\nThis check is O(1) — fastest way to classify a system.',
+    children:[
+      { id:'co1', label:'a₁/a₂ ≠\nb₁/b₂', x:565, y:-355, r:34, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'a₁/a₂ ≠ b₁/b₂\n→ UNIQUE solution\n→ Lines intersect\n→ Consistent & Independent\n\nExample: 2x + 3y = 7 and 4x − y = 1\na₁/a₂ = 2/4 = 0.5\nb₁/b₂ = 3/(−1) = −3\n0.5 ≠ −3 → intersecting → unique solution ✓\n\nThis is the most common case in problems.' },
+      { id:'co2', label:'a₁/a₂ =\nb₁/b₂ =\nc₁/c₂', x:595, y:-185, r:34, color:'#00091a', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'a₁/a₂ = b₁/b₂ = c₁/c₂\n→ INFINITE solutions\n→ Lines are coincident\n→ Consistent & Dependent\n\nExample: x + y = 5 and 3x + 3y = 15\na₁/a₂ = 1/3, b₁/b₂ = 1/3, c₁/c₂ = −5/−15 = 1/3\nAll equal → coincident ✓\n\nTip: one equation is always a scalar multiple of the other.' },
+      { id:'co3', label:'a₁/a₂ =\nb₁/b₂ ≠\nc₁/c₂', x:510, y:-50, r:34, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'a₁/a₂ = b₁/b₂ ≠ c₁/c₂\n→ NO solution\n→ Lines are parallel\n→ Inconsistent system\n\nExample: 2x + 3y = 7 and 4x + 6y = 3\na₁/a₂ = 2/4 = 1/2\nb₁/b₂ = 3/6 = 1/2\nc₁/c₂ = −7/−3 = 7/3\n1/2 = 1/2 ≠ 7/3 → parallel lines ✓\n\nForcing such a system gives a contradiction like 7 = 3.' },
+      { id:'co4', label:'Quick\nRatio Test', x:365, y:-390, r:34, color:'#0a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'Quick Exam Check:\nStep 1: Calculate a₁/a₂ (simplify fraction)\nStep 2: Calculate b₁/b₂ (simplify fraction)\n→ If different: STOP → unique solution\nStep 3: If equal, calculate c₁/c₂\n→ If c₁/c₂ also equals them: infinite solutions\n→ If c₁/c₂ is different: no solution\n\nAlways express as fractions in simplest form for comparison!' },
+    ]
+  },
+
+  // ── Algebraic Methods ──
+  {
+    id:'alg', label:'Algebraic\nMethods', x:-350, y:230, r:48,
+    color:'#00101a', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:'Three algebraic methods to solve a consistent system:\n1. Substitution\n2. Elimination\n3. Cross-Multiplication\n\nAll give the same answer — choose based on the structure of equations.\nGeneral advice: look at coefficients first, then choose the simplest method.',
+    children:[
+      { id:'a1', label:'Substitution\nMethod', x:-590, y:140, r:36, color:'#00101a', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Steps:\n1. Express one variable in terms of the other (from simpler equation)\n2. Substitute this expression into the other equation\n3. Solve the resulting single-variable equation\n4. Back-substitute to find the other variable\n5. Verify in both original equations\n\nBest when: coefficient of 1 or −1 in one equation (avoids fractions)\nExample: x − 2y = −1 → x = 2y − 1 (easy isolation!)' },
+      { id:'a2', label:'Elimination\nMethod', x:-600, y:280, r:36, color:'#00101a', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Steps:\n1. Multiply each equation by a suitable constant\n2. Make the coefficients of one variable equal in magnitude\n3. Add (if opposite signs) or subtract (if same signs) to eliminate\n4. Solve the resulting single-variable equation\n5. Substitute back to find second variable\n\nBest when: no coefficient is 1, or coefficients are large numbers.\nKey: LCM of coefficients = what to multiply by.\nExample: 3x+2y=16 and 5x−3y=7 → multiply by 3 and 2 to eliminate y.' },
+      { id:'a3', label:'Cross-\nMultiply', x:-510, y:405, r:36, color:'#00101a', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Formula (for a₁x + b₁y + c₁ = 0, a₂x + b₂y + c₂ = 0):\nx/(b₁c₂−b₂c₁) = y/(c₁a₂−c₂a₁) = 1/(a₁b₂−a₂b₁)\n\nDenominator condition: a₁b₂ − a₂b₁ ≠ 0\n\nMemory trick: "butterfly" — write b, c, a, b in two rows, cross-multiply diagonally.\n\nBest for: quick computation in exams, messy coefficients.\nCAUTION: Rewrite as ax + by + c = 0 (all terms on left, = 0 on right) before applying.' },
+      { id:'a4', label:'Choosing\nMethod', x:-355, y:435, r:36, color:'#00101a', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Decision guide:\n✓ Coefficient = 1 or −1 → Substitution (easiest)\n✓ One variable has same coefficient in both → Elimination directly\n✓ Coefficients are messy → Elimination (find LCM)\n✓ Need formula approach / exam speed → Cross-multiplication\n✓ Word problem → set up then use substitution or elimination\n\nAll methods work for all problems — just some are faster than others!' },
+    ]
+  },
+
+  // ── Applications ──
+  {
+    id:'app', label:'Applications', x:350, y:230, r:48,
+    color:'#1a0005', stroke:'#f43f5e', textColor:'#fda4af',
+    info:'The real power of linear equations! Any situation with two unknown quantities and two conditions can be modelled.\n\nGeneral strategy:\n1. Identify two unknowns → let x = ..., y = ...\n2. Write two equations from given conditions\n3. Solve by any algebraic method\n4. Verify answer makes practical sense (e.g., age can\'t be negative)',
+    children:[
+      { id:'ap1', label:'Age\nProblems', x:565, y:145, r:34, color:'#1a0005', stroke:'#f43f5e', textColor:'#fda4af',
+        info:'Pattern: current ages x and y, past/future ages use (x+n) or (x−n)\n\nCommon conditions:\n"A is k times older than B" → x = ky\n"n years ago, A was m times B" → (x−n) = m(y−n)\n"Sum of ages is S" → x + y = S\n\nExample: Father is 3× son\'s age; 10 years later, 2× as old.\nx = 3y and x + 10 = 2(y + 10)\nSolve: y = 10 (son), x = 30 (father)' },
+      { id:'ap2', label:'Money &\nPricing', x:590, y:295, r:34, color:'#1a0005', stroke:'#f43f5e', textColor:'#fda4af',
+        info:'Pattern: two different items with unknown prices, two purchase scenarios.\n\nLet price of item A = x, item B = y\nScenario 1: n₁x + m₁y = total₁\nScenario 2: n₂x + m₂y = total₂\n\nExample: 3 notebooks + 2 pens = ₹16; 1 notebook + 4 pens = ₹12\n3x + 2y = 16 and x + 4y = 12\nSolve: x = 4 (notebook), y = 2 (pen)' },
+      { id:'ap3', label:'Speed &\nDistance', x:520, y:430, r:34, color:'#1a0005', stroke:'#f43f5e', textColor:'#fda4af',
+        info:'D = Speed × Time. Two scenarios give two equations.\n\nBoat & Stream:\n→ Downstream speed = u + v (boat + current)\n→ Upstream speed = u − v (boat − current)\n\nTwo Persons / Two journeys:\nPerson A: t₁ hours at v₁ km/h = d₁\nPerson B: t₂ hours at v₂ km/h = d₂\n\nExample: A boat: 60 km downstream in 3h and 36 km upstream in 3h.\nu+v=20, u−v=12 → u=16, v=4 km/h' },
+      { id:'ap4', label:'Digit &\nFraction', x:365, y:475, r:34, color:'#1a0005', stroke:'#f43f5e', textColor:'#fda4af',
+        info:'Digit problems: 2-digit number = 10a + b (tens digit a, units b)\nReversed number = 10b + a\n\nFraction problems: fraction = x/y\nAdding to numerator or denominator changes fraction to known value.\n\nExample (digit): a + b = 9 and 10b + a − (10a + b) = 27\n→ a + b = 9 and b − a = 3 → a=3, b=6 → number = 36\n\nExample (fraction): (x+1)/y = 1/2 and x/(y+1) = 1/3\n→ x=3, y=8 → fraction = 3/8' },
+    ]
+  },
+
+  // ── Special Forms ──
+  {
+    id:'spec', label:'Special\nForms', x:0, y:330, r:48,
+    color:'#0a0018', stroke:'#d946ef', textColor:'#f0abfc',
+    info:'Some equations look non-linear but can be REDUCED to linear form by a clever substitution.\n\nKey insight: if the equations have patterns like 1/x, 1/y, or (ax+b), substitute a new variable.\n\nAlso included: equations with 3 variables reducible to systems of 2.',
+    children:[
+      { id:'sp1', label:'Reducible\nEquations', x:-190, y:490, r:34, color:'#0a0018', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'Pattern: equations of the form 1/x and 1/y\n\nSubstitution: let u = 1/x, v = 1/y\nThe equations become linear in u and v.\nSolve for u, v; then find x = 1/u, y = 1/v.\n\nExample:\n2/x + 3/y = 13 and 5/x − 4/y = −2\nLet u = 1/x, v = 1/y:\n2u + 3v = 13 and 5u − 4v = −2\nSolve → u = 2, v = 3 → x = 1/2, y = 1/3' },
+      { id:'sp2', label:'Linear\nSubstitution', x:0, y:510, r:34, color:'#0a0018', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'Pattern: equations of the form 1/(ax+b) or 1/(cx+d)\n\nSubstitution: let p = 1/(ax+b), q = 1/(cx+d)\nConvert to linear system in p and q.\n\nExample:\n1/(x+y) + 1/(x−y) = 5 and 3/(x+y) − 1/(x−y) = 1\nLet p = 1/(x+y), q = 1/(x−y):\np + q = 5 and 3p − q = 1\nSolve: p = 3/2, q = 7/2\nThen x+y = 2/3, x−y = 2/7; solve for x, y.' },
+      { id:'sp3', label:'Verify &\nCheck', x:190, y:490, r:34, color:'#0a0018', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'ALWAYS verify your final answer!\nSubstitute x and y back into BOTH original equations.\n\nCommon mistakes:\n• Forgetting to substitute back to original variables (when substitution was used)\n• Sign errors during cross-multiplication\n• Not checking if (x, y) satisfies BOTH equations\n• Missing constraint: if problem says "positive integer", check that too!\n\nVerification costs 30 seconds but saves marks!' },
+    ]
+  },
+];
+
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+function getNode(id){ return allNodes.find(n=>n.id===id); }
+
+// pan / zoom
+canvas.addEventListener('mousedown', e=>{
+  dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy};
+  canvas.style.cursor='grabbing';
+});
+canvas.addEventListener('mousemove', e=>{
+  if(dragging){ ox=dragOrigin.x+(e.clientX-dragStart.x); oy=dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x, dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found&&found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10,window.innerHeight-250)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>{ dragging=false; canvas.style.cursor='grab'; });
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY); },{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart', e=>{
+  if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }
+});
+canvas.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2, cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d;
+  }
+},{passive:false});
+canvas.addEventListener('touchend', ()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.2,Math.min(3,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+40; draw(); }
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(56,189,248,.03)'; ctx.lineWidth=1;
+  for(let x=-1600;x<1600;x+=70){ ctx.beginPath(); ctx.moveTo(x,-1600); ctx.lineTo(x,1600); ctx.stroke(); }
+  for(let y=-1600;y<1600;y+=70){ ctx.beginPath(); ctx.moveTo(-1600,y); ctx.lineTo(1600,y); ctx.stroke(); }
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from), b=getNode(e.to);
+    if(!a||!b) return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'55'); grd.addColorStop(1,b.stroke+'22');
+    const cbx=(a.x+b.x)/2+(b.y-a.y)*.12, cby=(a.y+b.y)/2-(b.x-a.x)*.12;
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.quadraticCurveTo(cbx,cby,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?42:18;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-10,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'33'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=n.id==='c'?14:12;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

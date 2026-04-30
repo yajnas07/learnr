@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Pair of Linear Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#040810;--card:#0a1422;--card2:#0f1c30;
+    --border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+    --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;
+    --green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.05) 0%,transparent 60%);}
+
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+    background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+
+  header{text-align:center;padding:1.6rem 1rem .8rem;}
+  header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+  .panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:1rem;padding:1rem 1.2rem 2rem;max-width:1100px;margin:0 auto;}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;position:relative;}
+  .panel-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;}
+  .panel-head .icon{font-size:1rem;}
+  .panel-body{padding:.8rem 1rem 1rem;display:flex;flex-direction:column;gap:.6rem;}
+
+  .ph-std .panel-head {background:rgba(245,158,11,.12);color:var(--amber);}
+  .ph-gph .panel-head {background:rgba(56,189,248,.12);color:var(--blue);}
+  .ph-cns .panel-head {background:rgba(129,140,248,.12);color:var(--indigo);}
+  .ph-sub .panel-head {background:rgba(45,212,191,.12);color:var(--teal);}
+  .ph-eli .panel-head {background:rgba(34,197,94,.12);color:var(--green);}
+  .ph-crs .panel-head {background:rgba(217,70,239,.12);color:var(--purple);}
+  .ph-app .panel-head {background:rgba(244,63,94,.12);color:var(--red);}
+  .ph-mem .panel-head {background:rgba(74,104,144,.18);color:#9ab8d8;}
+
+  .formula-block{background:var(--card2);border-radius:8px;padding:.6rem .8rem;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--teal);line-height:1.7;}
+  .formula-block strong{color:var(--amber);}
+  .sub-label{font-family:'Playfair Display',serif;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem;}
+
+  table{width:100%;border-collapse:collapse;font-size:.76rem;}
+  th{padding:.4rem .5rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+  td{padding:.38rem .5rem;border-bottom:1px solid rgba(26,45,69,.5);line-height:1.4;}
+  tr:last-child td{border-bottom:none;}
+  td.mono{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--teal);}
+  td.amber{color:var(--amber);}td.green{color:var(--green);}td.red{color:var(--red);}
+
+  .hbox{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .fact{background:var(--card2);border-radius:6px;padding:.4rem .65rem;font-size:.76rem;color:var(--text);flex:1;min-width:100px;}
+  .fact strong{display:block;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:.15rem;}
+  .trick{background:rgba(245,158,11,.07);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+  .trick strong{color:var(--amber);}
+  .tip{background:rgba(45,212,191,.07);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+  .tip strong{color:var(--teal);}
+  .warn{background:rgba(244,63,94,.07);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+  .warn strong{color:var(--red);}
+
+  .step-list{counter-reset:step;display:flex;flex-direction:column;gap:.3rem;}
+  .step-list li{display:flex;align-items:flex-start;gap:.5rem;font-size:.78rem;list-style:none;counter-increment:step;line-height:1.5;}
+  .step-list li::before{content:counter(step);background:var(--card2);color:var(--muted);font-family:'DM Mono',monospace;font-size:.65rem;min-width:1.4rem;height:1.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:.1rem;flex-shrink:0;}
+
+  .butterfly{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-family:'DM Mono',monospace;font-size:.75rem;}
+  .bt-row{display:flex;gap:1.5rem;align-items:center;}
+  .bt-cell{background:var(--card2);border-radius:4px;padding:.15rem .45rem;color:var(--teal);}
+  .bt-arrow{color:var(--muted);font-size:.7rem;}
+  .bt-result{color:var(--amber);}
+
+  @media(max-width:480px){.panel-grid{padding:.6rem .6rem 1.5rem;}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Pair of Linear Equations — Cheat Sheet</h1>
+  <p>Class X · Mathematics Ch.3 · 8 Panels · Quick Reference</p>
+</header>
+
+<div class="panel-grid">
+
+  <!-- 1. STANDARD FORM -->
+  <div class="panel ph-std">
+    <div class="panel-head"><span class="icon">📐</span> Standard Form</div>
+    <div class="panel-body">
+      <div class="sub-label">General Form</div>
+      <div class="formula-block">
+        <strong>a₁x + b₁y + c₁ = 0</strong><br>
+        <strong>a₂x + b₂y + c₂ = 0</strong><br>
+        where a² + b² ≠ 0 for each equation
+      </div>
+      <div class="sub-label">Derived Quantities (b ≠ 0)</div>
+      <div class="formula-block">
+        Slope       = −a/b<br>
+        Y-intercept = −c/b<br>
+        X-intercept = −c/a
+      </div>
+      <div class="hbox">
+        <div class="fact"><strong>Solution</strong>A pair (x₀, y₀) satisfying BOTH equations simultaneously</div>
+        <div class="fact"><strong>Solution set</strong>0, 1, or ∞ solutions — never exactly 2</div>
+      </div>
+      <div class="trick"><strong>Convert tip:</strong> Move all terms left, set = 0, then read off a, b, c.</div>
+    </div>
+  </div>
+
+  <!-- 2. GRAPHICAL -->
+  <div class="panel ph-gph">
+    <div class="panel-head"><span class="icon">📈</span> Graphical Method</div>
+    <div class="panel-body">
+      <div class="sub-label">Three Cases</div>
+      <table>
+        <tr><th>Graph</th><th>Condition</th><th>Solutions</th><th>System</th></tr>
+        <tr>
+          <td>Lines intersect</td>
+          <td class="mono">a₁/a₂ ≠ b₁/b₂</td>
+          <td class="green">Unique</td>
+          <td>Consistent</td>
+        </tr>
+        <tr>
+          <td>Lines parallel</td>
+          <td class="mono">a₁/a₂ = b₁/b₂ ≠ c₁/c₂</td>
+          <td class="red">None</td>
+          <td>Inconsistent</td>
+        </tr>
+        <tr>
+          <td>Coincident lines</td>
+          <td class="mono">a₁/a₂ = b₁/b₂ = c₁/c₂</td>
+          <td class="amber">Infinitely many</td>
+          <td>Consistent</td>
+        </tr>
+      </table>
+      <div class="tip"><strong>Plotting steps:</strong> Set x=0 → find y; set y=0 → find x. Plot both points, draw line.</div>
+      <div class="warn"><strong>Limitation:</strong> Graphical method gives approximate answers for non-integer solutions.</div>
+    </div>
+  </div>
+
+  <!-- 3. CONSISTENCY CONDITIONS -->
+  <div class="panel ph-cns">
+    <div class="panel-head"><span class="icon">🔢</span> Consistency Conditions</div>
+    <div class="panel-body">
+      <div class="sub-label">The Master Table</div>
+      <table>
+        <tr><th>Condition</th><th>Type</th><th>Geometric</th></tr>
+        <tr>
+          <td class="mono">a₁/a₂ ≠ b₁/b₂</td>
+          <td class="green">Unique solution ✓</td>
+          <td>Intersecting</td>
+        </tr>
+        <tr>
+          <td class="mono">a₁/a₂ = b₁/b₂ ≠ c₁/c₂</td>
+          <td class="red">No solution ✗</td>
+          <td>Parallel</td>
+        </tr>
+        <tr>
+          <td class="mono">a₁/a₂ = b₁/b₂ = c₁/c₂</td>
+          <td class="amber">Infinite solutions ∞</td>
+          <td>Coincident</td>
+        </tr>
+      </table>
+      <div class="sub-label">Quick Algorithm</div>
+      <ol class="step-list">
+        <li>Compute ratio r₁ = a₁/a₂ and r₂ = b₁/b₂</li>
+        <li>If r₁ ≠ r₂ → unique solution</li>
+        <li>If r₁ = r₂, compute r₃ = c₁/c₂</li>
+        <li>r₁ = r₂ ≠ r₃ → no solution; r₁ = r₂ = r₃ → infinite</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 4. SUBSTITUTION -->
+  <div class="panel ph-sub">
+    <div class="panel-head"><span class="icon">🔄</span> Substitution Method</div>
+    <div class="panel-body">
+      <div class="sub-label">Steps</div>
+      <ol class="step-list">
+        <li>From the simpler equation, express one variable in terms of the other (choose coefficient 1 or −1 to avoid fractions)</li>
+        <li>Substitute the expression into the other equation</li>
+        <li>Solve the resulting single-variable equation</li>
+        <li>Back-substitute to find the second variable</li>
+        <li>Verify in BOTH original equations</li>
+      </ol>
+      <div class="sub-label">Worked Example</div>
+      <div class="formula-block">
+        x − y = 1 … (1)<br>
+        2x + y = 8 … (2)<br>
+        From (1): x = y + 1<br>
+        Sub in (2): 2(y+1) + y = 8<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3y = 6 → <strong>y = 2</strong><br>
+        Back-sub: <strong>x = 3</strong> ✓
+      </div>
+      <div class="trick"><strong>Best when:</strong> One equation has a variable with coefficient ±1.</div>
+    </div>
+  </div>
+
+  <!-- 5. ELIMINATION -->
+  <div class="panel ph-eli">
+    <div class="panel-head"><span class="icon">✂️</span> Elimination Method</div>
+    <div class="panel-body">
+      <div class="sub-label">Steps</div>
+      <ol class="step-list">
+        <li>Multiply equations by suitable multipliers to make one variable's coefficients equal in magnitude</li>
+        <li>Add equations if signs of equal coefficients are <em>opposite</em>; subtract if same sign</li>
+        <li>Solve the resulting single-variable equation</li>
+        <li>Substitute back to find the other variable</li>
+        <li>Verify in BOTH original equations</li>
+      </ol>
+      <div class="sub-label">Worked Example</div>
+      <div class="formula-block">
+        3x + 2y = 16 … (1)<br>
+        5x − 2y = 8 &nbsp;… (2)<br>
+        Coefficients of y: +2 and −2 (opposite)<br>
+        ADD: 8x = 24 → <strong>x = 3</strong><br>
+        Sub in (1): <strong>y = 7/2 = 3.5</strong> ✓
+      </div>
+      <div class="trick"><strong>Best when:</strong> Coefficients share an LCM easily, or are already equal.</div>
+    </div>
+  </div>
+
+  <!-- 6. CROSS-MULTIPLICATION -->
+  <div class="panel ph-crs">
+    <div class="panel-head"><span class="icon">✖️</span> Cross-Multiplication Method</div>
+    <div class="panel-body">
+      <div class="sub-label">Formula (equations must be in ax + by + c = 0 form)</div>
+      <div class="formula-block">
+        <strong>x</strong>/(b₁c₂ − b₂c₁) = <strong>y</strong>/(c₁a₂ − c₂a₁) = <strong>1</strong>/(a₁b₂ − a₂b₁)
+      </div>
+      <div class="sub-label">Butterfly Diagram</div>
+      <div class="butterfly">
+        <div class="bt-row">
+          <span class="bt-cell">b₁</span><span class="bt-arrow">✕</span><span class="bt-cell">c₁</span><span class="bt-arrow">✕</span><span class="bt-cell">a₁</span><span class="bt-arrow">✕</span><span class="bt-cell">b₁</span>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin:.1rem 0;">cross products (each row vs next)</div>
+        <div class="bt-row">
+          <span class="bt-cell">b₂</span><span class="bt-arrow">✕</span><span class="bt-cell">c₂</span><span class="bt-arrow">✕</span><span class="bt-cell">a₂</span><span class="bt-arrow">✕</span><span class="bt-cell">b₂</span>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--amber);margin-top:.3rem;">
+          x-den: b₁c₂−b₂c₁ &nbsp;|&nbsp; y-den: c₁a₂−c₂a₁ &nbsp;|&nbsp; divisor: a₁b₂−a₂b₁
+        </div>
+      </div>
+      <div class="warn"><strong>Remember:</strong> Equations MUST be in ax + by + c = 0 form (not = k). Fails if a₁b₂ − a₂b₁ = 0.</div>
+    </div>
+  </div>
+
+  <!-- 7. APPLICATIONS -->
+  <div class="panel ph-app">
+    <div class="panel-head"><span class="icon">🎯</span> Word Problem Types</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Type</th><th>Variables</th><th>Key Equations</th></tr>
+        <tr>
+          <td>Age</td>
+          <td class="mono">x = older, y = younger</td>
+          <td>Present relation + future/past relation</td>
+        </tr>
+        <tr>
+          <td>Money</td>
+          <td class="mono">x = cost₁, y = cost₂</td>
+          <td>Two purchase scenarios</td>
+        </tr>
+        <tr>
+          <td>Digit</td>
+          <td class="mono">a = tens, b = units</td>
+          <td>Number = 10a+b; reversed = 10b+a</td>
+        </tr>
+        <tr>
+          <td>Speed / Stream</td>
+          <td class="mono">u = boat, v = stream</td>
+          <td>Down: u+v; Up: u−v; D = S×T</td>
+        </tr>
+        <tr>
+          <td>Fraction</td>
+          <td class="mono">x = num, y = den</td>
+          <td>Two conditions after cross-multiply</td>
+        </tr>
+        <tr>
+          <td>Geometry</td>
+          <td class="mono">angles / sides</td>
+          <td>Angle sum + given relationship</td>
+        </tr>
+      </table>
+      <div class="trick"><strong>Strategy:</strong> Define → Translate → Solve → Verify in original problem context.</div>
+    </div>
+  </div>
+
+  <!-- 8. MEMORY / EXAM TIPS -->
+  <div class="panel ph-mem">
+    <div class="panel-head"><span class="icon">🧠</span> Memory Tricks &amp; Exam Tips</div>
+    <div class="panel-body">
+      <div class="sub-label">Remember the Ratio Rule</div>
+      <div class="trick">
+        <strong>"IPC" Memory:</strong><br>
+        <strong>I</strong>ntersecting → 1 solution (a₁/a₂ <em>≠</em> b₁/b₂)<br>
+        <strong>P</strong>arallel → 0 solutions (a₁/a₂ = b₁/b₂ <em>≠</em> c₁/c₂)<br>
+        <strong>C</strong>oincident → ∞ solutions (all 3 ratios equal)
+      </div>
+      <div class="sub-label">Common Errors</div>
+      <div class="warn"><strong>Forgetting to move c to left:</strong> In cross-multiplication, c₁ is from ax + by + c = 0, so if equation is 2x + 3y = 7, then c = −7, not +7.</div>
+      <div class="warn"><strong>Back-substitution error:</strong> Always verify in BOTH equations, not just the one you used.</div>
+      <div class="sub-label">Method Selection Guide</div>
+      <table>
+        <tr><th>Situation</th><th>Best Method</th></tr>
+        <tr><td>One variable has coefficient ±1</td><td class="amber">Substitution</td></tr>
+        <tr><td>Coefficients share easy LCM</td><td class="green">Elimination</td></tr>
+        <tr><td>Quick/formulaic answer needed</td><td class="amber">Cross-multiplication</td></tr>
+        <tr><td>Approximate or visual answer OK</td><td class="mono">Graphical</td></tr>
+      </table>
+      <div class="tip"><strong>Exam tip:</strong> For 3-mark "solve the pair" questions, always write verification at the end — it earns the final mark.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

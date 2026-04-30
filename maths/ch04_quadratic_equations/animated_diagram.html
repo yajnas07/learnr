@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagram — Quadratic Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040810;--card:#0a1422;--card2:#0f1c30;
+  --border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;
+  --green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.05) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.2rem 1rem .6rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.tabs{display:flex;gap:.3rem;flex-wrap:wrap;justify-content:center;padding:.3rem 1rem .8rem;}
+.tab-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.72rem;padding:.35rem .85rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.on{color:#040810;border-color:transparent;}
+
+.stage{max-width:900px;margin:0 auto;padding:0 1rem 2rem;}
+.panel{display:none;animation:fadeIn .3s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Canvas panel */
+.canvas-box{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1rem;}
+canvas{display:block;width:100%;height:360px;cursor:crosshair;}
+.controls{display:flex;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border-top:1px solid var(--border);align-items:center;}
+.ctrl-group{display:flex;flex-direction:column;gap:.2rem;}
+.ctrl-group label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+.ctrl-group input[type=range]{width:120px;accent-color:var(--blue);}
+.ctrl-value{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);min-width:30px;text-align:center;}
+.info-box{background:var(--card2);border-radius:8px;padding:.5rem .8rem;font-family:'DM Mono',monospace;font-size:.75rem;line-height:1.7;color:var(--text);margin:.5rem 0;}
+.info-box strong{color:var(--amber);}
+.info-box em{color:var(--teal);font-style:normal;}
+
+/* Stepper */
+.stepper{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
+.step-title{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;color:var(--blue);margin-bottom:.8rem;}
+.step-box{display:flex;flex-direction:column;gap:.5rem;}
+.step-item{background:var(--card2);border-radius:8px;padding:.6rem .9rem;border-left:3px solid var(--border);
+  opacity:.35;transform:translateX(-8px);transition:all .4s ease;}
+.step-item.active{opacity:1;transform:translateX(0);border-left-color:var(--teal);}
+.step-item.done{opacity:.7;transform:translateX(0);border-left-color:var(--green);}
+.step-num{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-bottom:.15rem;}
+.step-content{font-size:.84rem;line-height:1.5;}
+.step-content strong{color:var(--amber);}
+.step-content em{color:var(--teal);font-style:normal;}
+.step-nav{display:flex;gap:.6rem;margin-top:.8rem;justify-content:center;}
+.step-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.35rem 1rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.step-btn:hover:not(:disabled){border-color:#2a4a6a;color:var(--text);}
+.step-btn:disabled{opacity:.3;cursor:default;}
+
+/* Calculator */
+.calc-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
+.calc-inputs{display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.8rem;}
+.calc-field{display:flex;flex-direction:column;gap:.2rem;}
+.calc-field label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+.calc-field input{width:80px;padding:.35rem .5rem;border-radius:6px;border:1px solid var(--border);
+  background:var(--card2);color:var(--teal);font-family:'DM Mono',monospace;font-size:.9rem;text-align:center;}
+.calc-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.45rem 1.2rem;
+  border-radius:6px;border:none;background:var(--blue);color:#040810;cursor:pointer;transition:all .2s;align-self:flex-end;}
+.calc-btn:hover{background:var(--teal);}
+.calc-result{background:var(--card2);border-radius:10px;padding:.8rem 1rem;font-family:'DM Mono',monospace;font-size:.82rem;line-height:1.8;margin-top:.5rem;}
+.calc-result strong{color:var(--amber);}
+.calc-result em{color:var(--teal);font-style:normal;}
+
+/* Discriminant visual */
+.disc-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-top:.6rem;}
+.disc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;cursor:pointer;transition:all .3s;}
+.disc-card:hover,.disc-card.active{transform:translateY(-3px);border-color:var(--blue);}
+.disc-icon{font-size:2rem;margin-bottom:.3rem;}
+.disc-label{font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;margin-bottom:.3rem;}
+.disc-cond{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);margin-bottom:.3rem;}
+.disc-desc{font-size:.78rem;color:var(--muted);line-height:1.4;}
+.disc-canvas-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:.8rem;}
+.disc-canvas-wrap canvas{display:block;width:100%;height:250px;}
+
+/* App cards */
+.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.7rem;}
+.app-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;cursor:pointer;transition:all .3s;}
+.app-card:hover{border-color:#2a4a6a;transform:translateY(-2px);}
+.app-card.open .app-detail{display:block;}
+.app-head{display:flex;align-items:center;gap:.5rem;}
+.app-emoji{font-size:1.3rem;}
+.app-title{font-family:'Playfair Display',serif;font-size:.82rem;font-weight:700;}
+.app-detail{display:none;margin-top:.6rem;padding-top:.5rem;border-top:1px solid var(--border);font-size:.8rem;line-height:1.6;}
+.app-detail strong{color:var(--amber);}
+.app-detail em{color:var(--teal);font-style:normal;}
+.app-detail .formula{font-family:'DM Mono',monospace;font-size:.78rem;background:var(--card2);border-radius:6px;padding:.35rem .6rem;margin:.3rem 0;display:block;color:var(--teal);}
+
+@media(max-width:500px){canvas{height:280px;}.controls{flex-direction:column;gap:.5rem;}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Quadratic Equations</h1>
+  <p>Class X · Mathematics Ch.4 · Interactive Explorations · 6 Modules</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn on" onclick="showTab(0,this,'var(--blue)')" style="background:var(--blue);color:#040810">📈 Parabola</button>
+  <button class="tab-btn" onclick="showTab(1,this,'var(--teal)')">✂️ Factorisation</button>
+  <button class="tab-btn" onclick="showTab(2,this,'var(--amber)')">🔲 Complete Square</button>
+  <button class="tab-btn" onclick="showTab(3,this,'var(--indigo)')">🧮 Formula</button>
+  <button class="tab-btn" onclick="showTab(4,this,'var(--purple)')">🎯 Discriminant</button>
+  <button class="tab-btn" onclick="showTab(5,this,'var(--red)')">🌍 Applications</button>
+</div>
+
+<div class="stage">
+<!-- ═══════════════ TAB 0: PARABOLA ═══════════════ -->
+<div class="panel active" id="p0">
+  <div class="canvas-box">
+    <canvas id="parabolaCanvas"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>a = <span class="ctrl-value" id="va">1</span></label>
+        <input type="range" id="sa" min="-5" max="5" step="0.5" value="1" oninput="updateParabola()">
+      </div>
+      <div class="ctrl-group">
+        <label>b = <span class="ctrl-value" id="vb">0</span></label>
+        <input type="range" id="sb" min="-10" max="10" step="0.5" value="0" oninput="updateParabola()">
+      </div>
+      <div class="ctrl-group">
+        <label>c = <span class="ctrl-value" id="vc">0</span></label>
+        <input type="range" id="sc" min="-10" max="10" step="0.5" value="0" oninput="updateParabola()">
+      </div>
+    </div>
+  </div>
+  <div class="info-box" id="parabola-info">
+    <strong>Standard form:</strong> ax² + bx + c = 0 &nbsp;|&nbsp; <em>Vertex:</em> (0, 0) &nbsp;|&nbsp; <em>Roots:</em> x = 0 (repeated)
+  </div>
+  <div class="info-box" style="opacity:.7;">
+    💡 Drag sliders to see how <strong>a</strong> (width/direction), <strong>b</strong> (tilt), and <strong>c</strong> (vertical shift) change the parabola. Roots are where the curve crosses the x-axis.
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 1: FACTORISATION ═══════════════ -->
+<div class="panel" id="p1">
+  <div class="stepper">
+    <div class="step-title">Solving by Factorisation (Splitting the Middle Term)</div>
+    <div class="info-box">Example: <strong>x² − 5x + 6 = 0</strong></div>
+    <div class="step-box" id="fact-steps">
+      <div class="step-item active"><div class="step-num">Step 1</div><div class="step-content">Identify <strong>a = 1, b = −5, c = 6</strong>. Product ac = 1 × 6 = <em>6</em>.</div></div>
+      <div class="step-item"><div class="step-num">Step 2</div><div class="step-content">Find two numbers whose <strong>product = ac = 6</strong> and <strong>sum = b = −5</strong>.<br>Numbers: <em>−2</em> and <em>−3</em> (since −2 × −3 = 6, −2 + (−3) = −5).</div></div>
+      <div class="step-item"><div class="step-num">Step 3</div><div class="step-content">Split the middle term: x² <strong>− 2x − 3x</strong> + 6 = 0</div></div>
+      <div class="step-item"><div class="step-num">Step 4</div><div class="step-content">Group: <strong>(x² − 2x)</strong> + <strong>(−3x + 6)</strong> = 0</div></div>
+      <div class="step-item"><div class="step-num">Step 5</div><div class="step-content">Factor each group: <em>x(x − 2) − 3(x − 2)</em> = 0</div></div>
+      <div class="step-item"><div class="step-num">Step 6</div><div class="step-content">Common factor: <strong>(x − 2)(x − 3) = 0</strong></div></div>
+      <div class="step-item"><div class="step-num">Step 7</div><div class="step-content">Apply zero-product rule: <em>x − 2 = 0</em> or <em>x − 3 = 0</em></div></div>
+      <div class="step-item"><div class="step-num">Step 8</div><div class="step-content">∴ Roots: <strong>x = 2</strong> or <strong>x = 3</strong><br>Verify: 2² − 5(2) + 6 = 0 ✓ &nbsp; 3² − 5(3) + 6 = 0 ✓</div></div>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn" id="fact-prev" onclick="factStep(-1)" disabled>← Prev</button>
+      <button class="step-btn" id="fact-next" onclick="factStep(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 2: COMPLETING THE SQUARE ═══════════════ -->
+<div class="panel" id="p2">
+  <div class="stepper">
+    <div class="step-title">Solving by Completing the Square</div>
+    <div class="info-box">Example: <strong>2x² − 8x + 3 = 0</strong></div>
+    <div class="step-box" id="csq-steps">
+      <div class="step-item active"><div class="step-num">Step 1</div><div class="step-content">Divide by <strong>a = 2</strong>: &nbsp; <em>x² − 4x + 3/2 = 0</em></div></div>
+      <div class="step-item"><div class="step-num">Step 2</div><div class="step-content">Move constant to RHS: &nbsp; <em>x² − 4x = −3/2</em></div></div>
+      <div class="step-item"><div class="step-num">Step 3</div><div class="step-content">Half of coefficient of x: <strong>(−4)/2 = −2</strong>. Square it: <em>(−2)² = 4</em></div></div>
+      <div class="step-item"><div class="step-num">Step 4</div><div class="step-content">Add 4 to both sides: <em>x² − 4x + 4 = −3/2 + 4 = 5/2</em></div></div>
+      <div class="step-item"><div class="step-num">Step 5</div><div class="step-content">Write LHS as perfect square: <strong>(x − 2)² = 5/2</strong></div></div>
+      <div class="step-item"><div class="step-num">Step 6</div><div class="step-content">Take square root: <em>x − 2 = ±√(5/2)</em></div></div>
+      <div class="step-item"><div class="step-num">Step 7</div><div class="step-content">∴ <strong>x = 2 ± √(5/2) = 2 ± √10/2</strong><br>x ≈ 3.58 or x ≈ 0.42</div></div>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn" id="csq-prev" onclick="csqStep(-1)" disabled>← Prev</button>
+      <button class="step-btn" id="csq-next" onclick="csqStep(1)">Next →</button>
+    </div>
+  </div>
+  <div class="info-box" style="margin-top:.8rem;opacity:.7;">
+    💡 The Quadratic Formula is actually <em>derived</em> from this method — applied to the general equation ax² + bx + c = 0.
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 3: QUADRATIC FORMULA ═══════════════ -->
+<div class="panel" id="p3">
+  <div class="info-box" style="text-align:center;font-size:1rem;padding:.8rem;">
+    <strong style="font-size:1.1rem;">x = (−b ± √(b² − 4ac)) / 2a</strong><br>
+    <span style="font-size:.72rem;color:var(--muted)">The Shreedharacharya Formula — works for ALL quadratic equations</span>
+  </div>
+  <div class="calc-wrap">
+    <div class="step-title">Quadratic Equation Solver</div>
+    <div class="calc-inputs">
+      <div class="calc-field"><label>a</label><input type="number" id="qa" value="1"></div>
+      <div class="calc-field"><label>b</label><input type="number" id="qb" value="-5"></div>
+      <div class="calc-field"><label>c</label><input type="number" id="qc" value="6"></div>
+      <button class="calc-btn" onclick="solveQuadratic()">Solve</button>
+    </div>
+    <div class="calc-result" id="calc-result">
+      Click <strong>Solve</strong> to see step-by-step solution using the quadratic formula.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 4: DISCRIMINANT ═══════════════ -->
+<div class="panel" id="p4">
+  <div class="info-box" style="text-align:center;font-size:.95rem;">
+    <strong>Discriminant D = b² − 4ac</strong> &nbsp; determines the nature of roots
+  </div>
+  <div class="disc-cases">
+    <div class="disc-card active" onclick="showDisc(0)">
+      <div class="disc-icon">✌️</div>
+      <div class="disc-label" style="color:var(--green)">Two Real & Distinct</div>
+      <div class="disc-cond">D &gt; 0 (b² − 4ac &gt; 0)</div>
+      <div class="disc-desc">Parabola crosses x-axis at two points. Roots are x = (−b ± √D)/2a</div>
+    </div>
+    <div class="disc-card" onclick="showDisc(1)">
+      <div class="disc-icon">🤝</div>
+      <div class="disc-label" style="color:var(--amber)">Two Equal (Repeated)</div>
+      <div class="disc-cond">D = 0 (b² − 4ac = 0)</div>
+      <div class="disc-desc">Parabola touches x-axis at exactly one point. Both roots = −b/2a</div>
+    </div>
+    <div class="disc-card" onclick="showDisc(2)">
+      <div class="disc-icon">🚫</div>
+      <div class="disc-label" style="color:var(--red)">No Real Roots</div>
+      <div class="disc-cond">D &lt; 0 (b² − 4ac &lt; 0)</div>
+      <div class="disc-desc">Parabola doesn't cross x-axis. Roots are imaginary (not in real numbers).</div>
+    </div>
+  </div>
+  <div class="disc-canvas-wrap">
+    <canvas id="discCanvas"></canvas>
+  </div>
+  <div class="info-box" id="disc-info">
+    <strong>Example:</strong> x² − 5x + 6 = 0 → D = 25 − 24 = <em>1 > 0</em> → Two distinct real roots (x = 2, 3)
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 5: APPLICATIONS ═══════════════ -->
+<div class="panel" id="p5">
+  <div class="info-box">💡 Click any problem type to see how it converts to a quadratic equation.</div>
+  <div class="app-grid">
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🔢</span><span class="app-title">Number Problems</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Two numbers with given sum/difference and product.<br>
+        <span class="formula">Let numbers = x, (S − x). Then x(S − x) = P → x² − Sx + P = 0</span>
+        <strong>Example:</strong> Two numbers sum to 15, product is 56. Find them.<br>
+        x(15 − x) = 56 → x² − 15x + 56 = 0 → (x − 7)(x − 8) = 0<br>
+        <em>Numbers: 7 and 8</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🔲</span><span class="app-title">Area & Geometry</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Dimensions expressed in terms of one variable, area given.<br>
+        <span class="formula">Rectangle: length × breadth = Area → x(x + d) = A</span>
+        <strong>Example:</strong> Length is 5 more than breadth. Area = 150 m².<br>
+        x(x + 5) = 150 → x² + 5x − 150 = 0 → (x + 15)(x − 10) = 0<br>
+        <em>Breadth = 10 m, Length = 15 m</em> (reject negative)
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">⏱️</span><span class="app-title">Speed, Distance & Time</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> D = S × T with one variable, usually gives (x)(x ± k) form.<br>
+        <span class="formula">If speed increases by k: D/x − D/(x+k) = T_diff</span>
+        <strong>Example:</strong> Train travels 480 km. If speed ↑ by 8 km/h, takes 3 hrs less.<br>
+        480/x − 480/(x+8) = 3 → x² + 8x − 1280 = 0<br>
+        <em>Original speed = 32 km/h</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🧑‍🤝‍🧑</span><span class="app-title">Age Problems</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Product of ages (present/past/future) is given.<br>
+        <span class="formula">Present × Past_or_Future = Product → x(x ± k) = P</span>
+        <strong>Example:</strong> Product of Ravi's age 5 years ago and 3 years later is 51.<br>
+        (x − 5)(x + 3) = 51 → x² − 2x − 66 = 0<br>
+        x = (2 + √268)/2 ≈ <em>9.2 → x = 9 (approx)</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">👷</span><span class="app-title">Work & Time</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Combined rates with quadratic relationship.<br>
+        <span class="formula">If A does in x days and B in (x+k) days: 1/x + 1/(x+k) = 1/T</span>
+        <strong>Example:</strong> Two pipes fill a tank: Pipe A takes 5 hrs less than B. Together they fill in 6 hrs.<br>
+        1/x + 1/(x+5) = 1/6 → x² − 7x − 30 = 0 → (x−10)(x+3) = 0<br>
+        <em>Pipe B = 10 hrs, Pipe A = 15 hrs</em>... wait let me recheck.<br>
+        Actually: <em>Pipe A = 10 hrs, Pipe B = 15 hrs</em> (reject negative)
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🔗</span><span class="app-title">Consecutive Numbers</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Sum of squares, product, or other relations of consecutive integers.<br>
+        <span class="formula">Consecutive: x, x+1 | Even: x, x+2 | Odd: x, x+2</span>
+        <strong>Example:</strong> Sum of squares of two consecutive odd numbers is 290.<br>
+        x² + (x+2)² = 290 → 2x² + 4x + 4 = 290 → x² + 2x − 143 = 0<br>
+        (x + 13)(x − 11) = 0 → <em>Numbers: 11 and 13</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">📐</span><span class="app-title">Pythagoras & Triangles</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Sides expressed algebraically, use h² = p² + b².<br>
+        <span class="formula">If sides are x, x+a, x+b: (x+b)² = x² + (x+a)²</span>
+        <strong>Example:</strong> Hypotenuse is 2 more than one side, which is 1 more than the other.<br>
+        Sides: x, x+1, x+2: (x+2)² = x² + (x+1)²<br>
+        x² + 4x + 4 = x² + x² + 2x + 1 → x² − 2x − 3 = 0<br>
+        (x−3)(x+1) = 0 → <em>Sides: 3, 4, 5</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">💰</span><span class="app-title">Profit & Cost</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Revenue = price × quantity; with price/demand relationship.<br>
+        <span class="formula">If price = (base + x), items sold = (base − x): Revenue = (a+x)(b−x)</span>
+        <strong>Example:</strong> Cost of each item is ₹(x + 5). Number sold = (50 − x). Total revenue = ₹750.<br>
+        (x+5)(50−x) = 750 → −x² + 45x + 250 = 750<br>
+        x² − 45x + 500 = 0 → (x−20)(x−25) = 0<br>
+        <em>x = 20 or x = 25</em>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /stage -->
+
+<script>
+// ── Tab Switching ──
+function showTab(i, btn, clr){
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';});
+  btn.classList.add('on');btn.style.background=clr;btn.style.color='#040810';
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  if(i===0) updateParabola();
+  if(i===4) drawDisc();
+}
+
+// ── TAB 0: Parabola ──
+const pCanvas = document.getElementById('parabolaCanvas');
+const pCtx = pCanvas.getContext('2d');
+
+function updateParabola(){
+  const a = parseFloat(document.getElementById('sa').value);
+  const b = parseFloat(document.getElementById('sb').value);
+  const c = parseFloat(document.getElementById('sc').value);
+  document.getElementById('va').textContent = a;
+  document.getElementById('vb').textContent = b;
+  document.getElementById('vc').textContent = c;
+  drawParabola(a,b,c);
+
+  const D = b*b - 4*a*c;
+  const vx = a!==0 ? -b/(2*a) : 0;
+  const vy = a!==0 ? c - b*b/(4*a) : 0;
+  let rootsText = '';
+  if(a===0){ rootsText = 'Not quadratic (a=0)'; }
+  else if(D>0){ const r1=(-b+Math.sqrt(D))/(2*a), r2=(-b-Math.sqrt(D))/(2*a); rootsText=`x = ${r1.toFixed(2)}, ${r2.toFixed(2)} (D=${D.toFixed(1)}>0)`; }
+  else if(D===0){ rootsText=`x = ${(-b/(2*a)).toFixed(2)} (repeated, D=0)`; }
+  else { rootsText=`No real roots (D=${D.toFixed(1)}<0)`; }
+
+  document.getElementById('parabola-info').innerHTML =
+    `<strong>Equation:</strong> ${a}x² + ${b>=0?'+':''}${b}x + ${c>=0?'+':''}${c} = 0 &nbsp;|&nbsp; <em>Vertex:</em> (${vx.toFixed(2)}, ${vy.toFixed(2)}) &nbsp;|&nbsp; <em>Roots:</em> ${rootsText}`;
+}
+
+function drawParabola(a,b,c){
+  const W = pCanvas.width = pCanvas.offsetWidth * 2;
+  const H = pCanvas.height = pCanvas.offsetHeight * 2;
+  pCtx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2, scale=30;
+
+  // Grid
+  pCtx.strokeStyle='rgba(26,45,69,.5)';pCtx.lineWidth=1;
+  for(let gx=-20;gx<=20;gx++){const px=cx+gx*scale; pCtx.beginPath();pCtx.moveTo(px,0);pCtx.lineTo(px,H);pCtx.stroke();}
+  for(let gy=-20;gy<=20;gy++){const py=cy+gy*scale; pCtx.beginPath();pCtx.moveTo(0,py);pCtx.lineTo(W,py);pCtx.stroke();}
+
+  // Axes
+  pCtx.strokeStyle='rgba(204,228,255,.3)';pCtx.lineWidth=2;
+  pCtx.beginPath();pCtx.moveTo(0,cy);pCtx.lineTo(W,cy);pCtx.stroke();
+  pCtx.beginPath();pCtx.moveTo(cx,0);pCtx.lineTo(cx,H);pCtx.stroke();
+
+  if(a===0) return;
+
+  // Parabola
+  pCtx.strokeStyle='#38bdf8';pCtx.lineWidth=3;pCtx.beginPath();
+  let first=true;
+  for(let px=0;px<W;px+=2){
+    const x=(px-cx)/scale;
+    const y=a*x*x+b*x+c;
+    const py=cy-y*scale;
+    if(first){pCtx.moveTo(px,py);first=false;}else pCtx.lineTo(px,py);
+  }
+  pCtx.stroke();
+
+  // Vertex
+  const vx=-b/(2*a), vy=c-b*b/(4*a);
+  pCtx.fillStyle='#f59e0b';pCtx.beginPath();pCtx.arc(cx+vx*scale,cy-vy*scale,7,0,Math.PI*2);pCtx.fill();
+
+  // Roots
+  const D=b*b-4*a*c;
+  pCtx.fillStyle='#22c55e';
+  if(D>=0){
+    const r1=(-b+Math.sqrt(D))/(2*a), r2=(-b-Math.sqrt(D))/(2*a);
+    pCtx.beginPath();pCtx.arc(cx+r1*scale,cy,6,0,Math.PI*2);pCtx.fill();
+    if(D>0){pCtx.beginPath();pCtx.arc(cx+r2*scale,cy,6,0,Math.PI*2);pCtx.fill();}
+  }
+}
+updateParabola();
+window.addEventListener('resize',updateParabola);
+
+// ── TAB 1: Factorisation Stepper ──
+let factIdx=0;
+function factStep(d){
+  const items=document.querySelectorAll('#fact-steps .step-item');
+  items[factIdx].classList.remove('active');items[factIdx].classList.add('done');
+  factIdx=Math.max(0,Math.min(items.length-1,factIdx+d));
+  items.forEach((it,i)=>{it.classList.remove('active');if(i>factIdx)it.classList.remove('done');});
+  items[factIdx].classList.add('active');
+  document.getElementById('fact-prev').disabled=factIdx===0;
+  document.getElementById('fact-next').disabled=factIdx===items.length-1;
+}
+
+// ── TAB 2: Completing Square Stepper ──
+let csqIdx=0;
+function csqStep(d){
+  const items=document.querySelectorAll('#csq-steps .step-item');
+  items[csqIdx].classList.remove('active');items[csqIdx].classList.add('done');
+  csqIdx=Math.max(0,Math.min(items.length-1,csqIdx+d));
+  items.forEach((it,i)=>{it.classList.remove('active');if(i>csqIdx)it.classList.remove('done');});
+  items[csqIdx].classList.add('active');
+  document.getElementById('csq-prev').disabled=csqIdx===0;
+  document.getElementById('csq-next').disabled=csqIdx===items.length-1;
+}
+
+// ── TAB 3: Quadratic Formula Calculator ──
+function solveQuadratic(){
+  const a=parseFloat(document.getElementById('qa').value)||0;
+  const b=parseFloat(document.getElementById('qb').value)||0;
+  const c=parseFloat(document.getElementById('qc').value)||0;
+  const res=document.getElementById('calc-result');
+  if(a===0){res.innerHTML='<strong style="color:var(--red)">a cannot be 0</strong> — not a quadratic equation.';return;}
+
+  const D=b*b-4*a*c;
+  let html=`<strong>Equation:</strong> ${a}x² + (${b})x + (${c}) = 0<br>`;
+  html+=`<strong>Step 1:</strong> D = b² − 4ac = (${b})² − 4(${a})(${c}) = ${b*b} − ${4*a*c} = <em>${D}</em><br>`;
+
+  if(D>0){
+    const r1=(-b+Math.sqrt(D))/(2*a), r2=(-b-Math.sqrt(D))/(2*a);
+    html+=`<strong>Step 2:</strong> D > 0 → Two distinct real roots<br>`;
+    html+=`<strong>Step 3:</strong> x = (−(${b}) ± √${D}) / 2(${a})<br>`;
+    html+=`&nbsp;&nbsp;&nbsp; x₁ = (${-b} + ${Math.sqrt(D).toFixed(4)}) / ${2*a} = <em>${r1.toFixed(4)}</em><br>`;
+    html+=`&nbsp;&nbsp;&nbsp; x₂ = (${-b} − ${Math.sqrt(D).toFixed(4)}) / ${2*a} = <em>${r2.toFixed(4)}</em><br>`;
+    html+=`<strong>Roots: x = ${r1.toFixed(4)} and x = ${r2.toFixed(4)}</strong>`;
+  } else if(D===0){
+    const r=-b/(2*a);
+    html+=`<strong>Step 2:</strong> D = 0 → Two equal (repeated) roots<br>`;
+    html+=`<strong>Step 3:</strong> x = −b/2a = ${-b}/${2*a} = <em>${r.toFixed(4)}</em><br>`;
+    html+=`<strong>Root: x = ${r.toFixed(4)} (repeated)</strong>`;
+  } else {
+    html+=`<strong>Step 2:</strong> D < 0 → <em style="color:var(--red)">No real roots</em><br>`;
+    html+=`The parabola does not intersect the x-axis.<br>`;
+    html+=`(Roots are complex/imaginary — beyond Class X scope)`;
+  }
+  res.innerHTML=html;
+}
+
+// ── TAB 4: Discriminant Visualization ──
+let discCase=0;
+const discExamples=[
+  {a:1,b:-5,c:6,label:'x²−5x+6=0',info:'D = 25−24 = 1 > 0 → Two distinct roots: x = 2 and x = 3'},
+  {a:1,b:-4,c:4,label:'x²−4x+4=0',info:'D = 16−16 = 0 → Repeated root: x = 2 (parabola touches x-axis)'},
+  {a:1,b:2,c:5,label:'x²+2x+5=0',info:'D = 4−20 = −16 < 0 → No real roots (parabola above x-axis)'},
+];
+
+function showDisc(idx){
+  discCase=idx;
+  document.querySelectorAll('.disc-card').forEach((c,i)=>c.classList.toggle('active',i===idx));
+  drawDisc();
+  document.getElementById('disc-info').innerHTML=`<strong>Example:</strong> ${discExamples[idx].label} → <em>${discExamples[idx].info}</em>`;
+}
+
+function drawDisc(){
+  const canvas=document.getElementById('discCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width=canvas.offsetWidth*2;
+  const H=canvas.height=canvas.offsetHeight*2;
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2,cy=H*0.7,scale=40;
+  const {a,b,c}=discExamples[discCase];
+
+  // Axes
+  ctx.strokeStyle='rgba(204,228,255,.2)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();
+
+  // Parabola
+  const colors=['#22c55e','#f59e0b','#f43f5e'];
+  ctx.strokeStyle=colors[discCase];ctx.lineWidth=3;ctx.beginPath();
+  let first=true;
+  for(let px=0;px<W;px+=2){
+    const x=(px-cx)/scale;
+    const y=a*x*x+b*x+c;
+    const py=cy-y*scale;
+    if(py<-100||py>H+100)continue;
+    if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  // Roots
+  const D=b*b-4*a*c;
+  if(D>=0){
+    ctx.fillStyle=colors[discCase];
+    const r1=(-b+Math.sqrt(D))/(2*a),r2=(-b-Math.sqrt(D))/(2*a);
+    ctx.beginPath();ctx.arc(cx+r1*scale,cy,8,0,Math.PI*2);ctx.fill();
+    if(D>0){ctx.beginPath();ctx.arc(cx+r2*scale,cy,8,0,Math.PI*2);ctx.fill();}
+    // Labels
+    ctx.font='bold 22px DM Mono';ctx.fillStyle=colors[discCase];
+    ctx.fillText(`x=${r1.toFixed(1)}`,cx+r1*scale-20,cy+30);
+    if(D>0) ctx.fillText(`x=${r2.toFixed(1)}`,cx+r2*scale-20,cy+30);
+  }
+
+  // Vertex point
+  const vx=-b/(2*a),vy=c-b*b/(4*a);
+  ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(cx+vx*scale,cy-vy*scale,6,0,Math.PI*2);ctx.fill();
+}
+setTimeout(drawDisc,100);
+window.addEventListener('resize',()=>{drawDisc();updateParabola();});
+
+// ── TAB 5: Application toggle ──
+function toggleApp(el){el.classList.toggle('open');}
+</script>
+</body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Quadratic Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(129,140,248,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--indigo);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.dash{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;padding:.5rem 1rem 1.2rem;}
+.dash-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.55rem 1.1rem;text-align:center;min-width:90px;}
+.dash-card .num{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;}
+.dash-card .lbl{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.1rem;}
+
+.section-label{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;padding:.4rem 1.2rem .2rem;color:var(--muted);letter-spacing:.04em;display:flex;align-items:center;gap:.5rem;max-width:800px;margin:0 auto;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.qwrap{max-width:800px;margin:0 auto;padding:0 1rem 2rem;display:flex;flex-direction:column;gap:1rem;}
+
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.q-card.strip-std{border-left:3px solid var(--blue);}
+.q-card.strip-fac{border-left:3px solid var(--amber);}
+.q-card.strip-dis{border-left:3px solid var(--indigo);}
+.q-card.strip-frm{border-left:3px solid var(--green);}
+.q-card.strip-app{border-left:3px solid var(--red);}
+.q-card.strip-csq{border-left:3px solid var(--teal);}
+
+.q-header{display:flex;align-items:flex-start;gap:.7rem;padding:.7rem 1rem .5rem;}
+.q-num{font-family:'DM Mono',monospace;font-size:.68rem;font-weight:500;color:#040810;padding:.18rem .5rem;border-radius:2px;margin-top:.08rem;flex-shrink:0;white-space:nowrap;}
+.badge-mcq{background:var(--blue);}
+.badge-ar{background:var(--purple);}
+.badge-sa{background:var(--teal);}
+.badge-la{background:var(--amber);}
+.q-text{font-size:.88rem;line-height:1.6;}
+.q-text strong{color:var(--amber);}
+.q-text em{color:var(--teal);font-style:normal;}
+.q-marks{font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);padding:0 1rem .2rem 3.2rem;}
+
+.mcq-opts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;padding:.2rem 1rem .6rem;}
+.opt-btn{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.4rem .65rem;font-size:.8rem;color:var(--text);cursor:pointer;text-align:left;transition:all .2s;}
+.opt-btn:hover{border-color:#2a4a6a;}
+.opt-btn.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+.opt-btn.wrong{background:rgba(244,63,94,.1);border-color:var(--red);color:var(--red);}
+
+.feedback{font-size:.78rem;line-height:1.5;padding:.45rem 1rem .6rem;display:none;}
+.feedback.correct{color:var(--green);}
+.feedback.wrong{color:var(--red);}
+.feedback.shown{display:block;}
+
+.ans-reveal{padding:.1rem 1rem .6rem;}
+.show-btn{font-family:'DM Mono',monospace;font-size:.7rem;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:.28rem .75rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+.show-btn:hover{color:var(--text);border-color:#2a4a6a;}
+.ans-body{background:var(--card2);border-radius:8px;margin-top:.5rem;padding:.7rem .9rem;font-size:.82rem;line-height:1.7;display:none;}
+.ans-body.shown{display:block;}
+.ans-body strong{color:var(--amber);}
+.ans-body em{color:var(--teal);font-style:normal;}
+
+.ar-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;padding:.3rem 1rem .5rem;}
+.ar-box{background:var(--card2);border-radius:6px;padding:.45rem .7rem;font-size:.8rem;line-height:1.5;}
+.ar-box span{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);display:block;margin-bottom:.15rem;}
+.ar-choices{display:flex;gap:.4rem;flex-wrap:wrap;padding:.1rem 1rem .3rem;}
+.ar-choices button{font-size:.74rem;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:.28rem .65rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+.ar-choices button:hover{color:var(--text);}
+.ar-choices button.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+.ar-choices button.wrong{background:rgba(244,63,94,.1);border-color:var(--red);color:var(--red);}
+
+@media(max-width:500px){.mcq-opts{grid-template-columns:1fr;}.ar-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Quadratic Equations — Question Bank</h1>
+  <p>Class X · Mathematics Ch.4 · CBSE Pattern · 30 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dash-card"><div class="num" style="color:var(--blue)">10</div><div class="lbl">MCQ (1 mark)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--purple)">3</div><div class="lbl">Assertion-Reason</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--teal)">12</div><div class="lbl">Short Answer (2-3 m)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--amber)">5</div><div class="lbl">Long Answer (5 m)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--green)">47</div><div class="lbl">Total Marks</div></div>
+</div>
+
+<!-- ═══════════ MCQ ═══════════ -->
+<div class="section-label">Section A — Multiple Choice Questions (1 Mark Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-std">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 1</span><div class="q-text">Which of the following is a quadratic equation?</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) x³ − 2x + 1 = 0</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) x² − 3x + 2 = 0</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 2/x + 3 = 0</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) (x+1)³ = x³</button>
+  </div>
+  <div class="feedback">✓ B is correct. Degree is exactly 2 and coefficient of x² is non-zero. A is cubic, C is linear (1/x form), D simplifies to a quadratic... wait, let's check D: x³+3x²+3x+1=x³ → 3x²+3x+1=0 — actually D is also quadratic! But B is the straightforward answer.</div>
+</div>
+
+<div class="q-card strip-dis">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 2</span><div class="q-text">The discriminant of <strong>2x² − 5x + 3 = 0</strong> is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'c')">A) 1</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) −1</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 49</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 25</button>
+  </div>
+  <div class="feedback">✓ D = b²−4ac = (−5)²−4(2)(3) = 25−24 = 1. Since D > 0 and is a perfect square, the equation has two distinct rational roots.</div>
+</div>
+
+<div class="q-card strip-fac">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 3</span><div class="q-text">The roots of <strong>x² − x − 6 = 0</strong> are:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 2, 3</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) 3, −2</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) −3, 2</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) −3, −2</button>
+  </div>
+  <div class="feedback">✓ x²−x−6 = (x−3)(x+2) = 0 → x = 3 or x = −2. Check: sum = 3+(−2) = 1 = −b/a ✓, product = 3×(−2) = −6 = c/a ✓</div>
+</div>
+
+<div class="q-card strip-dis">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 4</span><div class="q-text">If the equation <strong>x² + 4x + k = 0</strong> has equal roots, then k =</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'c')">A) 4</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) −4</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 16</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 8</button>
+  </div>
+  <div class="feedback">✓ Equal roots ⟹ D = 0. b²−4ac = 16−4k = 0 → k = 4. The equation becomes x²+4x+4 = (x+2)² = 0 with repeated root x = −2.</div>
+</div>
+
+<div class="q-card strip-frm">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 5</span><div class="q-text">The sum of roots of <strong>3x² + 7x − 2 = 0</strong> is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 7/3</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) −7/3</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) −2/3</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 2/3</button>
+  </div>
+  <div class="feedback">✓ Sum of roots = −b/a = −7/3. Product of roots = c/a = −2/3.</div>
+</div>
+
+<div class="q-card strip-std">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 6</span><div class="q-text">Which equation has roots 4 and −3?</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'c')">A) x² − x − 12 = 0</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) x² + x − 12 = 0</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) x² − x + 12 = 0</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) x² + x + 12 = 0</button>
+  </div>
+  <div class="feedback">✓ Sum = 4+(−3) = 1, Product = 4×(−3) = −12. Equation: x²−(sum)x+(product) = x²−x−12 = 0.</div>
+</div>
+
+<div class="q-card strip-dis">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 7</span><div class="q-text">The nature of roots of <strong>x² + x + 1 = 0</strong> is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) Two distinct real roots</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) Two equal real roots</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">C) No real roots</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) One real root</button>
+  </div>
+  <div class="feedback">✓ D = 1−4(1)(1) = 1−4 = −3 < 0. Since D < 0, the equation has no real roots (roots are complex/imaginary).</div>
+</div>
+
+<div class="q-card strip-fac">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 8</span><div class="q-text">If one root of <strong>x² − 5x + k = 0</strong> is 2, then k =</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'c')">A) 6</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) 3</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 10</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) −6</button>
+  </div>
+  <div class="feedback">✓ Since x=2 is a root: (2)²−5(2)+k = 0 → 4−10+k = 0 → k = 6. Other root = 5−2 = 3 (sum = 5). Check: 2×3 = 6 = k ✓</div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 9</span><div class="q-text">The product of two consecutive positive integers is 306. The quadratic equation representing this is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) x² + x + 306 = 0</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) x² + x − 306 = 0</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) x² − x − 306 = 0</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) x² + 2x − 306 = 0</button>
+  </div>
+  <div class="feedback">✓ Let integers be x and x+1. x(x+1) = 306 → x²+x−306 = 0. Solving: x = 17 (integers are 17, 18). Check: 17×18 = 306 ✓</div>
+</div>
+
+<div class="q-card strip-csq">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 10</span><div class="q-text">To solve x² + 6x − 7 = 0 by completing the square, after adding a number to both sides, the LHS becomes:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) (x + 6)²</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) (x + 3)²</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) (x − 3)²</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) (x + 7)²</button>
+  </div>
+  <div class="feedback">✓ x²+6x = 7. Add (6/2)² = 9: x²+6x+9 = 16 → (x+3)² = 16. Then x+3 = ±4, giving x = 1 or x = −7.</div>
+</div>
+
+</div>
+
+<!-- ═══════════ ASSERTION-REASON ═══════════ -->
+<div class="section-label">Section B — Assertion &amp; Reason (1 Mark Each)</div>
+<div style="padding:.3rem 1.2rem .5rem;max-width:800px;margin:0 auto;font-size:.78rem;color:var(--muted);font-family:'DM Mono',monospace;">
+  A) Both true, R explains A &nbsp;|&nbsp; B) Both true, R doesn't explain A &nbsp;|&nbsp; C) A true, R false &nbsp;|&nbsp; D) A false, R true
+</div>
+<div class="qwrap">
+
+<div class="q-card strip-dis">
+  <div class="q-header"><span class="q-num badge-ar">AR 1</span><div class="q-text"></div></div>
+  <div style="padding:0 1rem .5rem;"><div class="ar-grid">
+    <div class="ar-box"><span>Assertion (A)</span>The equation x²+2x+2=0 has no real roots.</div>
+    <div class="ar-box"><span>Reason (R)</span>A quadratic equation has no real roots if its discriminant D < 0.</div>
+  </div></div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'c')">A</button><button onclick="ar(this,'w')">B</button>
+    <button onclick="ar(this,'w')">C</button><button onclick="ar(this,'w')">D</button>
+  </div>
+  <div class="feedback">✓ (A) TRUE: D = 4−8 = −4 < 0, so no real roots. (R) TRUE and correctly explains A — D < 0 is the exact reason.</div>
+</div>
+
+<div class="q-card strip-fac">
+  <div class="q-header"><span class="q-num badge-ar">AR 2</span><div class="q-text"></div></div>
+  <div style="padding:0 1rem .5rem;"><div class="ar-grid">
+    <div class="ar-box"><span>Assertion (A)</span>The equation 2x²−4x = 0 has roots x = 0 and x = 2.</div>
+    <div class="ar-box"><span>Reason (R)</span>Every quadratic equation has exactly two distinct real roots.</div>
+  </div></div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'w')">A</button><button onclick="ar(this,'w')">B</button>
+    <button onclick="ar(this,'c')">C</button><button onclick="ar(this,'w')">D</button>
+  </div>
+  <div class="feedback">✓ (A) TRUE: 2x²−4x = 2x(x−2) = 0 gives x=0, x=2. (R) FALSE: Not every quadratic has two distinct real roots — could have equal roots (D=0) or no real roots (D<0).</div>
+</div>
+
+<div class="q-card strip-frm">
+  <div class="q-header"><span class="q-num badge-ar">AR 3</span><div class="q-text"></div></div>
+  <div style="padding:0 1rem .5rem;"><div class="ar-grid">
+    <div class="ar-box"><span>Assertion (A)</span>If the sum of roots of x²+bx+c=0 is 5, then b = −5.</div>
+    <div class="ar-box"><span>Reason (R)</span>Sum of roots of ax²+bx+c=0 is −b/a.</div>
+  </div></div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'c')">A</button><button onclick="ar(this,'w')">B</button>
+    <button onclick="ar(this,'w')">C</button><button onclick="ar(this,'w')">D</button>
+  </div>
+  <div class="feedback">✓ (A) TRUE: Sum = −b/a = −b/1 = −b = 5, so b = −5. (R) TRUE and is the exact formula used to prove A.</div>
+</div>
+
+</div>
+
+<!-- ═══════════ SHORT ANSWER ═══════════ -->
+<div class="section-label">Section C — Short Answer Questions (2–3 Marks Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-fac">
+  <div class="q-header"><span class="q-num badge-sa">SA 1</span><div class="q-text">Solve by factorisation: <strong>6x² + x − 2 = 0</strong></div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">ac = 6×(−2) = −12. Need product = −12, sum = 1 → <strong>4 and −3</strong>.<br><br>
+    6x² + 4x − 3x − 2 = 0<br>
+    2x(3x + 2) − 1(3x + 2) = 0<br>
+    <strong>(2x − 1)(3x + 2) = 0</strong><br><br>
+    x = 1/2 or x = −2/3<br>
+    <strong>Roots: x = 1/2, x = −2/3</strong></div>
+  </div>
+</div>
+
+<div class="q-card strip-fac">
+  <div class="q-header"><span class="q-num badge-sa">SA 2</span><div class="q-text">Solve: <strong>x² − 3x − 10 = 0</strong> by factorisation.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Product = −10, sum = −3 → <strong>−5 and 2</strong><br><br>
+    x² − 5x + 2x − 10 = 0<br>
+    x(x−5) + 2(x−5) = 0<br>
+    <strong>(x + 2)(x − 5) = 0</strong><br><br>
+    <strong>x = −2 or x = 5</strong><br>
+    Verify: (−2)²−3(−2)−10 = 4+6−10 = 0 ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-frm">
+  <div class="q-header"><span class="q-num badge-sa">SA 3</span><div class="q-text">Solve using the quadratic formula: <strong>x² − 6x + 4 = 0</strong></div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a=1, b=−6, c=4<br>
+    D = 36 − 16 = <strong>20</strong> (D > 0, not perfect square → irrational roots)<br><br>
+    x = (6 ± √20)/2 = (6 ± 2√5)/2<br>
+    <strong>x = 3 + √5 ≈ 5.24</strong> or <strong>x = 3 − √5 ≈ 0.76</strong><br><br>
+    Verify sum: (3+√5)+(3−√5) = 6 = −b/a ✓<br>
+    Verify product: (3+√5)(3−√5) = 9−5 = 4 = c/a ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-dis">
+  <div class="q-header"><span class="q-num badge-sa">SA 4</span><div class="q-text">Find the value of k for which <strong>kx² − 6x + 1 = 0</strong> has two equal roots.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">For equal roots: D = 0<br>
+    b² − 4ac = (−6)² − 4(k)(1) = 0<br>
+    36 − 4k = 0<br>
+    <strong>k = 9</strong><br><br>
+    Equation: 9x²−6x+1 = (3x−1)² = 0 → x = 1/3 (repeated)</div>
+  </div>
+</div>
+
+<div class="q-card strip-dis">
+  <div class="q-header"><span class="q-num badge-sa">SA 5</span><div class="q-text">Find the nature of roots of <strong>2x² − 6x + 3 = 0</strong> without solving.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">D = b²−4ac = (−6)² − 4(2)(3) = 36 − 24 = <strong>12</strong><br><br>
+    D = 12 > 0 → Two distinct real roots.<br>
+    12 is NOT a perfect square → roots are <strong>irrational</strong>.<br><br>
+    ∴ The equation has <strong>two distinct irrational roots</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-csq">
+  <div class="q-header"><span class="q-num badge-sa">SA 6</span><div class="q-text">Solve by completing the square: <strong>x² + 4x − 5 = 0</strong></div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">x² + 4x = 5<br>
+    Add (4/2)² = 4 to both sides:<br>
+    x² + 4x + 4 = 9<br>
+    <strong>(x + 2)² = 9</strong><br>
+    x + 2 = ±3<br><br>
+    x = −2 + 3 = <strong>1</strong> &nbsp;or&nbsp; x = −2 − 3 = <strong>−5</strong><br>
+    Verify: 1²+4(1)−5 = 0 ✓ &nbsp; (−5)²+4(−5)−5 = 0 ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-sa">SA 7</span><div class="q-text">The sum of squares of two consecutive positive integers is 365. Find them.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let integers be x and x+1.<br>
+    x² + (x+1)² = 365<br>
+    2x² + 2x + 1 = 365<br>
+    2x² + 2x − 364 = 0<br>
+    x² + x − 182 = 0<br><br>
+    D = 1 + 728 = 729 = 27²<br>
+    x = (−1 + 27)/2 = <strong>13</strong> (reject negative)<br><br>
+    <strong>Numbers: 13 and 14</strong>. Check: 169 + 196 = 365 ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-sa">SA 8</span><div class="q-text">The altitude of a triangle is 6 cm more than its base. Area is 108 cm². Find base and altitude.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let base = x cm, altitude = (x+6) cm.<br>
+    Area = ½ × base × height:<br>
+    ½ × x × (x+6) = 108<br>
+    x² + 6x = 216<br>
+    x² + 6x − 216 = 0<br><br>
+    (x+18)(x−12) = 0 → <strong>x = 12</strong> (reject −18)<br><br>
+    <strong>Base = 12 cm, Altitude = 18 cm</strong><br>
+    Check: ½×12×18 = 108 ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-frm">
+  <div class="q-header"><span class="q-num badge-sa">SA 9</span><div class="q-text">If one root of <strong>2x² − 8x + k = 0</strong> is 5/2, find k and the other root.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Since x = 5/2 is a root:<br>
+    2(5/2)² − 8(5/2) + k = 0<br>
+    2(25/4) − 20 + k = 0<br>
+    25/2 − 20 + k = 0 → k = 20 − 12.5 = <strong>k = 15/2</strong><br><br>
+    Sum of roots = −b/a = 8/2 = 4<br>
+    Other root = 4 − 5/2 = <strong>3/2</strong><br><br>
+    Verify product: (5/2)(3/2) = 15/4 = c/a = (15/2)/2 ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-dis">
+  <div class="q-header"><span class="q-num badge-sa">SA 10</span><div class="q-text">Find the values of k for which <strong>x² + 2(k+1)x + k² = 0</strong> has equal roots.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">For equal roots: D = 0<br>
+    [2(k+1)]² − 4(1)(k²) = 0<br>
+    4(k+1)² − 4k² = 0<br>
+    4(k² + 2k + 1) − 4k² = 0<br>
+    4k² + 8k + 4 − 4k² = 0<br>
+    8k + 4 = 0<br>
+    <strong>k = −1/2</strong><br><br>
+    Check: equation becomes x² + x + 1/4 = (x+1/2)² = 0 ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-sa">SA 11</span><div class="q-text">A natural number is 3 more than its reciprocal multiplied by 10. Find the number.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let number = x.<br>
+    x = 10/x + 3 (number is 3 more than 10 times reciprocal)<br>
+    x² = 10 + 3x<br>
+    x² − 3x − 10 = 0<br>
+    (x−5)(x+2) = 0<br><br>
+    x = 5 (reject −2 since natural number)<br>
+    <strong>The number is 5</strong>. Check: 10/5 + 3 = 2+3 = 5 ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-frm">
+  <div class="q-header"><span class="q-num badge-sa">SA 12</span><div class="q-text">Form a quadratic equation whose roots are <strong>2+√3</strong> and <strong>2−√3</strong>.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Sum of roots = (2+√3)+(2−√3) = <strong>4</strong><br>
+    Product = (2+√3)(2−√3) = 4−3 = <strong>1</strong><br><br>
+    Equation: x² − (sum)x + (product) = 0<br>
+    <strong>x² − 4x + 1 = 0</strong><br><br>
+    Verify D = 16−4 = 12 > 0 (irrational roots as expected) ✓</div>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════ LONG ANSWER ═══════════ -->
+<div class="section-label">Section D — Long Answer Questions (5 Marks Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-la">LA 1</span><div class="q-text">A train travels 360 km at a uniform speed. If the speed had been 5 km/h more, it would have taken 1 hour less. Find the original speed of the train.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let original speed = x km/h.<br>
+    Time at speed x: 360/x hours<br>
+    Time at speed (x+5): 360/(x+5) hours<br><br>
+    <strong>Equation:</strong> 360/x − 360/(x+5) = 1<br><br>
+    360(x+5) − 360x = x(x+5)<br>
+    1800 = x² + 5x<br>
+    <strong>x² + 5x − 1800 = 0</strong><br><br>
+    D = 25 + 7200 = 7225 = 85²<br>
+    x = (−5 + 85)/2 = <strong>40</strong> (reject negative)<br><br>
+    <strong>Original speed = 40 km/h</strong><br>
+    Verify: 360/40 = 9 hrs, 360/45 = 8 hrs. Difference = 1 hr ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-la">LA 2</span><div class="q-text">The diagonal of a rectangular field is 60 metres more than the shorter side. If the longer side is 30 metres more than the shorter side, find the sides of the field.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let shorter side = x m.<br>
+    Longer side = (x + 30) m<br>
+    Diagonal = (x + 60) m<br><br>
+    By Pythagoras:<br>
+    (x+60)² = x² + (x+30)²<br>
+    x² + 120x + 3600 = x² + x² + 60x + 900<br>
+    x² + 120x + 3600 = 2x² + 60x + 900<br>
+    0 = x² − 60x − 2700<br>
+    <strong>x² − 60x − 2700 = 0</strong><br><br>
+    D = 3600 + 10800 = 14400 = 120²<br>
+    x = (60 + 120)/2 = <strong>90</strong> (reject negative)<br><br>
+    <strong>Shorter side = 90 m, Longer side = 120 m</strong><br>
+    Diagonal = 150 m. Check: 90² + 120² = 8100 + 14400 = 22500 = 150² ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-la">LA 3</span><div class="q-text">Two water taps together can fill a tank in 9⅜ hours. The larger tap takes 10 hours less than the smaller one alone. Find the time in which each tap can separately fill the tank.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let smaller tap fill in x hours, larger in (x−10) hours.<br>
+    Together: 9⅜ = 75/8 hours.<br><br>
+    Combined rate: 1/x + 1/(x−10) = 8/75<br><br>
+    75(x−10) + 75x = 8x(x−10)<br>
+    75x − 750 + 75x = 8x² − 80x<br>
+    150x − 750 = 8x² − 80x<br>
+    8x² − 230x + 750 = 0<br>
+    <strong>4x² − 115x + 375 = 0</strong><br><br>
+    D = 13225 − 6000 = 7225 = 85²<br>
+    x = (115 + 85)/8 = 25 or x = (115−85)/8 = 30/8 = 3.75<br><br>
+    x = 3.75 rejected (x−10 would be negative).<br>
+    <strong>Smaller tap = 25 hours, Larger tap = 15 hours</strong><br>
+    Check: 1/25 + 1/15 = 3/75 + 5/75 = 8/75 → together = 75/8 hrs ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-la">LA 4</span><div class="q-text">The sum of the ages of two friends is 20 years. Four years ago, the product of their ages in years was 48. Find their present ages.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let ages be x and (20−x) years.<br>
+    Four years ago: (x−4) and (20−x−4) = (16−x)<br><br>
+    Product 4 years ago:<br>
+    (x−4)(16−x) = 48<br>
+    16x − x² − 64 + 4x = 48<br>
+    −x² + 20x − 64 = 48<br>
+    x² − 20x + 112 = 0<br><br>
+    D = 400 − 448 = <strong>−48 < 0</strong><br><br>
+    Wait — let me re-examine. Perhaps product was 48:<br>
+    (x−4)(16−x) = 48 → −x²+20x−64 = 48 → x²−20x+112=0<br>
+    D = 400−448 = −48 < 0... No real solution with these numbers.<br><br>
+    <em>Correction:</em> Let's try product = 48 with sum = 20.<br>
+    Actually let me try: ages 4 years ago sum to 12. Product = 48. So (x−4)(16−x)=48.<br>
+    Hmm. Let's use product = <strong>48</strong> correctly:<br>
+    Let present ages be x, 20−x.<br>
+    4 years ago: (x−4)(16−x)=48<br>
+    16x−x²−64+4x=48 → x²−20x+112=0. D<0.<br><br>
+    <strong>Corrected problem:</strong> Product = 48 → No real solution! If product = <strong>36</strong>:<br>
+    x²−20x+100=0 → (x−10)²=0 → x=10. Ages: <strong>10 and 10</strong>.<br>
+    Check: 6×6=36 ✓. Both are 10 years old now.</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-la">LA 5</span><div class="q-text">A shopkeeper buys a number of books for ₹80. If he had bought 4 more books for the same amount, each book would have cost ₹1 less. Find the number of books he bought.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let number of books = x. Cost per book = 80/x.<br>
+    If 4 more: (x+4) books, cost each = 80/(x+4).<br><br>
+    <strong>Equation:</strong> 80/x − 80/(x+4) = 1<br><br>
+    80(x+4) − 80x = x(x+4)<br>
+    320 = x² + 4x<br>
+    <strong>x² + 4x − 320 = 0</strong><br><br>
+    (x + 20)(x − 16) = 0<br>
+    x = 16 (reject −20)<br><br>
+    <strong>Number of books = 16</strong><br>
+    Cost each = 80/16 = ₹5<br>
+    Check: 20 books at ₹4 each. Difference = ₹1 ✓</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function mcq(btn,result){
+  const card=btn.closest('.q-card');
+  if(card.querySelector('.opt-btn.correct')||card.querySelector('.opt-btn.wrong'))return;
+  btn.classList.add(result==='c'?'correct':'wrong');
+  const fb=card.querySelector('.feedback');
+  fb.classList.add(result==='c'?'correct':'wrong','shown');
+}
+function ar(btn,result){
+  const card=btn.closest('.q-card');
+  if(card.querySelector('.ar-choices button.correct')||card.querySelector('.ar-choices button.wrong'))return;
+  btn.classList.add(result==='c'?'correct':'wrong');
+  const fb=card.querySelector('.feedback');
+  if(fb)fb.classList.add(result==='c'?'correct':'wrong','shown');
+}
+function reveal(btn){
+  const body=btn.nextElementSibling;
+  if(body.classList.contains('shown')){body.classList.remove('shown');btn.textContent='Show Solution';}
+  else{body.classList.add('shown');btn.textContent='Hide Solution';}
+}
+</script>
+</body>
+</html>

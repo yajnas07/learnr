@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Pair of Linear Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#040810;--card:#0a1422;--card2:#0f1c30;
+    --border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+    --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;
+    --green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.05) 0%,transparent 60%);}
+
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;
+    background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+
+  header{text-align:center;padding:1.6rem 1rem .8rem;}
+  header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+  .prog-row{display:flex;align-items:center;gap:1rem;padding:.5rem 1rem .8rem;width:100%;max-width:580px;}
+  .prog-bar{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .4s ease;}
+  .prog-text{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap;}
+
+  .filters{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;padding:.2rem 1rem .8rem;}
+  .f-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.72rem;
+    padding:.3rem .9rem;border-radius:3px;border:1px solid var(--border);
+    background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .f-btn:hover{color:var(--text);}
+  .f-btn.on{color:#040810;border-color:transparent;}
+  .f-all.on {background:var(--muted);color:var(--text)!important;}
+  .f-std.on {background:var(--amber);}
+  .f-gph.on {background:var(--blue);}
+  .f-cns.on {background:var(--teal);}
+  .f-mth.on {background:var(--indigo);}
+  .f-app.on {background:var(--red);}
+
+  .stage{width:100%;max-width:580px;padding:0 1rem;perspective:1200px;}
+  .fc-wrap{width:100%;aspect-ratio:3/2;position:relative;cursor:pointer;
+    transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);}
+  .fc-wrap.flipped{transform:rotateY(180deg);}
+  .fc-face{position:absolute;inset:0;border-radius:16px;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:1.4rem;text-align:center;}
+  .fc-front{background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.6);}
+  .fc-back{transform:rotateY(180deg);background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.6);}
+  .fc-tag{font-family:'DM Mono',monospace;font-size:.65rem;font-weight:500;padding:.18rem .65rem;border-radius:2px;margin-bottom:.7rem;}
+  .fc-q{font-family:'Playfair Display',serif;font-size:clamp(.88rem,2.4vw,1.1rem);font-weight:700;line-height:1.45;}
+  .fc-hint{font-size:.68rem;color:var(--muted);margin-top:.5rem;font-family:'DM Mono',monospace;}
+  .fc-flip-hint{position:absolute;bottom:.75rem;font-size:.65rem;font-family:'DM Mono',monospace;color:#1a2d45;animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+  .fc-ans-lbl{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--green);margin-bottom:.5rem;}
+  .fc-ans{font-size:clamp(.78rem,2vw,.95rem);line-height:1.65;color:var(--text);}
+  .fc-ans strong{color:var(--amber);}
+  .fc-ans em{color:var(--teal);font-style:normal;}
+  .fc-mono{font-family:'DM Mono',monospace;font-size:.84rem;color:var(--teal);}
+  .known-badge{position:absolute;top:.7rem;right:.7rem;font-size:.62rem;font-family:'DM Mono',monospace;padding:.12rem .45rem;border-radius:2px;}
+  .known{background:rgba(34,197,94,.15);color:#4ade80;}
+  .unknown{background:rgba(239,68,68,.1);color:#f87171;}
+
+  .nav-row{display:flex;gap:.7rem;align-items:center;padding:1rem;}
+  .nav-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.85rem;
+    padding:.5rem 1.3rem;border-radius:4px;border:1px solid var(--border);
+    background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .nav-btn:hover:not(:disabled){border-color:#2a4a6a;color:var(--text);}
+  .nav-btn:disabled{opacity:.3;cursor:default;}
+  .nav-ctr{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);min-width:80px;text-align:center;}
+  .action-row{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;padding:0 1rem .5rem;}
+  .act-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.32rem .9rem;border-radius:3px;
+    border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .act-btn:hover{color:var(--text);border-color:#2a4a6a;}
+
+  .stats-bar{display:flex;gap:1.2rem;justify-content:center;padding:.3rem 0 1rem;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);}
+  .stats-bar span strong{color:var(--text);}
+  .date-badge{font-size:.58rem;font-family:'DM Mono',monospace;color:var(--muted);margin-top:.3rem;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Pair of Linear Equations</h1>
+  <p>Class X · Mathematics Ch.3 · 40 Flashcards · 5 Categories</p>
+</header>
+
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 40</div>
+</div>
+
+<div class="filters">
+  <button class="f-btn f-all on" onclick="setFilter('all',this)">All (40)</button>
+  <button class="f-btn f-std" onclick="setFilter('std',this)">📐 Standard Form (8)</button>
+  <button class="f-btn f-gph" onclick="setFilter('gph',this)">📈 Graphical (7)</button>
+  <button class="f-btn f-cns" onclick="setFilter('cns',this)">🔢 Consistency (7)</button>
+  <button class="f-btn f-mth" onclick="setFilter('mth',this)">🔣 Methods (9)</button>
+  <button class="f-btn f-app" onclick="setFilter('app',this)">🎯 Applications (9)</button>
+</div>
+
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flip()">
+    <div class="fc-face fc-front" id="fc-front"></div>
+    <div class="fc-face fc-back"  id="fc-back"></div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="nav(-1)" disabled>&#8592; Prev</button>
+  <span class="nav-ctr" id="nav-ctr">1 / 40</span>
+  <button class="nav-btn" id="next-btn" onclick="nav(1)">Next &#8594;</button>
+</div>
+<div class="action-row">
+  <button class="act-btn" onclick="markKnown()">✓ Mark Known</button>
+  <button class="act-btn" onclick="markReview()">↩ Need Review</button>
+  <button class="act-btn" onclick="shuffle()">⇄ Shuffle</button>
+  <button class="act-btn" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="stats-bar">
+  <span>Known: <strong id="s-known">0</strong></span>
+  <span>Review: <strong id="s-review">0</strong></span>
+  <span>Remaining: <strong id="s-remain">40</strong></span>
+</div>
+
+<script>
+const ALL_CARDS = [
+  // ── STANDARD FORM (8) ──────────────────────────────────────
+  {cat:'std',q:'What is the standard (general) form of a pair of linear equations in two variables?',
+   a:'<strong>a₁x + b₁y + c₁ = 0</strong> and <strong>a₂x + b₂y + c₂ = 0</strong><br>where a₁, b₁, c₁, a₂, b₂, c₂ are real numbers and a² + b² ≠ 0 for each equation.',
+   hint:'Think: move all terms to the left side'},
+  {cat:'std',q:'What does a₂ + b² ≠ 0 mean in the general form of a linear equation?',
+   a:'It ensures <strong>at least one of a or b is non-zero</strong>, so the equation is not trivially 0 = 0. The equation must actually contain at least one variable.',
+   hint:'What if both a and b were zero?'},
+  {cat:'std',q:'Rewrite 3x = 7 − 2y in standard form ax + by + c = 0. What are a, b, c?',
+   a:'<em>3x + 2y − 7 = 0</em><br>∴ <strong>a = 3, b = 2, c = −7</strong><br>Move everything to the left side: 3x + 2y − 7 = 0',
+   hint:'Move all terms to left, = 0 on right'},
+  {cat:'std',q:'What is the slope of the line a₁x + b₁y + c₁ = 0 (when b₁ ≠ 0)?',
+   a:'Slope = <strong>−a₁/b₁</strong><br>Rewrite as y = (−a₁/b₁)x + (−c₁/b₁)<br>Y-intercept = −c₁/b₁, X-intercept = −c₁/a₁',
+   hint:'Rearrange to y = mx + b form'},
+  {cat:'std',q:'A solution (x, y) = (h, k) of a pair of equations must satisfy how many equations?',
+   a:'<strong>Both equations</strong>. The pair (h, k) must satisfy a₁h + b₁k + c₁ = 0 <em>and</em> a₂h + b₂k + c₂ = 0 simultaneously.',
+   hint:'Hence the name "simultaneous equations"'},
+  {cat:'std',q:'How do you check if (2, 3) is a solution of x + y = 5 and 2x − y = 1?',
+   a:'<strong>Substitute into both</strong>:<br>Eq 1: 2 + 3 = 5 ✓<br>Eq 2: 2(2) − 3 = 1 ✓<br>Since both are satisfied, (2, 3) is the solution.',
+   hint:'Substitute in EACH equation separately'},
+  {cat:'std',q:'What is the maximum number of solutions a pair of linear equations in two variables can have?',
+   a:'Either <strong>0, 1, or infinitely many</strong> solutions. Never exactly 2 or any finite number greater than 1.',
+   hint:'Lines can intersect, be parallel, or coincide'},
+  {cat:'std',q:'Rewrite the equation 5 = 3x − 4y in standard form. What type of graph does it produce?',
+   a:'Standard form: <strong>3x − 4y − 5 = 0</strong><br>It produces a <strong>straight line</strong> on the coordinate plane (all linear equations in 2 variables are lines).',
+   hint:'Every linear equation = a straight line'},
+
+  // ── GRAPHICAL (7) ──────────────────────────────────────────
+  {cat:'gph',q:'In the graphical method, what does the solution of a pair of linear equations represent?',
+   a:'The solution is the <strong>coordinates (x, y) of the point(s) of intersection</strong> of the two lines on the graph.',
+   hint:'Where do the two lines meet?'},
+  {cat:'gph',q:'Two lines intersect at exactly one point. What type of solution does this system have?',
+   a:'<strong>Unique solution</strong> — the pair is consistent and independent. The condition is a₁/a₂ ≠ b₁/b₂.',
+   hint:'Think of two roads crossing at a traffic light'},
+  {cat:'gph',q:'Two lines are parallel and never meet. What type of system is this?',
+   a:'<strong>Inconsistent system — no solution</strong>. The lines have the same slope but different y-intercepts.<br>Condition: a₁/a₂ = b₁/b₂ ≠ c₁/c₂',
+   hint:'Parallel lines never cross'},
+  {cat:'gph',q:'Two lines are coincident (the same line). What type of solution does this system have?',
+   a:'<strong>Infinitely many solutions</strong> — consistent and dependent. Every point on the line satisfies both equations.<br>Condition: a₁/a₂ = b₁/b₂ = c₁/c₂',
+   hint:'One equation is a multiple of the other'},
+  {cat:'gph',q:'What is the minimum number of points needed to draw a line, and which two points are usually found?',
+   a:'<strong>2 points</strong> are sufficient. Usually found by:<br>• Setting x = 0 → get y-intercept<br>• Setting y = 0 → get x-intercept',
+   hint:'Two points determine a unique line'},
+  {cat:'gph',q:'What is the main disadvantage of the graphical method?',
+   a:'It gives only <strong>approximate answers</strong> when the solution is not at integer (whole number) coordinates. Algebraic methods give exact answers.',
+   hint:'What if the intersection is between grid lines?'},
+  {cat:'gph',q:'For x + y = 5 and 2x + 2y = 10, what does their graph look like?',
+   a:'They are <strong>coincident lines</strong> — the same line. The second equation is just 2 × the first equation, so they represent identical lines with infinitely many solutions.',
+   hint:'Simplify the second equation'},
+
+  // ── CONSISTENCY (7) ─────────────────────────────────────────
+  {cat:'cns',q:'State the condition for a pair of linear equations to have a UNIQUE solution.',
+   a:'<strong>a₁/a₂ ≠ b₁/b₂</strong><br>The lines intersect at one point. System is consistent & independent.',
+   hint:'Ratios of x-coefficients vs y-coefficients differ'},
+  {cat:'cns',q:'State the condition for a pair of linear equations to have NO solution.',
+   a:'<strong>a₁/a₂ = b₁/b₂ ≠ c₁/c₂</strong><br>First two ratios equal, third different. Lines are parallel.',
+   hint:'Same slope, different intercept'},
+  {cat:'cns',q:'State the condition for a pair of linear equations to have INFINITELY MANY solutions.',
+   a:'<strong>a₁/a₂ = b₁/b₂ = c₁/c₂</strong><br>All three ratios are equal. Lines are coincident.',
+   hint:'All three ratios must match'},
+  {cat:'cns',q:'Check: 2x + 3y = 7 and 4x + 6y = 14 — unique, no solution, or infinite solutions?',
+   a:'a₁/a₂ = 2/4 = 1/2, b₁/b₂ = 3/6 = 1/2, c₁/c₂ = 7/14 = 1/2<br>All three equal → <strong>Infinitely many solutions</strong> (coincident lines)',
+   hint:'Compare all three ratios'},
+  {cat:'cns',q:'Check: 3x + 2y = 5 and 6x + 4y = 15 — what type of system?',
+   a:'a₁/a₂ = 3/6 = 1/2, b₁/b₂ = 2/4 = 1/2, c₁/c₂ = 5/15 = 1/3<br>1/2 = 1/2 ≠ 1/3 → <strong>No solution</strong> (inconsistent; parallel lines)',
+   hint:'First two ratios match, does the third?'},
+  {cat:'cns',q:'Check: 2x − 3y = 7 and 5x + 2y = 11 — what type of system?',
+   a:'a₁/a₂ = 2/5, b₁/b₂ = −3/2<br>2/5 ≠ −3/2 → <strong>Unique solution</strong> (consistent & independent; lines intersect)',
+   hint:'Just check first two ratios'},
+  {cat:'cns',q:'What does the term "consistent" mean for a pair of linear equations?',
+   a:'A system is <strong>consistent</strong> if it has at least one solution (one or infinitely many). If no solution exists, it is called <strong>inconsistent</strong>.',
+   hint:'Consistent = solvable'},
+
+  // ── METHODS (9) ─────────────────────────────────────────────
+  {cat:'mth',q:'In the substitution method, what is the first step?',
+   a:'<strong>Express one variable in terms of the other</strong> from the equation where one coefficient is 1 or −1 (to avoid fractions).',
+   hint:'Isolate the simplest variable'},
+  {cat:'mth',q:'Solve by substitution: x − y = 1 and 2x + y = 8',
+   a:'From Eq 1: x = y + 1<br>Sub into Eq 2: 2(y+1) + y = 8 → 3y = 6 → <strong>y = 2</strong><br>Back-sub: x = 3<br>Solution: <em>(3, 2)</em>',
+   hint:'Express x from Eq 1'},
+  {cat:'mth',q:'What is the key step in the elimination method?',
+   a:'<strong>Multiply each equation by suitable constants</strong> to make the coefficients of one variable equal in magnitude, then add or subtract to eliminate that variable.',
+   hint:'LCM of the coefficients'},
+  {cat:'mth',q:'When should you ADD the equations in elimination? When should you SUBTRACT?',
+   a:'<strong>ADD</strong> when the equal coefficients have <em>opposite signs</em> (+k and −k).<br><strong>SUBTRACT</strong> when they have the <em>same sign</em> (+k and +k).',
+   hint:'Opposite signs → add (they cancel)'},
+  {cat:'mth',q:'Solve by elimination: x + y = 7 and 2x − y = 5',
+   a:'Coefficients of y are +1 and −1 (opposite signs) → ADD:<br>3x = 12 → <strong>x = 4</strong><br>Back-sub: 4 + y = 7 → <strong>y = 3</strong><br>Solution: <em>(4, 3)</em>',
+   hint:'Add the equations directly'},
+  {cat:'mth',q:'Write the cross-multiplication formula for a₁x + b₁y + c₁ = 0 and a₂x + b₂y + c₂ = 0.',
+   a:'<em>x/(b₁c₂ − b₂c₁) = y/(c₁a₂ − c₂a₁) = 1/(a₁b₂ − a₂b₁)</em><br>Condition: <strong>a₁b₂ − a₂b₁ ≠ 0</strong>',
+   hint:'Butterfly diagram: b,c,a,b in two rows'},
+  {cat:'mth',q:'What form must equations be in BEFORE applying cross-multiplication?',
+   a:'All terms on the LEFT side, equals ZERO on the right:<br><strong>a₁x + b₁y + c₁ = 0</strong><br>(not ax + by = k form)',
+   hint:'Move all terms to left side first'},
+  {cat:'mth',q:'What is the condition for the cross-multiplication method to fail (no unique solution)?',
+   a:'When <strong>a₁b₂ − a₂b₁ = 0</strong> — this means the denominator is zero, indicating lines are parallel or coincident (not a unique solution).',
+   hint:'The denominator of both x and y'},
+  {cat:'mth',q:'Which algebraic method is fastest in exams when coefficients are messy fractions?',
+   a:'<strong>Cross-multiplication</strong> — it gives a direct formula without needing elimination steps or substitution. Also good for competitive exams.',
+   hint:'One-step formula method'},
+
+  // ── APPLICATIONS (9) ─────────────────────────────────────────
+  {cat:'app',q:'In an age problem, father is 3 times as old as son. In 12 years he will be twice as old. Find current ages.',
+   a:'Let father = x, son = y<br>Eq 1: x = 3y<br>Eq 2: x + 12 = 2(y + 12) → x − 2y = 12<br>Solving: 3y − 2y = 12 → <strong>y = 12, x = 36</strong>',
+   hint:'Set up two equations for present and future ages'},
+  {cat:'app',q:'For a two-digit number: how is it expressed algebraically if tens digit = a and units digit = b?',
+   a:'Two-digit number = <strong>10a + b</strong><br>Reversed number = <strong>10b + a</strong><br>Sum of digits = a + b',
+   hint:'Place value: tens × 10 + units × 1'},
+  {cat:'app',q:'Sum of digits of a 2-digit number is 9. Reversing adds 27. Find the number.',
+   a:'Let tens = x, units = y<br>Eq 1: x + y = 9<br>Eq 2: (10y + x) − (10x + y) = 27 → y − x = 3<br>Solving: <strong>x = 3, y = 6</strong> → Number = <em>36</em>',
+   hint:'Write equations for digit sum and reverse condition'},
+  {cat:'app',q:'For boat-and-stream problems, what are the two key speed equations?',
+   a:'Let boat speed in still water = u, stream speed = v<br><strong>Downstream</strong>: speed = u + v<br><strong>Upstream</strong>: speed = u − v<br>Use D = S × T for each.',
+   hint:'Downstream = with current, upstream = against'},
+  {cat:'app',q:'A fraction becomes 1/2 when 1 is added to numerator, and 1/3 when 1 is added to denominator. Find it.',
+   a:'Let fraction = x/y<br>Eq 1: (x+1)/y = 1/2 → 2x − y = −2<br>Eq 2: x/(y+1) = 1/3 → 3x − y = 1<br>Solving: <strong>x = 3, y = 8</strong> → Fraction = <em>3/8</em>',
+   hint:'Cross-multiply each fractional condition'},
+  {cat:'app',q:'2 pencils + 3 pens cost ₹18. 4 pencils + 5 pens cost ₹32. Find cost of each.',
+   a:'Eq 1: 2p + 3q = 18<br>Eq 2: 4p + 5q = 32<br>Multiply Eq 1 by 2: 4p + 6q = 36<br>Subtract Eq 2: q = 4 → p = 3<br><strong>Pencil = ₹3, Pen = ₹4</strong>',
+   hint:'Let pencil = p, pen = q'},
+  {cat:'app',q:'What is the general 4-step strategy for solving word problems using linear equations?',
+   a:'1. <strong>Define variables</strong>: let x = ..., y = ...<br>2. <strong>Translate conditions</strong> into 2 equations<br>3. <strong>Solve</strong> by appropriate method<br>4. <strong>Verify</strong> answer in original problem',
+   hint:'Read, define, write, solve, check'},
+  {cat:'app',q:'In a triangle, angles A and B differ by 20°. Angle C = 70°. Find A and B.',
+   a:'A + B + 70 = 180 → A + B = 110<br>A − B = 20 (assume A > B)<br>Adding: 2A = 130 → <strong>A = 65°, B = 45°</strong>',
+   hint:'Use angle sum property'},
+  {cat:'app',q:'Equations 2/x + 3/y = 13 and 5/x − 4/y = −2. How do you reduce to linear form?',
+   a:'Let <strong>u = 1/x, v = 1/y</strong><br>System becomes: 2u + 3v = 13 and 5u − 4v = −2<br>Solve for u, v; then x = 1/u, y = 1/v.<br>This is a <em>reducible</em> equation.',
+   hint:'Substitute u = 1/x, v = 1/y'},
+];
+
+let deck = [...ALL_CARDS.map((_,i)=>i)];
+let current = 0;
+let flipped = false;
+const known = new Set(), review = new Set();
+let filterCat = 'all';
+
+function filteredDeck(){
+  return filterCat==='all' ? deck : deck.filter(i=>ALL_CARDS[i].cat===filterCat);
+}
+
+function setFilter(cat, btn){
+  filterCat = cat;
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  current = 0;
+  render();
+}
+
+function render(){
+  const fd = filteredDeck();
+  if(fd.length===0){ document.getElementById('fc-front').innerHTML='<div class="fc-q">No cards in this category.</div>'; return; }
+  const idx = fd[current % fd.length];
+  const card = ALL_CARDS[idx];
+  const fc = document.getElementById('fc');
+  fc.classList.remove('flipped');
+  flipped = false;
+  setTimeout(()=>{
+    const catColors = {std:['var(--amber)','rgba(245,158,11,.15)'],gph:['var(--blue)','rgba(56,189,248,.15)'],
+      cns:['var(--teal)','rgba(45,212,191,.15)'],mth:['var(--indigo)','rgba(129,140,248,.15)'],
+      app:['var(--red)','rgba(244,63,94,.15)']};
+    const catNames = {std:'📐 Standard Form',gph:'📈 Graphical',cns:'🔢 Consistency',mth:'🔣 Methods',app:'🎯 Applications'};
+    const [cc,cb] = catColors[card.cat] || ['var(--muted)','rgba(100,116,139,.15)'];
+    const isKnown = known.has(idx), isReview = review.has(idx);
+    const badge = isKnown ? `<span class="known-badge known">✓ Known</span>` : isReview ? `<span class="known-badge unknown">↩ Review</span>` : '';
+    document.getElementById('fc-front').innerHTML = `
+      ${badge}
+      <span class="fc-tag" style="background:${cb};color:${cc}">${catNames[card.cat]}</span>
+      <div class="fc-q">${card.q}</div>
+      ${card.hint?`<div class="fc-hint">Hint: ${card.hint}</div>`:''}
+      <div class="fc-flip-hint">tap to reveal answer</div>`;
+    document.getElementById('fc-back').innerHTML = `
+      ${badge}
+      <div class="fc-ans-lbl">✦ ANSWER</div>
+      <div class="fc-ans">${card.a}</div>`;
+  }, flipped ? 280 : 0);
+
+  const fd2 = filteredDeck();
+  document.getElementById('nav-ctr').textContent = `${(current%fd2.length)+1} / ${fd2.length}`;
+  document.getElementById('prev-btn').disabled = current===0;
+  document.getElementById('next-btn').disabled = current>=fd2.length-1;
+  updateProgress();
+}
+
+function flip(){ flipped=!flipped; document.getElementById('fc').classList.toggle('flipped',flipped); }
+function nav(d){ const fd=filteredDeck(); current=Math.max(0,Math.min(fd.length-1,current+d)); render(); }
+function markKnown(){ const fd=filteredDeck(); if(fd.length) { known.add(fd[current%fd.length]); review.delete(fd[current%fd.length]); render(); updateStats(); } }
+function markReview(){ const fd=filteredDeck(); if(fd.length) { review.add(fd[current%fd.length]); known.delete(fd[current%fd.length]); render(); updateStats(); } }
+function shuffle(){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]; } current=0; render(); }
+function resetAll(){ known.clear(); review.clear(); deck=[...ALL_CARDS.map((_,i)=>i)]; current=0; render(); updateStats(); }
+
+function updateProgress(){
+  const fd=filteredDeck();
+  const seen = fd.slice(0,current+1).length;
+  const pct = fd.length ? Math.round(seen/fd.length*100) : 0;
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog-text').textContent=`${seen} / ${fd.length}`;
+}
+function updateStats(){
+  document.getElementById('s-known').textContent=known.size;
+  document.getElementById('s-review').textContent=review.size;
+  document.getElementById('s-remain').textContent=ALL_CARDS.length-known.size-review.size;
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight') nav(1);
+  if(e.key==='ArrowLeft') nav(-1);
+  if(e.key===' '||e.key==='Enter'){ e.preventDefault(); flip(); }
+});
+
+render();
+updateStats();
+</script>
+</body>
+</html>

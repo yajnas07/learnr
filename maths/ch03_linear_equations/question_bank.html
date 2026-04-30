@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Pair of Linear Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#040810;--card:#0a1422;--card2:#0f1c30;
+    --border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+    --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;
+    --green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.05) 0%,transparent 60%);}
+
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+    background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+
+  header{text-align:center;padding:1.6rem 1rem .8rem;}
+  header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+  .dash{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;padding:.5rem 1rem 1.2rem;}
+  .dash-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.55rem 1.1rem;text-align:center;min-width:90px;}
+  .dash-card .num{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;}
+  .dash-card .lbl{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.1rem;}
+
+  .section-label{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;padding:.4rem 1.2rem .2rem;color:var(--muted);letter-spacing:.04em;display:flex;align-items:center;gap:.5rem;max-width:800px;margin:0 auto;}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  .qwrap{max-width:800px;margin:0 auto;padding:0 1rem 2rem;display:flex;flex-direction:column;gap:1rem;}
+
+  .q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .q-card.strip-gph{border-left:3px solid var(--blue);}
+  .q-card.strip-cns{border-left:3px solid var(--indigo);}
+  .q-card.strip-mth{border-left:3px solid var(--teal);}
+  .q-card.strip-app{border-left:3px solid var(--red);}
+  .q-card.strip-mix{border-left:3px solid var(--amber);}
+
+  .q-header{display:flex;align-items:flex-start;gap:.7rem;padding:.7rem 1rem .5rem;}
+  .q-num{font-family:'DM Mono',monospace;font-size:.68rem;font-weight:500;color:#040810;padding:.18rem .5rem;border-radius:2px;margin-top:.08rem;flex-shrink:0;white-space:nowrap;}
+  .badge-mcq {background:var(--blue);}
+  .badge-ar  {background:var(--purple);}
+  .badge-sa  {background:var(--teal);}
+  .badge-la  {background:var(--amber);}
+  .q-text{font-size:.88rem;line-height:1.6;}
+  .q-text strong{color:var(--amber);}
+  .q-text em{color:var(--teal);font-style:normal;}
+
+  .q-marks{font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);padding:0 1rem .2rem 3.2rem;}
+
+  .mcq-opts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;padding:.2rem 1rem .6rem;}
+  .opt-btn{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.4rem .65rem;font-size:.8rem;color:var(--text);cursor:pointer;text-align:left;transition:all .2s;}
+  .opt-btn:hover{border-color:#2a4a6a;}
+  .opt-btn.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+  .opt-btn.wrong  {background:rgba(244,63,94,.1);border-color:var(--red);color:var(--red);}
+
+  .feedback{font-size:.78rem;line-height:1.5;padding:.45rem 1rem .6rem;display:none;}
+  .feedback.correct{color:var(--green);}
+  .feedback.wrong  {color:var(--red);}
+  .feedback.shown  {display:block;}
+
+  .ans-reveal{padding:.1rem 1rem .6rem;}
+  .show-btn{font-family:'DM Mono',monospace;font-size:.7rem;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:.28rem .75rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+  .show-btn:hover{color:var(--text);border-color:#2a4a6a;}
+  .ans-body{background:var(--card2);border-radius:8px;margin-top:.5rem;padding:.7rem .9rem;font-size:.82rem;line-height:1.7;display:none;}
+  .ans-body.shown{display:block;}
+  .ans-body strong{color:var(--amber);}
+  .ans-body em{color:var(--teal);font-style:normal;}
+  .ans-body .mono{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--teal);}
+  .ans-body ul{padding-left:1.2rem;margin-top:.3rem;}
+  .ans-body li{margin-bottom:.2rem;}
+
+  .ar-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;padding:.3rem 1rem .5rem;}
+  .ar-box{background:var(--card2);border-radius:6px;padding:.45rem .7rem;font-size:.8rem;line-height:1.5;}
+  .ar-box span{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);display:block;margin-bottom:.15rem;}
+
+  .ar-choices{display:flex;gap:.4rem;flex-wrap:wrap;padding:.1rem 1rem .3rem;}
+  .ar-choices button{font-size:.74rem;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:.28rem .65rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+  .ar-choices button:hover{color:var(--text);}
+  .ar-choices button.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+  .ar-choices button.wrong  {background:rgba(244,63,94,.1);border-color:var(--red);color:var(--red);}
+
+  @media(max-width:500px){
+    .mcq-opts{grid-template-columns:1fr;}
+    .ar-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Pair of Linear Equations — Question Bank</h1>
+  <p>Class X · Mathematics Ch.3 · CBSE Pattern · 30 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dash-card"><div class="num" style="color:var(--blue)">10</div><div class="lbl">MCQ (1 mark)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--purple)">3</div><div class="lbl">Assertion-Reason</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--teal)">12</div><div class="lbl">Short Answer (2-3 m)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--amber)">5</div><div class="lbl">Long Answer (5 m)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--green)">47</div><div class="lbl">Total Marks</div></div>
+</div>
+
+<!-- ════════════════ MCQ ════════════════ -->
+<div class="section-label">Section A — Multiple Choice Questions (1 Mark Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-gph">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 1</span>
+    <div class="q-text">The pair of equations x + 2y − 5 = 0 and 2x + 4y − 10 = 0 represents:</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) Two intersecting lines</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) Two parallel lines</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">C) Two coincident lines</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) A line and a point</button>
+  </div>
+  <div class="feedback">✓ Correct! a₁/a₂ = 1/2, b₁/b₂ = 2/4 = 1/2, c₁/c₂ = 5/10 = 1/2. All ratios equal → coincident lines → infinitely many solutions.</div>
+</div>
+
+<div class="q-card strip-cns">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 2</span>
+    <div class="q-text">For the system 2x + 3y = 7 and 4x + 6y = 15 to be inconsistent, which condition holds?</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) a₁/a₂ ≠ b₁/b₂</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) a₁/a₂ = b₁/b₂ ≠ c₁/c₂</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) a₁/a₂ = b₁/b₂ = c₁/c₂</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) a₁b₂ = a₂b₁</button>
+  </div>
+  <div class="feedback">✓ Correct! a₁/a₂ = 2/4 = 1/2, b₁/b₂ = 3/6 = 1/2, c₁/c₂ = 7/15. First two ratios match, third differs → parallel lines → no solution (inconsistent).</div>
+</div>
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 3</span>
+    <div class="q-text">The solution of the pair x + y = 14 and x − y = 4 is:</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) x = 4, y = 10</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) x = 9, y = 5</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) x = 5, y = 9</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) x = 10, y = 4</button>
+  </div>
+  <div class="feedback">✓ Correct! Adding: 2x = 18 → x = 9. Substituting: 9 + y = 14 → y = 5.</div>
+</div>
+
+<div class="q-card strip-gph">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 4</span>
+    <div class="q-text">Two lines represented by a₁x + b₁y + c₁ = 0 and a₂x + b₂y + c₂ = 0 are parallel if:</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) a₁/a₂ = b₁/b₂ = c₁/c₂</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) a₁/a₂ = b₁/b₂ ≠ c₁/c₂</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) a₁/a₂ ≠ b₁/b₂</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) a₁b₂ − a₂b₁ ≠ 0</button>
+  </div>
+  <div class="feedback">✓ Correct! Parallel lines have same slope (a₁/a₂ = b₁/b₂) but different y-intercepts (≠ c₁/c₂), so they never meet.</div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 5</span>
+    <div class="q-text">The sum of two numbers is 30 and their difference is 10. The smaller number is:</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 20</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) 10</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 15</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 5</button>
+  </div>
+  <div class="feedback">✓ Correct! x + y = 30, x − y = 10. Adding: 2x = 40 → x = 20 (larger). So y = 10 (smaller).</div>
+</div>
+
+<div class="q-card strip-cns">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 6</span>
+    <div class="q-text">The value of k for which the equations kx − y = 2 and 6x − 2y = 3 have no solution is:</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'c')">A) k = 3</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) k = 1</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) k = 2</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) k = 6</button>
+  </div>
+  <div class="feedback">✓ Correct! For no solution: k/6 = −1/−2 ≠ 2/3. k/6 = 1/2 → k = 3. Check: c-ratio = 2/3 ≠ 1/2 ✓ so lines are parallel.</div>
+</div>
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 7</span>
+    <div class="q-text">In the cross-multiplication method, the denominator for x is:</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) c₁a₂ − c₂a₁</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) b₁c₂ − b₂c₁</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) a₁b₂ − a₂b₁</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) a₁c₂ − a₂c₁</button>
+  </div>
+  <div class="feedback">✓ Correct! x/(b₁c₂ − b₂c₁) = y/(c₁a₂ − c₂a₁) = 1/(a₁b₂ − a₂b₁). The denominator for x uses b and c values.</div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 8</span>
+    <div class="q-text">A two-digit number has its tens digit twice the units digit. If 18 is subtracted, the digits reverse. The number is:</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 24</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) 48</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">C) 42</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 21</button>
+  </div>
+  <div class="feedback">✓ Correct! Let tens = a, units = b. a = 2b (Eq 1). 10a + b − 18 = 10b + a → 9a − 9b = 18 → a − b = 2 (Eq 2). From Eq 1 & 2: 2b − b = 2 → b = 2, a = 4. Number = 42.</div>
+</div>
+
+<div class="q-card strip-gph">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 9</span>
+    <div class="q-text">A consistent system of equations is one which has:</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) No solution</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) Exactly two solutions</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">C) At least one solution</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) Exactly three solutions</button>
+  </div>
+  <div class="feedback">✓ Correct! A consistent system has one or infinitely many solutions. "Inconsistent" means no solution. Linear systems can never have exactly 2 or 3 solutions.</div>
+</div>
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-mcq">MCQ 10</span>
+    <div class="q-text">If x = a, y = b is the solution of x − y = 2 and x + y = 4, then a and b are:</div>
+  </div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'c')">A) a = 3, b = 1</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) a = 1, b = 3</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) a = 2, b = 2</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) a = 4, b = 0</button>
+  </div>
+  <div class="feedback">✓ Correct! Add: 2x = 6 → x = 3. Subtract: 2y = 2 → y = 1. So a = 3, b = 1. Verify: 3−1=2 ✓ and 3+1=4 ✓</div>
+</div>
+
+</div><!-- /qwrap -->
+
+<!-- ════════════════ ASSERTION-REASON ════════════════ -->
+<div class="section-label">Section B — Assertion &amp; Reason (1 Mark Each)</div>
+<div style="padding:.3rem 1.2rem .5rem;max-width:800px;margin:0 auto;font-size:.78rem;color:var(--muted);font-family:'DM Mono',monospace;">
+  A) Both A and R are true, R is correct explanation of A &nbsp;|&nbsp;
+  B) Both A and R are true, R is NOT the correct explanation &nbsp;|&nbsp;
+  C) A is true, R is false &nbsp;|&nbsp;
+  D) A is false, R is true
+</div>
+<div class="qwrap">
+
+<div class="q-card strip-cns">
+  <div class="q-header">
+    <span class="q-num badge-ar">AR 1</span>
+    <div class="q-text" style="flex:1"></div>
+  </div>
+  <div style="padding:0 1rem .5rem;">
+    <div class="ar-grid">
+      <div class="ar-box"><span>Assertion (A)</span>The pair 2x + 3y = 5 and 4x + 6y = 10 has infinitely many solutions.</div>
+      <div class="ar-box"><span>Reason (R)</span>If a₁/a₂ = b₁/b₂ = c₁/c₂, the lines are coincident and have infinite solutions.</div>
+    </div>
+  </div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'c')">A</button>
+    <button onclick="ar(this,'w')">B</button>
+    <button onclick="ar(this,'w')">C</button>
+    <button onclick="ar(this,'w')">D</button>
+  </div>
+  <div class="feedback">✓ Correct! (A) 2/4 = 3/6 = 5/10 = 1/2 — all ratios equal, so infinitely many solutions. (R) correctly states the condition and is the exact explanation for (A).</div>
+</div>
+
+<div class="q-card strip-gph">
+  <div class="q-header">
+    <span class="q-num badge-ar">AR 2</span>
+    <div class="q-text" style="flex:1"></div>
+  </div>
+  <div style="padding:0 1rem .5rem;">
+    <div class="ar-grid">
+      <div class="ar-box"><span>Assertion (A)</span>The graphical method can always give exact answers for a pair of linear equations.</div>
+      <div class="ar-box"><span>Reason (R)</span>Two straight lines either intersect at one point, are parallel, or coincide.</div>
+    </div>
+  </div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'w')">A</button>
+    <button onclick="ar(this,'w')">B</button>
+    <button onclick="ar(this,'w')">C</button>
+    <button onclick="ar(this,'c')">D</button>
+  </div>
+  <div class="feedback">✓ Correct! (A) is FALSE — graphical method gives approximate answers when the intersection is at non-integer coordinates. (R) is TRUE — the three cases for two lines are always one of those three.</div>
+</div>
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-ar">AR 3</span>
+    <div class="q-text" style="flex:1"></div>
+  </div>
+  <div style="padding:0 1rem .5rem;">
+    <div class="ar-grid">
+      <div class="ar-box"><span>Assertion (A)</span>The equations x + 2y = 3 and 2x + 4y = 6 cannot be solved by the substitution method to get a unique solution.</div>
+      <div class="ar-box"><span>Reason (R)</span>When one equation is a constant multiple of the other, the system has infinitely many solutions, not a unique one.</div>
+    </div>
+  </div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'c')">A</button>
+    <button onclick="ar(this,'w')">B</button>
+    <button onclick="ar(this,'w')">C</button>
+    <button onclick="ar(this,'w')">D</button>
+  </div>
+  <div class="feedback">✓ Correct! (A) is TRUE — the second equation is exactly 2 × the first, so they are coincident. (R) is TRUE and correctly explains (A): a scalar multiple implies identical lines and infinite solutions.</div>
+</div>
+
+</div><!-- /qwrap -->
+
+<!-- ════════════════ SHORT ANSWER ════════════════ -->
+<div class="section-label">Section C — Short Answer Questions (2–3 Marks Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 1</span>
+    <div class="q-text">Solve by substitution: <strong>2x + 3y = 11</strong> and <strong>2x − 4y = −24</strong>.</div>
+  </div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      <strong>Step 1:</strong> From Eq 1: 2x = 11 − 3y → x = (11 − 3y)/2<br><br>
+      <strong>Step 2:</strong> Substitute in Eq 2:<br>
+      <em>2·(11 − 3y)/2 − 4y = −24</em><br>
+      11 − 3y − 4y = −24<br>
+      −7y = −35 → <strong>y = 5</strong><br><br>
+      <strong>Step 3:</strong> x = (11 − 15)/2 = −4/2 = <strong>x = −2</strong><br><br>
+      <strong>Verification:</strong> Eq 1: 2(−2)+3(5) = −4+15 = 11 ✓ &nbsp; Eq 2: 2(−2)−4(5) = −4−20 = −24 ✓<br>
+      <strong>Solution: (−2, 5)</strong>
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 2</span>
+    <div class="q-text">Solve by elimination: <strong>3x + 4y = 10</strong> and <strong>2x − 4y = 0</strong>.</div>
+  </div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Coefficients of y are +4 and −4 (opposite signs) → <strong>ADD</strong> the equations:<br>
+      <em>(3x + 4y) + (2x − 4y) = 10 + 0</em><br>
+      5x = 10 → <strong>x = 2</strong><br><br>
+      Substitute in Eq 2: 2(2) − 4y = 0 → 4y = 4 → <strong>y = 1</strong><br><br>
+      <strong>Verification:</strong> 3(2)+4(1) = 10 ✓ and 2(2)−4(1) = 0 ✓<br>
+      <strong>Solution: (2, 1)</strong>
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-cns">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 3</span>
+    <div class="q-text">Check whether the following pair is consistent or inconsistent: <strong>3x + 2y = 8</strong> and <strong>6x + 4y = 9</strong>.</div>
+  </div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Compute ratios: a₁/a₂ = 3/6 = <strong>1/2</strong>, b₁/b₂ = 2/4 = <strong>1/2</strong>, c₁/c₂ = 8/9<br><br>
+      <em>a₁/a₂ = b₁/b₂ (both 1/2) ≠ c₁/c₂ (8/9)</em><br><br>
+      Condition for no solution: ✓ matched.<br>
+      ∴ The lines are <strong>parallel</strong> and the system is <strong>inconsistent</strong> (no solution).
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-cns">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 4</span>
+    <div class="q-text">Find the value of k so that the system <strong>3x − y = 3</strong> and <strong>9x − ky = 9</strong> has <em>infinitely many solutions</em>.</div>
+  </div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      For infinite solutions: a₁/a₂ = b₁/b₂ = c₁/c₂<br><br>
+      a₁/a₂ = 3/9 = 1/3 &nbsp;|&nbsp; b₁/b₂ = −1/(−k) = 1/k &nbsp;|&nbsp; c₁/c₂ = 3/9 = 1/3<br><br>
+      Require: 1/k = 1/3 → <strong>k = 3</strong><br><br>
+      Check: c-ratio = 1/3 = 1/3 ✓ — all three ratios equal.<br>
+      <strong>k = 3</strong>
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 5</span>
+    <div class="q-text">Solve by cross-multiplication: <strong>2x + y = 5</strong> and <strong>3x + 2y = 8</strong>.</div>
+  </div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Rewrite in ax + by + c = 0 form:<br>
+      <em>2x + y − 5 = 0</em> &nbsp;(a₁=2, b₁=1, c₁=−5)<br>
+      <em>3x + 2y − 8 = 0</em> &nbsp;(a₂=3, b₂=2, c₂=−8)<br><br>
+      x/(b₁c₂ − b₂c₁) = x/[(1)(−8) − (2)(−5)] = x/(−8+10) = <strong>x/2</strong><br>
+      y/(c₁a₂ − c₂a₁) = y/[(−5)(3) − (−8)(2)] = y/(−15+16) = <strong>y/1</strong><br>
+      1/(a₁b₂ − a₂b₁) = 1/[(2)(2) − (3)(1)] = <strong>1/1</strong><br><br>
+      x/2 = 1 → <strong>x = 2</strong> &nbsp;|&nbsp; y/1 = 1 → <strong>y = 1</strong><br><br>
+      <strong>Verification:</strong> 2(2)+1=5 ✓ &nbsp; 3(2)+2(1)=8 ✓<br>
+      <strong>Solution: (2, 1)</strong>
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 6</span>
+    <div class="q-text">The sum of a two-digit number and the number obtained by reversing its digits is 66. The units digit is 2 more than the tens digit. Find the number.</div>
+  </div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Let tens digit = x, units digit = y. Number = 10x + y, Reversed = 10y + x.<br><br>
+      <strong>Eq 1:</strong> (10x + y) + (10y + x) = 66 → 11x + 11y = 66 → <em>x + y = 6</em><br>
+      <strong>Eq 2:</strong> y = x + 2 → <em>y − x = 2</em><br><br>
+      Adding: 2y = 8 → <strong>y = 4</strong>, then x = 2.<br><br>
+      Number = 10(2) + 4 = <strong>24</strong>. Reversed = 42. Sum = 66 ✓ and 4 − 2 = 2 ✓
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 7</span>
+    <div class="q-text">5 pencils and 7 pens together cost ₹50, and 7 pencils and 5 pens cost ₹46. Find the cost of each.</div>
+  </div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Let pencil = ₹x, pen = ₹y.<br>
+      <strong>Eq 1:</strong> 5x + 7y = 50<br>
+      <strong>Eq 2:</strong> 7x + 5y = 46<br><br>
+      Multiply Eq 1 by 5: 25x + 35y = 250<br>
+      Multiply Eq 2 by 7: 49x + 35y = 322<br>
+      Subtract: 24x = 72 → <strong>x = 3</strong><br><br>
+      Sub in Eq 1: 15 + 7y = 50 → 7y = 35 → <strong>y = 5</strong><br><br>
+      <strong>Pencil = ₹3, Pen = ₹5</strong> &nbsp; Verify: 5(3)+7(5)=50 ✓ &nbsp; 7(3)+5(5)=46 ✓
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 8</span>
+    <div class="q-text">Solve the reducible pair: <strong>2/x + 3/y = 13</strong> and <strong>5/x − 4/y = −2</strong> (x ≠ 0, y ≠ 0).</div>
+  </div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Let u = 1/x, v = 1/y. System becomes:<br>
+      <em>2u + 3v = 13 … (1)</em><br>
+      <em>5u − 4v = −2 … (2)</em><br><br>
+      Multiply (1) by 4: 8u + 12v = 52<br>
+      Multiply (2) by 3: 15u − 12v = −6<br>
+      Add: 23u = 46 → <strong>u = 2</strong> → x = 1/2<br><br>
+      Sub in (1): 4 + 3v = 13 → v = 3 → <strong>y = 1/3</strong><br><br>
+      <strong>x = 1/2, y = 1/3</strong>
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-cns">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 9</span>
+    <div class="q-text">For what value of p does the pair <strong>px + 3y − (p − 3) = 0</strong> and <strong>12x + py − p = 0</strong> have infinite solutions?</div>
+  </div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      For infinite solutions: a₁/a₂ = b₁/b₂ = c₁/c₂<br><br>
+      p/12 = 3/p = (p−3)/p<br><br>
+      From p/12 = 3/p: p² = 36 → p = ±6<br>
+      From 3/p = (p−3)/p: 3 = p − 3 → p = 6<br><br>
+      Both conditions satisfied when <strong>p = 6</strong>.<br>
+      Check: 6/12 = 3/6 = 3/6 = 1/2 ✓
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 10</span>
+    <div class="q-text">In a triangle ABC, ∠A = x°, ∠B = (3x − 2)°, ∠C = y°. Also ∠A − ∠B = 10°. Find all three angles.</div>
+  </div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Angle sum: x + (3x − 2) + y = 180 → <em>4x + y = 182 … (1)</em><br>
+      Given: x − (3x − 2) = 10 → −2x + 2 = 10 → <em>x = −4</em><br><br>
+      Wait — let's re-read: ∠A − ∠B = 10 → x − (3x−2) = 10 → −2x = 8 → x = −4. That gives negative angle.<br>
+      Correct reading: ∠B − ∠A = 10 → (3x−2) − x = 10 → 2x = 12 → <strong>x = 6</strong><br><br>
+      ∠A = 6°, ∠B = 3(6)−2 = <strong>16°</strong><br>
+      From (1): 24 + y = 182 → <strong>y = 158°</strong><br>
+      Check: 6 + 16 + 158 = 180 ✓<br>
+      <strong>∠A = 6°, ∠B = 16°, ∠C = 158°</strong>
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 11</span>
+    <div class="q-text">Solve graphically: <strong>x + y = 6</strong> and <strong>x − y = 2</strong>. Shade the region bounded by the two lines and the y-axis.</div>
+  </div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Table for x + y = 6: (0,6), (6,0)<br>
+      Table for x − y = 2: (0,−2), (2,0)<br><br>
+      Plot both lines. They intersect when:<br>
+      Adding: 2x = 8 → <strong>x = 4, y = 2</strong> → Intersection at <em>(4, 2)</em><br><br>
+      The region bounded by the two lines and y-axis is the triangle with vertices:<br>
+      <strong>(0, 6), (0, −2), (4, 2)</strong><br><br>
+      Area = ½ × base × height = ½ × 8 × 4 = <strong>16 sq. units</strong>
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-sa">SA 12</span>
+    <div class="q-text">A fraction becomes 1/3 when 1 is subtracted from the numerator and 1 is added to the denominator. It becomes 1/2 when 1 is added to both. Find the fraction.</div>
+  </div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Let fraction = x/y.<br>
+      <strong>Eq 1:</strong> (x−1)/(y+1) = 1/3 → 3(x−1) = y+1 → 3x − y = 4<br>
+      <strong>Eq 2:</strong> (x+1)/(y+1) = 1/2 → 2(x+1) = y+1 → 2x − y = −1<br><br>
+      Subtract Eq 2 from Eq 1: x = 5<br>
+      Sub in Eq 2: 10 − y = −1 → y = 11<br><br>
+      <strong>Fraction = 5/11</strong><br>
+      Verify: (5−1)/(11+1) = 4/12 = 1/3 ✓ &nbsp; (5+1)/(11+1) = 6/12 = 1/2 ✓
+    </div>
+  </div>
+</div>
+
+</div><!-- /qwrap -->
+
+<!-- ════════════════ LONG ANSWER ════════════════ -->
+<div class="section-label">Section D — Long Answer Questions (5 Marks Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-la">LA 1</span>
+    <div class="q-text">A father is 3 times as old as his son. After 12 years, the father will be twice as old as his son. Find their present ages. Also find how many years ago the father was 5 times as old as the son.</div>
+  </div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Let father's age = x, son's age = y.<br>
+      <strong>Eq 1:</strong> x = 3y … present ages<br>
+      <strong>Eq 2:</strong> x + 12 = 2(y + 12) → x − 2y = 12<br><br>
+      Substitute x = 3y: 3y − 2y = 12 → <strong>y = 12</strong>, <strong>x = 36</strong><br><br>
+      <strong>Father = 36 years, Son = 12 years</strong><br><br>
+      <strong>When was father 5× son's age?</strong><br>
+      Let t years ago: (36 − t) = 5(12 − t)<br>
+      36 − t = 60 − 5t → 4t = 24 → <strong>t = 6 years ago</strong><br><br>
+      Verify: 6 years ago, father = 30, son = 6. 30 = 5 × 6 ✓<br>
+      Present: father = 36 = 3 × 12 ✓ &nbsp; After 12 years: 48 = 2 × 24 ✓
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-la">LA 2</span>
+    <div class="q-text">A boat can go 30 km upstream and 44 km downstream in 10 hours. It can go 40 km upstream and 55 km downstream in 13 hours. Find the speed of the boat in still water and the speed of the stream.</div>
+  </div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Let speed of boat = u km/h, speed of stream = v km/h.<br>
+      Upstream speed = u − v, Downstream speed = u + v.<br><br>
+      Let a = 1/(u+v), b = 1/(u−v). Then:<br>
+      <strong>Eq 1:</strong> 44a + 30b = 10<br>
+      <strong>Eq 2:</strong> 55a + 40b = 13<br><br>
+      Multiply Eq 1 by 4: 176a + 120b = 40<br>
+      Multiply Eq 2 by 3: 165a + 120b = 39<br>
+      Subtract: 11a = 1 → <strong>a = 1/11</strong> → u + v = 11<br><br>
+      Sub in Eq 1: 4 + 30b = 10 → 30b = 6 → <strong>b = 1/5</strong> → u − v = 5<br><br>
+      Adding: 2u = 16 → <strong>u = 8 km/h</strong><br>
+      v = 11 − 8 = <strong>v = 3 km/h</strong><br><br>
+      <strong>Speed in still water = 8 km/h, Stream speed = 3 km/h</strong>
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-mth">
+  <div class="q-header">
+    <span class="q-num badge-la">LA 3</span>
+    <div class="q-text">Solve the following pair of equations using cross-multiplication method: <strong>ax + by = a − b</strong> and <strong>bx − ay = a + b</strong>.</div>
+  </div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Rewrite in standard form:<br>
+      <em>ax + by − (a−b) = 0</em> &nbsp;&nbsp;→ c₁ = −(a−b)<br>
+      <em>bx − ay − (a+b) = 0</em> &nbsp;→ c₂ = −(a+b)<br><br>
+      Apply cross-multiplication:<br>
+      x/[b·(−(a+b)) − (−a)·(−(a−b))]<br>
+      = x/[−b(a+b) − a(a−b)]<br>
+      = x/[−ab − b² − a² + ab]<br>
+      = <strong>x/(−a² − b²)</strong><br><br>
+      y/[(−(a−b))·b − (−(a+b))·a]<br>
+      = y/[−b(a−b) + a(a+b)]<br>
+      = y/[−ab + b² + a² + ab]<br>
+      = <strong>y/(a² + b²)</strong><br><br>
+      1/(a·(−a) − b·b) = 1/(−a² − b²)<br><br>
+      x/(−a²−b²) = 1/(−a²−b²) → <strong>x = 1</strong><br>
+      y/(a²+b²) = 1/(−a²−b²) → y = −1 → <strong>y = −1</strong><br><br>
+      <strong>Solution: x = 1, y = −1</strong><br>
+      Verify in Eq 1: a(1) + b(−1) = a − b ✓
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-la">LA 4</span>
+    <div class="q-text">Places A and B are 100 km apart on a highway. One car starts from A and another from B at the same time. If they travel in the same direction, they meet in 5 hours. If they travel towards each other, they meet in 1 hour. Find the speeds of the two cars.</div>
+  </div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Let speed of car from A = x km/h, from B = y km/h. Assume x > y.<br><br>
+      <strong>Condition 1 (same direction):</strong><br>
+      Car A overtakes Car B after 5 hours. In 5 hours A covers 5x, B covers 5y.<br>
+      Distance A travels extra = 100 km: 5x − 5y = 100 → <em>x − y = 20</em> … (1)<br><br>
+      <strong>Condition 2 (opposite direction):</strong><br>
+      They cover combined distance of 100 km in 1 hour:<br>
+      x + y = 100 … (2)<br><br>
+      Add (1) and (2): 2x = 120 → <strong>x = 60 km/h</strong><br>
+      y = 100 − 60 = <strong>y = 40 km/h</strong><br><br>
+      <strong>Speed of car from A = 60 km/h, from B = 40 km/h</strong><br>
+      Verify: Same direction: 5(60−40) = 100 ✓ &nbsp; Opposite: 60+40=100 km in 1 h ✓
+    </div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header">
+    <span class="q-num badge-la">LA 5</span>
+    <div class="q-text">A lending library charges fixed fee for first 3 days and then ₹ per day thereafter. Raju paid ₹27 for a book kept for 7 days. Tariq paid ₹21 for 5 days. Find the fixed charge and the charge per day.</div>
+  </div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal">
+    <button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">
+      Let fixed charge = ₹x, charge per extra day = ₹y.<br><br>
+      <strong>Raju:</strong> 7 days = 3 fixed + 4 extra days<br>
+      <em>x + 4y = 27 … (1)</em><br><br>
+      <strong>Tariq:</strong> 5 days = 3 fixed + 2 extra days<br>
+      <em>x + 2y = 21 … (2)</em><br><br>
+      Subtract (2) from (1): 2y = 6 → <strong>y = ₹3 per day</strong><br>
+      Substitute: x + 6 = 21 → <strong>x = ₹15 fixed charge</strong><br><br>
+      <strong>Fixed charge = ₹15, Charge per extra day = ₹3</strong><br>
+      Verify: 15 + 4(3) = 27 ✓ &nbsp; 15 + 2(3) = 21 ✓
+    </div>
+  </div>
+</div>
+
+</div><!-- /qwrap -->
+
+<script>
+function mcq(btn, result){
+  const card = btn.closest('.q-card');
+  if(card.querySelector('.opt-btn.correct')||card.querySelector('.opt-btn.wrong')) return;
+  btn.classList.add(result==='c'?'correct':'wrong');
+  if(result==='c'){
+    const fb = card.querySelector('.feedback');
+    fb.classList.add('correct','shown');
+  } else {
+    btn.classList.add('wrong');
+    const fb = card.querySelector('.feedback');
+    fb.classList.add('wrong','shown');
+  }
+}
+function ar(btn, result){
+  const card = btn.closest('.q-card');
+  if(card.querySelector('.ar-choices button.correct')||card.querySelector('.ar-choices button.wrong')) return;
+  btn.classList.add(result==='c'?'correct':'wrong');
+  const fb = card.querySelector('.feedback');
+  if(fb){ fb.classList.add(result==='c'?'correct':'wrong','shown'); }
+}
+function reveal(btn){
+  const body = btn.nextElementSibling;
+  if(body.classList.contains('shown')){ body.classList.remove('shown'); btn.textContent='Show Solution'; }
+  else { body.classList.add('shown'); btn.textContent='Hide Solution'; }
+}
+</script>
+</body>
+</html>

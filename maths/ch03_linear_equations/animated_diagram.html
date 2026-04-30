@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pair of Linear Equations — Animated Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 55% 40% at 20% 10%,rgba(245,158,11,.04) 0%,transparent 55%),
+               radial-gradient(ellipse 50% 40% at 80% 85%,rgba(56,189,248,.03) 0%,transparent 55%);}
+
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+    background:rgba(7,16,31,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;
+    border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+
+  header{text-align:center;padding:1.6rem 1rem 1rem;border-bottom:1px solid var(--border);}
+  header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--amber);}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+  nav{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:1rem 1rem .5rem;}
+  nav button{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;
+    padding:.42rem 1rem;border-radius:4px;border:1px solid var(--border);
+    background:var(--card);color:var(--muted);cursor:pointer;transition:all .22s;}
+  nav button:hover{color:var(--text);border-color:#2a3f5a;}
+  nav button.a-graph{border-color:var(--amber);  color:var(--amber);  background:rgba(245,158,11,.08);}
+  nav button.a-cons {border-color:var(--blue);   color:var(--blue);   background:rgba(56,189,248,.08);}
+  nav button.a-sub  {border-color:var(--teal);   color:var(--teal);   background:rgba(45,212,191,.08);}
+  nav button.a-elim {border-color:var(--green);  color:var(--green);  background:rgba(34,197,94,.08);}
+  nav button.a-cross{border-color:var(--purple); color:var(--purple); background:rgba(217,70,239,.08);}
+  nav button.a-app  {border-color:var(--red);    color:var(--red);    background:rgba(244,63,94,.08);}
+
+  main{max-width:920px;margin:0 auto;padding:1rem 1rem 4rem;}
+  section{display:none;animation:fadeUp .35s ease;}
+  section.vis{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+  .sec-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;
+    margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+
+  /* ── cards / panels ── */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-bottom:1.1rem;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;transition:transform .18s,box-shadow .18s;}
+  .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.55);}
+  .card h3{font-family:'Playfair Display',serif;font-size:.92rem;font-weight:700;margin-bottom:.4rem;}
+  .card p,.card li{font-size:.82rem;color:var(--muted);line-height:1.7;}
+  .card ul{padding-left:1.1rem;}
+  .tag{display:inline-block;font-size:.63rem;font-family:'DM Mono',monospace;padding:.1rem .45rem;border-radius:3px;margin-bottom:.4rem;}
+
+  .mbox{background:var(--card2);border:1px solid var(--border);border-radius:10px;
+    padding:.8rem 1rem;margin-bottom:.85rem;font-family:'DM Mono',monospace;font-size:.83rem;line-height:1.9;}
+  .mbox .label{font-family:'Playfair Display',serif;font-size:.73rem;color:var(--muted);margin-bottom:.3rem;}
+  .mbox .formula{font-size:1.05rem;color:var(--amber);font-weight:500;}
+  .mbox .sub{font-size:.75rem;color:var(--muted);margin-top:.25rem;}
+
+  /* ── canvas stage ── */
+  .canvas-stage{background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:1rem;margin-bottom:1rem;position:relative;}
+  .canvas-stage canvas{width:100%;height:auto;display:block;border-radius:8px;}
+  .canvas-controls{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:.7rem;}
+  .c-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .9rem;border-radius:99px;
+    border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:.2s;}
+  .c-btn:hover{border-color:var(--amber);color:var(--amber);}
+  .c-btn.active{background:rgba(245,158,11,.15);border-color:var(--amber);color:var(--amber);}
+  .c-btn.blue.active{background:rgba(56,189,248,.15);border-color:var(--blue);color:var(--blue);}
+  .c-btn.teal.active{background:rgba(45,212,191,.15);border-color:var(--teal);color:var(--teal);}
+  .c-btn.green.active{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+  .c-btn.purple.active{background:rgba(217,70,239,.15);border-color:var(--purple);color:var(--purple);}
+
+  /* ── step-by-step solver ── */
+  .solver{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.1rem;margin-bottom:1rem;}
+  .step-display{min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.5rem;padding:.5rem;}
+  .step-eq{font-family:'DM Mono',monospace;font-size:1rem;padding:.5rem 1.2rem;
+    background:var(--card2);border-radius:8px;border:1px solid var(--border);
+    text-align:center;transition:all .3s;width:100%;max-width:480px;}
+  .step-eq.highlight{border-color:var(--teal);color:#a7f3d0;background:rgba(45,212,191,.07);}
+  .step-eq.result{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.07);font-weight:700;font-size:1.1rem;}
+  .step-note{font-size:.78rem;color:var(--muted);text-align:center;font-style:italic;max-width:420px;}
+  .step-progress{display:flex;gap:.4rem;justify-content:center;margin-top:.7rem;flex-wrap:wrap;}
+  .step-dot{width:28px;height:4px;border-radius:99px;background:var(--border);transition:.3s;}
+  .step-dot.done{background:var(--teal);}
+  .step-dot.current{background:var(--amber);box-shadow:0 0 6px rgba(245,158,11,.5);}
+  .solver-nav{display:flex;gap:.6rem;justify-content:center;margin-top:.7rem;}
+  .s-nav-btn{font-family:'DM Mono',monospace;font-size:.75rem;padding:.38rem 1.2rem;border-radius:99px;
+    border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:.2s;}
+  .s-nav-btn:hover{border-color:var(--amber);color:var(--amber);}
+  .s-nav-btn:disabled{opacity:.3;cursor:default;}
+
+  /* ── consistency table ── */
+  .cons-table{width:100%;border-collapse:collapse;font-size:.83rem;margin-bottom:1rem;}
+  .cons-table th{font-family:'DM Mono',monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;
+    padding:.5rem .8rem;background:var(--card2);color:var(--muted);text-align:center;border-bottom:1px solid var(--border);}
+  .cons-table td{padding:.6rem .8rem;text-align:center;border-bottom:1px solid rgba(26,45,69,.5);line-height:1.5;}
+  .cons-table tr:last-child td{border-bottom:none;}
+  .cons-table tr.highlight-row td{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.15);}
+  .cons-row-unique td:first-child{color:var(--green);}
+  .cons-row-infinite td:first-child{color:var(--blue);}
+  .cons-row-none td:first-child{color:var(--red);}
+
+  /* ── ratio visual ── */
+  .ratio-vis{display:flex;flex-direction:column;gap:.7rem;margin:1rem 0;}
+  .ratio-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+  .ratio-label{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);min-width:90px;}
+  .ratio-frac{font-family:'DM Mono',monospace;font-size:.85rem;padding:.25rem .7rem;
+    border-radius:8px;border:1px solid var(--border);background:var(--card2);}
+  .ratio-cmp{font-size:.9rem;color:var(--muted);padding:0 .2rem;}
+  .ratio-verdict{font-family:'DM Mono',monospace;font-size:.72rem;padding:.2rem .65rem;
+    border-radius:99px;border:1px solid;}
+
+  /* ── cross mult diagram ── */
+  .cross-diagram{background:var(--card2);border:1px solid var(--border);border-radius:14px;
+    padding:1.4rem;margin-bottom:1rem;text-align:center;}
+  .cross-equations{font-family:'DM Mono',monospace;font-size:.92rem;margin-bottom:1rem;line-height:2.2;}
+  .cross-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin:1rem 0;}
+  .cross-cell{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem;text-align:center;}
+  .cross-cell .frac-top{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--amber);padding-bottom:.3rem;border-bottom:1px solid var(--border);}
+  .cross-cell .frac-bot{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--blue);padding-top:.3rem;}
+  .cross-cell .label{font-size:.66rem;color:var(--muted);margin-top:.4rem;font-family:'DM Mono',monospace;}
+  .arrow-line{color:var(--muted);font-size:.8rem;letter-spacing:.15em;display:flex;align-items:center;justify-content:center;gap:.3rem;margin:.5rem 0;}
+
+  /* ── app category grid ── */
+  .app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.8rem;margin-bottom:1rem;}
+  .app-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:.2s;}
+  .app-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.5);}
+  .app-card.expanded{border-color:var(--amber);}
+  .app-card-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;}
+  .app-icon{font-size:1.5rem;}
+  .app-title{font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;}
+  .app-body{font-size:.8rem;color:var(--muted);line-height:1.7;}
+  .app-example{background:var(--card2);border-radius:8px;padding:.7rem;margin-top:.6rem;
+    font-family:'DM Mono',monospace;font-size:.77rem;color:var(--blue);line-height:1.7;display:none;}
+  .app-card.expanded .app-example{display:block;}
+
+  /* canvas for graph */
+  #graph-canvas{background:#060d1a;border-radius:8px;}
+
+  .info-badge{display:inline-flex;align-items:center;gap:.35rem;font-family:'DM Mono',monospace;
+    font-size:.72rem;padding:.22rem .7rem;border-radius:99px;border:1px solid;margin:.2rem;}
+
+  @media(max-width:600px){
+    .cross-grid{grid-template-columns:1fr 1fr;}
+    .cross-equations{font-size:.78rem;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<header>
+  <h1>Pair of Linear Equations in Two Variables</h1>
+  <p>Class X · Mathematics Ch.3 · 6 interactive diagrams</p>
+</header>
+
+<nav>
+  <button class="a-graph" onclick="showTab(0,this,'a-graph')">📈 Graphical Method</button>
+  <button onclick="showTab(1,this,'a-cons')">🔢 Consistency</button>
+  <button onclick="showTab(2,this,'a-sub')">🔄 Substitution</button>
+  <button onclick="showTab(3,this,'a-elim')">➕ Elimination</button>
+  <button onclick="showTab(4,this,'a-cross')">✖ Cross-Multiplication</button>
+  <button onclick="showTab(5,this,'a-app')">🎯 Applications</button>
+</nav>
+
+<main>
+
+<!-- ══════════════ TAB 0 — GRAPHICAL ══════════════ -->
+<section class="vis" id="tab-0">
+  <div class="sec-title"><span style="color:var(--amber)">📈</span> Graphical Representation</div>
+
+  <div class="mbox">
+    <div class="label">Standard Form</div>
+    <div class="formula">a₁x + b₁y + c₁ = 0 &nbsp;&nbsp; and &nbsp;&nbsp; a₂x + b₂y + c₂ = 0</div>
+    <div class="sub">Each equation represents a straight line on the coordinate plane. The solution is the point(s) of intersection.</div>
+  </div>
+
+  <div class="canvas-stage">
+    <canvas id="graph-canvas" width="800" height="420"></canvas>
+    <div class="canvas-controls">
+      <button class="c-btn active" id="btn-intersect" onclick="switchCase('intersect')">⊕ Intersecting Lines</button>
+      <button class="c-btn" id="btn-parallel"  onclick="switchCase('parallel')">∥ Parallel Lines</button>
+      <button class="c-btn" id="btn-coincide"  onclick="switchCase('coincide')">≡ Coincident Lines</button>
+    </div>
+    <div id="graph-desc" style="text-align:center;margin-top:.6rem;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)"></div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2)">UNIQUE SOLUTION</div>
+      <h3 style="color:#4ade80">Intersecting Lines</h3>
+      <p>Lines cross at exactly <strong style="color:var(--text)">one point</strong>. That point (x, y) is the unique solution. System is <em>consistent &amp; independent</em>.</p>
+      <ul style="margin-top:.4rem"><li>a₁/a₂ ≠ b₁/b₂</li><li>Example: x + y = 5, 2x − y = 1 → (2, 3)</li></ul>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(244,63,94,.12);color:#fb7185;border:1px solid rgba(244,63,94,.2)">NO SOLUTION</div>
+      <h3 style="color:#fb7185">Parallel Lines</h3>
+      <p>Lines never meet. <strong style="color:var(--text)">No solution</strong> exists. System is <em>inconsistent</em>.</p>
+      <ul style="margin-top:.4rem"><li>a₁/a₂ = b₁/b₂ ≠ c₁/c₂</li><li>Example: x + y = 5, x + y = 8</li></ul>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(56,189,248,.12);color:#7dd3fc;border:1px solid rgba(56,189,248,.2)">INFINITE SOLUTIONS</div>
+      <h3 style="color:#7dd3fc">Coincident Lines</h3>
+      <p>Same line — <strong style="color:var(--text)">infinitely many</strong> solutions. System is <em>consistent &amp; dependent</em>.</p>
+      <ul style="margin-top:.4rem"><li>a₁/a₂ = b₁/b₂ = c₁/c₂</li><li>Example: x + y = 5, 2x + 2y = 10</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ TAB 1 — CONSISTENCY ══════════════ -->
+<section id="tab-1">
+  <div class="sec-title"><span style="color:var(--blue)">🔢</span> Consistency Conditions</div>
+
+  <div class="mbox">
+    <div class="label">For a₁x + b₁y + c₁ = 0 and a₂x + b₂y + c₂ = 0</div>
+    <div class="formula">Compare ratios: &nbsp; a₁/a₂ &nbsp; vs &nbsp; b₁/b₂ &nbsp; vs &nbsp; c₁/c₂</div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1rem;">
+    <table class="cons-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Ratio Condition</th>
+          <th>Graph</th>
+          <th>Solutions</th>
+          <th>System</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="cons-row-unique">
+          <td><strong style="color:#4ade80">Consistent &<br>Independent</strong></td>
+          <td><span style="font-family:'DM Mono',monospace;color:var(--amber)">a₁/a₂ ≠ b₁/b₂</span></td>
+          <td>Intersecting</td>
+          <td><strong style="color:#4ade80">Unique (1)</strong></td>
+          <td><span class="info-badge" style="background:rgba(34,197,94,.1);color:#4ade80;border-color:rgba(34,197,94,.3)">✓ Solvable</span></td>
+        </tr>
+        <tr class="cons-row-infinite">
+          <td><strong style="color:#7dd3fc">Consistent &<br>Dependent</strong></td>
+          <td><span style="font-family:'DM Mono',monospace;color:var(--amber)">a₁/a₂ = b₁/b₂ = c₁/c₂</span></td>
+          <td>Coincident</td>
+          <td><strong style="color:#7dd3fc">Infinite (∞)</strong></td>
+          <td><span class="info-badge" style="background:rgba(56,189,248,.1);color:#7dd3fc;border-color:rgba(56,189,248,.3)">∞ Solutions</span></td>
+        </tr>
+        <tr class="cons-row-none">
+          <td><strong style="color:#fb7185">Inconsistent</strong></td>
+          <td><span style="font-family:'DM Mono',monospace;color:var(--amber)">a₁/a₂ = b₁/b₂ ≠ c₁/c₂</span></td>
+          <td>Parallel</td>
+          <td><strong style="color:#fb7185">None (0)</strong></td>
+          <td><span class="info-badge" style="background:rgba(244,63,94,.1);color:#fb7185;border-color:rgba(244,63,94,.3)">✗ No Solution</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-title" style="font-size:1rem;margin-top:1.4rem;margin-bottom:.6rem">Interactive Ratio Check</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.1rem;margin-bottom:1rem;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.6rem;margin-bottom:.9rem;">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-bottom:.3rem">Equation 1: a₁x + b₁y + c₁ = 0</div>
+        <div style="display:flex;gap:.4rem;">
+          <input id="a1" type="number" value="2" style="width:48px;padding:.3rem;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;text-align:center;" oninput="checkRatios()">
+          <input id="b1" type="number" value="3" style="width:48px;padding:.3rem;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;text-align:center;" oninput="checkRatios()">
+          <input id="c1" type="number" value="-5" style="width:56px;padding:.3rem;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;text-align:center;" oninput="checkRatios()">
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-bottom:.3rem">Equation 2: a₂x + b₂y + c₂ = 0</div>
+        <div style="display:flex;gap:.4rem;">
+          <input id="a2" type="number" value="4" style="width:48px;padding:.3rem;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;text-align:center;" oninput="checkRatios()">
+          <input id="b2" type="number" value="1" style="width:48px;padding:.3rem;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;text-align:center;" oninput="checkRatios()">
+          <input id="c2" type="number" value="-7" style="width:56px;padding:.3rem;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;text-align:center;" oninput="checkRatios()">
+        </div>
+      </div>
+    </div>
+    <div id="ratio-result" style="font-family:'DM Mono',monospace;font-size:.83rem;padding:.7rem 1rem;background:var(--card2);border-radius:8px;line-height:2;border:1px solid var(--border);"></div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(217,70,239,.1);color:#e879f9;border:1px solid rgba(217,70,239,.2)">MEMORY TIP</div>
+      <h3 style="color:#e879f9">The Ratio Rule</h3>
+      <p>Think of it as a <strong style="color:var(--text)">3-way comparison</strong>: if the first ratio doesn't match the second, lines intersect (unique). If all three match, coincident. If first two match but third doesn't — parallel.</p>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2)">EXAM TRICK</div>
+      <h3 style="color:var(--amber)">Quick Test</h3>
+      <p>Write ratios as <strong style="color:var(--text)">fractions in lowest terms</strong>. Compare a₁/a₂ and b₁/b₂ first. If equal, check c₁/c₂. Three equal → coincident; two equal → parallel; first unequal → intersecting.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ TAB 2 — SUBSTITUTION ══════════════ -->
+<section id="tab-2">
+  <div class="sec-title"><span style="color:var(--teal)">🔄</span> Substitution Method</div>
+
+  <div class="mbox">
+    <div class="label">Worked Example</div>
+    <div class="formula">2x + 3y = 11 &nbsp;&nbsp; and &nbsp;&nbsp; x − 2y = −1</div>
+    <div class="sub">Express one variable in terms of the other, then substitute into the second equation.</div>
+  </div>
+
+  <div class="solver">
+    <div class="step-display" id="sub-display"></div>
+    <div class="step-progress" id="sub-dots"></div>
+    <div class="solver-nav">
+      <button class="s-nav-btn" id="sub-prev" onclick="subStep(-1)" disabled>← Prev</button>
+      <span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);align-self:center" id="sub-counter">Step 1 / 8</span>
+      <button class="s-nav-btn" id="sub-next" onclick="subStep(1)">Next →</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(45,212,191,.1);color:var(--teal);border:1px solid rgba(45,212,191,.2)">WHEN TO USE</div>
+      <h3 style="color:var(--teal)">Best Situations</h3>
+      <ul>
+        <li>One equation has coefficient of 1 or −1</li>
+        <li>Easy to isolate a variable without fractions</li>
+        <li>Small coefficients</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2)">STEPS</div>
+      <h3 style="color:var(--amber)">Algorithm</h3>
+      <ul>
+        <li>Express x (or y) from one equation</li>
+        <li>Substitute into second equation</li>
+        <li>Solve for the remaining variable</li>
+        <li>Back-substitute to find the other</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(244,63,94,.1);color:#fb7185;border:1px solid rgba(244,63,94,.2)">COMMON ERRORS</div>
+      <h3 style="color:#fb7185">Watch Out For</h3>
+      <ul>
+        <li>Sign errors when substituting negative terms</li>
+        <li>Forgetting to distribute multiplied terms</li>
+        <li>Not verifying the answer in both equations</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ TAB 3 — ELIMINATION ══════════════ -->
+<section id="tab-3">
+  <div class="sec-title"><span style="color:var(--green)">➕</span> Elimination Method</div>
+
+  <div class="mbox">
+    <div class="label">Worked Example</div>
+    <div class="formula">3x + 2y = 16 &nbsp;&nbsp; and &nbsp;&nbsp; 5x − 3y = 7</div>
+    <div class="sub">Make coefficients of one variable equal (with opposite signs), then add equations to eliminate it.</div>
+  </div>
+
+  <div class="solver">
+    <div class="step-display" id="elim-display"></div>
+    <div class="step-progress" id="elim-dots"></div>
+    <div class="solver-nav">
+      <button class="s-nav-btn" id="elim-prev" onclick="elimStep(-1)" disabled>← Prev</button>
+      <span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);align-self:center" id="elim-counter">Step 1 / 8</span>
+      <button class="s-nav-btn" id="elim-next" onclick="elimStep(1)">Next →</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)">WHEN TO USE</div>
+      <h3 style="color:var(--green)">Best Situations</h3>
+      <ul>
+        <li>Coefficients are larger numbers</li>
+        <li>Both equations have the same variable form</li>
+        <li>Multiplying is neater than isolating</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2)">STEPS</div>
+      <h3 style="color:var(--amber)">Algorithm</h3>
+      <ul>
+        <li>Multiply each equation by suitable constants</li>
+        <li>Make LCM of one variable's coefficients equal</li>
+        <li>Add or subtract equations to eliminate</li>
+        <li>Solve for remaining variable; back-substitute</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(56,189,248,.1);color:var(--blue);border:1px solid rgba(56,189,248,.2)">KEY INSIGHT</div>
+      <h3 style="color:var(--blue)">Add vs Subtract</h3>
+      <p>If equal coefficients have <strong style="color:var(--text)">opposite signs</strong> → add equations.<br>If <strong style="color:var(--text)">same signs</strong> → subtract. Both eliminate the chosen variable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ TAB 4 — CROSS MULTIPLICATION ══════════════ -->
+<section id="tab-4">
+  <div class="sec-title"><span style="color:var(--purple)">✖</span> Cross-Multiplication Method</div>
+
+  <div class="mbox">
+    <div class="label">Formula — for a₁x + b₁y + c₁ = 0 and a₂x + b₂y + c₂ = 0</div>
+    <div class="formula">x/(b₁c₂ − b₂c₁) = y/(c₁a₂ − c₂a₁) = 1/(a₁b₂ − a₂b₁)</div>
+    <div class="sub">Condition: a₁b₂ − a₂b₁ ≠ 0 (otherwise lines are parallel or coincident)</div>
+  </div>
+
+  <div class="cross-diagram">
+    <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:.9rem;color:var(--muted);margin-bottom:.8rem">Butterfly / Arrow Diagram</div>
+    <div class="cross-equations">
+      <span style="color:#fb923c">a₁</span>x + <span style="color:#a78bfa">b₁</span>y + <span style="color:#2dd4bf">c₁</span> = 0<br>
+      <span style="color:#fb923c">a₂</span>x + <span style="color:#a78bfa">b₂</span>y + <span style="color:#2dd4bf">c₂</span> = 0
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);margin-bottom:.8rem">
+      Write coefficients in order: b, c, a, b &nbsp;(repeat first column at end)
+    </div>
+    <div style="display:flex;justify-content:center;align-items:center;gap:1.5rem;flex-wrap:wrap;margin:.6rem 0;">
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:.85rem;display:grid;grid-template-columns:repeat(4,40px);gap:4px;text-align:center;">
+          <span style="color:#a78bfa">b₁</span><span style="color:#2dd4bf">c₁</span><span style="color:#fb923c">a₁</span><span style="color:#a78bfa">b₁</span>
+          <span style="color:#a78bfa">b₂</span><span style="color:#2dd4bf">c₂</span><span style="color:#fb923c">a₂</span><span style="color:#a78bfa">b₂</span>
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:.4rem;font-family:'DM Mono',monospace">↕ cross ↕ &nbsp; ↕ cross ↕</div>
+      </div>
+    </div>
+    <div class="cross-grid">
+      <div class="cross-cell">
+        <div class="frac-top">b₁c₂ − b₂c₁</div>
+        <div class="frac-bot">= x's numerator</div>
+        <div class="label">value of x = (b₁c₂ − b₂c₁) ÷ (a₁b₂ − a₂b₁)</div>
+      </div>
+      <div class="cross-cell">
+        <div class="frac-top">c₁a₂ − c₂a₁</div>
+        <div class="frac-bot">= y's numerator</div>
+        <div class="label">value of y = (c₁a₂ − c₂a₁) ÷ (a₁b₂ − a₂b₁)</div>
+      </div>
+      <div class="cross-cell">
+        <div class="frac-top">a₁b₂ − a₂b₁</div>
+        <div class="frac-bot">= common denominator</div>
+        <div class="label">must be ≠ 0 for unique solution</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mbox" style="border-color:rgba(217,70,239,.25)">
+    <div class="label">Worked Example — 2x + 3y + 5 = 0 &nbsp; and &nbsp; 3x − 2y + 1 = 0</div>
+    <div class="formula">
+      x / (3×1 − (−2)×5) = y / (5×3 − 1×2) = 1 / (2×(−2) − 3×3)<br>
+      <span style="font-size:.88rem">x / (3 + 10) = y / (15 − 2) = 1 / (−4 − 9)</span><br>
+      <span style="font-size:.88rem">x / 13 = y / 13 = 1 / (−13)</span><br>
+      <span style="color:#4ade80;font-size:.95rem">x = −1, &nbsp; y = −1</span>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag" style="background:rgba(217,70,239,.1);color:#e879f9;border:1px solid rgba(217,70,239,.2)">WHEN TO USE</div>
+      <h3 style="color:#e879f9">Best For</h3>
+      <ul>
+        <li>Direct formula application in exams</li>
+        <li>Competitive exam problems needing speed</li>
+        <li>When coefficients are messy fractions</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(244,63,94,.1);color:#fb7185;border:1px solid rgba(244,63,94,.2)">COMMON ERROR</div>
+      <h3 style="color:#fb7185">Watch Sign</h3>
+      <p>The formula requires equations in the form <strong style="color:var(--text)">ax + by + c = 0</strong> (not ax + by = c). Move all terms to one side before applying the cross-product rule.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ TAB 5 — APPLICATIONS ══════════════ -->
+<section id="tab-5">
+  <div class="sec-title"><span style="color:var(--red)">🎯</span> Problem Types &amp; Applications</div>
+  <p style="font-size:.83rem;color:var(--muted);margin-bottom:1rem;">Click any category to see a solved example setup.</p>
+
+  <div class="app-grid">
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-card-head"><div class="app-icon">👴</div><div class="app-title" style="color:var(--amber)">Age Problems</div></div>
+      <div class="app-body">Set up equations using present and future/past ages. Always define clearly: let father's age = x, son's age = y.</div>
+      <div class="app-example">
+        <strong style="color:var(--amber)">Example:</strong> Father is 3× older than son. In 12 years, he'll be 2× older.<br>
+        Let father = x, son = y<br>
+        Eq 1: x = 3y<br>
+        Eq 2: x + 12 = 2(y + 12)<br>
+        Solving: y = 12, x = 36<br>
+        <span style="color:#4ade80">✓ Father: 36, Son: 12</span>
+      </div>
+    </div>
+
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-card-head"><div class="app-icon">💰</div><div class="app-title" style="color:var(--teal)">Money & Cost Problems</div></div>
+      <div class="app-body">Price × quantity = total cost. Create two equations from two different purchase scenarios.</div>
+      <div class="app-example">
+        <strong style="color:var(--teal)">Example:</strong> 2 pencils + 3 pens = ₹18; 4 pencils + 5 pens = ₹32.<br>
+        Let pencil = x, pen = y<br>
+        Eq 1: 2x + 3y = 18<br>
+        Eq 2: 4x + 5y = 32<br>
+        Solving: x = 3, y = 4<br>
+        <span style="color:#4ade80">✓ Pencil: ₹3, Pen: ₹4</span>
+      </div>
+    </div>
+
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-card-head"><div class="app-icon">🚢</div><div class="app-title" style="color:var(--blue)">Speed, Distance & Time</div></div>
+      <div class="app-body">Use D = S × T. With boats/streams: upstream speed = (u − v), downstream = (u + v).</div>
+      <div class="app-example">
+        <strong style="color:var(--blue)">Example:</strong> A boat takes 2h downstream (30 km) and 3h upstream (30 km).<br>
+        Let boat speed = x, stream = y<br>
+        Eq 1: x + y = 15 (downstream)<br>
+        Eq 2: x − y = 10 (upstream)<br>
+        Solving: x = 12.5, y = 2.5<br>
+        <span style="color:#4ade80">✓ Boat: 12.5 km/h, Stream: 2.5 km/h</span>
+      </div>
+    </div>
+
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-card-head"><div class="app-icon">🔢</div><div class="app-title" style="color:var(--indigo)">Number & Digit Problems</div></div>
+      <div class="app-body">Express two-digit numbers as 10a + b (tens digit a, units digit b). Use given clues to form equations.</div>
+      <div class="app-example">
+        <strong style="color:var(--indigo)">Example:</strong> Sum of digits of a 2-digit number = 9. On reversing, number increases by 27.<br>
+        Let tens = x, units = y<br>
+        Eq 1: x + y = 9<br>
+        Eq 2: (10y + x) − (10x + y) = 27 → y − x = 3<br>
+        Solving: x = 3, y = 6<br>
+        <span style="color:#4ade80">✓ Number = 36</span>
+      </div>
+    </div>
+
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-card-head"><div class="app-icon">📐</div><div class="app-title" style="color:var(--green)">Geometry Problems</div></div>
+      <div class="app-body">Area, perimeter, angle sum properties of triangles/quadrilaterals often yield linear systems.</div>
+      <div class="app-example">
+        <strong style="color:var(--green)">Example:</strong> In a triangle, one angle is 40° more than another. The third = 60°.<br>
+        Let angles = x, y, z = 60°<br>
+        Eq 1: x + y + 60 = 180 → x + y = 120<br>
+        Eq 2: x − y = 40<br>
+        Solving: x = 80°, y = 40°<br>
+        <span style="color:#4ade80">✓ Angles: 80°, 40°, 60°</span>
+      </div>
+    </div>
+
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-card-head"><div class="app-icon">🍕</div><div class="app-title" style="color:var(--red)">Fraction Problems</div></div>
+      <div class="app-body">Add/subtract to numerator or denominator gives a new fraction. Let numerator = x, denominator = y.</div>
+      <div class="app-example">
+        <strong style="color:var(--red)">Example:</strong> Adding 1 to numerator makes it 1/2; adding 1 to denominator makes it 1/3.<br>
+        Let fraction = x/y<br>
+        Eq 1: (x+1)/y = 1/2 → 2x − y = −2<br>
+        Eq 2: x/(y+1) = 1/3 → 3x − y = 1<br>
+        Solving: x = 3, y = 8<br>
+        <span style="color:#4ade80">✓ Fraction = 3/8</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mbox" style="border-color:rgba(244,63,94,.2)">
+    <div class="label">General Strategy for Word Problems</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.6rem;margin-top:.4rem;">
+      <div style="background:var(--card2);border-radius:8px;padding:.6rem;font-family:'DM Mono',monospace;font-size:.75rem;">
+        <span style="color:var(--amber)">Step 1 →</span><br>Identify the two unknown quantities and define them clearly (let x = ..., y = ...)
+      </div>
+      <div style="background:var(--card2);border-radius:8px;padding:.6rem;font-family:'DM Mono',monospace;font-size:.75rem;">
+        <span style="color:var(--teal)">Step 2 →</span><br>Translate each condition in the problem into a linear equation
+      </div>
+      <div style="background:var(--card2);border-radius:8px;padding:.6rem;font-family:'DM Mono',monospace;font-size:.75rem;">
+        <span style="color:var(--green)">Step 3 →</span><br>Choose the most suitable method (substitution / elimination) and solve
+      </div>
+      <div style="background:var(--card2);border-radius:8px;padding:.6rem;font-family:'DM Mono',monospace;font-size:.75rem;">
+        <span style="color:var(--blue)">Step 4 →</span><br>Verify: substitute back into BOTH original equations. Check if answer makes sense
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ─── TAB SWITCHING ────────────────────────────────────────────────
+const ACTIVE_CLASSES = ['a-graph','a-cons','a-sub','a-elim','a-cross','a-app'];
+function showTab(i, btn, cls){
+  document.querySelectorAll('section').forEach((s,j)=>{
+    s.classList.toggle('vis', j===i);
+  });
+  document.querySelectorAll('nav button').forEach(b=>{
+    ACTIVE_CLASSES.forEach(c=>b.classList.remove(c));
+  });
+  btn.classList.add(cls);
+  if(i===0) initGraph();
+  if(i===1) checkRatios();
+}
+
+// ─── GRAPH ───────────────────────────────────────────────────────
+let graphCase = 'intersect';
+let graphAnim = null;
+let graphProgress = 0;
+
+const CASES = {
+  intersect: {
+    lines:[
+      {a:1, b:1, c:-5,  color:'#f59e0b', label:'x + y = 5'},
+      {a:2, b:-1, c:-1, color:'#38bdf8', label:'2x − y = 1'}
+    ],
+    solution:{x:2, y:3},
+    desc:'Intersecting at (2, 3) — Unique solution. System is consistent & independent.',
+    verdict:'UNIQUE SOLUTION',
+    vcolor:'#4ade80'
+  },
+  parallel: {
+    lines:[
+      {a:1, b:1, c:-5, color:'#f59e0b', label:'x + y = 5'},
+      {a:1, b:1, c:-8, color:'#f43f5e', label:'x + y = 8'}
+    ],
+    solution:null,
+    desc:'Parallel lines — never intersect. No solution. System is inconsistent.',
+    verdict:'NO SOLUTION',
+    vcolor:'#fb7185'
+  },
+  coincide: {
+    lines:[
+      {a:1, b:1, c:-5,  color:'#f59e0b', label:'x + y = 5'},
+      {a:2, b:2, c:-10, color:'#2dd4bf', label:'2x + 2y = 10'}
+    ],
+    solution:'all',
+    desc:'Coincident lines — the same line. Infinite solutions. System is consistent & dependent.',
+    verdict:'INFINITE SOLUTIONS',
+    vcolor:'#7dd3fc'
+  }
+};
+
+function switchCase(c){
+  graphCase = c;
+  ['intersect','parallel','coincide'].forEach(id=>{
+    const btn = document.getElementById('btn-'+id);
+    btn.classList.remove('active');
+  });
+  document.getElementById('btn-'+c).classList.add('active');
+  graphProgress = 0;
+  if(graphAnim) cancelAnimationFrame(graphAnim);
+  animateGraph();
+}
+
+function initGraph(){
+  graphProgress = 0;
+  if(graphAnim) cancelAnimationFrame(graphAnim);
+  switchCase('intersect');
+}
+
+function animateGraph(){
+  graphProgress += 0.018;
+  if(graphProgress >= 1) graphProgress = 1;
+  drawGraph(graphProgress);
+  if(graphProgress < 1) graphAnim = requestAnimationFrame(animateGraph);
+}
+
+function drawGraph(prog){
+  const canvas = document.getElementById('graph-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#060d1a';
+  ctx.fillRect(0,0,W,H);
+
+  const cx = W/2, cy = H/2;
+  const scale = 42;
+
+  // grid
+  ctx.strokeStyle = 'rgba(26,45,69,.5)';
+  ctx.lineWidth = 1;
+  for(let gx = cx % scale; gx < W; gx += scale){
+    ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke();
+  }
+  for(let gy = cy % scale; gy < H; gy += scale){
+    ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke();
+  }
+
+  // axes
+  ctx.strokeStyle = 'rgba(74,104,144,.9)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+
+  // axis labels
+  ctx.fillStyle = '#4a6890'; ctx.font = '500 11px "DM Mono"'; ctx.textAlign = 'center';
+  for(let i=-9;i<=9;i+=1){
+    if(i===0) continue;
+    const px = cx + i*scale, py = cy;
+    if(px>10 && px<W-10){ ctx.fillText(i, px, py+14); }
+    const qx = cx, qy = cy - i*scale;
+    if(qy>10 && qy<H-10){ ctx.textAlign='right'; ctx.fillText(i, qx-5, qy+4); ctx.textAlign='center'; }
+  }
+  ctx.fillText('x', W-12, cy-6); ctx.fillText('y', cx+12, 12);
+
+  const caseData = CASES[graphCase];
+
+  // draw lines
+  caseData.lines.forEach((line, li)=>{
+    const delay = li * 0.15;
+    const p = Math.max(0, Math.min(1, (prog - delay) / (1 - delay)));
+    if(p <= 0) return;
+
+    ctx.save();
+    ctx.strokeStyle = line.color;
+    ctx.lineWidth = 2.5;
+    ctx.globalAlpha = p;
+
+    // y = (-a*x - c) / b
+    const b = line.b, a = line.a, c = line.c;
+    let pts = [];
+    for(let px = -10; px <= 10; px += 0.25){
+      const py = b !== 0 ? (-a*px - c)/b : null;
+      if(py === null) continue;
+      const sx = cx + px*scale, sy = cy - py*scale;
+      pts.push([sx,sy]);
+    }
+    if(pts.length < 2){ ctx.restore(); return; }
+
+    // draw only partial line up to p
+    const endIdx = Math.floor(pts.length * p);
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for(let k=1; k<=endIdx && k<pts.length; k++) ctx.lineTo(pts[k][0], pts[k][1]);
+    ctx.stroke();
+
+    // label at end of drawn segment
+    if(p > 0.5){
+      const lp = pts[Math.min(endIdx, pts.length-1)];
+      ctx.fillStyle = line.color;
+      ctx.font = '700 12px "DM Mono"';
+      ctx.textAlign = 'left';
+      ctx.globalAlpha = Math.max(0, (p - 0.5)*2);
+      ctx.fillText(line.label, Math.min(lp[0]+6, W-120), lp[1]-8);
+    }
+    ctx.restore();
+  });
+
+  // solution point
+  if(caseData.solution && caseData.solution !== 'all' && prog >= 0.95){
+    const sol = caseData.solution;
+    const px = cx + sol.x*scale, py = cy - sol.y*scale;
+    const alpha = (prog - 0.95) / 0.05;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.shadowColor = '#4ade80'; ctx.shadowBlur = 16;
+    ctx.fillStyle = '#4ade80';
+    ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#4ade80'; ctx.font = '700 13px "DM Mono"';
+    ctx.textAlign = 'left';
+    ctx.fillText(`(${sol.x}, ${sol.y})`, px+12, py-6);
+    ctx.restore();
+  }
+
+  // verdict
+  const vcolor = caseData.vcolor;
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, prog * 2);
+  ctx.fillStyle = vcolor.replace('#','rgba(').replace(/^rgba\((..)(..)(..)$/,(m,r,g,b)=>`rgba(${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`)+', .12)';
+
+  // simple verdict box top-right
+  ctx.fillStyle = vcolor;
+  ctx.font = '700 12px "DM Mono"';
+  ctx.textAlign = 'right';
+  ctx.fillText(caseData.verdict, W-12, 24);
+  ctx.restore();
+
+  // desc below
+  document.getElementById('graph-desc').textContent = caseData.desc;
+}
+
+// ─── RATIO CHECKER ────────────────────────────────────────────────
+function fmt(n,d){ return d===0?'∞':(n/d).toFixed(3); }
+function checkRatios(){
+  const a1=+document.getElementById('a1').value||0;
+  const b1=+document.getElementById('b1').value||0;
+  const c1=+document.getElementById('c1').value||0;
+  const a2=+document.getElementById('a2').value||0;
+  const b2=+document.getElementById('b2').value||0;
+  const c2=+document.getElementById('c2').value||0;
+
+  const r1 = a2===0 ? '∞' : (a1/a2).toFixed(3);
+  const r2 = b2===0 ? '∞' : (b1/b2).toFixed(3);
+  const r3 = c2===0 ? '∞' : (c1/c2).toFixed(3);
+
+  let verdict='', color='';
+  if(r1 !== r2){
+    verdict='✓ CONSISTENT & INDEPENDENT — Unique Solution (lines intersect)';
+    color='#4ade80';
+  } else if(r1 === r2 && r2 === r3){
+    verdict='∞ CONSISTENT & DEPENDENT — Infinite Solutions (lines coincide)';
+    color='#7dd3fc';
+  } else {
+    verdict='✗ INCONSISTENT — No Solution (lines are parallel)';
+    color='#fb7185';
+  }
+  document.getElementById('ratio-result').innerHTML =
+    `<span style="color:var(--muted)">a₁/a₂ = </span><span style="color:var(--amber)">${r1}</span>&nbsp;&nbsp;&nbsp;`+
+    `<span style="color:var(--muted)">b₁/b₂ = </span><span style="color:var(--amber)">${r2}</span>&nbsp;&nbsp;&nbsp;`+
+    `<span style="color:var(--muted)">c₁/c₂ = </span><span style="color:var(--amber)">${r3}</span><br>`+
+    `<span style="color:${color};font-weight:700">${verdict}</span>`;
+}
+
+// ─── SUBSTITUTION STEPPER ─────────────────────────────────────────
+const SUB_STEPS = [
+  { eqs: ['2x + 3y = 11', 'x − 2y = −1'], note: 'Given pair of equations', active: [] },
+  { eqs: ['2x + 3y = 11', 'x = 2y − 1'], note: 'From Eq 2: isolate x → x = 2y − 1', active: [1] },
+  { eqs: ['2(2y − 1) + 3y = 11'], note: 'Substitute x = 2y − 1 into Eq 1', active: [0] },
+  { eqs: ['4y − 2 + 3y = 11'], note: 'Expand the brackets', active: [0] },
+  { eqs: ['7y − 2 = 11'], note: 'Combine like terms', active: [0] },
+  { eqs: ['7y = 13', 'y = 13/7'], note: 'Hmm — let\'s use a nicer example! Using: x + 2y = 5, 2x − y = 0', active: [0,1] },
+  { eqs: ['x = 2y − 0 = 2y (from Eq 2)', '(2y) + 2y = 5 → 4y = 5'], note: 'Using x + 2y = 5 and 2x − y = 0; from Eq2: x = y/2', active: [0,1] },
+  { eqs: ['2x + 3y = 11', 'x − 2y = −1', '', 'x = 2y − 1', '2(2y−1) + 3y = 11', '7y = 13', 'y = 13/7, x = 2(13/7)−1 = 19/7'], note: 'Full solution: x = 19/7, y = 13/7. Verify in both equations ✓', active: [6] },
+];
+
+// Cleaner steps
+const SUB_STEPS2 = [
+  { eqs: ['Eq 1:  2x + 3y = 11', 'Eq 2:  x − 2y = −1'], note: 'We have a pair of linear equations' },
+  { eqs: ['From Eq 2:', 'x = 2y − 1'], note: 'Express x in terms of y using Eq 2 (coefficient 1 — easiest!)' },
+  { eqs: ['Substitute into Eq 1:', '2(2y − 1) + 3y = 11'], note: 'Replace x with (2y − 1) in Equation 1' },
+  { eqs: ['Expand:', '4y − 2 + 3y = 11'], note: 'Distribute: 2 × (2y − 1) = 4y − 2' },
+  { eqs: ['Collect terms:', '7y = 13'], note: '4y + 3y = 7y; move −2 to right side: 7y = 11 + 2 = 13' },
+  { eqs: ['y = 13/7'], note: 'Solve for y', result: false },
+  { eqs: ['Back-substitute:', 'x = 2(13/7) − 1 = 26/7 − 7/7'], note: 'Put y = 13/7 back into x = 2y − 1' },
+  { eqs: ['x = 19/7,  y = 13/7', 'Verify: 2(19/7) + 3(13/7) = 38/7 + 39/7 = 77/7 = 11 ✓'], note: '✓ Solution verified in both equations!', result: true },
+];
+
+let subIdx = 0;
+function renderSub(){
+  const step = SUB_STEPS2[subIdx];
+  const disp = document.getElementById('sub-display');
+  disp.innerHTML = step.eqs.map((eq,i)=>
+    `<div class="step-eq ${step.result&&i===0?'result':i===step.eqs.length-1&&step.result?'result':''}" style="${step.result&&i===step.eqs.length-1?'border-color:var(--amber);color:var(--amber)':''}">${eq}</div>`
+  ).join('') + `<div class="step-note">${step.note}</div>`;
+  const dots = document.getElementById('sub-dots');
+  dots.innerHTML = SUB_STEPS2.map((_,i)=>`<div class="step-dot ${i<subIdx?'done':i===subIdx?'current':''}"></div>`).join('');
+  document.getElementById('sub-counter').textContent = `Step ${subIdx+1} / ${SUB_STEPS2.length}`;
+  document.getElementById('sub-prev').disabled = subIdx===0;
+  document.getElementById('sub-next').disabled = subIdx===SUB_STEPS2.length-1;
+}
+function subStep(d){ subIdx = Math.max(0, Math.min(SUB_STEPS2.length-1, subIdx+d)); renderSub(); }
+
+// ─── ELIMINATION STEPPER ──────────────────────────────────────────
+const ELIM_STEPS = [
+  { eqs: ['Eq 1:  3x + 2y = 16', 'Eq 2:  5x − 3y = 7'], note: 'We need to eliminate one variable. Let\'s eliminate y.' },
+  { eqs: ['Multiply Eq 1 by 3:', '9x + 6y = 48', 'Multiply Eq 2 by 2:', '10x − 6y = 14'], note: 'Make coefficients of y equal in magnitude (LCM of 2, 3 = 6)' },
+  { eqs: ['Add the equations:', '9x + 6y = 48', '10x − 6y = 14', '―――――――――――', '19x + 0y = 62'], note: '+6y and −6y cancel out — y is eliminated!' },
+  { eqs: ['19x = 62'], note: 'Solve for x' },
+  { eqs: ['x = 62/19'], note: 'Hmm — let\'s use integers. Using 3x + 2y = 16 and 5x − 3y = 7 → x = 62/19...', result: false },
+  { eqs: ['Back-substitute x = 62/19:', '3(62/19) + 2y = 16', '186/19 + 2y = 16'], note: 'Substitute back into Eq 1' },
+  { eqs: ['2y = 16 − 186/19 = (304 − 186)/19 = 118/19', 'y = 59/19'], note: 'Solve for y' },
+  { eqs: ['Solution: x = 62/19,  y = 59/19', 'Verify: 3(62/19) + 2(59/19) = 186/19 + 118/19 = 304/19 = 16 ✓'], note: '✓ Solution verified!', result: true },
+];
+
+const ELIM_STEPS2 = [
+  { eqs: ['Eq 1:  x + y = 7', 'Eq 2:  2x − y = 5'], note: 'We have a pair of equations. Let\'s eliminate y using addition.' },
+  { eqs: ['Coefficients of y: +1 and −1', 'Same magnitude, opposite signs → ADD directly'], note: 'Lucky! No multiplication needed when signs are already opposite.' },
+  { eqs: ['  x + y = 7', '+ 2x − y = 5', '―――――――――', '3x + 0 = 12'], note: 'Add the equations term by term. y terms cancel!' },
+  { eqs: ['3x = 12', 'x = 4'], note: 'Solve for x' },
+  { eqs: ['Back-substitute x = 4 into Eq 1:', '4 + y = 7', 'y = 3'], note: 'Put x = 4 into the simpler Eq 1' },
+  { eqs: ['x = 4,   y = 3'], note: 'Solution found!', result: false },
+  { eqs: ['Verify in Eq 1:  4 + 3 = 7 ✓', 'Verify in Eq 2:  2(4) − 3 = 8 − 3 = 5 ✓'], note: 'Always verify in BOTH equations', result: true },
+  { eqs: ['Final Answer:  (x, y) = (4, 3)'], note: '✓ Consistent & independent system — unique solution', result: true },
+];
+
+let elimIdx = 0;
+function renderElim(){
+  const step = ELIM_STEPS2[elimIdx];
+  const disp = document.getElementById('elim-display');
+  disp.innerHTML = step.eqs.map((eq,i)=>
+    `<div class="step-eq ${step.result&&i===step.eqs.length-1?'result':''}">${eq}</div>`
+  ).join('') + `<div class="step-note">${step.note}</div>`;
+  const dots = document.getElementById('elim-dots');
+  dots.innerHTML = ELIM_STEPS2.map((_,i)=>`<div class="step-dot ${i<elimIdx?'done':i===elimIdx?'current':''}"></div>`).join('');
+  document.getElementById('elim-counter').textContent = `Step ${elimIdx+1} / ${ELIM_STEPS2.length}`;
+  document.getElementById('elim-prev').disabled = elimIdx===0;
+  document.getElementById('elim-next').disabled = elimIdx===ELIM_STEPS2.length-1;
+}
+function elimStep(d){ elimIdx = Math.max(0, Math.min(ELIM_STEPS2.length-1, elimIdx+d)); renderElim(); }
+
+// ─── APP CARDS ────────────────────────────────────────────────────
+function toggleApp(el){
+  const wasExpanded = el.classList.contains('expanded');
+  document.querySelectorAll('.app-card').forEach(c=>c.classList.remove('expanded'));
+  if(!wasExpanded) el.classList.add('expanded');
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', ()=>{
+  initGraph();
+  checkRatios();
+  renderSub();
+  renderElim();
+});
+</script>
+</body>
+</html>

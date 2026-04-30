@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Quadratic Equations</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.05) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--indigo);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.prog-row{display:flex;align-items:center;gap:1rem;padding:.5rem 1rem .8rem;width:100%;max-width:580px;}
+.prog-bar{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--indigo),var(--teal));transition:width .4s ease;}
+.prog-text{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap;}
+
+.filters{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;padding:.2rem 1rem .8rem;}
+.f-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.72rem;padding:.3rem .9rem;border-radius:3px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.f-btn:hover{color:var(--text);}
+.f-btn.on{color:#040810;border-color:transparent;}
+.f-all.on{background:var(--muted);color:var(--text)!important;}
+.f-std.on{background:var(--blue);}
+.f-fac.on{background:var(--amber);}
+.f-csq.on{background:var(--teal);}
+.f-frm.on{background:var(--green);}
+.f-dis.on{background:var(--indigo);}
+.f-app.on{background:var(--red);}
+
+.stage{width:100%;max-width:580px;padding:0 1rem;perspective:1200px;}
+.fc-wrap{width:100%;aspect-ratio:3/2;position:relative;cursor:pointer;
+  transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);}
+.fc-wrap.flipped{transform:rotateY(180deg);}
+.fc-face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.4rem;text-align:center;}
+.fc-front{background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.6);}
+.fc-back{transform:rotateY(180deg);background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.6);}
+.fc-tag{font-family:'DM Mono',monospace;font-size:.65rem;font-weight:500;padding:.18rem .65rem;border-radius:2px;margin-bottom:.7rem;}
+.fc-q{font-family:'Playfair Display',serif;font-size:clamp(.88rem,2.4vw,1.1rem);font-weight:700;line-height:1.45;}
+.fc-hint{font-size:.68rem;color:var(--muted);margin-top:.5rem;font-family:'DM Mono',monospace;}
+.fc-flip-hint{position:absolute;bottom:.75rem;font-size:.65rem;font-family:'DM Mono',monospace;color:#1a2d45;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.fc-ans-lbl{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--green);margin-bottom:.5rem;}
+.fc-ans{font-size:clamp(.78rem,2vw,.95rem);line-height:1.65;color:var(--text);}
+.fc-ans strong{color:var(--amber);}
+.fc-ans em{color:var(--teal);font-style:normal;}
+.known-badge{position:absolute;top:.7rem;right:.7rem;font-size:.62rem;font-family:'DM Mono',monospace;padding:.12rem .45rem;border-radius:2px;}
+.known{background:rgba(34,197,94,.15);color:#4ade80;}
+.unknown{background:rgba(239,68,68,.1);color:#f87171;}
+
+.nav-row{display:flex;gap:.7rem;align-items:center;padding:1rem;}
+.nav-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.85rem;padding:.5rem 1.3rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.nav-btn:hover:not(:disabled){border-color:#2a4a6a;color:var(--text);}
+.nav-btn:disabled{opacity:.3;cursor:default;}
+.nav-ctr{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);min-width:80px;text-align:center;}
+.action-row{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;padding:0 1rem .5rem;}
+.act-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.32rem .9rem;border-radius:3px;
+  border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s;}
+.act-btn:hover{color:var(--text);border-color:#2a4a6a;}
+.stats-bar{display:flex;gap:1.2rem;justify-content:center;padding:.3rem 0 1rem;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);}
+.stats-bar span strong{color:var(--text);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Quadratic Equations</h1>
+  <p>Class X · Mathematics Ch.4 · 36 Flashcards · 6 Categories</p>
+</header>
+
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 36</div>
+</div>
+
+<div class="filters">
+  <button class="f-btn f-all on" onclick="setFilter('all',this)">All (36)</button>
+  <button class="f-btn f-std" onclick="setFilter('std',this)">📐 Standard (6)</button>
+  <button class="f-btn f-fac" onclick="setFilter('fac',this)">✂️ Factorisation (6)</button>
+  <button class="f-btn f-csq" onclick="setFilter('csq',this)">🔲 Complete Sq (5)</button>
+  <button class="f-btn f-frm" onclick="setFilter('frm',this)">🧮 Formula (6)</button>
+  <button class="f-btn f-dis" onclick="setFilter('dis',this)">🎯 Discriminant (6)</button>
+  <button class="f-btn f-app" onclick="setFilter('app',this)">🌍 Applications (7)</button>
+</div>
+
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flip()">
+    <div class="fc-face fc-front" id="fc-front"></div>
+    <div class="fc-face fc-back" id="fc-back"></div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="nav(-1)" disabled>&#8592; Prev</button>
+  <span class="nav-ctr" id="nav-ctr">1 / 36</span>
+  <button class="nav-btn" id="next-btn" onclick="nav(1)">Next &#8594;</button>
+</div>
+<div class="action-row">
+  <button class="act-btn" onclick="markKnown()">✓ Mark Known</button>
+  <button class="act-btn" onclick="markReview()">↩ Need Review</button>
+  <button class="act-btn" onclick="shuffle()">⇄ Shuffle</button>
+  <button class="act-btn" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="stats-bar">
+  <span>Known: <strong id="s-known">0</strong></span>
+  <span>Review: <strong id="s-review">0</strong></span>
+  <span>Remaining: <strong id="s-remain">36</strong></span>
+</div>
+
+<script>
+const ALL_CARDS=[
+// ── STANDARD FORM (6) ──
+{cat:'std',q:'What is the standard form of a quadratic equation?',a:'<strong>ax² + bx + c = 0</strong><br>where a, b, c are real numbers and <em>a ≠ 0</em>. The highest power of x is 2.',hint:'Degree must be exactly 2'},
+{cat:'std',q:'Why must a ≠ 0 in ax² + bx + c = 0?',a:'If a = 0, the equation becomes <strong>bx + c = 0</strong> which is <em>linear</em>, not quadratic. The term ax² is what makes it quadratic.',hint:'What happens to the x² term?'},
+{cat:'std',q:'How many roots can a quadratic equation have at most?',a:'At most <strong>2 roots</strong>. A polynomial of degree n has at most n real roots. Since degree = 2, maximum roots = 2.',hint:'Fundamental theorem of algebra'},
+{cat:'std',q:'Is 3x² − 4x + 2 = 0 a quadratic equation? What are a, b, c?',a:'<strong>Yes</strong> — it\'s of the form ax²+bx+c=0 with:<br><em>a = 3, b = −4, c = 2</em><br>a ≠ 0 ✓, highest power = 2 ✓',hint:'Check the three conditions'},
+{cat:'std',q:'Convert (x + 3)² = 2x − 5 to standard form.',a:'x² + 6x + 9 = 2x − 5<br>x² + 6x − 2x + 9 + 5 = 0<br><strong>x² + 4x + 14 = 0</strong><br>(a=1, b=4, c=14)',hint:'Expand, move all to left side'},
+{cat:'std',q:'What is the relationship between roots and zeros of ax² + bx + c?',a:'The <strong>roots</strong> of ax²+bx+c=0 are the same as the <strong>zeros</strong> of the polynomial p(x)=ax²+bx+c — they are the x-values where p(x)=0 (x-intercepts of the parabola).',hint:'Roots = zeros = x-intercepts'},
+
+// ── FACTORISATION (6) ──
+{cat:'fac',q:'What is the zero-product property used in factorisation?',a:'If <strong>A × B = 0</strong>, then either A = 0 or B = 0 (or both).<br>So if (x−p)(x−q) = 0, then <em>x = p or x = q</em>.',hint:'Product is zero → at least one factor is zero'},
+{cat:'fac',q:'In splitting the middle term for ax²+bx+c, what two numbers do you need?',a:'Two numbers whose:<br>• <strong>Product = a × c</strong><br>• <strong>Sum = b</strong><br>These numbers replace b to split the middle term.',hint:'Product = ac, Sum = b'},
+{cat:'fac',q:'Factorise and solve: x² − 7x + 12 = 0',a:'Need: product = 12, sum = −7 → <em>−3 and −4</em><br>x² − 3x − 4x + 12 = 0<br>x(x−3) − 4(x−3) = 0<br><strong>(x−3)(x−4) = 0 → x = 3 or x = 4</strong>',hint:'What two negatives multiply to 12 and add to −7?'},
+{cat:'fac',q:'Factorise and solve: 2x² + x − 6 = 0',a:'ac = 2×(−6) = −12. Need: product = −12, sum = 1 → <em>4 and −3</em><br>2x² + 4x − 3x − 6 = 0<br>2x(x+2) − 3(x+2) = 0<br><strong>(2x−3)(x+2) = 0 → x = 3/2 or x = −2</strong>',hint:'ac = −12, sum = 1'},
+{cat:'fac',q:'When does factorisation NOT work easily?',a:'When the roots are <strong>irrational</strong> (like 2±√3) or <strong>complex</strong>. Factorisation is efficient only when the discriminant D is a <em>perfect square</em>, giving rational roots.',hint:'Think: can you find integer factors?'},
+{cat:'fac',q:'Solve: x² − 25 = 0 by factorisation.',a:'This is a <strong>difference of squares</strong>:<br>x² − 25 = (x−5)(x+5) = 0<br><em>x = 5 or x = −5</em><br><br>Shortcut: x² = 25 → x = ±5',hint:'a² − b² = (a−b)(a+b)'},
+
+// ── COMPLETING THE SQUARE (5) ──
+{cat:'csq',q:'What is the first step in completing the square for ax²+bx+c=0?',a:'<strong>Divide the entire equation by a</strong> to make the coefficient of x² equal to 1:<br><em>x² + (b/a)x + (c/a) = 0</em>',hint:'Coefficient of x² must become 1'},
+{cat:'csq',q:'After making coefficient of x² = 1, what do you add to both sides?',a:'Add <strong>(half the coefficient of x)²</strong> to both sides.<br>If equation is x² + px + q = 0:<br>Add <em>(p/2)²</em> to both sides after moving q to RHS.',hint:'Square of half the x-coefficient'},
+{cat:'csq',q:'Complete the square for x² + 6x + 5 = 0 and solve.',a:'x² + 6x = −5<br>Add (6/2)² = 9: x² + 6x + 9 = 4<br><strong>(x+3)² = 4</strong><br>x + 3 = ±2<br><em>x = −1 or x = −5</em>',hint:'Half of 6 = 3, square it = 9'},
+{cat:'csq',q:'How is the quadratic formula derived from completing the square?',a:'Apply completing the square to <strong>ax²+bx+c=0</strong>:<br>x² + (b/a)x = −c/a<br>x² + (b/a)x + (b/2a)² = (b²−4ac)/4a²<br>(x + b/2a)² = (b²−4ac)/4a²<br>→ <em>x = (−b ± √(b²−4ac))/2a</em>',hint:'Apply the method to the general form'},
+{cat:'csq',q:'What geometric shape does "completing the square" refer to?',a:'Literally making a <strong>perfect square trinomial</strong> (x+k)² on the LHS. Geometrically, it\'s about rearranging an "L-shaped" area into a complete square by adding the missing corner piece.',hint:'Think of algebra tiles'},
+
+// ── QUADRATIC FORMULA (6) ──
+{cat:'frm',q:'State the Quadratic Formula (Shreedharacharya Formula).',a:'For ax² + bx + c = 0 (a ≠ 0):<br><strong>x = (−b ± √(b² − 4ac)) / 2a</strong><br>Also called the <em>Shreedharacharya formula</em>.',hint:'Negative b, plus or minus, square root...'},
+{cat:'frm',q:'Solve using the formula: x² − 5x + 6 = 0',a:'a=1, b=−5, c=6<br>D = 25−24 = 1<br>x = (5 ± √1)/2 = (5±1)/2<br><strong>x = 3 or x = 2</strong>',hint:'Plug a, b, c into the formula'},
+{cat:'frm',q:'Solve using the formula: 2x² + 3x − 2 = 0',a:'a=2, b=3, c=−2<br>D = 9+16 = 25<br>x = (−3 ± 5)/4<br>x = 2/4 or x = −8/4<br><strong>x = 1/2 or x = −2</strong>',hint:'D = b²−4ac = 9−4(2)(−2)'},
+{cat:'frm',q:'What are Vieta\'s formulas for sum and product of roots?',a:'For roots α and β of ax²+bx+c=0:<br><strong>Sum: α + β = −b/a</strong><br><strong>Product: αβ = c/a</strong><br>Useful for verification and forming equations.',hint:'Sum = −b/a, Product = c/a'},
+{cat:'frm',q:'Form a quadratic equation whose roots are 3 and −2.',a:'Sum of roots = 3 + (−2) = <em>1</em><br>Product = 3 × (−2) = <em>−6</em><br>Equation: x² − (sum)x + (product) = 0<br><strong>x² − x − 6 = 0</strong>',hint:'x² − (sum)x + (product) = 0'},
+{cat:'frm',q:'When does the quadratic formula give irrational roots?',a:'When D > 0 but D is <strong>NOT a perfect square</strong>.<br>Example: x²−3x+1=0 → D=5 (not perfect square)<br>Roots: (3±√5)/2 — irrational.',hint:'D positive but not a perfect square'},
+
+// ── DISCRIMINANT (6) ──
+{cat:'dis',q:'What is the discriminant and what does it tell us?',a:'<strong>D = b² − 4ac</strong><br>It determines the <em>nature of roots</em> without actually solving:<br>• D > 0 → two distinct real roots<br>• D = 0 → two equal roots<br>• D < 0 → no real roots',hint:'The expression under the √ in the formula'},
+{cat:'dis',q:'If D > 0, what type of roots does the equation have?',a:'<strong>Two distinct real roots</strong>.<br>If D is a perfect square → roots are <em>rational</em>.<br>If D is not a perfect square → roots are <em>irrational</em> (come in conjugate pairs like a±√b).',hint:'Parabola crosses x-axis at 2 points'},
+{cat:'dis',q:'If D = 0, what type of roots does the equation have?',a:'<strong>Two equal (repeated) roots</strong>.<br>Both roots = <em>−b/2a</em>.<br>The parabola touches the x-axis at exactly one point (vertex on x-axis).',hint:'Parabola just touches x-axis'},
+{cat:'dis',q:'If D < 0, what type of roots does the equation have?',a:'<strong>No real roots</strong> (imaginary/complex roots).<br>The parabola does NOT intersect the x-axis at all. It lies entirely above or below.',hint:'Parabola floats above/below x-axis'},
+{cat:'dis',q:'Find the nature of roots: 3x² − 2x + 1/3 = 0',a:'Multiply by 3: 9x² − 6x + 1 = 0<br>D = (−6)² − 4(9)(1) = 36 − 36 = <strong>0</strong><br>∴ Two equal real roots.<br>Root = −b/2a = 6/18 = <em>1/3</em>',hint:'Compute b² − 4ac'},
+{cat:'dis',q:'For what value of k does 2x² + kx + 3 = 0 have equal roots?',a:'For equal roots: D = 0<br>k² − 4(2)(3) = 0<br>k² = 24<br><strong>k = ±2√6</strong>',hint:'Set D = 0 and solve for k'},
+
+// ── APPLICATIONS (7) ──
+{cat:'app',q:'Two numbers differ by 3 and their product is 108. Find them.',a:'Let numbers be x and x+3.<br>x(x+3) = 108<br>x² + 3x − 108 = 0<br>(x+12)(x−9) = 0 → x = 9 (reject −12)<br><strong>Numbers: 9 and 12</strong>',hint:'x(x+3) = 108'},
+{cat:'app',q:'A rectangular field has perimeter 82m and area 400m². Find its dimensions.',a:'2(l+b)=82 → l+b=41 → l=41−b<br>Area: b(41−b)=400<br>b²−41b+400=0<br>D=1681−1600=81<br>b=(41±9)/2 → <strong>b=16 or 25</strong><br>Dimensions: <em>25m × 16m</em>',hint:'Express l in terms of b, then use area'},
+{cat:'app',q:'A train travels 480 km. If speed increases by 8 km/h, it takes 3 hours less. Find original speed.',a:'Let speed = x km/h.<br>480/x − 480/(x+8) = 3<br>480(x+8) − 480x = 3x(x+8)<br>3840 = 3x² + 24x<br>x² + 8x − 1280 = 0<br>(x+40)(x−32)=0 → <strong>x = 32 km/h</strong>',hint:'Time = Distance/Speed'},
+{cat:'app',q:'The hypotenuse of a right triangle is 1 cm more than twice the shortest side. Third side is 7 cm more than shortest. Find sides.',a:'Let shortest = x. Hyp = 2x+1, third = x+7.<br>(2x+1)² = x² + (x+7)²<br>4x²+4x+1 = x² + x²+14x+49<br>2x²−10x−48=0 → x²−5x−24=0<br>(x−8)(x+3)=0 → <strong>x=8</strong><br>Sides: <em>8, 15, 17 cm</em>',hint:'Pythagoras: h² = p² + b²'},
+{cat:'app',q:'Sum of squares of two consecutive odd numbers is 394. Find them.',a:'Let numbers be x and x+2.<br>x² + (x+2)² = 394<br>2x² + 4x + 4 = 394<br>x² + 2x − 195 = 0<br>(x+15)(x−13) = 0<br><strong>Numbers: 13 and 15</strong> (or −15, −13)',hint:'Consecutive odd: x, x+2'},
+{cat:'app',q:'A takes 6 days less than B to finish a job. Together they finish in 4 days. Find individual times.',a:'Let B = x days, A = (x−6) days.<br>1/x + 1/(x−6) = 1/4<br>4(x−6) + 4x = x(x−6)<br>x²−14x+24=0<br>(x−12)(x−2)=0 → x=12 (reject 2)<br><strong>B=12 days, A=6 days</strong>',hint:'Rate: 1/x + 1/(x−6) = 1/4'},
+{cat:'app',q:'A shopkeeper buys items for ₹2400. If each cost ₹5 less, he could buy 4 more. Find number of items.',a:'Let items = n, cost each = 2400/n.<br>2400/(n) − 2400/(n+4) = 5... wait:<br>(n+4)(2400/n − 5) = 2400 is complex. Better:<br>2400/n − 2400/(n+4) = 5<br>2400×4 = 5n(n+4)<br>n²+4n−1920=0<br>(n−40)(n+48)=0 → <strong>n = 40 items</strong>',hint:'Total cost ÷ number = cost each'},
+];
+
+let deck=[...ALL_CARDS.map((_,i)=>i)];
+let current=0,flipped=false,filterCat='all';
+const known=new Set(),review=new Set();
+
+function filteredDeck(){return filterCat==='all'?deck:deck.filter(i=>ALL_CARDS[i].cat===filterCat);}
+function setFilter(cat,btn){filterCat=cat;document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');current=0;render();}
+
+function render(){
+  const fd=filteredDeck();
+  if(!fd.length){document.getElementById('fc-front').innerHTML='<div class="fc-q">No cards in this category.</div>';return;}
+  const idx=fd[current%fd.length],card=ALL_CARDS[idx],fc=document.getElementById('fc');
+  fc.classList.remove('flipped');flipped=false;
+  const catColors={std:['var(--blue)','rgba(56,189,248,.15)'],fac:['var(--amber)','rgba(245,158,11,.15)'],
+    csq:['var(--teal)','rgba(45,212,191,.15)'],frm:['var(--green)','rgba(34,197,94,.15)'],
+    dis:['var(--indigo)','rgba(129,140,248,.15)'],app:['var(--red)','rgba(244,63,94,.15)']};
+  const catNames={std:'📐 Standard Form',fac:'✂️ Factorisation',csq:'🔲 Complete Square',frm:'🧮 Formula',dis:'🎯 Discriminant',app:'🌍 Applications'};
+  const [cc,cb]=catColors[card.cat]||['var(--muted)','rgba(100,116,139,.15)'];
+  const isK=known.has(idx),isR=review.has(idx);
+  const badge=isK?'<span class="known-badge known">✓ Known</span>':isR?'<span class="known-badge unknown">↩ Review</span>':'';
+  document.getElementById('fc-front').innerHTML=`${badge}<span class="fc-tag" style="background:${cb};color:${cc}">${catNames[card.cat]}</span><div class="fc-q">${card.q}</div>${card.hint?`<div class="fc-hint">Hint: ${card.hint}</div>`:''}<div class="fc-flip-hint">tap to reveal answer</div>`;
+  document.getElementById('fc-back').innerHTML=`${badge}<div class="fc-ans-lbl">✦ ANSWER</div><div class="fc-ans">${card.a}</div>`;
+  document.getElementById('nav-ctr').textContent=`${(current%fd.length)+1} / ${fd.length}`;
+  document.getElementById('prev-btn').disabled=current===0;
+  document.getElementById('next-btn').disabled=current>=fd.length-1;
+  updateProgress();
+}
+function flip(){flipped=!flipped;document.getElementById('fc').classList.toggle('flipped',flipped);}
+function nav(d){const fd=filteredDeck();current=Math.max(0,Math.min(fd.length-1,current+d));render();}
+function markKnown(){const fd=filteredDeck();if(fd.length){known.add(fd[current%fd.length]);review.delete(fd[current%fd.length]);render();updateStats();}}
+function markReview(){const fd=filteredDeck();if(fd.length){review.add(fd[current%fd.length]);known.delete(fd[current%fd.length]);render();updateStats();}}
+function shuffle(){for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}current=0;render();}
+function resetAll(){known.clear();review.clear();deck=[...ALL_CARDS.map((_,i)=>i)];current=0;render();updateStats();}
+function updateProgress(){const fd=filteredDeck(),seen=fd.slice(0,current+1).length,pct=fd.length?Math.round(seen/fd.length*100):0;document.getElementById('prog').style.width=pct+'%';document.getElementById('prog-text').textContent=`${seen} / ${fd.length}`;}
+function updateStats(){document.getElementById('s-known').textContent=known.size;document.getElementById('s-review').textContent=review.size;document.getElementById('s-remain').textContent=ALL_CARDS.length-known.size-review.size;}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')nav(1);if(e.key==='ArrowLeft')nav(-1);if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}});
+render();updateStats();
+</script>
+</body>
+</html>
