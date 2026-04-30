@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Development (Economics Ch.1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0e0a04;--card:#1a1208;--card2:#221a0a;--border:#3a2e1a;--text:#e8d8b0;--muted:#8a7a5a;--gold:#f5c842;--orange:#f97316;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--teal:#2dd4bf;--pink:#f472b6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+  header{text-align:center;padding:2.5rem 1rem 1.5rem;position:relative}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(245,200,66,.08),transparent 70%);pointer-events:none}
+  header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;background:linear-gradient(135deg,#f5c842,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.82rem;margin-top:.4rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.2rem;max-width:1120px;margin:auto;padding:0 1.2rem 3rem}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;position:relative;overflow:hidden}
+  .panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0}
+  .panel.gold::before{background:var(--gold)}.panel.green::before{background:var(--green)}.panel.blue::before{background:var(--blue)}.panel.indigo::before{background:var(--indigo)}.panel.teal::before{background:var(--teal)}.panel.orange::before{background:var(--orange)}.panel.red::before{background:var(--red)}.panel.pink::before{background:var(--pink)}
+  .panel h2{font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:.7rem}
+  .panel h3{font-size:.88rem;margin:.8rem 0 .4rem;color:var(--gold)}
+  .panel p,.panel li{font-size:.82rem;line-height:1.7;color:var(--muted)}
+  .panel ul{padding-left:1.1rem}
+  .panel li{margin-bottom:.25rem}
+  .panel li strong{color:var(--text)}
+  .f{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--gold);background:rgba(245,200,66,.08);padding:.35rem .7rem;border-radius:6px;margin:.4rem 0;display:inline-block}
+  .tbl{width:100%;border-collapse:collapse;margin:.5rem 0;font-size:.76rem}
+  .tbl th,.tbl td{border:1px solid var(--border);padding:.4rem .5rem;text-align:center}
+  .tbl th{background:var(--card2);color:var(--gold);font-weight:700}
+  .tbl td{color:var(--muted)}
+  .tip{background:rgba(245,200,66,.05);border-left:3px solid var(--gold);padding:.5rem .8rem;border-radius:0 6px 6px 0;margin:.6rem 0;font-size:.78rem;color:var(--text)}
+  .tip strong{color:var(--gold)}
+  .wide{grid-column:1/-1}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(14,10,4,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,46,26,.7);position:relative;z-index:100}
+  .site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#8a7a5a;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e8d8b0}
+  @media(max-width:600px){.grid{grid-template-columns:1fr;padding:0 .7rem 2rem}.wide{grid-column:1}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Development</h1>
+  <p>Cheat Sheet · CBSE Class X · Economics Chapter 1</p>
+</header>
+<div class="grid">
+
+<!-- 1 -->
+<div class="panel gold">
+  <h2 style="color:var(--gold)">💡 What is Development?</h2>
+  <ul>
+    <li><strong>Development</strong> = progress + improvement in quality of life.</li>
+    <li>People have <strong>different developmental goals</strong> based on their life situations.</li>
+    <li>What is development for one may be <strong>harmful for another</strong> (conflicting goals).</li>
+    <li>Development is not just income — includes <strong>freedom, equality, security, respect</strong>.</li>
+    <li>Decisions involve <strong>trade-offs</strong> between different stakeholders.</li>
+  </ul>
+  <div class="tip"><strong>Key Example:</strong> A dam = electricity for industry BUT displacement for tribals. Both are valid developmental concerns.</div>
+</div>
+
+<!-- 2 -->
+<div class="panel green">
+  <h2 style="color:var(--green)">💰 National Income & Per Capita Income</h2>
+  <ul>
+    <li><strong>National Income:</strong> Total value of goods & services produced in a country/year.</li>
+    <li><strong>Per Capita Income (PCI):</strong></li>
+  </ul>
+  <p><span class="f">PCI = National Income ÷ Total Population</span></p>
+  <ul>
+    <li>Used by <strong>World Bank</strong> to classify countries.</li>
+    <li><strong>Limitation:</strong> It's an average — hides inequality!</li>
+    <li>High PCI ≠ everyone is well-off (wealth may be concentrated).</li>
+  </ul>
+  <h3>World Bank Classification (2019)</h3>
+  <table class="tbl">
+    <tr><th>Category</th><th>PCI Threshold</th></tr>
+    <tr><td>Rich (High-income)</td><td>> $12,056/year</td></tr>
+    <tr><td>Upper middle-income</td><td>$3,996 – $12,055</td></tr>
+    <tr><td>Lower middle-income</td><td>$1,036 – $3,995</td></tr>
+    <tr><td>Low-income</td><td>< $1,036/year</td></tr>
+  </table>
+  <div class="tip"><strong>India</strong> = Low middle-income country (PCI ≈ $6,681 PPP)</div>
+</div>
+
+<!-- 3 -->
+<div class="panel blue wide">
+  <h2 style="color:var(--blue)">📊 Key Development Indicators</h2>
+  <table class="tbl">
+    <tr><th>Indicator</th><th>What it Measures</th><th>Formula / Definition</th><th>Better = ?</th></tr>
+    <tr><td><strong>IMR</strong></td><td>Child health & healthcare</td><td>Deaths before age 1, per 1000 live births</td><td>Lower</td></tr>
+    <tr><td><strong>Literacy Rate</strong></td><td>Education access</td><td>% of pop. age 7+ who can read & write</td><td>Higher</td></tr>
+    <tr><td><strong>NAR</strong></td><td>School attendance</td><td>% of age-group children actually in school</td><td>Higher</td></tr>
+    <tr><td><strong>Life Expectancy</strong></td><td>Overall health</td><td>Average years a newborn is expected to live</td><td>Higher</td></tr>
+    <tr><td><strong>BMI</strong></td><td>Nutrition status</td><td>Weight(kg) ÷ Height²(m²)</td><td>18.5–24.9</td></tr>
+  </table>
+</div>
+
+<!-- 4 -->
+<div class="panel orange">
+  <h2 style="color:var(--orange)">🗺️ Comparing Indian States</h2>
+  <table class="tbl">
+    <tr><th>Indicator</th><th style="color:var(--green)">Kerala</th><th style="color:var(--gold)">Punjab</th><th style="color:var(--red)">Bihar</th></tr>
+    <tr><td>Per Capita Income</td><td>₹1,50,000</td><td><strong>₹2,10,000 ✓</strong></td><td>₹40,000</td></tr>
+    <tr><td>IMR (per 1000)</td><td><strong>7 ✓</strong></td><td>25</td><td>38</td></tr>
+    <tr><td>Literacy Rate</td><td><strong>94% ✓</strong></td><td>82%</td><td>62%</td></tr>
+    <tr><td>Net Attendance</td><td><strong>83% ✓</strong></td><td>79%</td><td>43%</td></tr>
+    <tr><td>Life Expectancy</td><td><strong>75 yrs ✓</strong></td><td>72 yrs</td><td>65 yrs</td></tr>
+  </table>
+  <div class="tip"><strong>Conclusion:</strong> Punjab = richest but Kerala = most developed. Income alone ≠ Development!</div>
+</div>
+
+<!-- 5 -->
+<div class="panel indigo">
+  <h2 style="color:var(--indigo)">🏆 Human Development Index (HDI)</h2>
+  <ul>
+    <li>Published by <strong>UNDP</strong> annually.</li>
+    <li>Scale: <strong>0 (worst) to 1 (best)</strong>.</li>
+    <li>More comprehensive than World Bank's income-only approach.</li>
+  </ul>
+  <h3>Three Pillars of HDI</h3>
+  <table class="tbl">
+    <tr><th>Pillar</th><th>Indicator Used</th></tr>
+    <tr><td>❤️ Health</td><td>Life Expectancy at Birth</td></tr>
+    <tr><td>📚 Education</td><td>Mean Years of Schooling + Expected Years</td></tr>
+    <tr><td>💵 Standard of Living</td><td>GNI per capita (PPP $)</td></tr>
+  </table>
+  <h3>Country Comparison</h3>
+  <table class="tbl">
+    <tr><th>Country</th><th>HDI Rank</th><th>Life Exp.</th><th>Schooling</th><th>GNI/cap</th></tr>
+    <tr><td>Sri Lanka</td><td><strong>72</strong></td><td>77 yrs</td><td>10.6 yrs</td><td>$12,707</td></tr>
+    <tr><td>India</td><td>131</td><td>69 yrs</td><td>6.5 yrs</td><td>$6,681</td></tr>
+    <tr><td>Pakistan</td><td>154</td><td>67 yrs</td><td>5.2 yrs</td><td>$5,005</td></tr>
+  </table>
+</div>
+
+<!-- 6 -->
+<div class="panel gold">
+  <h2 style="color:var(--gold)">⚖️ World Bank vs UNDP</h2>
+  <table class="tbl">
+    <tr><th>Feature</th><th>World Bank</th><th>UNDP</th></tr>
+    <tr><td>Measure</td><td>Per Capita Income only</td><td>HDI (3 pillars)</td></tr>
+    <tr><td>Classifies as</td><td>Rich / Poor countries</td><td>Very High / High / Medium / Low HDI</td></tr>
+    <tr><td>Advantage</td><td>Simple, easy to calculate</td><td>Holistic, captures quality of life</td></tr>
+    <tr><td>Limitation</td><td>Ignores health & education</td><td>More complex to compute</td></tr>
+  </table>
+  <div class="tip"><strong>Board favourite:</strong> "UNDP method is better because it doesn't look at income alone — it considers what money can and cannot buy."</div>
+</div>
+
+<!-- 7 -->
+<div class="panel teal">
+  <h2 style="color:var(--teal)">♻️ Sustainable Development</h2>
+  <ul>
+    <li><strong>Definition:</strong> Development that meets <strong>present needs</strong> without compromising <strong>future generations'</strong> ability to meet their needs.</li>
+    <li>Source: <strong>Brundtland Commission, 1987</strong></li>
+    <li>Environmental degradation = anti-development.</li>
+    <li>Must balance economic growth with environmental protection.</li>
+  </ul>
+  <h3>Resource Classification</h3>
+  <table class="tbl">
+    <tr><th>Renewable ✅</th><th>Non-Renewable ❌</th></tr>
+    <tr><td>Solar, Wind, Hydro, Biomass</td><td>Coal (~200 yrs), Petroleum (~50 yrs)</td></tr>
+    <tr><td>Can be replenished naturally</td><td>Finite — once gone, gone forever</td></tr>
+    <tr><td>Clean, low pollution</td><td>Causes pollution & climate change</td></tr>
+  </table>
+  <div class="tip"><strong>India examples:</strong> Groundwater depletion (Punjab), Delhi air pollution, Ganga pollution, deforestation for mining.</div>
+</div>
+
+<!-- 8 -->
+<div class="panel red">
+  <h2 style="color:var(--red)">🚫 What Money Cannot Buy</h2>
+  <ul>
+    <li><strong>Pollution-free environment</strong> — requires collective action</li>
+    <li><strong>Freedom & democracy</strong> — political, not purchasable</li>
+    <li><strong>Respect & dignity</strong> — social equality needed</li>
+    <li><strong>Peace & security</strong> — community-level effort</li>
+    <li><strong>Public healthcare for all</strong> — market fails the poor</li>
+  </ul>
+  <div class="tip"><strong>Key insight:</strong> These require <strong>government intervention</strong> and <strong>public facilities</strong>. The market alone cannot ensure development for all.</div>
+</div>
+
+<!-- 9 -->
+<div class="panel pink">
+  <h2 style="color:var(--pink)">🍽️ BMI — Nutritional Indicator</h2>
+  <p><span class="f">BMI = Weight (kg) ÷ Height² (m²)</span></p>
+  <table class="tbl">
+    <tr><th>BMI Range</th><th>Status</th><th>Development Implication</th></tr>
+    <tr><td>< 18.5</td><td style="color:var(--red)">Undernourished</td><td>Poverty, food insecurity</td></tr>
+    <tr><td>18.5 – 24.9</td><td style="color:var(--green)">Normal</td><td>Adequate nutrition</td></tr>
+    <tr><td>25 – 29.9</td><td style="color:var(--orange)">Overweight</td><td>Lifestyle concerns</td></tr>
+    <tr><td>≥ 30</td><td style="color:var(--red)">Obese</td><td>Health risk</td></tr>
+  </table>
+</div>
+
+<!-- 10 -->
+<div class="panel green">
+  <h2 style="color:var(--green)">📝 Important Full Forms</h2>
+  <table class="tbl">
+    <tr><th>Acronym</th><th>Full Form</th></tr>
+    <tr><td>HDI</td><td>Human Development Index</td></tr>
+    <tr><td>UNDP</td><td>United Nations Development Programme</td></tr>
+    <tr><td>PCI</td><td>Per Capita Income</td></tr>
+    <tr><td>IMR</td><td>Infant Mortality Rate</td></tr>
+    <tr><td>BMI</td><td>Body Mass Index</td></tr>
+    <tr><td>GNI</td><td>Gross National Income</td></tr>
+    <tr><td>PPP</td><td>Purchasing Power Parity</td></tr>
+    <tr><td>NAR</td><td>Net Attendance Ratio</td></tr>
+  </table>
+</div>
+
+<!-- 11 -->
+<div class="panel gold">
+  <h2 style="color:var(--gold)">🧠 Board Exam Quick-Fire</h2>
+  <ul>
+    <li>World Bank "rich" threshold: <strong>$12,056+/yr</strong></li>
+    <li>India HDI rank: <strong>~131</strong> (Medium)</li>
+    <li>Kerala IMR: <strong>7</strong> | Bihar IMR: <strong>38</strong></li>
+    <li>Kerala literacy: <strong>94%</strong> | Bihar: <strong>62%</strong></li>
+    <li>Brundtland Commission: <strong>1987</strong></li>
+    <li>HDI published by: <strong>UNDP</strong></li>
+    <li>PCI = <strong>National Income ÷ Population</strong></li>
+    <li>Sri Lanka HDI rank: <strong>72</strong> (higher than India despite similar region)</li>
+    <li>3 pillars of HDI: <strong>Health + Education + Income</strong></li>
+    <li>Petroleum reserves: <strong>~50 years</strong> at current rate</li>
+  </ul>
+</div>
+
+<!-- 12 -->
+<div class="panel blue">
+  <h2 style="color:var(--blue)">🔑 Key Differences & Comparisons</h2>
+  <h3>Economic Growth vs Development</h3>
+  <table class="tbl">
+    <tr><th>Economic Growth</th><th>Development</th></tr>
+    <tr><td>Increase in GDP/income</td><td>Improvement in quality of life</td></tr>
+    <tr><td>Quantitative (numbers)</td><td>Qualitative (well-being)</td></tr>
+    <tr><td>Can occur without equity</td><td>Requires equity & inclusion</td></tr>
+    <tr><td>Measured by PCI</td><td>Measured by HDI</td></tr>
+  </table>
+  <h3>Developed vs Developing Countries</h3>
+  <table class="tbl">
+    <tr><th>Developed</th><th>Developing</th></tr>
+    <tr><td>High PCI (>$12,056)</td><td>Low/Medium PCI</td></tr>
+    <tr><td>High HDI (>0.8)</td><td>Medium/Low HDI</td></tr>
+    <tr><td>Low IMR, High Literacy</td><td>Higher IMR, Lower Literacy</td></tr>
+    <tr><td>Examples: USA, Norway</td><td>Examples: India, Pakistan</td></tr>
+  </table>
+</div>
+
+</div>
+</body>
+</html>

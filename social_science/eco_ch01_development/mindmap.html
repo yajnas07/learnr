@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Development (Economics Ch.1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0600; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#f5c842,#f97316,#22c55e);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #6b5b3a; margin-top: .1rem; }
+
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #3a2e1a; background: rgba(26,18,8,.9);
+  color: #8a7a5a; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #5a4a2a; color: #e8d8b0; }
+
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1a1208; border: 1px solid #3a2e1a;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 260px; font-size: .82rem; color: #e8d8b0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; color: #f5c842; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(10,6,0,.92); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(58,46,26,.75);
+  position:sticky; top:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#8a7a5a; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(58,46,26,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#e8d8b0; border-color:#5a4a2a; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<div id="ui">
+  <div>
+    <h1>Development — Economics Ch.1</h1>
+    <p>Class X · CBSE · Mind Map — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+
+let W, H, scale = 1, ox = 0, oy = 0;
+let dragging = false, dragStart = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2 + 20;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Development\n(Economics)', x:0, y:0, r:60,
+  color:'#1a0e00', stroke:'#f5c842', textColor:'#f5c842', fontSize:13
+};
+
+const BRANCHES = [
+  {
+    id:'what', label:'What is\nDevelopment?', x:-310, y:-210, r:44,
+    color:'#1a1400', stroke:'#f5c842', textColor:'#fde68a',
+    info:'Development = progress + improvement in quality of life.\nDifferent people have different developmental goals.\nWhat is development for one may not be for another.\nInvolves thinking about a mix of goals — income, freedom, equality, security.',
+    children:[
+      { id:'w1', label:'Different\nGoals', x:-510, y:-330, r:34, color:'#1a1400', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'A girl from a rich family wants equal treatment — not income.\nA landless worker wants more wages.\nAn adivasi wants forest rights.\nGoals depend on life situation & aspirations.' },
+      { id:'w2', label:'Conflicting\nGoals', x:-540, y:-200, r:34, color:'#1a1400', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'What may be development for one may be destructive for another.\nExample: Dam → electricity for industry BUT displacement for tribals.\nIndustrialists vs. environmentalists.\nDecision involves trade-offs between groups.' },
+      { id:'w3', label:'Beyond\nIncome', x:-510, y:-70, r:34, color:'#1a1400', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'People seek more than just income.\nFreedom, equality, security, respect.\nPollution-free environment.\nPeace and democracy.\nThese cannot be bought with money.' },
+    ]
+  },
+  {
+    id:'income', label:'Income &\nComparison', x:310, y:-210, r:44,
+    color:'#001a0a', stroke:'#22c55e', textColor:'#86efac',
+    info:'Income is the most common criterion for comparing countries.\nPer Capita Income = National Income ÷ Population.\nUsed by World Bank to classify countries.\nLimitation: averages hide inequality.',
+    children:[
+      { id:'i1', label:'National\nIncome', x:510, y:-330, r:34, color:'#001a0a', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'Total value of all goods & services produced in a country in a year.\nAlso called GDP (Gross Domestic Product).\nHigher national income → more resources available.\nBut doesn\'t tell how income is distributed.' },
+      { id:'i2', label:'Per Capita\nIncome', x:550, y:-200, r:34, color:'#001a0a', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'PCI = National Income ÷ Total Population.\nIt is an AVERAGE — can be misleading.\nTwo countries with same PCI can have very different income distributions.\nWorld Bank uses this to classify countries.' },
+      { id:'i3', label:'World Bank\nCriteria', x:520, y:-70, r:34, color:'#001a0a', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'Rich / High-income: PCI > $12,056/yr.\nUpper middle: $3,996–$12,055.\nLower middle: $1,036–$3,995.\nLow-income: < $1,036/yr.\nIndia = Low middle-income country.' },
+      { id:'i4', label:'Limitations\nof PCI', x:360, y:-370, r:34, color:'#001a0a', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'It is an average — hides inequality.\nDoesn\'t show distribution of income.\nRich can pull up average even if poor stay poor.\nDoesn\'t account for health, education, environment.' },
+    ]
+  },
+  {
+    id:'ind', label:'Key\nIndicators', x:-300, y:230, r:44,
+    color:'#001020', stroke:'#38bdf8', textColor:'#7dd3fc',
+    info:'Beyond income, we need other indicators to measure development.\nThese include health, education, and nutrition indicators.\nThey show what money cannot always buy.',
+    children:[
+      { id:'n1', label:'IMR', x:-520, y:140, r:34, color:'#001020', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'Infant Mortality Rate.\nNumber of children that die before age 1, per 1000 live births.\nLower IMR = better healthcare.\nKerala: 7 | Bihar: 38.\nShows effectiveness of public health system.' },
+      { id:'n2', label:'Literacy\nRate', x:-540, y:270, r:34, color:'#001020', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'% of population age 7+ that can read & write.\nHigher = better access to education.\nKerala: 94% | Bihar: 62%.\nImportant for empowerment & employment.\nIndia average: ~77%.' },
+      { id:'n3', label:'Net Attend.\nRatio', x:-500, y:380, r:34, color:'#001020', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'% of children of school-going age actually enrolled in school.\nShows actual access to education (not just literacy on paper).\nKerala: 83% | Bihar: 43%.\nReveals gaps between enrollment & attendance.' },
+      { id:'n4', label:'Life\nExpectancy', x:-320, y:400, r:34, color:'#001020', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'Average number of years a newborn is expected to live.\nHigher = better overall health & nutrition.\nKerala: 75 yrs | Bihar: 65 yrs.\nReflects healthcare, sanitation, nutrition combined.' },
+      { id:'n5', label:'BMI', x:-160, y:380, r:32, color:'#001020', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'Body Mass Index = Weight(kg) ÷ Height²(m²).\n< 18.5: undernourished.\n18.5–24.9: normal.\n25–29.9: overweight.\n≥ 30: obese.\nUsed to assess nutritional status of population.' },
+    ]
+  },
+  {
+    id:'hdi', label:'Human Dev.\nIndex (HDI)', x:300, y:230, r:44,
+    color:'#0a0020', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'Published by UNDP annually.\nScale: 0 (worst) to 1 (best).\nMore comprehensive than World Bank\'s income-only approach.\nCompares countries on 3 pillars.',
+    children:[
+      { id:'h1', label:'Health\nPillar', x:500, y:130, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Measured by Life Expectancy at Birth.\nLonger life = better healthcare, nutrition, sanitation.\nSri Lanka: 77 yrs | India: 69 yrs | Pakistan: 67 yrs.' },
+      { id:'h2', label:'Education\nPillar', x:540, y:260, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Measured by:\n• Mean Years of Schooling (adults)\n• Expected Years of Schooling (children).\nSri Lanka: 10.6 yrs | India: 6.5 yrs | Pakistan: 5.2 yrs.' },
+      { id:'h3', label:'Income\nPillar', x:510, y:370, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Measured by GNI per capita (PPP $).\nPPP = Purchasing Power Parity — adjusts for cost of living.\nSri Lanka: $12,707 | India: $6,681 | Pakistan: $5,005.' },
+      { id:'h4', label:'HDI\nRankings', x:340, y:410, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Sri Lanka: Rank 72 (High HDI).\nIndia: Rank 131 (Medium HDI).\nPakistan: Rank 154 (Low HDI).\nNorway: Rank 1.\nShows India lags despite economic growth.' },
+    ]
+  },
+  {
+    id:'sus', label:'Sustainable\nDevelopment', x:0, y:-310, r:44,
+    color:'#001a1a', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:'Development that meets present needs without compromising future generations\' ability to meet theirs.\nBrundtland Commission, 1987.\nMust balance economic growth with environmental protection.',
+    children:[
+      { id:'s1', label:'Non-\nRenewable', x:-180, y:-430, r:34, color:'#001a1a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Finite resources — once gone, gone forever.\nCoal: ~200 years remaining.\nPetroleum: ~50 years remaining.\nCause pollution & climate change.\nMust reduce dependence on these.' },
+      { id:'s2', label:'Renewable\nResources', x:0, y:-460, r:34, color:'#001a1a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Can be replenished naturally.\nSolar, wind, hydro, biomass energy.\nClean, low pollution.\nSustainable for long-term.\nIndia investing heavily in solar & wind.' },
+      { id:'s3', label:'Environ.\nDegradation', x:180, y:-430, r:34, color:'#001a1a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Groundwater overuse (Punjab crisis).\nDeforestation for mining & industry.\nAir pollution (Delhi).\nRiver pollution (Ganga).\nThis is anti-development — harms quality of life.' },
+    ]
+  },
+  {
+    id:'comp', label:'Comparing\nStates', x:0, y:310, r:42,
+    color:'#1a0800', stroke:'#f97316', textColor:'#fdba74',
+    info:'Indian states show that income alone ≠ development.\nKerala: highest on health & education despite lower income.\nPunjab: highest income but not best on all indicators.\nBihar: lowest on most indicators.',
+    children:[
+      { id:'c1', label:'Kerala', x:-170, y:430, r:34, color:'#1a0800', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'PCI: ₹1,50,000 (not highest).\nIMR: 7 (best) | Literacy: 94% (best).\nLife Expectancy: 75 yrs (best).\nNet Attendance: 83% (best).\nProves: good governance > high income.' },
+      { id:'c2', label:'Punjab', x:0, y:470, r:34, color:'#1a0800', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'PCI: ₹2,10,000 (highest of the three).\nIMR: 25 | Literacy: 82%.\nLife Expectancy: 72 yrs.\nRicher but NOT most developed.\nShows income alone is insufficient.' },
+      { id:'c3', label:'Bihar', x:170, y:430, r:34, color:'#1a0800', stroke:'#fb923c', textColor:'#fed7aa',
+        info:'PCI: ₹40,000 (lowest).\nIMR: 38 (worst) | Literacy: 62% (lowest).\nLife Expectancy: 65 yrs.\nNet Attendance: 43%.\nNeeds improvement on all fronts.' },
+    ]
+  }
+];
+
+// Build flat list
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+
+function getNode(id) { return allNodes.find(n=>n.id===id); }
+
+// Pan & zoom
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { ox = dragOrigin.x+(e.clientX-dragStart.x); oy = dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>dragging=false);
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:0.91; zoomAt(f,e.clientX,e.clientY); },{passive:false});
+
+// Touch
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }});
+canvas.addEventListener('touchmove',e=>{ e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d; }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.3,Math.min(2.5,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+20; draw(); }
+
+// Draw
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy);
+  ctx.scale(scale,scale);
+
+  // grid
+  ctx.save();
+  ctx.strokeStyle='rgba(245,200,66,.015)';
+  ctx.lineWidth=1;
+  for(let x=-1000;x<1000;x+=60){ ctx.beginPath();ctx.moveTo(x,-1000);ctx.lineTo(x,1000);ctx.stroke(); }
+  for(let y=-1000;y<1000;y+=60){ ctx.beginPath();ctx.moveTo(-1000,y);ctx.lineTo(1000,y);ctx.stroke(); }
+  ctx.restore();
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'88');
+    grd.addColorStop(1,b.stroke+'44');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2-30;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[4,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?30:16;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||11}px Nunito,sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=14;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

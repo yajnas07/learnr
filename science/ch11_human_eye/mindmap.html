@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — The Human Eye and the Colourful World</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #080f1e; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#10b981,#38bdf8,#818cf8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 260px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,45,69,.75);
+  position:sticky; top:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a9ab8; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(26,45,69,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<div id="ui">
+  <div>
+    <h1>The Human Eye &amp; the Colourful World</h1>
+    <p>Class X · CBSE · Mind Map — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+
+let W, H, scale = 1, ox = 0, oy = 0;
+let dragging = false, dragStart = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2 + 20;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Human Eye\n& Colourful\nWorld', x:0, y:0, r:62,
+  color:'#021a12', stroke:'#10b981', textColor:'#6ee7b7', fontSize:13
+};
+
+const BRANCHES = [
+  {
+    id:'eye', label:'Human Eye\nStructure', x:-320, y:-200, r:44,
+    color:'#021a12', stroke:'#10b981', textColor:'#a7f3d0',
+    info:'The human eye is a natural optical instrument.\nIt forms a real, inverted, diminished image on the retina.\nThe eye lens is a biconvex crystalline lens whose focal length can be adjusted by ciliary muscles.',
+    children:[
+      { id:'e1', label:'Cornea', x:-520, y:-330, r:34, color:'#021a12', stroke:'#34d399', textColor:'#bbf7d0',
+        info:'Transparent, curved front surface.\nProvides maximum refraction (~2/3 of total).\nNo blood vessels — gets oxygen from air.\nProtects inner parts of the eye.' },
+      { id:'e2', label:'Iris &\nPupil', x:-550, y:-200, r:34, color:'#021a12', stroke:'#34d399', textColor:'#bbf7d0',
+        info:'Iris: coloured muscular diaphragm.\nPupil: central aperture in iris.\nPupil contracts in bright light.\nPupil dilates in dim light.\nRegulates amount of light entering eye.' },
+      { id:'e3', label:'Eye Lens', x:-530, y:-70, r:34, color:'#021a12', stroke:'#34d399', textColor:'#bbf7d0',
+        info:'Crystalline, biconvex, transparent lens.\nFocal length adjustable (accommodation).\nHeld by ciliary muscles.\nForms image on retina.\nPower: ~40 dioptre (relaxed).' },
+      { id:'e4', label:'Retina', x:-380, y:-360, r:34, color:'#021a12', stroke:'#34d399', textColor:'#bbf7d0',
+        info:'Light-sensitive screen at back of eye.\nContains rods (dim light) & cones (colour).\nImage formed: real, inverted, diminished.\nBlind spot: no receptors (optic nerve exit).\nYellow spot (fovea): max cone density.' },
+      { id:'e5', label:'Optic\nNerve', x:-180, y:-350, r:34, color:'#021a12', stroke:'#34d399', textColor:'#bbf7d0',
+        info:'Carries electrical signals from retina to brain.\nBrain interprets inverted image as erect.\nPersistence of vision = 1/16 second.\nThis makes movies & animations possible.' },
+    ]
+  },
+  {
+    id:'acc', label:'Power of\nAccommodation', x:320, y:-200, r:44,
+    color:'#0a1a2e', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:'Ability of the eye lens to adjust its focal length.\nCiliary muscles contract → lens thickens → f decreases (near objects).\nCiliary muscles relax → lens thins → f increases (far objects).',
+    children:[
+      { id:'ac1', label:'Near Point', x:500, y:-330, r:34, color:'#0a1a2e', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Closest point of clear vision.\nNear point (D) = 25 cm for normal eye.\nIncreases with age:\n• Age 60+: may be > 200 cm.\nAlso called "least distance of distinct vision".' },
+      { id:'ac2', label:'Far Point', x:550, y:-200, r:34, color:'#0a1a2e', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Farthest point of clear vision.\nFar point = infinity (∞) for normal eye.\nEye is fully relaxed looking at ∞.\nLens is thinnest, focal length maximum.' },
+      { id:'ac3', label:'Range of\nVision', x:500, y:-70, r:34, color:'#0a1a2e', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Normal eye: 25 cm to infinity.\nEye adapts focal length within this range.\nAccommodation range decreases with age.\nThis is why elderly need reading glasses.' },
+    ]
+  },
+  {
+    id:'def', label:'Defects of\nVision', x:-300, y:220, r:44,
+    color:'#1a0f00', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'When the eye cannot focus images properly on the retina.\nThree main defects: Myopia, Hypermetropia, Presbyopia.\nAll correctable using appropriate lenses.',
+    children:[
+      { id:'d1', label:'Myopia', x:-520, y:120, r:36, color:'#1a0f00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Short-sightedness / Near-sightedness.\nCan see near objects clearly, far objects blurry.\nImage forms BEFORE retina.\nCauses:\n• Eyeball too long\n• Lens too curved (excess power)\nCorrection: CONCAVE (diverging) lens.\nf = −(far point distance).' },
+      { id:'d2', label:'Hyper-\nmetropia', x:-530, y:260, r:36, color:'#1a0f00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Long-sightedness / Far-sightedness.\nCan see far objects clearly, near objects blurry.\nImage forms BEHIND retina.\nCauses:\n• Eyeball too short\n• Lens too flat (low power)\nCorrection: CONVEX (converging) lens.\nP = 1/f where 1/f = 1/25 − 1/N.' },
+      { id:'d3', label:'Presbyopia', x:-420, y:380, r:36, color:'#1a0f00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Age-related weakening of accommodation.\nNear point recedes with age.\nCiliary muscles weaken, lens loses flexibility.\nCorrection: BIFOCAL lens.\nUpper: concave (distance)\nLower: convex (reading).\nCommon after age 40.' },
+      { id:'d4', label:'Astigmatism', x:-200, y:380, r:34, color:'#1a0f00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Cornea not perfectly spherical.\nDifferent curvatures in different planes.\nImage distorted / blurred in one direction.\nCorrection: CYLINDRICAL lens.\nCan combine with myopia or hypermetropia.' },
+    ]
+  },
+  {
+    id:'prism', label:'Prism &\nDispersion', x:300, y:220, r:44,
+    color:'#0c0024', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'A glass prism refracts light twice (entry & exit faces).\nWhite light splits into 7 colours (VIBGYOR) = dispersion.\nCause: different wavelengths have different refractive indices.',
+    children:[
+      { id:'p1', label:'Refraction\nby Prism', x:500, y:110, r:34, color:'#0c0024', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Light bends towards base at each surface.\nAngle of deviation δ = (i + e) − A.\nA = angle of prism.\nAt minimum deviation: i = e.\nRay inside is parallel to base.' },
+      { id:'p2', label:'Dispersion', x:540, y:230, r:34, color:'#0c0024', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'White light → VIBGYOR spectrum.\nViolet bends MOST (short λ, high μ).\nRed bends LEAST (long λ, low μ).\nNewton proved with 2-prism experiment:\n2nd prism recombines colours back to white.' },
+      { id:'p3', label:'Rainbow', x:500, y:350, r:34, color:'#0c0024', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Natural spectrum in sky after rain.\nSunlight enters water drops:\n1. Refraction at entry\n2. Total internal reflection\n3. Refraction at exit\nPrimary: red outside, violet inside.' },
+      { id:'p4', label:'Atmospheric\nDispersion', x:300, y:400, r:34, color:'#0c0024', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'White sunlight dispersed by atmosphere.\nRed & orange least scattered → visible at horizon.\nCauses red appearance of sun at sunrise/sunset.\nStars appear slightly displaced.' },
+    ]
+  },
+  {
+    id:'scat', label:'Scattering\nof Light', x:0, y:-310, r:42,
+    color:'#001a2e', stroke:'#38bdf8', textColor:'#7dd3fc',
+    info:'Tyndall Effect: scattering by colloidal particles.\nRayleigh Scattering: by atmospheric molecules.\nIntensity ∝ 1/λ⁴ — shorter wavelengths scatter much more.',
+    children:[
+      { id:'sc1', label:'Blue Sky', x:-170, y:-430, r:34, color:'#001a2e', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'Blue light (short λ) scattered most by atmosphere.\nScattered blue reaches us from all directions.\nSky appears blue on clear days.\nAt high altitude: sky appears darker.' },
+      { id:'sc2', label:'Red\nSunset', x:0, y:-460, r:34, color:'#001a2e', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'At sunrise/sunset: sunlight travels longer path.\nBlue/violet scattered away completely.\nOnly red/orange reach our eyes.\nSun & sky appear reddish.' },
+      { id:'sc3', label:'Danger\nSignals', x:170, y:-430, r:34, color:'#001a2e', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'Red colour used for danger signals.\nRed has longest λ → least scattered.\nCan travel longest distance without loss.\nVisible from far away through fog/mist.' },
+    ]
+  },
+  {
+    id:'atm', label:'Atmospheric\nPhenomena', x:0, y:300, r:42,
+    color:'#1a0010', stroke:'#f43f5e', textColor:'#fda4af',
+    info:'Optical effects caused by Earth\'s atmosphere.\nDue to refraction, scattering, and reflection by atmospheric layers of varying density.',
+    children:[
+      { id:'at1', label:'Twinkling\nStars', x:-180, y:420, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'Stars are point sources of light.\nAtmospheric refraction changes direction continuously.\nApparent position shifts → intensity fluctuates.\nPlanets DON\'T twinkle (extended sources).' },
+      { id:'at2', label:'Advanced\nSunrise', x:0, y:460, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'Sun visible ~2 min BEFORE actual sunrise.\nAlso ~2 min AFTER actual sunset.\nCause: atmospheric refraction bends light.\nDay is ~4 minutes longer due to this effect.' },
+      { id:'at3', label:'Tyndall\nEffect', x:180, y:420, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'Scattering of light by colloidal particles.\nVisible beam in dusty room, forest canopy.\nHeadlights in fog, blue smoke from motorcycles.\nParticle size must be ~ wavelength of light.' },
+    ]
+  }
+];
+
+// Build flat list
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+
+function getNode(id) { return allNodes.find(n=>n.id===id); }
+
+// Pan & zoom
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { ox = dragOrigin.x+(e.clientX-dragStart.x); oy = dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>dragging=false);
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:0.91; zoomAt(f,e.clientX,e.clientY); },{passive:false});
+
+// Touch
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }});
+canvas.addEventListener('touchmove',e=>{ e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d; }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.3,Math.min(2.5,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+20; draw(); }
+
+// Draw
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy);
+  ctx.scale(scale,scale);
+
+  // grid
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.025)';
+  ctx.lineWidth=1;
+  for(let x=-1000;x<1000;x+=60){ ctx.beginPath();ctx.moveTo(x,-1000);ctx.lineTo(x,1000);ctx.stroke(); }
+  for(let y=-1000;y<1000;y+=60){ ctx.beginPath();ctx.moveTo(-1000,y);ctx.lineTo(1000,y);ctx.stroke(); }
+  ctx.restore();
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'88');
+    grd.addColorStop(1,b.stroke+'44');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2-30;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[4,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?30:16;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||11}px Nunito,sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=14;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Development (Economics Ch.1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0a04;--card:#1a1208;--card2:#221a0a;--border:#3a2e1a;--text:#e8d8b0;--muted:#8a7a5a;--gold:#f5c842;--orange:#f97316;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--teal:#2dd4bf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+header{text-align:center;padding:2.2rem 1rem 1rem;position:relative}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(245,200,66,.08),transparent 70%);pointer-events:none}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4.5vw,2.5rem);font-weight:800;background:linear-gradient(135deg,#f5c842,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;margin-top:.3rem}
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;padding:.8rem 1rem}
+.fbtn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .85rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.fbtn:hover{border-color:#5a4a2a;color:var(--text)}
+.fbtn.active{border-color:var(--gold);color:#fff;background:rgba(245,200,66,.12)}
+.progress-bar{max-width:600px;margin:.5rem auto;padding:0 1rem;display:flex;align-items:center;gap:.6rem}
+.pbar{flex:1;height:6px;border-radius:3px;background:var(--card2);overflow:hidden}
+.pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--orange));transition:width .3s}
+.ptext{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);min-width:80px;text-align:right}
+.toolbar{display:flex;justify-content:center;gap:.5rem;padding:.3rem 1rem .8rem}
+.tbtn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tbtn:hover{border-color:#5a4a2a;color:var(--text)}
+.card-area{display:flex;justify-content:center;align-items:center;min-height:340px;padding:1rem;perspective:900px}
+.flip-card{width:min(520px,92vw);height:300px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center}
+.flip-front{background:var(--card);border:1.5px solid var(--border)}
+.flip-back{background:var(--card2);border:1.5px solid rgba(245,200,66,.25);transform:rotateY(180deg)}
+.flip-front .cat{font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.8rem;padding:.2rem .7rem;border-radius:99px;border:1px solid var(--border)}
+.flip-front .q{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;line-height:1.6}
+.flip-back .a{font-size:.95rem;line-height:1.75;color:var(--text)}
+.flip-back .a strong{color:var(--gold)}
+.flip-hint{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-top:auto;padding-top:1rem}
+.card-num{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);position:absolute;top:.8rem;right:1rem}
+.card-nav{display:flex;justify-content:center;align-items:center;gap:1.5rem;padding:.5rem}
+.nav-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-size:1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.nav-btn:hover{border-color:var(--gold);color:var(--text)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+.kb-hint{text-align:center;font-family:'DM Mono',monospace;font-size:.65rem;color:#3a2e1a;padding:.5rem}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(14,10,4,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,46,26,.7);position:relative;z-index:100}
+.site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#8a7a5a;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e8d8b0}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Development</h1>
+  <p>Flashcards · 36 cards · CBSE Class X · Economics Ch.1</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress-bar"><div class="pbar"><div class="pfill" id="pfill"></div></div><div class="ptext" id="ptext">0 / 0</div></div>
+<div class="toolbar">
+  <button class="tbtn" onclick="shuffle()">🔀 Shuffle</button>
+  <button class="tbtn" onclick="markKnown()">✅ Known</button>
+  <button class="tbtn" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="card-area"><div class="flip-card" id="fc" onclick="flip()"><div class="flip-front" id="ff"></div><div class="flip-back" id="fb"></div></div></div>
+<div class="card-nav">
+  <button class="nav-btn" id="prevBtn" onclick="prev()">◀</button>
+  <button class="nav-btn" id="nextBtn" onclick="next()">▶</button>
+</div>
+<div class="kb-hint">← → to navigate · Space to flip · K to mark known</div>
+
+<script>
+const CARDS=[
+  // CONCEPT (concept)
+  {cat:'concept',q:'What does "development" mean in economics?',a:'Development refers to <strong>progress and improvement</strong> in quality of life. It includes not just higher income but also better health, education, freedom, equality, and security. Different people may have <strong>different developmental goals</strong>.'},
+  {cat:'concept',q:'Why do different people have different developmental goals?',a:'Because people have <strong>different life situations, aspirations, and needs</strong>. A landless labourer wants wages and dignity; an industrialist wants profits and power. What is development for one may be <strong>harmful for another</strong> (e.g., a dam).'},
+  {cat:'concept',q:'Give an example of conflicting developmental goals.',a:'A <strong>dam</strong> provides electricity and irrigation (development for industrialists/farmers) but may <strong>displace tribal communities</strong> and submerge forests (anti-development for them). Both groups have legitimate claims.'},
+  {cat:'concept',q:'What are the common goals that all people share?',a:'Regardless of differences, most people desire: <strong>regular income</strong>, <strong>freedom</strong>, <strong>equality</strong>, <strong>security</strong>, <strong>respect</strong>, and a <strong>good quality of life</strong> (health, education, pollution-free environment).'},
+  {cat:'concept',q:'Can income alone measure development?',a:'<strong>No.</strong> Income is important but not sufficient. People also need: pollution-free environment, good healthcare, dignity, freedom, safety. Money cannot buy everything — e.g., a pollution-free environment or peace of mind.'},
+  {cat:'concept',q:'What is national development?',a:'Thinking about development at the <strong>country level</strong>. It involves evaluating which country/state is more developed based on a <strong>combination of indicators</strong> — not just income, but also health, education, and environment.'},
+
+  // INCOME (income)
+  {cat:'income',q:'What is National Income?',a:'The <strong>total value of all goods and services produced</strong> within a country in a year, plus net income from abroad. It measures the overall economic output of the nation.'},
+  {cat:'income',q:'What is Per Capita Income?',a:'<strong>Per Capita Income = National Income ÷ Total Population</strong><br>It gives the average income per person. Used by World Bank to classify countries as rich or poor.'},
+  {cat:'income',q:'How does the World Bank classify countries?',a:'Based on Per Capita Income (2019):<br>• <strong>Rich/High income:</strong> > $12,056/year<br>• <strong>Low income:</strong> < $1,036/year<br>• India is classified as a <strong>low middle-income country</strong>.'},
+  {cat:'income',q:'What is the major limitation of per capita income?',a:'It is only an <strong>average</strong> — it hides inequality. A country can have high average income while most people are poor (if wealth is concentrated with a few). It also ignores health, education, and environment.'},
+  {cat:'income',q:'Why is Kerala considered more developed than Punjab despite lower income?',a:'Kerala has: <strong>lower IMR (7 vs 25)</strong>, <strong>higher literacy (94% vs 82%)</strong>, better life expectancy (75 vs 72 yrs), and higher net attendance ratio. <strong>Quality of life indicators > just income.</strong>'},
+
+  // HDI (hdi)
+  {cat:'hdi',q:'What is HDI and who publishes it?',a:'<strong>Human Development Index</strong> — published by UNDP annually. It ranks countries on a scale of <strong>0 to 1</strong> based on three pillars: Health, Education, and Standard of Living.'},
+  {cat:'hdi',q:'What are the three pillars of HDI?',a:'1. <strong>Health</strong> — measured by Life Expectancy at Birth<br>2. <strong>Education</strong> — measured by Mean Years of Schooling + Expected Years of Schooling<br>3. <strong>Standard of Living</strong> — measured by GNI per capita (PPP $)'},
+  {cat:'hdi',q:'How does the World Bank approach differ from UNDP?',a:'<strong>World Bank:</strong> Uses only Per Capita Income to classify countries (rich/poor).<br><strong>UNDP:</strong> Uses HDI (health + education + income) — a more <strong>holistic measure</strong> of development.'},
+  {cat:'hdi',q:'Compare India, Sri Lanka, and Pakistan on HDI.',a:'<strong>Sri Lanka:</strong> HDI rank 72, Life Exp 77 yrs — "High HDI"<br><strong>India:</strong> HDI rank 131, Life Exp 69 yrs — "Medium HDI"<br><strong>Pakistan:</strong> HDI rank 154, Life Exp 67 yrs — "Low HDI"<br>Sri Lanka invested more in health & education.'},
+  {cat:'hdi',q:'What does PPP stand for and why is it used?',a:'<strong>Purchasing Power Parity</strong> — adjusts income to reflect what money can actually buy in different countries. $1 in India buys more than $1 in USA. PPP gives a fairer comparison of living standards.'},
+
+  // INDICATORS (indicators)
+  {cat:'indicators',q:'What is Infant Mortality Rate (IMR)?',a:'The number of children who <strong>die before age 1</strong> per 1,000 live births in a year. Indicates quality of healthcare, nutrition, and sanitation. Lower IMR = better development.'},
+  {cat:'indicators',q:'What is Literacy Rate?',a:'The percentage of the population aged <strong>7 years and above</strong> who can read and write with understanding. Higher literacy = better human development.'},
+  {cat:'indicators',q:'What is Net Attendance Ratio?',a:'The percentage of children of a specific age group (e.g., 14–15 years) who are <strong>actually attending school</strong>. Measures access to education in practice, not just enrollment.'},
+  {cat:'indicators',q:'What is Life Expectancy at Birth?',a:'The average number of years a newborn is expected to live. It reflects <strong>overall health conditions</strong> — nutrition, healthcare, sanitation, safety. Higher = more developed.'},
+  {cat:'indicators',q:'What is BMI and how is it used?',a:'<strong>BMI = Weight (kg) ÷ Height² (m²)</strong><br>Measures nutritional status:<br>• < 18.5 = Undernourished<br>• 18.5–24.9 = Normal<br>• 25–29.9 = Overweight<br>• ≥ 30 = Obese'},
+  {cat:'indicators',q:'Compare Kerala, Punjab, and Bihar on development.',a:'<strong>Punjab:</strong> Highest income (₹2.1L) but moderate health/education.<br><strong>Kerala:</strong> Lower income but BEST IMR (7), literacy (94%), life exp (75).<br><strong>Bihar:</strong> Lowest on all — income (₹40K), IMR (38), literacy (62%).<br>Conclusion: Income ≠ Development.'},
+
+  // SUSTAINABILITY (sustain)
+  {cat:'sustain',q:'What is Sustainable Development?',a:'Development that meets the needs of the <strong>present generation without compromising</strong> the ability of future generations to meet their own needs. (Brundtland Commission, 1987)'},
+  {cat:'sustain',q:'Why is groundwater depletion a sustainability issue?',a:'Excessive pumping (especially in Punjab, Haryana for Green Revolution crops) lowers the water table. If current rates continue, <strong>future generations will face severe water crisis</strong>. Groundwater takes decades to recharge.'},
+  {cat:'sustain',q:'Distinguish renewable and non-renewable resources.',a:'<strong>Renewable:</strong> Replenished naturally — solar, wind, biomass, hydro. Can be used indefinitely if managed well.<br><strong>Non-renewable:</strong> Finite stock — coal (~200 yrs), petroleum (~50 yrs), natural gas. Once exhausted, gone forever.'},
+  {cat:'sustain',q:'Why is environmental degradation called "anti-development"?',a:'Because it reduces quality of life and harms future generations. Pollution causes disease, climate change threatens food security, deforestation leads to floods. <strong>True development must be environmentally sustainable.</strong>'},
+  {cat:'sustain',q:'Give examples of unsustainable practices in India.',a:'• Overuse of <strong>groundwater</strong> in Punjab/Haryana<br>• <strong>Coal burning</strong> for power (pollution + climate change)<br>• <strong>Deforestation</strong> for mining and urbanization<br>• <strong>River pollution</strong> by industries (Ganga, Yamuna)<br>All harm future generations.'},
+  {cat:'sustain',q:'What can individuals do for sustainable development?',a:'• Use <strong>renewable energy</strong> (solar, LED bulbs)<br>• <strong>Conserve water</strong> (rainwater harvesting)<br>• <strong>Reduce, reuse, recycle</strong><br>• Use <strong>public transport</strong> / cycle<br>• <strong>Plant trees</strong><br>• Reduce consumption of non-renewables'},
+
+  // PUBLIC FACILITIES (public)
+  {cat:'public',q:'What are public facilities and why do they matter?',a:'Services provided by the <strong>government</strong> for all: healthcare, education, sanitation, drinking water, electricity, roads. Important because <strong>the market cannot ensure these for the poor</strong> — private providers are too expensive.'},
+  {cat:'public',q:'Why can money not buy a pollution-free environment?',a:'Clean air and water are <strong>public goods</strong> — they cannot be individually purchased in a market. Even the rich suffer from air pollution. Only <strong>collective action and government regulation</strong> can ensure environmental quality.'},
+  {cat:'public',q:'What are the things money cannot buy?',a:'• <strong>Pollution-free environment</strong><br>• <strong>Peace and harmony</strong> in community<br>• <strong>Democracy and freedom</strong><br>• <strong>Respect and dignity</strong><br>These require collective action, good governance, and social equality — not just income.'},
+  {cat:'public',q:'Why do we need to look at public health data?',a:'Because health indicators (IMR, Life Expectancy) reveal whether <strong>economic growth is reaching all people</strong>. A state may be rich but if public health is poor, the benefits of growth are not being shared equitably.'},
+
+  // EXAM (exam)
+  {cat:'exam',q:'What is the full form of HDI, UNDP, PCI, IMR, BMI?',a:'<strong>HDI</strong> = Human Development Index<br><strong>UNDP</strong> = United Nations Development Programme<br><strong>PCI</strong> = Per Capita Income<br><strong>IMR</strong> = Infant Mortality Rate<br><strong>BMI</strong> = Body Mass Index'},
+  {cat:'exam',q:'Key data to remember for board exam:',a:'• World Bank "rich" threshold: <strong>$12,056+/yr</strong><br>• India HDI rank: <strong>~131</strong><br>• Kerala IMR: <strong>7</strong>, Bihar IMR: <strong>38</strong><br>• Kerala literacy: <strong>94%</strong><br>• Near point for sustainability: <strong>Brundtland 1987</strong>'},
+  {cat:'exam',q:'"Development of a country can generally be determined by..." — complete this.',a:'...its <strong>per capita income</strong> (World Bank method) OR its <strong>Human Development Index</strong> (UNDP method).<br>The HDI method is <strong>more comprehensive</strong> as it includes health and education along with income.'},
+];
+
+const CATS=[
+  {id:'all',label:'All'},
+  {id:'concept',label:'Concepts'},
+  {id:'income',label:'Income'},
+  {id:'hdi',label:'HDI'},
+  {id:'indicators',label:'Indicators'},
+  {id:'sustain',label:'Sustainability'},
+  {id:'public',label:'Public Facilities'},
+  {id:'exam',label:'Exam Quick'},
+];
+
+let activeCat='all',idx=0,known=new Set();
+function filtered(){return activeCat==='all'?CARDS:CARDS.filter(c=>c.cat===activeCat);}
+
+const filtersEl=document.getElementById('filters');
+CATS.forEach(c=>{
+  const b=document.createElement('button');
+  b.className='fbtn'+(c.id==='all'?' active':'');
+  b.textContent=c.label+(c.id==='all'?` (${CARDS.length})`:` (${CARDS.filter(x=>x.cat===c.id).length})`);
+  b.onclick=()=>{activeCat=c.id;idx=0;filtersEl.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');render();};
+  filtersEl.appendChild(b);
+});
+
+const fc=document.getElementById('fc'),ff=document.getElementById('ff'),fb=document.getElementById('fb');
+const pfill=document.getElementById('pfill'),ptext=document.getElementById('ptext');
+
+function render(){
+  const deck=filtered();
+  if(!deck.length){ff.innerHTML='<div class="q">No cards in this category</div>';fb.innerHTML='';return;}
+  if(idx>=deck.length)idx=deck.length-1;
+  const c=deck[idx];const catInfo=CATS.find(x=>x.id===c.cat);
+  fc.classList.remove('flipped');
+  ff.innerHTML=`<div class="card-num">${idx+1} / ${deck.length}</div><div class="cat" style="color:var(--gold)">${catInfo?catInfo.label:c.cat}</div><div class="q">${c.q}</div><div class="flip-hint">Click or press Space to reveal answer</div>`;
+  fb.innerHTML=`<div class="card-num">${idx+1} / ${deck.length}</div><div class="a">${c.a}</div><div class="flip-hint">Click to flip back · K to mark known</div>`;
+  const knownInDeck=deck.filter((_,i)=>known.has(CARDS.indexOf(deck[i]))).length;
+  pfill.style.width=(deck.length?(knownInDeck/deck.length*100):0)+'%';
+  ptext.textContent=`${knownInDeck} / ${deck.length} known`;
+  document.getElementById('prevBtn').disabled=idx===0;
+  document.getElementById('nextBtn').disabled=idx>=deck.length-1;
+}
+function flip(){fc.classList.toggle('flipped');}
+function next(){if(idx<filtered().length-1){idx++;render();}}
+function prev(){if(idx>0){idx--;render();}}
+function shuffle(){CARDS.sort(()=>Math.random()-.5);idx=0;render();}
+function markKnown(){const d=filtered();known.add(CARDS.indexOf(d[idx]));next();if(idx===filtered().length-1)render();}
+function resetAll(){known.clear();idx=0;render();}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();
+  else if(e.key===' '){e.preventDefault();flip();}else if(e.key==='k'||e.key==='K')markKnown();
+});
+render();
+</script>
+</body>
+</html>

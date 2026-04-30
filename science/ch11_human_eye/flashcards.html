@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — The Human Eye and the Colourful World</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080f1e;--card:#111c2e;--card2:#162236;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;--blue:#38bdf8;--green:#22c55e;--amber:#f59e0b;--purple:#a78bfa;--pink:#f472b6;--teal:#2dd4bf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+header{text-align:center;padding:2.2rem 1rem 1rem;position:relative}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(16,185,129,.1),transparent 70%);pointer-events:none}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4.5vw,2.5rem);font-weight:800;background:linear-gradient(135deg,#10b981,#38bdf8,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;margin-top:.3rem}
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;padding:.8rem 1rem}
+.fbtn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .85rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.fbtn:hover{border-color:#64748b;color:var(--text)}
+.fbtn.active{border-color:var(--green);color:#fff;background:rgba(16,185,129,.12)}
+.progress-bar{max-width:600px;margin:.5rem auto;padding:0 1rem;display:flex;align-items:center;gap:.6rem}
+.pbar{flex:1;height:6px;border-radius:3px;background:var(--card2);overflow:hidden}
+.pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--teal));transition:width .3s}
+.ptext{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);min-width:80px;text-align:right}
+.toolbar{display:flex;justify-content:center;gap:.5rem;padding:.3rem 1rem .8rem}
+.tbtn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tbtn:hover{border-color:#64748b;color:var(--text)}
+.card-area{display:flex;justify-content:center;align-items:center;min-height:340px;padding:1rem;perspective:900px}
+.flip-card{width:min(520px,92vw);height:300px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center}
+.flip-front{background:var(--card);border:1.5px solid var(--border)}
+.flip-back{background:var(--card2);border:1.5px solid rgba(16,185,129,.25);transform:rotateY(180deg)}
+.flip-front .cat{font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.8rem;padding:.2rem .7rem;border-radius:99px;border:1px solid var(--border)}
+.flip-front .q{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;line-height:1.6}
+.flip-back .a{font-size:.95rem;line-height:1.75;color:var(--text)}
+.flip-back .a strong{color:var(--green)}
+.flip-hint{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-top:auto;padding-top:1rem}
+.card-num{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);position:absolute;top:.8rem;right:1rem}
+.card-nav{display:flex;justify-content:center;align-items:center;gap:1.5rem;padding:.5rem}
+.nav-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-size:1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.nav-btn:hover{border-color:var(--green);color:var(--text)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+.kb-hint{text-align:center;font-family:'DM Mono',monospace;font-size:.65rem;color:#334155;padding:.5rem}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(8,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.5);position:relative;z-index:100}
+.site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#64748b;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e2e8f0}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>The Human Eye &amp; the Colourful World</h1>
+  <p>Flashcards · 40 cards · CBSE Class X · Ch.11</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress-bar"><div class="pbar"><div class="pfill" id="pfill"></div></div><div class="ptext" id="ptext">0 / 0</div></div>
+<div class="toolbar">
+  <button class="tbtn" onclick="shuffle()">🔀 Shuffle</button>
+  <button class="tbtn" onclick="markKnown()">✅ Known</button>
+  <button class="tbtn" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="card-area"><div class="flip-card" id="fc" onclick="flip()"><div class="flip-front" id="ff"></div><div class="flip-back" id="fb"></div></div></div>
+<div class="card-nav">
+  <button class="nav-btn" id="prevBtn" onclick="prev()">◀</button>
+  <button class="nav-btn" id="nextBtn" onclick="next()">▶</button>
+</div>
+<div class="kb-hint">← → to navigate · Space to flip · K to mark known</div>
+
+<script>
+const CARDS = [
+  // HUMAN EYE (eye)
+  {cat:'eye',q:'What are the main parts of the human eye?',a:'<strong>Cornea</strong> (transparent front, max refraction), <strong>Iris</strong> (coloured, controls pupil size), <strong>Pupil</strong> (aperture for light), <strong>Crystalline Lens</strong> (biconvex, adjustable focus), <strong>Retina</strong> (screen with rods & cones), <strong>Optic Nerve</strong> (transmits signals to brain).'},
+  {cat:'eye',q:'What is the function of the cornea?',a:'The cornea is a transparent, curved membrane at the front of the eye. It provides about <strong>two-thirds</strong> of the eye\'s total focusing (refractive) power. Light enters the eye through the cornea.'},
+  {cat:'eye',q:'What is the role of the iris and pupil?',a:'The <strong>iris</strong> is a coloured muscular diaphragm that controls the size of the <strong>pupil</strong>. In bright light, the pupil constricts (smaller) to reduce light entry. In dim light, it dilates (larger) to allow more light.'},
+  {cat:'eye',q:'What is the crystalline lens?',a:'A transparent, <strong>biconvex</strong> lens made of fibrous, jelly-like material. Its curvature can be adjusted by <strong>ciliary muscles</strong> to change focal length — this enables focusing on objects at different distances.'},
+  {cat:'eye',q:'What is the retina?',a:'The retina is a delicate membrane at the back of the eye that acts as a <strong>screen</strong>. It contains light-sensitive cells: <strong>rods</strong> (sensitive to dim light, no colour) and <strong>cones</strong> (sensitive to bright light, detect colour — R/G/B types). The image formed is <strong>real and inverted</strong>.'},
+  {cat:'eye',q:'What is the blind spot?',a:'The point on the retina where the <strong>optic nerve</strong> exits the eye. It has <strong>no photoreceptor cells</strong> (no rods or cones), so any image falling here is not detected.'},
+  {cat:'eye',q:'How does the eye function like a camera?',a:'The <strong>cornea + lens</strong> act like the camera lens (focus light). The <strong>retina</strong> acts like the film/sensor (captures image). The <strong>iris/pupil</strong> acts like the aperture (controls light). Image formed: real, inverted, diminished.'},
+
+  // ACCOMMODATION (accom)
+  {cat:'accom',q:'What is the power of accommodation?',a:'The ability of the eye lens to change its <strong>focal length</strong> (by adjusting curvature via ciliary muscles) to focus on objects at varying distances. This allows clear vision from 25 cm to infinity.'},
+  {cat:'accom',q:'What is the near point (D)?',a:'The minimum distance at which the eye can see objects clearly without strain = <strong>25 cm</strong> (for a normal adult eye). Also called the <strong>least distance of distinct vision</strong>.'},
+  {cat:'accom',q:'What is the far point?',a:'The farthest point at which an object can be seen clearly = <strong>infinity (∞)</strong> for a normal eye. At this point, ciliary muscles are fully relaxed and the lens is at its thinnest.'},
+  {cat:'accom',q:'What happens when ciliary muscles contract?',a:'The lens becomes <strong>thicker</strong> (more curved) → focal length <strong>decreases</strong> → eye can focus on <strong>nearby objects</strong>. This is maximum accommodation.'},
+  {cat:'accom',q:'What happens when ciliary muscles relax?',a:'The lens becomes <strong>thinner</strong> (less curved) → focal length <strong>increases</strong> → eye focuses on <strong>distant objects</strong>. Minimum strain on the eye.'},
+
+  // DEFECTS (defects)
+  {cat:'defects',q:'What is myopia (near-sightedness)?',a:'A defect where a person can see <strong>nearby objects clearly</strong> but distant objects appear blurry. The image forms <strong>in front of the retina</strong>. Causes: elongated eyeball or excessive lens curvature.'},
+  {cat:'defects',q:'How is myopia corrected?',a:'Using a <strong>concave (diverging) lens</strong> of appropriate power. The lens diverges the incoming rays slightly before they enter the eye, so the image shifts back onto the retina.'},
+  {cat:'defects',q:'What is hypermetropia (far-sightedness)?',a:'A defect where a person can see <strong>distant objects clearly</strong> but nearby objects appear blurry. The image forms <strong>behind the retina</strong>. Causes: shortened eyeball or weak lens curvature. Near point shifts beyond 25 cm.'},
+  {cat:'defects',q:'How is hypermetropia corrected?',a:'Using a <strong>convex (converging) lens</strong> of appropriate power. The lens converges rays extra before entering the eye, so the image shifts forward onto the retina.'},
+  {cat:'defects',q:'What is presbyopia?',a:'An <strong>age-related</strong> defect (usually after 40) where ciliary muscles weaken and the lens loses flexibility → cannot accommodate for nearby objects. Near point recedes beyond 25 cm.'},
+  {cat:'defects',q:'How is presbyopia corrected?',a:'Using <strong>bifocal lenses</strong>: upper part = concave (for distance), lower part = convex (for reading). Or progressive lenses with gradual power change.'},
+  {cat:'defects',q:'A person uses −2.0 D lenses. What defect do they have?',a:'<strong>Myopia.</strong> Negative power → concave lens. f = 1/(−2) = −0.5 m = −50 cm. Their far point has shifted to 50 cm (instead of ∞).'},
+  {cat:'defects',q:'A person\'s near point is 75 cm. What lens is needed?',a:'<strong>Convex lens (hypermetropia).</strong> Need to bring apparent near point from 75 cm to 25 cm.<br>Using 1/f = 1/v − 1/u: 1/f = 1/(−25) − 1/(−75) = −1/25 + 1/75 = −2/75<br>f ≈ +37.5 cm, P ≈ <strong>+2.67 D</strong>'},
+
+  // PRISM & DISPERSION (prism)
+  {cat:'prism',q:'What is a prism?',a:'A transparent optical element with flat, polished surfaces that refract light. Typically triangular cross-section with an <strong>angle of prism (A)</strong>. It causes deviation and dispersion of light.'},
+  {cat:'prism',q:'What is dispersion of light?',a:'The splitting of <strong>white light into its component colours</strong> (spectrum) when passing through a prism. The band of colours is: <strong>VIBGYOR</strong> — Violet, Indigo, Blue, Green, Yellow, Orange, Red.'},
+  {cat:'prism',q:'Why does dispersion occur?',a:'Different colours have <strong>different wavelengths</strong> → different refractive indices in glass. Violet (shortest λ, highest μ) bends <strong>most</strong>. Red (longest λ, lowest μ) bends <strong>least</strong>.'},
+  {cat:'prism',q:'What was Newton\'s prism experiment?',a:'Newton showed: (1) A prism disperses white light into VIBGYOR. (2) A <strong>second inverted prism</strong> recombines the colours back into white light. This proved white light is a mixture of seven colours.'},
+  {cat:'prism',q:'How is a rainbow formed?',a:'Sunlight enters <strong>water droplets</strong> → (1) Refraction at entry, (2) <strong>Dispersion</strong> inside, (3) <strong>Total internal reflection</strong> at back, (4) Refraction at exit. Observer must have Sun <strong>behind them</strong>. Primary rainbow: 42°, VIBGYOR (red outside, violet inside).'},
+  {cat:'prism',q:'Why is the secondary rainbow fainter with reversed colours?',a:'The secondary rainbow involves <strong>two internal reflections</strong> inside each droplet (more light lost). Colours are reversed: <strong>red inside, violet outside</strong>. It appears at ~51° (higher arc).'},
+
+  // SCATTERING (scatter)
+  {cat:'scatter',q:'What is Rayleigh scattering?',a:'Scattering of light by particles much <strong>smaller</strong> than the wavelength (like air molecules N₂, O₂). Intensity ∝ <strong>1/λ⁴</strong> — shorter wavelengths scatter much more than longer ones.'},
+  {cat:'scatter',q:'Why is the sky blue?',a:'Sunlight is scattered by air molecules. Since scattering ∝ 1/λ⁴, <strong>blue light</strong> (short λ ≈ 450 nm) scatters ~5.5× more than red (λ ≈ 700 nm). This scattered blue light reaches us from all directions → sky appears blue.'},
+  {cat:'scatter',q:'Why does the Sun appear red at sunrise and sunset?',a:'At the horizon, sunlight travels through <strong>maximum atmosphere</strong> (longer path). Blue and violet are <strong>completely scattered away</strong>. Only red and orange (long λ, least scattered) reach the observer directly.'},
+  {cat:'scatter',q:'Why are danger signals red?',a:'Red light has the <strong>longest wavelength</strong> (~700 nm) in the visible spectrum → <strong>scatters the least</strong> (∝ 1/λ⁴). So it can travel the farthest through fog, dust, and smoke without being scattered away — visible from the greatest distance.'},
+  {cat:'scatter',q:'What is the Tyndall effect?',a:'Scattering of light by <strong>colloidal particles</strong> (size comparable to wavelength of light). Unlike Rayleigh scattering, it can scatter all colours depending on particle size. Example: light beam in dusty room, mist in forest.'},
+  {cat:'scatter',q:'Why does the sky appear black from the Moon?',a:'The Moon has <strong>no atmosphere</strong> → no molecules to scatter sunlight. Without scattering, the sky appears <strong>black</strong> and stars are visible even during the day.'},
+
+  // ATMOSPHERIC PHENOMENA (atmo)
+  {cat:'atmo',q:'Why do stars twinkle?',a:'Due to <strong>atmospheric refraction</strong>. Starlight passes through air layers of varying temperature/density → refractive index fluctuates → apparent position shifts continuously → intensity varies → <strong>twinkling</strong>.'},
+  {cat:'atmo',q:'Why don\'t planets twinkle?',a:'Planets are much closer → they are <strong>extended sources</strong> (subtend a larger angle). The many point sources that make up the planet\'s disc have individual fluctuations that <strong>average out</strong>, giving steady light.'},
+  {cat:'atmo',q:'Explain the advanced sunrise and delayed sunset.',a:'Atmospheric refraction bends sunlight towards the normal (denser layers below). The Sun appears <strong>above its actual position</strong> → visible ~2 minutes before actual sunrise and ~2 minutes after actual sunset. Total extra daylight ≈ <strong>4 minutes/day</strong>.'},
+  {cat:'atmo',q:'Why does the Sun appear flattened (oval) at sunrise/sunset?',a:'Light from the <strong>lower edge</strong> of the Sun\'s disc passes through more atmosphere than from the upper edge → it is refracted (raised) more. This differential refraction compresses the vertical dimension, making the Sun appear <strong>flattened (oval)</strong>.'},
+  {cat:'atmo',q:'What colour would the sky be if Earth had no atmosphere?',a:'The sky would appear <strong>black</strong> (like on the Moon) because there would be no molecules to scatter sunlight. Stars would be visible during the daytime.'},
+  {cat:'atmo',q:'Why is the colour of clear water in a deep pool blue-green?',a:'Water molecules <strong>absorb red wavelengths</strong> more than blue. Additionally, scattered light from suspended particles (Tyndall effect) tends toward blue-green. The deeper the water, the more red is absorbed → blue-green dominates.'},
+];
+
+const CATS = [
+  {id:'all', label:'All'},
+  {id:'eye', label:'Eye Structure'},
+  {id:'accom', label:'Accommodation'},
+  {id:'defects', label:'Defects'},
+  {id:'prism', label:'Prism & Dispersion'},
+  {id:'scatter', label:'Scattering'},
+  {id:'atmo', label:'Atmosphere'},
+];
+
+let activeCat='all',idx=0,known=new Set();
+function filtered(){return activeCat==='all'?CARDS:CARDS.filter(c=>c.cat===activeCat);}
+
+const filtersEl=document.getElementById('filters');
+CATS.forEach(c=>{
+  const b=document.createElement('button');
+  b.className='fbtn'+(c.id==='all'?' active':'');
+  b.textContent=c.label+(c.id==='all'?` (${CARDS.length})`:` (${CARDS.filter(x=>x.cat===c.id).length})`);
+  b.onclick=()=>{activeCat=c.id;idx=0;filtersEl.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');render();};
+  filtersEl.appendChild(b);
+});
+
+const fc=document.getElementById('fc'),ff=document.getElementById('ff'),fb=document.getElementById('fb');
+const pfill=document.getElementById('pfill'),ptext=document.getElementById('ptext');
+
+function render(){
+  const deck=filtered();
+  if(!deck.length){ff.innerHTML='<div class="q">No cards in this category</div>';fb.innerHTML='';return;}
+  if(idx>=deck.length)idx=deck.length-1;
+  const c=deck[idx];
+  const catInfo=CATS.find(x=>x.id===c.cat);
+  fc.classList.remove('flipped');
+  ff.innerHTML=`<div class="card-num">${idx+1} / ${deck.length}</div><div class="cat" style="color:var(--green)">${catInfo?catInfo.label:c.cat}</div><div class="q">${c.q}</div><div class="flip-hint">Click or press Space to reveal answer</div>`;
+  fb.innerHTML=`<div class="card-num">${idx+1} / ${deck.length}</div><div class="a">${c.a}</div><div class="flip-hint">Click to flip back · K to mark known</div>`;
+  const knownInDeck=deck.filter((_,i)=>known.has(CARDS.indexOf(deck[i]))).length;
+  const pct=deck.length?(knownInDeck/deck.length*100):0;
+  pfill.style.width=pct+'%';
+  ptext.textContent=`${knownInDeck} / ${deck.length} known`;
+  document.getElementById('prevBtn').disabled=idx===0;
+  document.getElementById('nextBtn').disabled=idx>=deck.length-1;
+}
+
+function flip(){fc.classList.toggle('flipped');}
+function next(){const d=filtered();if(idx<d.length-1){idx++;render();}}
+function prev(){if(idx>0){idx--;render();}}
+function shuffle(){CARDS.sort(()=>Math.random()-.5);idx=0;render();}
+function markKnown(){const d=filtered();const gi=CARDS.indexOf(d[idx]);known.add(gi);next();if(idx===filtered().length-1)render();}
+function resetAll(){known.clear();idx=0;render();}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')next();
+  else if(e.key==='ArrowLeft')prev();
+  else if(e.key===' '){e.preventDefault();flip();}
+  else if(e.key==='k'||e.key==='K')markKnown();
+});
+
+render();
+</script>
+</body>
+</html>

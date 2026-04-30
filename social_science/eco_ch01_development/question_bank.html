@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Development (Economics Ch.1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0a04;--card:#1a1208;--card2:#221a0a;--border:#3a2e1a;--text:#e8d8b0;--muted:#8a7a5a;--gold:#f5c842;--orange:#f97316;--blue:#38bdf8;--green:#22c55e;--red:#f87171;--indigo:#818cf8;--teal:#2dd4bf;--pink:#f472b6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+header{text-align:center;padding:2.2rem 1rem 1rem;position:relative}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(245,200,66,.08),transparent 70%);pointer-events:none}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4.5vw,2.5rem);font-weight:800;background:linear-gradient(135deg,#f5c842,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;margin-top:.3rem}
+.container{max-width:900px;margin:auto;padding:0 1rem 3rem}
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;padding:1rem 0}
+.fbtn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .8rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.fbtn:hover{border-color:#5a4a2a;color:var(--text)}
+.fbtn.active{border-color:var(--gold);color:#fff;background:rgba(245,200,66,.12)}
+.score-bar{display:flex;align-items:center;gap:.8rem;padding:.6rem 0;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.score-bar .sbar{flex:1;height:6px;border-radius:3px;background:var(--card2);overflow:hidden}
+.score-bar .sfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--orange));transition:width .3s}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:1rem;overflow:hidden}
+.qcard .qhead{display:flex;align-items:flex-start;gap:.8rem;padding:1.2rem 1.2rem .8rem;cursor:pointer}
+.qcard .qnum{font-family:'Playfair Display',serif;font-weight:800;font-size:1rem;color:var(--gold);min-width:30px}
+.qcard .qtag{font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:1px;padding:.15rem .5rem;border-radius:99px;margin-left:auto;white-space:nowrap}
+.qcard .qbody{padding:0 1.2rem;font-size:.9rem;line-height:1.7}
+.opts{list-style:none;padding:.3rem 0 .8rem}
+.opts li{padding:.45rem .8rem;margin:.3rem 0;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:.85rem;transition:all .2s;display:flex;align-items:center;gap:.5rem}
+.opts li:hover{border-color:#5a4a2a}
+.opts li.correct{border-color:var(--green);background:rgba(34,197,94,.08);color:var(--green)}
+.opts li.wrong{border-color:var(--red);background:rgba(248,113,113,.08);color:var(--red)}
+.opts li .ol{font-family:'DM Mono',monospace;font-weight:700;font-size:.78rem;min-width:20px}
+.ans-toggle{font-family:'DM Mono',monospace;font-size:.75rem;padding:.35rem 1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;margin:.5rem 0 .8rem;display:inline-block;transition:all .2s}
+.ans-toggle:hover{border-color:var(--gold);color:var(--text)}
+.model-ans{display:none;padding:.8rem 1rem;margin:0 0 1rem;background:rgba(245,200,66,.04);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;font-size:.85rem;line-height:1.75;color:var(--text)}
+.model-ans.show{display:block}
+.model-ans strong{color:var(--gold)}
+.exam-tip{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--orange);margin-top:.4rem;display:block}
+.strip-concept{border-left:3px solid var(--gold)}.strip-income{border-left:3px solid var(--green)}.strip-hdi{border-left:3px solid var(--indigo)}.strip-indicator{border-left:3px solid var(--blue)}.strip-sustain{border-left:3px solid var(--teal)}.strip-public{border-left:3px solid var(--orange)}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(14,10,4,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,46,26,.7);position:relative;z-index:100}
+.site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#8a7a5a;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e8d8b0}
+@media(max-width:600px){.container{padding:0 .6rem 2rem}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Development</h1>
+  <p>Question Bank · 30 Questions · CBSE Class X · Economics Ch.1</p>
+</header>
+
+<div class="container">
+  <div class="filters" id="filters"></div>
+  <div class="score-bar"><span id="scoreText">0 / 0 correct</span><div class="sbar"><div class="sfill" id="sfill"></div></div></div>
+  <div id="qlist"></div>
+</div>
+
+<script>
+const QS=[
+  // MCQ (10)
+  {type:'mcq',cat:'income',strip:'strip-income',q:'Development of a country can generally be determined by:',ops:['Its per capita income','Its total population','Size of the country','Number of factories'],ans:0,explain:'Per Capita Income is the primary criterion used by the World Bank to classify countries as developed or developing. It represents average income per person.'},
+  {type:'mcq',cat:'hdi',strip:'strip-hdi',q:'Which of the following is NOT a pillar of the Human Development Index?',ops:['Health (Life Expectancy)','Education (Mean schooling)','Per Capita Income (GNI)','Military strength'],ans:3,explain:'HDI has three pillars: Health, Education, and Standard of Living (GNI per capita). Military strength is not a development indicator.'},
+  {type:'mcq',cat:'income',strip:'strip-income',q:'According to the World Bank (2019), a country is classified as "rich" if its per capita income is more than:',ops:['$1,036 per annum','$5,000 per annum','$12,056 per annum','$50,000 per annum'],ans:2,explain:'The World Bank uses $12,056/year per capita income as the threshold for high-income (rich) countries.'},
+  {type:'mcq',cat:'indicator',strip:'strip-indicator',q:'Infant Mortality Rate (IMR) refers to:',ops:['Deaths of infants per 1000 births in a year','Deaths of children under 5 per 100 births','Total child deaths in a country','Deaths of infants per 100,000 population'],ans:0,explain:'IMR = number of children dying before age 1, per 1,000 live births in a given year. It indicates quality of healthcare.'},
+  {type:'mcq',cat:'sustain',strip:'strip-sustain',q:'Sustainable development means:',ops:['Fastest possible economic growth','Development at the cost of environment','Development without compromising future generations\' needs','Development only for the rich'],ans:2,explain:'Sustainable development (Brundtland Commission, 1987) = meeting present needs without compromising future generations\' ability to meet theirs.'},
+  {type:'mcq',cat:'indicator',strip:'strip-indicator',q:'Which state in India has the lowest Infant Mortality Rate?',ops:['Punjab','Bihar','Kerala','Maharashtra'],ans:2,explain:'Kerala has IMR of about 7 (lowest in India), thanks to excellent public health and education systems, high literacy, and awareness.'},
+  {type:'mcq',cat:'hdi',strip:'strip-hdi',q:'HDI is published by:',ops:['World Bank','IMF','UNDP','WHO'],ans:2,explain:'The Human Development Index is published annually by the UNDP (United Nations Development Programme) in its Human Development Report.'},
+  {type:'mcq',cat:'concept',strip:'strip-concept',q:'Which of the following can money NOT buy?',ops:['Food and clothing','A pollution-free environment','A house','A car'],ans:1,explain:'A pollution-free environment is a public good that requires collective action and government regulation. Individual wealth cannot purchase clean air for a city.'},
+  {type:'mcq',cat:'sustain',strip:'strip-sustain',q:'Which is a non-renewable resource?',ops:['Solar energy','Wind energy','Petroleum','Biomass'],ans:2,explain:'Petroleum is a fossil fuel formed over millions of years. Once exhausted, it cannot be replenished. Solar, wind, and biomass are renewable.'},
+  {type:'mcq',cat:'income',strip:'strip-income',q:'Per Capita Income is calculated as:',ops:['Total income × Population','Total income ÷ Total population','GDP × Exports','National income − Imports'],ans:1,explain:'Per Capita Income = National Income ÷ Total Population. It represents the average income earned per person in the country.'},
+
+  // ASSERTION-REASON (4)
+  {type:'ar',cat:'concept',strip:'strip-concept',q:'<strong>Assertion:</strong> Different people can have different developmental goals.<br><strong>Reason:</strong> People have different life situations, occupations, and aspirations.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'Both are true. People\'s varied life situations (farmer vs industrialist vs student) directly cause them to have different developmental priorities.'},
+  {type:'ar',cat:'income',strip:'strip-income',q:'<strong>Assertion:</strong> Punjab has a higher per capita income than Kerala.<br><strong>Reason:</strong> Punjab is more developed than Kerala.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:2,explain:'A is true (Punjab PCI ≈ ₹2.1L vs Kerala ≈ ₹1.5L). R is false — Kerala is considered more developed due to better IMR, literacy, and life expectancy. Income alone ≠ development.'},
+  {type:'ar',cat:'sustain',strip:'strip-sustain',q:'<strong>Assertion:</strong> Groundwater depletion is a serious sustainability issue in India.<br><strong>Reason:</strong> Overuse of groundwater for irrigation has lowered water tables in many states.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'Excessive pumping (esp. in Punjab, Haryana for wheat/rice) directly causes falling water tables, threatening water availability for future generations.'},
+  {type:'ar',cat:'hdi',strip:'strip-hdi',q:'<strong>Assertion:</strong> Sri Lanka has a better HDI rank than India.<br><strong>Reason:</strong> Sri Lanka has higher per capita income than India.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:2,explain:'A is true (Sri Lanka rank 72 vs India 131). R is false — while Sri Lanka has somewhat higher PCI, the main reason for better HDI is its superior health and education indicators, not just income.'},
+
+  // SHORT ANSWER (12)
+  {type:'short',cat:'concept',strip:'strip-concept',q:'Why do we use averages to compare development? Are there any limitations?',
+   answer:'We use <strong>averages</strong> (like per capita income) because they allow simple comparison between countries/states with different populations.<br><br><strong>Limitations:</strong><br>1. Averages <strong>hide inequality</strong> — a country may have high average income but most people could be poor.<br>2. They don\'t reveal <strong>distribution of income</strong>.<br>3. Two countries with same PCI may differ vastly in health, education, and quality of life.',tip:'Give a numerical example: 5 people earn ₹1L, ₹1L, ₹1L, ₹1L, ₹46L → average = ₹10L, but 4/5 people earn only ₹1L!'},
+  {type:'short',cat:'concept',strip:'strip-concept',q:'"What may be development for one may not be development for the other." Explain with an example.',
+   answer:'Development goals are <strong>conflicting</strong> for different groups:<br><br><strong>Example — Dam construction:</strong><br>• For an <strong>industrialist</strong>: Development (cheap electricity, irrigation for farmers)<br>• For <strong>tribal communities</strong>: Anti-development (displacement from ancestral land, loss of forests and livelihood)<br><br>This shows development must consider <strong>all stakeholders</strong> and involve trade-offs.',tip:'Always give a clear example with TWO contrasting stakeholders. Dam is the textbook example — use it!'},
+  {type:'short',cat:'income',strip:'strip-income',q:'Why is per capita income not an adequate indicator of development? What should be used instead?',
+   answer:'<strong>Limitations of PCI:</strong><br>1. It\'s an average — hides <strong>inequality</strong><br>2. Ignores <strong>health</strong> (IMR, life expectancy)<br>3. Ignores <strong>education</strong> (literacy, attendance)<br>4. Ignores <strong>environment</strong>, freedom, dignity<br>5. People need more than just income<br><br><strong>Better alternative: HDI</strong> (Human Development Index) — combines health + education + income for a holistic view.',tip:'Mention specific examples: Punjab has high PCI but Kerala is more developed. Money can\'t buy pollution-free air.'},
+  {type:'short',cat:'indicator',strip:'strip-indicator',q:'Compare the development indicators of Kerala and Bihar. What conclusions can you draw?',
+   answer:'<strong>Comparison:</strong><br>• PCI: Bihar ₹40K vs Kerala ₹1.5L<br>• IMR: Bihar 38 vs Kerala 7<br>• Literacy: Bihar 62% vs Kerala 94%<br>• Life Expectancy: Bihar 65 vs Kerala 75 yrs<br>• Net Attendance: Bihar 43% vs Kerala 83%<br><br><strong>Conclusion:</strong> Kerala invested heavily in public health and education. Even with moderate income, quality of life can be excellent. <strong>Development requires social investment, not just income growth.</strong>',tip:'Present data in a table format if possible. The contrast between these states is a board favourite.'},
+  {type:'short',cat:'hdi',strip:'strip-hdi',q:'Explain how UNDP measures the Human Development Index.',
+   answer:'<strong>HDI measures 3 dimensions:</strong><br><br>1. <strong>Health</strong> — Life Expectancy at Birth (longer life = better health system)<br>2. <strong>Education</strong> — Mean Years of Schooling + Expected Years of Schooling<br>3. <strong>Standard of Living</strong> — Gross National Income per capita adjusted for PPP ($)<br><br>Each dimension is scored 0–1 using a formula. The HDI is the <strong>geometric mean</strong> of the three scores. Range: 0 (worst) to 1 (best). Published annually by UNDP.',tip:'Remember: World Bank uses ONLY income. UNDP uses income + health + education. UNDP method is more holistic.'},
+  {type:'short',cat:'sustain',strip:'strip-sustain',q:'What is sustainable development? Why is it important? Give two examples.',
+   answer:'<strong>Sustainable Development:</strong> Meeting present needs without compromising future generations\' ability to meet their needs (Brundtland Commission, 1987).<br><br><strong>Importance:</strong> Resources are finite. Overuse today = scarcity tomorrow. Environmental damage is often irreversible.<br><br><strong>Examples:</strong><br>1. <strong>Groundwater:</strong> Overuse in Punjab lowers water table → future generations face water crisis<br>2. <strong>Fossil fuels:</strong> Petroleum may last only ~50 years at current rates → must switch to solar/wind for future energy security',tip:'Always quote Brundtland 1987. Give concrete Indian examples. Link to intergenerational equity.'},
+  {type:'short',cat:'public',strip:'strip-public',q:'"Money in your pocket cannot buy all the goods and services you need." Explain.',
+   answer:'Some essential requirements are <strong>not available through individual purchase</strong> in markets:<br><br>1. <strong>Pollution-free environment</strong> — cannot buy clean air<br>2. <strong>Public healthcare</strong> — poor can\'t afford private hospitals<br>3. <strong>Safe drinking water</strong> — needs infrastructure<br>4. <strong>Good governance & democracy</strong> — not a market commodity<br>5. <strong>Community harmony</strong> — money can\'t buy peace<br><br>These require <strong>government investment and collective action</strong>. That\'s why public facilities are essential for true development.',tip:'Use the exact textbook phrase. Link to why government spending on health/education is crucial.'},
+  {type:'short',cat:'concept',strip:'strip-concept',q:'What are the common developmental goals that people across the country share?',
+   answer:'Despite different specific goals, most people desire:<br><br>1. <strong>Regular work and income</strong> — for economic security<br>2. <strong>Equal treatment</strong> — no discrimination by caste/gender/religion<br>3. <strong>Freedom and security</strong> — personal safety, political freedom<br>4. <strong>Respect and dignity</strong> — social recognition<br>5. <strong>Good health facilities</strong> — affordable healthcare<br>6. <strong>Quality education</strong> — for children<br>7. <strong>Clean environment</strong> — unpolluted air and water<br><br>These are <strong>non-material goals</strong> alongside income.',tip:'Emphasize that development = material (income) + non-material (freedom, dignity, environment). Board loves this distinction.'},
+  {type:'short',cat:'indicator',strip:'strip-indicator',q:'What is BMI? How is it used to measure development?',
+   answer:'<strong>BMI = Body Mass Index = Weight (kg) ÷ Height² (m²)</strong><br><br>Used to assess nutritional status of a population:<br>• BMI < 18.5 → Undernourished (indicates poverty, food insecurity)<br>• BMI 18.5–24.9 → Normal weight<br>• BMI 25–29.9 → Overweight<br>• BMI ≥ 30 → Obese<br><br><strong>Development link:</strong> High rates of undernutrition indicate poor development (food insecurity, poverty). A developed country should have most citizens in the normal BMI range.',tip:'Simple formula-based question. State the ranges clearly. Link low BMI to underdevelopment.'},
+  {type:'short',cat:'income',strip:'strip-income',q:'How does the World Bank classify countries? Where does India stand?',
+   answer:'<strong>World Bank Classification (2019):</strong><br>• <strong>High-income (Rich):</strong> PCI > $12,056/year<br>• <strong>Upper middle-income:</strong> $3,996–$12,055<br>• <strong>Lower middle-income:</strong> $1,036–$3,995<br>• <strong>Low-income:</strong> < $1,036/year<br><br><strong>India:</strong> Classified as a <strong>low middle-income country</strong> with PCI of approximately $6,681 (PPP). India\'s rank: 131 on HDI.<br><br>Limitation: This uses only income — ignores health and education.',tip:'Remember the $12,056 threshold for "rich". India = low middle-income. Always mention the limitation.'},
+  {type:'short',cat:'hdi',strip:'strip-hdi',q:'Compare the development of India, Sri Lanka, and Pakistan using HDI criteria.',
+   answer:'<strong>Comparison table:</strong><br>• <strong>Sri Lanka:</strong> HDI rank 72, Life Exp 77 yrs, Schooling 10.6 yrs, GNI $12,707 — HIGH HDI<br>• <strong>India:</strong> HDI rank 131, Life Exp 69 yrs, Schooling 6.5 yrs, GNI $6,681 — MEDIUM HDI<br>• <strong>Pakistan:</strong> HDI rank 154, Life Exp 67 yrs, Schooling 5.2 yrs, GNI $5,005 — LOW HDI<br><br><strong>Key insight:</strong> Sri Lanka\'s investment in health and education gives it a much higher HDI despite not being the richest in the region.',tip:'Present as a table. Highlight that Sri Lanka shows investment in health/education pays off in development.'},
+  {type:'short',cat:'sustain',strip:'strip-sustain',q:'Distinguish between renewable and non-renewable resources with examples. Why must we use resources carefully?',
+   answer:'<strong>Renewable Resources:</strong> Can be replenished naturally.<br>Examples: Solar energy, wind, water (hydro), biomass, forests (if managed).<br><br><strong>Non-renewable Resources:</strong> Finite stock, cannot be replenished once used.<br>Examples: Coal (~200 yrs), Petroleum (~50 yrs), Natural Gas (~60 yrs), minerals.<br><br><strong>Why careful use?</strong><br>1. Non-renewables will be <strong>exhausted</strong> — future generations will have nothing<br>2. Burning fossil fuels causes <strong>pollution and climate change</strong><br>3. Must transition to renewables for <strong>sustainable development</strong>',tip:'Give estimated years left for fossil fuels — shows urgency. Link to sustainable development definition.'},
+
+  // LONG ANSWER (4)
+  {type:'long',cat:'concept',strip:'strip-concept',q:'"Development involves thinking about a mix of goals." Explain this statement with examples. Why do different stakeholders have conflicting goals?',
+   answer:'<strong>Development is multi-dimensional:</strong> It\'s not just about income — people seek a combination of goals: income, health, education, security, freedom, respect, and a good environment.<br><br><strong>Different stakeholders, different goals:</strong><br>• <strong>Industrialist:</strong> Wants dams (electricity), roads, cheap resources → prioritizes economic growth<br>• <strong>Tribal community:</strong> Wants to protect forests, ancestral land → opposes displacement<br>• <strong>Girl student:</strong> Wants equal access to education, safety, freedom<br>• <strong>Urban professional:</strong> Wants pollution-free city, good transport, job security<br><br><strong>Why conflicts arise:</strong><br>1. Resources are <strong>limited</strong> — cannot satisfy everyone simultaneously<br>2. Development projects have <strong>winners and losers</strong> (dam benefits industry but displaces tribals)<br>3. Different groups have different <strong>power and influence</strong><br>4. Short-term gains may conflict with <strong>long-term sustainability</strong><br><br><strong>Resolution:</strong> Democratic decision-making, public debate, compensation for displaced people, environmental impact assessments. Development policy must balance diverse interests.',tip:'5-mark structure: Define → Give 3-4 stakeholder examples → Explain conflicts → Suggest resolution. Use dam/industry vs tribal as key example.'},
+  {type:'long',cat:'indicator',strip:'strip-indicator',q:'Why is per capita income alone not a satisfactory measure of development? Explain with the help of data from Indian states. What alternative indicators should be used?',
+   answer:'<strong>Limitations of Per Capita Income:</strong><br>1. It\'s an <strong>average</strong> — hides inequality (rich few raise the average)<br>2. Ignores <strong>health</strong> — a rich state may have poor healthcare<br>3. Ignores <strong>education</strong> — high income doesn\'t guarantee literacy<br>4. Ignores <strong>quality of life</strong> — environment, security, dignity<br><br><strong>Evidence from Indian States:</strong><br><table style="font-size:.8rem;border-collapse:collapse;width:100%;margin:.5rem 0"><tr style="border-bottom:1px solid #3a2e1a"><th style="text-align:left;padding:.3rem">Indicator</th><th style="padding:.3rem">Punjab</th><th style="padding:.3rem">Kerala</th><th style="padding:.3rem">Bihar</th></tr><tr><td style="padding:.3rem">Per Capita Income</td><td style="padding:.3rem;color:#22c55e"><strong>₹2,10,000</strong></td><td style="padding:.3rem">₹1,50,000</td><td style="padding:.3rem">₹40,000</td></tr><tr><td style="padding:.3rem">IMR (per 1000)</td><td style="padding:.3rem">25</td><td style="padding:.3rem;color:#22c55e"><strong>7</strong></td><td style="padding:.3rem">38</td></tr><tr><td style="padding:.3rem">Literacy Rate</td><td style="padding:.3rem">82%</td><td style="padding:.3rem;color:#22c55e"><strong>94%</strong></td><td style="padding:.3rem">62%</td></tr><tr><td style="padding:.3rem">Life Expectancy</td><td style="padding:.3rem">72 yrs</td><td style="padding:.3rem;color:#22c55e"><strong>75 yrs</strong></td><td style="padding:.3rem">65 yrs</td></tr></table><br><strong>Conclusion:</strong> Punjab has highest PCI but Kerala is more developed overall. Money alone ≠ development.<br><br><strong>Better Indicators:</strong><br>• HDI (UNDP) — combines health + education + income<br>• IMR, Literacy Rate, Net Attendance Ratio, Life Expectancy<br>• BMI for nutritional status<br>• Environmental quality indicators',tip:'This is a 5-mark board favourite. Present data as a table. Clearly conclude that Kerala > Punjab in development despite lower income. Mention HDI as the better alternative.'},
+  {type:'long',cat:'sustain',strip:'strip-sustain',q:'What is sustainable development? Explain why it is necessary. Describe the consequences of ignoring sustainability with examples from India.',
+   answer:'<strong>Sustainable Development:</strong> "Development that meets the needs of the present without compromising the ability of future generations to meet their own needs." — Brundtland Commission, 1987.<br><br><strong>Why necessary:</strong><br>1. Non-renewable resources (coal, oil) are <strong>finite</strong> — will be exhausted<br>2. Environmental damage is often <strong>irreversible</strong> (species extinction, climate change)<br>3. Current overuse creates <strong>intergenerational inequity</strong> — unfair to future generations<br>4. Environmental degradation affects <strong>current quality of life</strong> too (pollution, health)<br><br><strong>Consequences of ignoring sustainability (Indian examples):</strong><br><br>1. <strong>Groundwater depletion:</strong> Punjab/Haryana overuse for wheat-rice → water table falling 1m/year → future water crisis<br>2. <strong>Air pollution:</strong> Delhi\'s toxic air (AQI 400+) → respiratory diseases, reduced life expectancy<br>3. <strong>River pollution:</strong> Ganga/Yamuna polluted by industrial waste → affects 500M+ people<br>4. <strong>Deforestation:</strong> Cleared for mining/urbanization → soil erosion, floods, loss of biodiversity, tribal displacement<br>5. <strong>Fossil fuel dependence:</strong> Coal burning → India is 3rd largest CO₂ emitter → climate change<br><br><strong>Way forward:</strong> Renewable energy, water conservation, afforestation, pollution control, and circular economy.',tip:'5-mark structure: Define (with Brundtland quote) → Why necessary (4 reasons) → Indian examples (3-4) → Solutions. Always quote 1987.'},
+  {type:'long',cat:'hdi',strip:'strip-hdi',q:'How do the World Bank and UNDP measure development differently? Compare India, Sri Lanka, and Pakistan. Which method gives a better picture and why?',
+   answer:'<strong>World Bank Approach:</strong><br>• Uses <strong>Per Capita Income (PCI)</strong> only<br>• Classifies: Rich (>$12,056), Middle-income, Low-income (<$1,036)<br>• Advantage: Simple, easy to compare<br>• Limitation: Ignores health, education, equality, environment<br><br><strong>UNDP Approach (HDI):</strong><br>• Uses <strong>three pillars</strong>: Health (Life Expectancy) + Education (Schooling years) + Income (GNI per capita PPP)<br>• Ranks on 0–1 scale<br>• Advantage: More holistic, captures quality of life<br><br><strong>Comparison of Countries:</strong><br><table style="font-size:.8rem;border-collapse:collapse;width:100%;margin:.5rem 0"><tr style="border-bottom:1px solid #3a2e1a"><th style="text-align:left;padding:.3rem">Criterion</th><th style="padding:.3rem">Sri Lanka</th><th style="padding:.3rem">India</th><th style="padding:.3rem">Pakistan</th></tr><tr><td style="padding:.3rem">HDI Rank</td><td style="padding:.3rem;color:#22c55e"><strong>72</strong></td><td style="padding:.3rem">131</td><td style="padding:.3rem">154</td></tr><tr><td style="padding:.3rem">Life Expectancy</td><td style="padding:.3rem;color:#22c55e"><strong>77 yrs</strong></td><td style="padding:.3rem">69 yrs</td><td style="padding:.3rem">67 yrs</td></tr><tr><td style="padding:.3rem">Mean Schooling</td><td style="padding:.3rem;color:#22c55e"><strong>10.6 yrs</strong></td><td style="padding:.3rem">6.5 yrs</td><td style="padding:.3rem">5.2 yrs</td></tr><tr><td style="padding:.3rem">GNI/capita (PPP $)</td><td style="padding:.3rem;color:#22c55e"><strong>$12,707</strong></td><td style="padding:.3rem">$6,681</td><td style="padding:.3rem">$5,005</td></tr><tr><td style="padding:.3rem">Category</td><td style="padding:.3rem;color:#22c55e">High</td><td style="padding:.3rem;color:#f97316">Medium</td><td style="padding:.3rem;color:#f43f5e">Low</td></tr></table><br><strong>Which method is better?</strong><br>HDI (UNDP) gives a <strong>better picture</strong> because:<br>1. Income alone hides inequality and ignores quality of life<br>2. Sri Lanka proves that investing in health/education matters more than just income<br>3. People need healthcare, education, and security — not just money<br>4. HDI captures what <strong>citizens actually experience</strong> in daily life',tip:'Compare BOTH methods clearly (table format). Show country data. Conclude WHY HDI is better with specific reasoning. This is a guaranteed 5-mark question.'},
+];
+
+const CATS=[{id:'all',label:'All'},{id:'mcq',label:'MCQ'},{id:'ar',label:'Assert-Reason'},{id:'short',label:'Short Answer'},{id:'long',label:'Long Answer'}];
+const TOPIC_COLORS={concept:'var(--gold)',income:'var(--green)',hdi:'var(--indigo)',indicator:'var(--blue)',sustain:'var(--teal)',public:'var(--orange)'};
+
+let activeCat='all',score=0,attempted=0;
+const filtersEl=document.getElementById('filters');
+CATS.forEach(c=>{
+  const b=document.createElement('button');b.className='fbtn'+(c.id==='all'?' active':'');
+  const cnt=c.id==='all'?QS.length:QS.filter(q=>q.type===c.id).length;
+  b.textContent=c.label+` (${cnt})`;
+  b.onclick=()=>{activeCat=c.id;filtersEl.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderAll();};
+  filtersEl.appendChild(b);
+});
+
+function renderAll(){
+  const list=document.getElementById('qlist');list.innerHTML='';
+  const qs=activeCat==='all'?QS:QS.filter(q=>q.type===activeCat);
+  qs.forEach((q,qi)=>{
+    const gi=QS.indexOf(q);const div=document.createElement('div');div.className='qcard '+(q.strip||'');
+    const typeLabel=q.type==='mcq'?'MCQ':q.type==='ar'?'Assertion-Reason':q.type==='short'?'Short Answer':'Long Answer';
+    const tagColor=TOPIC_COLORS[q.cat]||'var(--muted)';
+    let html=`<div class="qhead"><span class="qnum">Q${qi+1}</span><span style="flex:1;font-size:.9rem;line-height:1.6">${q.q}</span><span class="qtag" style="border:1px solid ${tagColor};color:${tagColor}">${typeLabel}</span></div><div class="qbody">`;
+    if(q.type==='mcq'||q.type==='ar'){
+      html+='<ul class="opts">';q.ops.forEach((op,oi)=>{html+=`<li onclick="checkMCQ(this,${gi},${oi})"><span class="ol">${String.fromCharCode(65+oi)}.</span> ${op}</li>`;});html+='</ul>';
+      html+=`<div class="model-ans" id="exp-${gi}"><strong>Explanation:</strong> ${q.explain}</div>`;
+    } else {
+      html+=`<button class="ans-toggle" onclick="toggleAns(${gi})">Show Model Answer</button>`;
+      html+=`<div class="model-ans" id="ans-${gi}">${q.answer}`;
+      if(q.tip)html+=`<span class="exam-tip">📝 Exam Tip: ${q.tip}</span>`;
+      html+='</div>';
+    }
+    html+='</div>';div.innerHTML=html;list.appendChild(div);
+  });
+  updateScore();
+}
+
+function checkMCQ(el,qi,oi){
+  const q=QS[qi];const parent=el.parentElement;
+  if(parent.dataset.done)return;parent.dataset.done='1';attempted++;
+  if(oi===q.ans){el.classList.add('correct');score++;}
+  else{el.classList.add('wrong');parent.children[q.ans].classList.add('correct');}
+  document.getElementById('exp-'+qi).classList.add('show');updateScore();
+}
+function toggleAns(qi){document.getElementById('ans-'+qi).classList.toggle('show');}
+function updateScore(){
+  const total=QS.filter(q=>q.type==='mcq'||q.type==='ar').length;
+  document.getElementById('scoreText').textContent=`${score} / ${attempted} correct (${total} MCQ+AR total)`;
+  document.getElementById('sfill').style.width=(total?score/total*100:0)+'%';
+}
+renderAll();
+</script>
+</body>
+</html>

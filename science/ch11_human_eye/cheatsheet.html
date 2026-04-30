@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — The Human Eye and the Colourful World</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#080f1e;--card:#111c2e;--card2:#162236;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;--blue:#38bdf8;--green:#22c55e;--amber:#f59e0b;--purple:#a78bfa;--pink:#f472b6;--teal:#2dd4bf;--emerald:#10b981;--red:#f87171}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+  header{text-align:center;padding:2.5rem 1rem 1.5rem;position:relative}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(16,185,129,.1),transparent 70%);pointer-events:none}
+  header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;background:linear-gradient(135deg,#10b981,#38bdf8,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.82rem;margin-top:.4rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.2rem;max-width:1120px;margin:auto;padding:0 1.2rem 3rem}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;position:relative;overflow:hidden}
+  .panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0}
+  .panel.green::before{background:var(--green)}.panel.blue::before{background:var(--blue)}.panel.amber::before{background:var(--amber)}.panel.purple::before{background:var(--purple)}.panel.pink::before{background:var(--pink)}.panel.teal::before{background:var(--teal)}.panel.emerald::before{background:var(--emerald)}.panel.red::before{background:var(--red)}
+  .panel h2{font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:.7rem}
+  .panel h3{font-size:.88rem;margin:.8rem 0 .4rem;color:var(--emerald)}
+  .panel p,.panel li{font-size:.82rem;line-height:1.7;color:var(--muted)}
+  .panel ul{padding-left:1.1rem}
+  .panel li{margin-bottom:.25rem}
+  .panel li strong{color:var(--text)}
+  .f{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--amber);background:rgba(245,158,11,.08);padding:.35rem .7rem;border-radius:6px;margin:.4rem 0;display:inline-block}
+  .tbl{width:100%;border-collapse:collapse;margin:.5rem 0;font-size:.76rem}
+  .tbl th,.tbl td{border:1px solid var(--border);padding:.4rem .5rem;text-align:center}
+  .tbl th{background:var(--card2);color:var(--emerald);font-weight:700}
+  .tbl td{color:var(--muted)}
+  .tip{background:rgba(16,185,129,.05);border-left:3px solid var(--emerald);padding:.5rem .8rem;border-radius:0 6px 6px 0;margin:.6rem 0;font-size:.78rem;color:var(--text)}
+  .tip strong{color:var(--emerald)}
+  .wide{grid-column:1/-1}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(8,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.5);position:relative;z-index:100}
+  .site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#64748b;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e2e8f0}
+  @media(max-width:600px){.grid{grid-template-columns:1fr;padding:0 .7rem 2rem}.wide{grid-column:1}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>The Human Eye &amp; the Colourful World</h1>
+  <p>Cheat Sheet · CBSE Class X · Chapter 11</p>
+</header>
+<div class="grid">
+
+<!-- 1 -->
+<div class="panel green">
+  <h2 style="color:var(--green)">👁️ The Human Eye — Structure</h2>
+  <ul>
+    <li><strong>Cornea:</strong> Transparent front membrane; provides ~⅔ of focusing power.</li>
+    <li><strong>Iris:</strong> Coloured muscular diaphragm; controls pupil size.</li>
+    <li><strong>Pupil:</strong> Opening in iris; regulates light entry (dilates/constricts).</li>
+    <li><strong>Crystalline Lens:</strong> Biconvex, flexible; adjusted by ciliary muscles.</li>
+    <li><strong>Retina:</strong> Light-sensitive screen; <strong>rods</strong> (dim light) + <strong>cones</strong> (colour: R/G/B).</li>
+    <li><strong>Optic Nerve:</strong> Transmits electrical signals from retina to brain.</li>
+    <li><strong>Blind Spot:</strong> No receptors at optic nerve exit point.</li>
+  </ul>
+  <div class="tip"><strong>Key:</strong> Eye = biological camera. Cornea+Lens = camera lens. Retina = film/sensor. Image: real, inverted, diminished.</div>
+</div>
+
+<!-- 2 -->
+<div class="panel teal">
+  <h2 style="color:var(--teal)">🔍 Power of Accommodation</h2>
+  <ul>
+    <li>Ability of eye lens to <strong>change focal length</strong> to focus at different distances.</li>
+    <li><strong>Near point (D):</strong> 25 cm — least distance of distinct vision.</li>
+    <li><strong>Far point:</strong> ∞ (infinity) for normal eye.</li>
+    <li><strong>Range of vision:</strong> 25 cm to ∞.</li>
+  </ul>
+  <h3>Mechanism</h3>
+  <table class="tbl">
+    <tr><th>Viewing</th><th>Ciliary Muscles</th><th>Lens</th><th>Focal Length</th></tr>
+    <tr><td>Distant object</td><td>Relaxed</td><td>Thin (flat)</td><td>Maximum</td></tr>
+    <tr><td>Near object</td><td>Contracted</td><td>Thick (curved)</td><td>Minimum</td></tr>
+  </table>
+  <div class="tip"><strong>Remember:</strong> Contract → Curved → Close objects. Relax → flat → faR objects.</div>
+</div>
+
+<!-- 3 -->
+<div class="panel amber wide">
+  <h2 style="color:var(--amber)">👓 Defects of Vision & Corrections</h2>
+  <table class="tbl">
+    <tr><th>Defect</th><th>Can't See</th><th>Image Forms</th><th>Cause</th><th>Correction</th><th>Lens Sign</th></tr>
+    <tr><td><strong>Myopia</strong><br>(Near-sighted)</td><td>Far objects</td><td>In front of retina</td><td>Elongated eyeball or excessive curvature</td><td>Concave lens</td><td>−ve power</td></tr>
+    <tr><td><strong>Hypermetropia</strong><br>(Far-sighted)</td><td>Near objects</td><td>Behind retina</td><td>Short eyeball or weak curvature</td><td>Convex lens</td><td>+ve power</td></tr>
+    <tr><td><strong>Presbyopia</strong><br>(Age-related)</td><td>Near objects</td><td>Behind retina</td><td>Ciliary muscles weaken; lens loses flexibility</td><td>Bifocal lens</td><td>+ve (lower)</td></tr>
+  </table>
+  <div class="tip"><strong>Mnemonics:</strong> <em>My</em>opia = <em>Mi</em>nus lens. <em>H</em>ypermetropia = <em>H</em>igh (+ve) lens. Presbyopia = <em>P</em>rogressive/Bifocal.</div>
+  <h3>Key Formulas</h3>
+  <p><span class="f">P = 1/f (in metres)</span> &nbsp; <span class="f">Far point (myopia) = |f of concave lens|</span></p>
+  <p><span class="f">1/f = 1/v − 1/u</span> (for calculating power of corrective lens)</p>
+</div>
+
+<!-- 4 -->
+<div class="panel purple">
+  <h2 style="color:var(--purple)">🔺 Refraction Through a Prism</h2>
+  <ul>
+    <li><strong>Prism:</strong> Triangular glass body with angle of prism <strong>A</strong>.</li>
+    <li>Incident ray bends towards base on entering and again on exiting.</li>
+    <li><strong>Angle of deviation (δ):</strong> Angle between incident ray and emergent ray.</li>
+    <li>δ depends on: angle of prism, refractive index, angle of incidence.</li>
+  </ul>
+  <div class="tip"><strong>Key relationship:</strong> A = r₁ + r₂ and δ = (i₁ + i₂) − A</div>
+</div>
+
+<!-- 5 -->
+<div class="panel blue">
+  <h2 style="color:var(--blue)">🌈 Dispersion of Light</h2>
+  <ul>
+    <li><strong>Dispersion:</strong> Splitting of white light into 7 colours by a prism.</li>
+    <li><strong>Spectrum:</strong> VIBGYOR — Violet, Indigo, Blue, Green, Yellow, Orange, Red.</li>
+    <li><strong>Cause:</strong> Different λ → different refractive indices in glass.</li>
+    <li><strong>Violet:</strong> λ ≈ 380 nm, μ highest → bends MOST.</li>
+    <li><strong>Red:</strong> λ ≈ 700 nm, μ lowest → bends LEAST.</li>
+  </ul>
+  <h3>Newton's Experiment</h3>
+  <ul>
+    <li>1st prism: White → VIBGYOR (dispersion).</li>
+    <li>2nd inverted prism: VIBGYOR → White (recombination).</li>
+    <li><strong>Proves:</strong> White = mixture of 7 colours; prism only separates, doesn't create.</li>
+  </ul>
+</div>
+
+<!-- 6 -->
+<div class="panel emerald">
+  <h2 style="color:var(--emerald)">🌈 Rainbow Formation</h2>
+  <ul>
+    <li>Formed in <strong>water droplets</strong> after rain (or near fountains/waterfalls).</li>
+    <li><strong>Steps in each droplet:</strong></li>
+    <li>1. Refraction (entering) → 2. Dispersion → 3. Total Internal Reflection → 4. Refraction (exiting)</li>
+    <li><strong>Conditions:</strong> Sun behind observer, rain in front.</li>
+  </ul>
+  <table class="tbl">
+    <tr><th>Rainbow</th><th>Angle</th><th>Reflections</th><th>Colour Order (outside→inside)</th><th>Brightness</th></tr>
+    <tr><td>Primary</td><td>42°</td><td>1 TIR</td><td>Red → Violet</td><td>Brighter</td></tr>
+    <tr><td>Secondary</td><td>51°</td><td>2 TIRs</td><td>Violet → Red (reversed)</td><td>Fainter</td></tr>
+  </table>
+</div>
+
+<!-- 7 -->
+<div class="panel pink wide">
+  <h2 style="color:var(--pink)">💫 Scattering of Light</h2>
+  <h3>Rayleigh Scattering Law</h3>
+  <p><span class="f">Intensity of scattered light ∝ 1/λ⁴</span></p>
+  <ul>
+    <li>By particles <strong>much smaller</strong> than wavelength (air molecules: N₂, O₂).</li>
+    <li>Shorter wavelength → scatters MUCH more. Blue scatters ~5.5× more than red.</li>
+  </ul>
+  <h3>Tyndall Effect</h3>
+  <ul>
+    <li>Scattering by <strong>colloidal particles</strong> (size ~ wavelength).</li>
+    <li>Can scatter all colours depending on particle size.</li>
+    <li>Examples: dusty room beam, forest mist, blue smoke from incense.</li>
+  </ul>
+  <table class="tbl">
+    <tr><th>Phenomenon</th><th>Cause</th><th>Key Reasoning</th></tr>
+    <tr><td>Blue sky</td><td>Rayleigh scattering</td><td>Blue (short λ) scatters most → reaches eyes from all directions</td></tr>
+    <tr><td>White clouds</td><td>Mie scattering</td><td>Large water droplets scatter all λ equally → white</td></tr>
+    <tr><td>Red sunset/sunrise</td><td>Rayleigh scattering</td><td>Long path → blue scattered away → only red/orange remains</td></tr>
+    <tr><td>Red danger signals</td><td>Least scattering</td><td>Red (longest λ) → least scattered → travels farthest</td></tr>
+    <tr><td>Black sky on Moon</td><td>No atmosphere</td><td>No molecules → no scattering → sky is black</td></tr>
+  </table>
+</div>
+
+<!-- 8 -->
+<div class="panel teal">
+  <h2 style="color:var(--teal)">⭐ Atmospheric Refraction</h2>
+  <ul>
+    <li>Atmosphere has layers of <strong>varying density</strong> (denser near surface).</li>
+    <li>Light continuously bends towards denser layers (towards ground).</li>
+  </ul>
+  <h3>Effects</h3>
+  <table class="tbl">
+    <tr><th>Phenomenon</th><th>Explanation</th></tr>
+    <tr><td>Twinkling of stars</td><td>Point source + varying refractive index → apparent position shifts → intensity fluctuates</td></tr>
+    <tr><td>Planets don't twinkle</td><td>Extended source → individual fluctuations average out</td></tr>
+    <tr><td>Advanced sunrise (+2 min)</td><td>Refraction makes Sun appear above actual position</td></tr>
+    <tr><td>Delayed sunset (+2 min)</td><td>Sun visible after crossing below horizon</td></tr>
+    <tr><td>Flattened Sun at horizon</td><td>Bottom edge refracted more than top → vertical compression</td></tr>
+  </table>
+  <div class="tip"><strong>Total extra daylight due to atmospheric refraction ≈ 4 minutes/day</strong> (2 min sunrise + 2 min sunset).</div>
+</div>
+
+<!-- 9 -->
+<div class="panel red">
+  <h2 style="color:var(--red)">📊 Wavelength & Colour Data</h2>
+  <table class="tbl">
+    <tr><th>Colour</th><th>Wavelength (nm)</th><th>Frequency</th><th>μ in glass</th><th>Deviation</th></tr>
+    <tr><td style="color:#8b00ff">Violet</td><td>380–450</td><td>Highest</td><td>Highest</td><td>Maximum</td></tr>
+    <tr><td style="color:#4b0082">Indigo</td><td>450–490</td><td>↑</td><td>↑</td><td>↑</td></tr>
+    <tr><td style="color:#0066ff">Blue</td><td>490–520</td><td></td><td></td><td></td></tr>
+    <tr><td style="color:#00cc00">Green</td><td>520–565</td><td></td><td></td><td></td></tr>
+    <tr><td style="color:#cccc00">Yellow</td><td>565–590</td><td></td><td></td><td></td></tr>
+    <tr><td style="color:#ff8c00">Orange</td><td>590–625</td><td>↓</td><td>↓</td><td>↓</td></tr>
+    <tr><td style="color:#ff0000">Red</td><td>625–700</td><td>Lowest</td><td>Lowest</td><td>Minimum</td></tr>
+  </table>
+  <div class="tip"><strong>Remember:</strong> λ increases V→R. Frequency increases R→V. Speed in glass increases V→R. All colours have same speed in vacuum (c = 3×10⁸ m/s).</div>
+</div>
+
+<!-- 10 -->
+<div class="panel green">
+  <h2 style="color:var(--green)">🧠 Exam Quick-Fire Facts</h2>
+  <ul>
+    <li><strong>Persistence of vision:</strong> ~1/16 second. Movies use 24+ fps to exploit this.</li>
+    <li><strong>Colour of an object:</strong> Determined by wavelength it reflects. Red rose reflects red, absorbs rest.</li>
+    <li><strong>At noon:</strong> Sun overhead → short path → white/yellow Sun.</li>
+    <li><strong>On Moon:</strong> No atmosphere → black sky + no twinkling + no refraction effects.</li>
+    <li><strong>Deep sea:</strong> Appears blue-green (water absorbs red wavelengths).</li>
+    <li><strong>Stars twinkle, planets don't</strong> = point source vs extended source.</li>
+    <li>Human eye focal length ≈ <strong>2.5 cm</strong> (approx).</li>
+    <li>Eye can distinguish about <strong>10 million colours</strong>.</li>
+  </ul>
+</div>
+
+<!-- 11 -->
+<div class="panel amber">
+  <h2 style="color:var(--amber)">📝 Important Numericals Pattern</h2>
+  <h3>Type 1: Power of Corrective Lens</h3>
+  <p><span class="f">P = 1/f &nbsp;(f in metres)</span></p>
+  <ul>
+    <li>Myopia: Far point given → f = −(far point) → P = 1/f</li>
+    <li>Hypermetropia: Near point given → use lens formula with v = −(near point), u = −25 cm</li>
+  </ul>
+  <h3>Type 2: Combination of Lenses</h3>
+  <p><span class="f">P = P₁ + P₂ + P₃ ...</span></p>
+  <h3>Example</h3>
+  <p>A person's far point is 80 cm. Find the power of corrective lens.</p>
+  <p>f = −80 cm = −0.8 m (concave lens for myopia)</p>
+  <p><span class="f">P = 1/(−0.8) = −1.25 D</span></p>
+</div>
+
+<!-- 12 -->
+<div class="panel blue">
+  <h2 style="color:var(--blue)">🔑 Key Differences</h2>
+  <table class="tbl">
+    <tr><th>Feature</th><th>Rayleigh Scattering</th><th>Tyndall Effect</th></tr>
+    <tr><td>Particle size</td><td>≪ λ (molecules)</td><td>≈ λ (colloidal)</td></tr>
+    <tr><td>Dependence</td><td>Strong (∝ 1/λ⁴)</td><td>Weaker λ dependence</td></tr>
+    <tr><td>Example</td><td>Blue sky</td><td>Dusty room beam</td></tr>
+  </table>
+  <table class="tbl" style="margin-top:.8rem">
+    <tr><th>Feature</th><th>Primary Rainbow</th><th>Secondary Rainbow</th></tr>
+    <tr><td>Internal reflections</td><td>1</td><td>2</td></tr>
+    <tr><td>Angle</td><td>42°</td><td>51°</td></tr>
+    <tr><td>Intensity</td><td>Brighter</td><td>Fainter</td></tr>
+    <tr><td>Order (outside→in)</td><td>Red → Violet</td><td>Violet → Red</td></tr>
+  </table>
+</div>
+
+</div>
+</body>
+</html>

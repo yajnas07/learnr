@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagram — The Human Eye and the Colourful World</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040810;--card:#0a1422;--card2:#0f1c30;
+  --border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;
+  --green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;
+  --emerald:#10b981;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(16,185,129,.05) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.2rem 1rem .6rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3.8vw,1.9rem);font-weight:900;color:var(--emerald);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.tabs{display:flex;gap:.3rem;flex-wrap:wrap;justify-content:center;padding:.3rem 1rem .8rem;}
+.tab-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.72rem;padding:.35rem .85rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.on{color:#040810;border-color:transparent;}
+
+.stage{max-width:920px;margin:0 auto;padding:0 1rem 2rem;}
+.panel{display:none;animation:fadeIn .3s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.canvas-box{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:.8rem;}
+canvas{display:block;width:100%;cursor:crosshair;}
+.info-box{background:var(--card2);border-radius:8px;padding:.55rem .85rem;font-family:'DM Mono',monospace;font-size:.76rem;line-height:1.7;color:var(--text);margin:.5rem 0;}
+.info-box strong{color:var(--amber);}
+.info-box em{color:var(--teal);font-style:normal;}
+
+.controls{display:flex;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border-top:1px solid var(--border);align-items:center;}
+.ctrl-group{display:flex;flex-direction:column;gap:.2rem;}
+.ctrl-group label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+.ctrl-group input[type=range]{width:130px;accent-color:var(--emerald);}
+.ctrl-value{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);min-width:40px;text-align:center;}
+.ctrl-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.3rem .8rem;border-radius:4px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.ctrl-btn:hover{color:var(--text);border-color:#2a4a6a;}
+.ctrl-btn.active{background:var(--emerald);color:#040810;border-color:var(--emerald);}
+
+/* Labels / parts grid */
+.parts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.6rem;margin-top:.6rem;}
+.part-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.65rem .85rem;cursor:pointer;transition:all .2s;}
+.part-card:hover,.part-card.active{border-color:var(--emerald);background:rgba(16,185,129,.06);}
+.part-name{font-family:'Playfair Display',serif;font-size:.8rem;font-weight:700;color:var(--emerald);margin-bottom:.2rem;}
+.part-desc{font-size:.76rem;color:var(--muted);line-height:1.4;}
+
+/* Defect cards */
+.defect-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;}
+.defect-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.3rem .75rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.defect-btn:hover{color:var(--text);}
+.defect-btn.on{background:var(--teal);color:#040810;border-color:var(--teal);}
+
+/* Spectrum */
+.spectrum-bar{height:40px;border-radius:8px;background:linear-gradient(90deg,#8b0000,#ff0000,#ff4500,#ffa500,#ffff00,#7fff00,#00ff00,#00ffff,#0000ff,#4b0082,#8b00ff);margin:.6rem 0;position:relative;}
+.spectrum-label{position:absolute;bottom:-18px;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);transform:translateX(-50%);}
+
+/* Phenomenon cards */
+.phenom-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.7rem;}
+.phenom-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.9rem;cursor:pointer;transition:all .3s;}
+.phenom-card:hover{border-color:#2a4a6a;transform:translateY(-2px);}
+.phenom-card.open .phenom-detail{display:block;}
+.phenom-head{display:flex;align-items:center;gap:.5rem;}
+.phenom-emoji{font-size:1.3rem;}
+.phenom-title{font-family:'Playfair Display',serif;font-size:.82rem;font-weight:700;}
+.phenom-detail{display:none;margin-top:.6rem;padding-top:.5rem;border-top:1px solid var(--border);font-size:.8rem;line-height:1.6;}
+.phenom-detail strong{color:var(--amber);}
+.phenom-detail em{color:var(--teal);font-style:normal;}
+
+@media(max-width:500px){canvas{height:260px!important;}.controls{flex-direction:column;gap:.5rem;}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>The Human Eye and the Colourful World</h1>
+  <p>Class X · Science Ch.11 · Interactive Explorations · 6 Modules</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn on" onclick="showTab(0,this,'var(--emerald)')" style="background:var(--emerald);color:#040810">👁️ Eye Anatomy</button>
+  <button class="tab-btn" onclick="showTab(1,this,'var(--teal)')">🔍 Accommodation</button>
+  <button class="tab-btn" onclick="showTab(2,this,'var(--amber)')">👓 Defects</button>
+  <button class="tab-btn" onclick="showTab(3,this,'var(--indigo)')">🌈 Dispersion</button>
+  <button class="tab-btn" onclick="showTab(4,this,'var(--blue)')">🌅 Scattering</button>
+  <button class="tab-btn" onclick="showTab(5,this,'var(--red)')">🌍 Phenomena</button>
+</div>
+
+<div class="stage">
+<!-- ═══════════ TAB 0: EYE ANATOMY ═══════════ -->
+<div class="panel active" id="p0">
+  <div class="canvas-box">
+    <canvas id="eyeCanvas" height="380"></canvas>
+  </div>
+  <div class="info-box">
+    💡 Hover over the labelled parts below to highlight them on the diagram. The eye works like a <strong>camera</strong> — cornea + lens focus light on the <em>retina</em>.
+  </div>
+  <div class="parts-grid">
+    <div class="part-card" onmouseenter="hlPart('cornea')" onmouseleave="hlPart(null)">
+      <div class="part-name">Cornea</div>
+      <div class="part-desc">Transparent front cover; provides ~2/3 of eye's focusing power (refractive index ≈ 1.376)</div>
+    </div>
+    <div class="part-card" onmouseenter="hlPart('iris')" onmouseleave="hlPart(null)">
+      <div class="part-name">Iris & Pupil</div>
+      <div class="part-desc">Coloured muscular diaphragm; pupil regulates light entry (dilates in dark, constricts in bright)</div>
+    </div>
+    <div class="part-card" onmouseenter="hlPart('lens')" onmouseleave="hlPart(null)">
+      <div class="part-name">Crystalline Lens</div>
+      <div class="part-desc">Biconvex, flexible; changes curvature via ciliary muscles for accommodation (f ≈ 2.5 cm)</div>
+    </div>
+    <div class="part-card" onmouseenter="hlPart('retina')" onmouseleave="hlPart(null)">
+      <div class="part-name">Retina</div>
+      <div class="part-desc">Screen with rods (dim light) & cones (colour, 3 types: R/G/B); image forms here (inverted & real)</div>
+    </div>
+    <div class="part-card" onmouseenter="hlPart('optic')" onmouseleave="hlPart(null)">
+      <div class="part-name">Optic Nerve</div>
+      <div class="part-desc">Transmits electrical impulses from retina to brain; exit point = blind spot (no receptors)</div>
+    </div>
+    <div class="part-card" onmouseenter="hlPart('ciliary')" onmouseleave="hlPart(null)">
+      <div class="part-name">Ciliary Muscles</div>
+      <div class="part-desc">Adjust lens shape: relax → thin lens (far objects); contract → thick lens (near objects)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 1: ACCOMMODATION ═══════════ -->
+<div class="panel" id="p1">
+  <div class="canvas-box">
+    <canvas id="accomCanvas" height="320"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Object Distance: <span class="ctrl-value" id="obj-dist-val">∞ (far)</span></label>
+        <input type="range" id="obj-dist" min="0" max="100" value="0" oninput="updateAccom()">
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;" id="accom-status">
+        Ciliary muscles: <strong style="color:var(--green)">RELAXED</strong> · Lens: thin · Focus: ∞
+      </div>
+    </div>
+  </div>
+  <div class="info-box">
+    <strong>Accommodation:</strong> The ability of the eye lens to change its focal length to focus on objects at varying distances.<br>
+    <em>Near point</em> = 25 cm (least distance of distinct vision, D) &nbsp;|&nbsp; <em>Far point</em> = infinity (∞)
+  </div>
+  <div class="info-box" style="opacity:.7">
+    💡 Move the slider from far (∞) to near (25 cm). Watch how the lens thickens and ciliary muscles contract. Beyond the near point, the eye cannot accommodate further.
+  </div>
+</div>
+
+<!-- ═══════════ TAB 2: DEFECTS OF VISION ═══════════ -->
+<div class="panel" id="p2">
+  <div class="defect-tabs">
+    <button class="defect-btn on" onclick="showDefect(0,this)">Myopia (Near-sightedness)</button>
+    <button class="defect-btn" onclick="showDefect(1,this)">Hypermetropia (Far-sightedness)</button>
+    <button class="defect-btn" onclick="showDefect(2,this)">Presbyopia</button>
+  </div>
+  <div class="canvas-box">
+    <canvas id="defectCanvas" height="340"></canvas>
+  </div>
+  <div class="info-box" id="defect-info">
+    <strong>Myopia:</strong> Can see near objects clearly but distant objects appear blurry. Image forms <em>in front of retina</em>.<br>
+    <strong>Cause:</strong> Elongated eyeball or excessive lens curvature.<br>
+    <strong>Correction:</strong> Concave lens (diverging) of appropriate power.
+  </div>
+</div>
+
+<!-- ═══════════ TAB 3: DISPERSION ═══════════ -->
+<div class="panel" id="p3">
+  <div class="canvas-box">
+    <canvas id="prismCanvas" height="360"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Prism Angle: <span class="ctrl-value" id="prism-angle-val">60°</span></label>
+        <input type="range" id="prism-angle" min="30" max="80" value="60" oninput="updatePrism()">
+      </div>
+      <button class="ctrl-btn" id="rainbow-btn" onclick="toggleRainbow()">Show Rainbow Formation</button>
+    </div>
+  </div>
+  <div class="info-box">
+    <strong>Dispersion:</strong> Splitting of white light into its component colours (VIBGYOR) by a prism.<br>
+    <em>Cause:</em> Different colours have different refractive indices in glass (violet bends most, red least).<br>
+    <strong>Newton's experiment:</strong> Second inverted prism recombines colours back to white.
+  </div>
+  <div style="position:relative;margin:.6rem 0;">
+    <div class="spectrum-bar"></div>
+    <span class="spectrum-label" style="left:4%">V</span>
+    <span class="spectrum-label" style="left:14%">I</span>
+    <span class="spectrum-label" style="left:28%">B</span>
+    <span class="spectrum-label" style="left:42%">G</span>
+    <span class="spectrum-label" style="left:56%">Y</span>
+    <span class="spectrum-label" style="left:70%">O</span>
+    <span class="spectrum-label" style="left:88%">R</span>
+  </div>
+  <div class="info-box" style="margin-top:1.5rem;opacity:.8">
+    Wavelength increases: Violet (380nm) → Red (700nm)<br>
+    Frequency decreases: Violet → Red<br>
+    Speed in glass: Red (fastest) → Violet (slowest)
+  </div>
+</div>
+
+<!-- ═══════════ TAB 4: SCATTERING ═══════════ -->
+<div class="panel" id="p4">
+  <div class="canvas-box">
+    <canvas id="scatterCanvas" height="340"></canvas>
+    <div class="controls">
+      <button class="ctrl-btn active" onclick="setScatterScene(0,this)">☀️ Noon (overhead)</button>
+      <button class="ctrl-btn" onclick="setScatterScene(1,this)">🌅 Sunset / Sunrise</button>
+      <button class="ctrl-btn" onclick="setScatterScene(2,this)">🔴 Danger Signals</button>
+    </div>
+  </div>
+  <div class="info-box" id="scatter-info">
+    <strong>Rayleigh Scattering:</strong> Intensity ∝ 1/λ⁴ — shorter wavelengths scatter MUCH more.<br>
+    <em>Blue sky:</em> Blue light (short λ) scatters most in all directions → sky appears blue when sun is overhead.
+  </div>
+  <div class="info-box" style="opacity:.7">
+    💡 At sunrise/sunset, sunlight travels through more atmosphere. Blue is scattered away completely, leaving <strong>red/orange</strong>. Danger signals use red because it scatters <em>least</em> and travels farthest.
+  </div>
+</div>
+
+<!-- ═══════════ TAB 5: PHENOMENA ═══════════ -->
+<div class="panel" id="p5">
+  <div class="info-box">💡 Click any phenomenon to see its explanation based on scattering, refraction, and dispersion.</div>
+  <div class="phenom-grid">
+    <div class="phenom-card" onclick="togglePhenom(this)">
+      <div class="phenom-head"><span class="phenom-emoji">🌈</span><span class="phenom-title">Rainbow</span></div>
+      <div class="phenom-detail">
+        <strong>Cause:</strong> Dispersion + internal reflection + refraction in water droplets.<br>
+        <strong>Conditions:</strong> Observer must have sun <em>behind them</em>, rain in front. Always appears as arc at 42° (primary) / 51° (secondary).<br>
+        <strong>Primary rainbow:</strong> VIBGYOR (violet inside, red outside) — one internal reflection.<br>
+        <strong>Secondary rainbow:</strong> Reversed order (red inside) — two internal reflections, fainter.
+      </div>
+    </div>
+    <div class="phenom-card" onclick="togglePhenom(this)">
+      <div class="phenom-head"><span class="phenom-emoji">🔵</span><span class="phenom-title">Blue Sky</span></div>
+      <div class="phenom-detail">
+        <strong>Cause:</strong> Rayleigh scattering of sunlight by tiny air molecules (N₂, O₂).<br>
+        Scattering ∝ <em>1/λ⁴</em> — blue (λ ≈ 450 nm) scatters ~5.5× more than red (λ ≈ 700 nm).<br>
+        Scattered blue light reaches our eyes from all directions → sky looks blue.
+      </div>
+    </div>
+    <div class="phenom-card" onclick="togglePhenom(this)">
+      <div class="phenom-head"><span class="phenom-emoji">🌅</span><span class="phenom-title">Red Sunrise & Sunset</span></div>
+      <div class="phenom-detail">
+        <strong>Cause:</strong> At horizon, sunlight passes through maximum atmosphere.<br>
+        All shorter wavelengths (blue, violet) scatter away. Only <strong>red and orange</strong> (long λ) reach the observer directly.<br>
+        Sun itself appears reddish-orange and slightly flattened (due to refraction).
+      </div>
+    </div>
+    <div class="phenom-card" onclick="togglePhenom(this)">
+      <div class="phenom-head"><span class="phenom-emoji">⭐</span><span class="phenom-title">Twinkling of Stars</span></div>
+      <div class="phenom-detail">
+        <strong>Cause:</strong> Atmospheric refraction. Starlight passes through layers of varying density (temperature → refractive index changes).<br>
+        The apparent position shifts slightly and continuously → intensity fluctuates → <em>twinkling</em>.<br>
+        <strong>Planets don't twinkle</strong> because they subtend a larger angle (extended source) — individual fluctuations average out.
+      </div>
+    </div>
+    <div class="phenom-card" onclick="togglePhenom(this)">
+      <div class="phenom-head"><span class="phenom-emoji">🌞</span><span class="phenom-title">Advanced Sunrise & Delayed Sunset</span></div>
+      <div class="phenom-detail">
+        <strong>Cause:</strong> Atmospheric refraction bends light towards the normal (denser below).<br>
+        Sun appears <strong>~2 minutes early</strong> at sunrise and stays visible ~2 minutes after it's actually below horizon.<br>
+        Total extra visibility ≈ <em>4 minutes per day</em>. Sun appears slightly higher than actual position.
+      </div>
+    </div>
+    <div class="phenom-card" onclick="togglePhenom(this)">
+      <div class="phenom-head"><span class="phenom-emoji">🔴</span><span class="phenom-title">Red Danger Signals</span></div>
+      <div class="phenom-detail">
+        <strong>Cause:</strong> Red light has longest wavelength → <strong>scatters the least</strong> (∝ 1/λ⁴).<br>
+        Can travel the farthest through fog, dust, and smoke without being scattered away.<br>
+        Used for: traffic signals, brake lights, emergency signs, tail lamps.
+      </div>
+    </div>
+    <div class="phenom-card" onclick="togglePhenom(this)">
+      <div class="phenom-head"><span class="phenom-emoji">🌫️</span><span class="phenom-title">Tyndall Effect</span></div>
+      <div class="phenom-detail">
+        <strong>Cause:</strong> Scattering of light by <em>colloidal particles</em> (size comparable to wavelength).<br>
+        Unlike Rayleigh (molecules), Tyndall scattering depends on particle size → can scatter all colours.<br>
+        <strong>Examples:</strong> Light beam through dusty room, blue colour of smoke from milk + water + laser, forest mist.
+      </div>
+    </div>
+    <div class="phenom-card" onclick="togglePhenom(this)">
+      <div class="phenom-head"><span class="phenom-emoji">🌙</span><span class="phenom-title">Sky on Moon</span></div>
+      <div class="phenom-detail">
+        <strong>Moon has no atmosphere</strong> → no molecules to scatter light.<br>
+        Result: Sky appears <strong>black</strong> from the Moon even during daytime.<br>
+        Stars are visible during day on the Moon (no scattered blue light to overpower them).
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /stage -->
+
+<script>
+// ── Tab Switching ──
+function showTab(i,btn,clr){
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';});
+  btn.classList.add('on');btn.style.background=clr;btn.style.color='#040810';
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  if(i===0)drawEye();if(i===1)updateAccom();if(i===2)drawDefect();if(i===3)updatePrism();if(i===4)drawScatter();
+}
+
+// ═══ TAB 0: EYE ANATOMY ═══
+const eyeC=document.getElementById('eyeCanvas');const eyeCtx=eyeC.getContext('2d');
+let hlPartName=null;
+
+function hlPart(name){hlPartName=name;drawEye();}
+
+function drawEye(){
+  const W=eyeC.width=eyeC.offsetWidth*2,H=eyeC.height=eyeC.offsetHeight*2;
+  const ctx=eyeCtx;ctx.clearRect(0,0,W,H);
+  const cx=W*.45,cy=H*.5,rx=W*.28,ry=H*.38;
+
+  // Eyeball (sclera)
+  ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+  ctx.fillStyle='#1a2d45';ctx.fill();ctx.strokeStyle='#2a4a6a';ctx.lineWidth=2;ctx.stroke();
+
+  // Vitreous humor
+  ctx.beginPath();ctx.ellipse(cx,cy,rx*.88,ry*.88,0,0,Math.PI*2);
+  ctx.fillStyle='rgba(16,185,129,.05)';ctx.fill();
+
+  // Retina (inner lining)
+  const retHL=hlPartName==='retina';
+  ctx.beginPath();ctx.ellipse(cx,cy,rx*.92,ry*.92,0,Math.PI*.65,Math.PI*1.35);
+  ctx.strokeStyle=retHL?'#f59e0b':'#d946ef';ctx.lineWidth=retHL?5:3;ctx.stroke();
+  ctx.font=`${retHL?'bold ':''}${W*.018}px DM Mono`;ctx.fillStyle=retHL?'#f59e0b':'#d946ef';
+  ctx.fillText('Retina',cx+rx*.55,cy+ry*.6);
+
+  // Lens
+  const lensHL=hlPartName==='lens';
+  const lx=cx-rx*.45,lw=rx*.18;
+  ctx.beginPath();
+  ctx.ellipse(lx,cy,lw,ry*.45,0,0,Math.PI*2);
+  ctx.fillStyle=lensHL?'rgba(56,189,248,.4)':'rgba(56,189,248,.2)';ctx.fill();
+  ctx.strokeStyle=lensHL?'#38bdf8':'#38bdf8';ctx.lineWidth=lensHL?4:2;ctx.stroke();
+  ctx.font=`${lensHL?'bold ':''}${W*.016}px DM Mono`;ctx.fillStyle='#38bdf8';
+  ctx.fillText('Lens',lx-W*.03,cy-ry*.52);
+
+  // Cornea
+  const cornHL=hlPartName==='cornea';
+  ctx.beginPath();
+  ctx.ellipse(cx-rx,cy,rx*.15,ry*.7,0,-Math.PI*.45,Math.PI*.45);
+  ctx.strokeStyle=cornHL?'#22c55e':'#10b981';ctx.lineWidth=cornHL?5:3;ctx.stroke();
+  ctx.font=`${cornHL?'bold ':''}${W*.016}px DM Mono`;ctx.fillStyle='#10b981';
+  ctx.fillText('Cornea',cx-rx-W*.08,cy-ry*.55);
+
+  // Iris & Pupil
+  const irisHL=hlPartName==='iris';
+  const irisX=cx-rx*.6;
+  ctx.beginPath();ctx.ellipse(irisX,cy,rx*.06,ry*.35,0,0,Math.PI*2);
+  ctx.fillStyle=irisHL?'rgba(129,140,248,.5)':'rgba(129,140,248,.3)';ctx.fill();
+  ctx.strokeStyle=irisHL?'#818cf8':'#818cf8';ctx.lineWidth=irisHL?4:2;ctx.stroke();
+  // Pupil
+  ctx.beginPath();ctx.ellipse(irisX,cy,rx*.025,ry*.12,0,0,Math.PI*2);
+  ctx.fillStyle='#040810';ctx.fill();
+  ctx.font=`${irisHL?'bold ':''}${W*.015}px DM Mono`;ctx.fillStyle='#818cf8';
+  ctx.fillText('Iris/Pupil',irisX-W*.04,cy+ry*.5);
+
+  // Ciliary muscles
+  const cilHL=hlPartName==='ciliary';
+  ctx.beginPath();ctx.arc(lx-lw*.3,cy-ry*.42,W*.012,0,Math.PI*2);ctx.fillStyle=cilHL?'#f59e0b':'rgba(245,158,11,.5)';ctx.fill();
+  ctx.beginPath();ctx.arc(lx-lw*.3,cy+ry*.42,W*.012,0,Math.PI*2);ctx.fill();
+  ctx.font=`${cilHL?'bold ':''}${W*.014}px DM Mono`;ctx.fillStyle='#f59e0b';
+  ctx.fillText('Ciliary',lx-W*.1,cy+ry*.7);
+  ctx.fillText('Muscles',lx-W*.1,cy+ry*.78);
+
+  // Optic nerve
+  const opHL=hlPartName==='optic';
+  ctx.beginPath();ctx.moveTo(cx+rx*.85,cy);ctx.lineTo(cx+rx*1.2,cy-ry*.15);ctx.lineTo(cx+rx*1.4,cy-ry*.1);
+  ctx.strokeStyle=opHL?'#f43f5e':'rgba(244,63,94,.6)';ctx.lineWidth=opHL?6:4;ctx.lineCap='round';ctx.stroke();
+  ctx.font=`${opHL?'bold ':''}${W*.016}px DM Mono`;ctx.fillStyle='#f43f5e';
+  ctx.fillText('Optic Nerve',cx+rx*.9,cy-ry*.3);
+
+  // Light rays entering
+  ctx.setLineDash([6,4]);ctx.strokeStyle='rgba(245,158,11,.4)';ctx.lineWidth=1.5;
+  for(let i=-2;i<=2;i++){
+    ctx.beginPath();ctx.moveTo(0,cy+i*ry*.15);ctx.lineTo(cx-rx,cy+i*ry*.05);ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // Focused rays to retina
+  ctx.strokeStyle='rgba(245,158,11,.3)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(lx+lw,cy-ry*.15);ctx.lineTo(cx+rx*.6,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(lx+lw,cy+ry*.15);ctx.lineTo(cx+rx*.6,cy);ctx.stroke();
+
+  // Focal point on retina
+  ctx.beginPath();ctx.arc(cx+rx*.6,cy,4,0,Math.PI*2);ctx.fillStyle='#f59e0b';ctx.fill();
+}
+setTimeout(drawEye,50);
+window.addEventListener('resize',()=>{drawEye();updateAccom();drawDefect();updatePrism();drawScatter();});
+
+// ═══ TAB 1: ACCOMMODATION ═══
+const acC=document.getElementById('accomCanvas');const acCtx=acC.getContext('2d');
+
+function updateAccom(){
+  const val=parseInt(document.getElementById('obj-dist').value);
+  const W=acC.width=acC.offsetWidth*2,H=acC.height=acC.offsetHeight*2;
+  const ctx=acCtx;ctx.clearRect(0,0,W,H);
+  
+  // val 0=far(∞), 100=near(25cm)
+  const nearness=val/100;
+  const lensThick=12+nearness*14;// lens gets thicker
+  
+  // Distance label
+  const dist=val===0?'∞':val<20?'Far (~5m+)':(25+Math.round(75*(1-val/100)))+'cm';
+  document.getElementById('obj-dist-val').textContent=val===0?'∞ (far)':dist;
+  
+  const status=document.getElementById('accom-status');
+  if(val<30) status.innerHTML='Ciliary muscles: <strong style="color:#22c55e">RELAXED</strong> · Lens: thin · Focus: far';
+  else if(val<70) status.innerHTML='Ciliary muscles: <strong style="color:#f59e0b">SLIGHTLY CONTRACTED</strong> · Lens: moderate';
+  else status.innerHTML='Ciliary muscles: <strong style="color:#f43f5e">FULLY CONTRACTED</strong> · Lens: thick · Focus: near point (25cm)';
+
+  const cx=W*.5,cy=H*.5,eyeR=H*.35;
+  
+  // Eye outline
+  ctx.beginPath();ctx.ellipse(cx,cy,eyeR*1.5,eyeR,0,0,Math.PI*2);
+  ctx.fillStyle='#0f1c30';ctx.fill();ctx.strokeStyle='#1a2d45';ctx.lineWidth=2;ctx.stroke();
+
+  // Lens (changes thickness)
+  ctx.beginPath();ctx.ellipse(cx-eyeR*.4,cy,lensThick,eyeR*.6,0,0,Math.PI*2);
+  ctx.fillStyle='rgba(56,189,248,.2)';ctx.fill();ctx.strokeStyle='#38bdf8';ctx.lineWidth=2;ctx.stroke();
+
+  // Ciliary muscles indicator
+  const muscleColor=val<30?'#22c55e':val<70?'#f59e0b':'#f43f5e';
+  ctx.beginPath();ctx.arc(cx-eyeR*.4-lensThick-8,cy-eyeR*.5,6,0,Math.PI*2);ctx.fillStyle=muscleColor;ctx.fill();
+  ctx.beginPath();ctx.arc(cx-eyeR*.4-lensThick-8,cy+eyeR*.5,6,0,Math.PI*2);ctx.fill();
+
+  // Retina
+  ctx.beginPath();ctx.ellipse(cx,cy,eyeR*1.4,eyeR*.9,0,Math.PI*.6,Math.PI*1.4);
+  ctx.strokeStyle='#d946ef';ctx.lineWidth=3;ctx.stroke();
+
+  // Object (arrow)
+  const objX=W*.05+nearness*(W*.2);
+  ctx.beginPath();ctx.moveTo(objX,cy);ctx.lineTo(objX,cy-H*.2);ctx.strokeStyle='#f59e0b';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(objX-8,cy-H*.2+12);ctx.lineTo(objX,cy-H*.2);ctx.lineTo(objX+8,cy-H*.2+12);ctx.stroke();
+
+  // Rays from object to lens
+  ctx.strokeStyle='rgba(245,158,11,.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(objX,cy-H*.2);ctx.lineTo(cx-eyeR*.4,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(objX,cy-H*.2);ctx.lineTo(cx-eyeR*.4,cy-eyeR*.3);ctx.stroke();
+
+  // Refracted to retina (always focus ON retina for normal eye)
+  const focusX=cx+eyeR*.8;
+  ctx.strokeStyle='rgba(34,197,94,.6)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(cx-eyeR*.4,cy);ctx.lineTo(focusX,cy+H*.05);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-eyeR*.4,cy-eyeR*.3);ctx.lineTo(focusX,cy+H*.05);ctx.stroke();
+  ctx.beginPath();ctx.arc(focusX,cy+H*.05,4,0,Math.PI*2);ctx.fillStyle='#22c55e';ctx.fill();
+
+  // Labels
+  ctx.font='bold '+W*.02+'px DM Mono';
+  ctx.fillStyle='#38bdf8';ctx.fillText('Lens (f changes)',cx-eyeR*.4-W*.06,cy+eyeR*.8);
+  ctx.fillStyle='#f59e0b';ctx.fillText('Object',objX-10,cy+H*.15);
+  ctx.fillStyle='#22c55e';ctx.fillText('Image on retina',focusX-W*.06,cy+H*.15);
+}
+setTimeout(updateAccom,100);
+
+// ═══ TAB 2: DEFECTS ═══
+const defC=document.getElementById('defectCanvas');const defCtx=defC.getContext('2d');
+let defectType=0;
+const defectInfos=[
+  `<strong>Myopia (Near-sightedness):</strong> Far objects blurry. Image forms <em>in front of retina</em>.<br><strong>Causes:</strong> Elongated eyeball OR too much lens curvature.<br><strong>Correction:</strong> Concave lens (diverging, negative power) to diverge rays before entering the eye.`,
+  `<strong>Hypermetropia (Far-sightedness):</strong> Near objects blurry. Image forms <em>behind retina</em>.<br><strong>Causes:</strong> Shortened eyeball OR too little lens curvature. Near point shifts beyond 25 cm.<br><strong>Correction:</strong> Convex lens (converging, positive power) to converge rays extra.`,
+  `<strong>Presbyopia:</strong> Age-related (usually after 40). Ciliary muscles weaken → lens loses flexibility → cannot accommodate well for near objects.<br><strong>Correction:</strong> Bifocal lens (upper: concave for distance; lower: convex for reading) or progressive lenses.`
+];
+
+function showDefect(i,btn){
+  defectType=i;
+  document.querySelectorAll('.defect-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('defect-info').innerHTML=defectInfos[i];
+  drawDefect();
+}
+
+function drawDefect(){
+  const W=defC.width=defC.offsetWidth*2,H=defC.height=defC.offsetHeight*2;
+  const ctx=defCtx;ctx.clearRect(0,0,W,H);
+  const cy=H*.5,eyeX=W*.6,eyeRX=W*.18,eyeRY=H*.35;
+
+  // Draw eye
+  ctx.beginPath();ctx.ellipse(eyeX,cy,eyeRX,eyeRY,0,0,Math.PI*2);
+  ctx.fillStyle='#0f1c30';ctx.fill();ctx.strokeStyle='#1a2d45';ctx.lineWidth=2;ctx.stroke();
+
+  // Lens
+  const lensX=eyeX-eyeRX*.55;
+  ctx.beginPath();ctx.ellipse(lensX,cy,10,eyeRY*.5,0,0,Math.PI*2);
+  ctx.fillStyle='rgba(56,189,248,.2)';ctx.fill();ctx.strokeStyle='#38bdf8';ctx.lineWidth=2;ctx.stroke();
+
+  // Retina position
+  const retX=eyeX+eyeRX*.75;
+
+  if(defectType===0){// Myopia
+    // Image forms BEFORE retina
+    const imgX=retX-W*.06;
+    ctx.strokeStyle='rgba(244,63,94,.5)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(W*.1,cy-H*.15);ctx.lineTo(lensX,cy-eyeRY*.2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*.1,cy+H*.05);ctx.lineTo(lensX,cy+eyeRY*.1);ctx.stroke();
+    // Converge too early
+    ctx.strokeStyle='rgba(244,63,94,.7)';
+    ctx.beginPath();ctx.moveTo(lensX,cy-eyeRY*.2);ctx.lineTo(imgX,cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(lensX,cy+eyeRY*.1);ctx.lineTo(imgX,cy);ctx.stroke();
+    ctx.beginPath();ctx.arc(imgX,cy,5,0,Math.PI*2);ctx.fillStyle='#f43f5e';ctx.fill();
+    // Continue past to show blur on retina
+    ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(244,63,94,.3)';
+    ctx.beginPath();ctx.moveTo(imgX,cy);ctx.lineTo(retX,cy-H*.08);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(imgX,cy);ctx.lineTo(retX,cy+H*.08);ctx.stroke();
+    ctx.setLineDash([]);
+    // Correction lens
+    ctx.strokeStyle='#22c55e';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.ellipse(W*.3,cy,8,H*.2,0,0,Math.PI*2);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font='bold '+W*.018+'px DM Mono';ctx.fillStyle='#f43f5e';ctx.fillText('Image (before retina)',imgX-W*.08,cy+H*.2);
+    ctx.fillStyle='#22c55e';ctx.fillText('Correction: Concave lens',W*.15,cy+H*.35);
+  } else if(defectType===1){// Hypermetropia
+    const imgX=retX+W*.06;
+    ctx.strokeStyle='rgba(245,158,11,.5)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(W*.2,cy-H*.1);ctx.lineTo(lensX,cy-eyeRY*.15);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*.2,cy+H*.05);ctx.lineTo(lensX,cy+eyeRY*.05);ctx.stroke();
+    // Converge too late (behind retina)
+    ctx.strokeStyle='rgba(245,158,11,.7)';
+    ctx.beginPath();ctx.moveTo(lensX,cy-eyeRY*.15);ctx.lineTo(imgX,cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(lensX,cy+eyeRY*.05);ctx.lineTo(imgX,cy);ctx.stroke();
+    ctx.beginPath();ctx.arc(imgX,cy,5,0,Math.PI*2);ctx.fillStyle='#f59e0b';ctx.fill();
+    // Blur on retina
+    ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(245,158,11,.3)';
+    ctx.beginPath();ctx.moveTo(lensX,cy-eyeRY*.15);ctx.lineTo(retX,cy-H*.04);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(lensX,cy+eyeRY*.05);ctx.lineTo(retX,cy+H*.04);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle='#22c55e';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.ellipse(W*.3,cy,8,H*.2,0,0,Math.PI*2);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font='bold '+W*.018+'px DM Mono';ctx.fillStyle='#f59e0b';ctx.fillText('Image (behind retina)',imgX-W*.05,cy+H*.2);
+    ctx.fillStyle='#22c55e';ctx.fillText('Correction: Convex lens',W*.15,cy+H*.35);
+  } else {// Presbyopia
+    ctx.font='bold '+W*.02+'px DM Mono';ctx.fillStyle='var(--teal)';
+    ctx.fillText('Presbyopia = Age-related loss of accommodation',W*.1,H*.15);
+    ctx.font=W*.016+'px DM Mono';ctx.fillStyle='var(--muted)';
+    ctx.fillText('Ciliary muscles weaken → lens can\'t thicken → can\'t focus near',W*.1,H*.25);
+    ctx.fillText('Correction: Bifocal lens (concave top + convex bottom)',W*.1,H*.35);
+    // Bifocal drawing
+    ctx.strokeStyle='#f43f5e';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(W*.35,cy+H*.1,H*.15,-Math.PI*.5,0);ctx.stroke();// concave top
+    ctx.strokeStyle='#22c55e';
+    ctx.beginPath();ctx.arc(W*.35,cy+H*.1,H*.15,0,Math.PI*.5);ctx.stroke();// convex bottom
+    ctx.font=W*.014+'px DM Mono';
+    ctx.fillStyle='#f43f5e';ctx.fillText('Distance (concave)',W*.35+H*.18,cy);
+    ctx.fillStyle='#22c55e';ctx.fillText('Near (convex)',W*.35+H*.18,cy+H*.25);
+  }
+
+  // Retina marker
+  ctx.beginPath();ctx.moveTo(retX,cy-eyeRY*.7);ctx.lineTo(retX,cy+eyeRY*.7);
+  ctx.strokeStyle='rgba(217,70,239,.4)';ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+  ctx.font=W*.014+'px DM Mono';ctx.fillStyle='#d946ef';ctx.fillText('Retina',retX-W*.02,cy+eyeRY*.85);
+}
+setTimeout(drawDefect,100);
+
+// ═══ TAB 3: DISPERSION (PRISM) ═══
+const prC=document.getElementById('prismCanvas');const prCtx=prC.getContext('2d');
+let showRainbow=false;
+
+function toggleRainbow(){
+  showRainbow=!showRainbow;
+  document.getElementById('rainbow-btn').classList.toggle('active',showRainbow);
+  updatePrism();
+}
+
+function updatePrism(){
+  const angle=parseInt(document.getElementById('prism-angle').value);
+  document.getElementById('prism-angle-val').textContent=angle+'°';
+  const W=prC.width=prC.offsetWidth*2,H=prC.height=prC.offsetHeight*2;
+  const ctx=prCtx;ctx.clearRect(0,0,W,H);
+
+  if(showRainbow){
+    // Rainbow formation in water droplet
+    drawRainbow(ctx,W,H);
+    return;
+  }
+
+  // Prism
+  const px=W*.45,py=H*.25,pSize=H*.45;
+  const angleRad=angle*Math.PI/180;
+  const p1={x:px,y:py};
+  const p2={x:px-pSize*Math.sin(angleRad/2),y:py+pSize*Math.cos(angleRad/2)};
+  const p3={x:px+pSize*Math.sin(angleRad/2),y:py+pSize*Math.cos(angleRad/2)};
+
+  ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.lineTo(p3.x,p3.y);ctx.closePath();
+  ctx.fillStyle='rgba(56,189,248,.1)';ctx.fill();ctx.strokeStyle='#38bdf8';ctx.lineWidth=2;ctx.stroke();
+
+  // Incident white light
+  const incidentEnd={x:px-pSize*.25,y:(p1.y+p2.y)/2+pSize*.15};
+  ctx.beginPath();ctx.moveTo(W*.05,H*.45);ctx.lineTo(incidentEnd.x,incidentEnd.y);
+  ctx.strokeStyle='#ffffff';ctx.lineWidth=3;ctx.stroke();
+  // Arrow
+  ctx.beginPath();ctx.moveTo(incidentEnd.x-15,incidentEnd.y-8);ctx.lineTo(incidentEnd.x,incidentEnd.y);ctx.lineTo(incidentEnd.x-15,incidentEnd.y+8);
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+
+  // Dispersed spectrum (7 rays)
+  const colors=['#8b00ff','#4b0082','#0000ff','#00ff00','#ffff00','#ff8c00','#ff0000'];
+  const spread=angle*.35;
+  const exitPt={x:px+pSize*.2,y:(p1.y+p3.y)/2+pSize*.1};
+  colors.forEach((c,i)=>{
+    const a=(i-3)*spread/7;
+    const endX=exitPt.x+W*.35;
+    const endY=exitPt.y+a*2.5;
+    ctx.beginPath();ctx.moveTo(exitPt.x,exitPt.y);ctx.lineTo(endX,endY);
+    ctx.strokeStyle=c;ctx.lineWidth=2.5;ctx.stroke();
+  });
+
+  // Labels
+  ctx.font='bold '+W*.018+'px DM Mono';
+  ctx.fillStyle='#ffffff';ctx.fillText('White Light',W*.02,H*.4);
+  ctx.fillStyle='#8b00ff';ctx.fillText('V',W*.82,exitPt.y-spread*1);
+  ctx.fillStyle='#ff0000';ctx.fillText('R',W*.82,exitPt.y+spread*1);
+  ctx.fillStyle='var(--muted)';ctx.fillText(`Prism (${angle}°)`,px-W*.05,p3.y+H*.08);
+}
+
+function drawRainbow(ctx,W,H){
+  // Water droplet
+  const cx=W*.5,cy=H*.45,r=H*.25;
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.fillStyle='rgba(56,189,248,.1)';ctx.fill();ctx.strokeStyle='#38bdf8';ctx.lineWidth=2;ctx.stroke();
+  
+  // Incident white ray
+  ctx.beginPath();ctx.moveTo(W*.05,cy-r*.3);ctx.lineTo(cx-r*.7,cy-r*.3);
+  ctx.strokeStyle='#ffffff';ctx.lineWidth=3;ctx.stroke();
+  
+  // Refraction at entry → dispersion inside → internal reflection → exit
+  const colors=['#ff0000','#ff8c00','#ffff00','#00ff00','#0000ff','#4b0082','#8b00ff'];
+  colors.forEach((c,i)=>{
+    const angle=(.3+i*.04)*Math.PI;
+    const entryAngle=-Math.PI*.15+i*.015;
+    // simplified path inside droplet
+    const mx=cx+r*.2*Math.cos(angle),my=cy-r*.6+i*r*.12;
+    const exitX=cx-r*.5-i*W*.02,exitY=cy+r*.3+i*H*.04;
+    ctx.beginPath();
+    ctx.moveTo(cx-r*.7,cy-r*.3);
+    ctx.quadraticCurveTo(mx,my,exitX,exitY);
+    ctx.strokeStyle=c;ctx.lineWidth=2;ctx.stroke();
+  });
+
+  ctx.font='bold '+W*.018+'px DM Mono';
+  ctx.fillStyle='#ffffff';ctx.fillText('White light',W*.02,cy-r*.35);
+  ctx.fillStyle='#38bdf8';ctx.fillText('Water droplet',cx-W*.06,cy+r+H*.05);
+  ctx.fillStyle='var(--muted)';ctx.fillText('1. Refraction at entry',W*.65,H*.15);
+  ctx.fillText('2. Dispersion inside',W*.65,H*.25);
+  ctx.fillText('3. Internal reflection',W*.65,H*.35);
+  ctx.fillText('4. Refraction at exit',W*.65,H*.45);
+  ctx.fillStyle='#ff0000';ctx.fillText('Red (42° — outer)',W*.1,H*.85);
+  ctx.fillStyle='#8b00ff';ctx.fillText('Violet (40° — inner)',W*.1,H*.92);
+}
+setTimeout(updatePrism,100);
+
+// ═══ TAB 4: SCATTERING ═══
+const scC=document.getElementById('scatterCanvas');const scCtx=scC.getContext('2d');
+let scatterScene=0;
+
+function setScatterScene(i,btn){
+  scatterScene=i;
+  document.querySelectorAll('#p4 .ctrl-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  drawScatter();
+  const infos=[
+    `<strong>Noon sky:</strong> Sun overhead → light passes through thin atmosphere. Blue scatters most (∝ 1/λ⁴) → <em>sky appears blue</em>. Sun appears white/yellowish (minimal scattering from direct path).`,
+    `<strong>Sunset/Sunrise:</strong> Light travels through maximum atmosphere (longer path). Blue completely scattered away → only <em>red/orange</em> reach observer. Sun appears red.`,
+    `<strong>Red signals:</strong> Red has longest λ (700nm) → <em>scatters least</em> → visible from farthest distance through fog/dust. Used for danger signals, traffic lights, brake lights.`
+  ];
+  document.getElementById('scatter-info').innerHTML=infos[i];
+}
+
+function drawScatter(){
+  const W=scC.width=scC.offsetWidth*2,H=scC.height=scC.offsetHeight*2;
+  const ctx=scCtx;ctx.clearRect(0,0,W,H);
+
+  if(scatterScene===0){// Noon
+    // Sky gradient
+    const grad=ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'#0a1a3a');grad.addColorStop(0.7,'#1a3a6a');grad.addColorStop(1,'#2a5a4a');
+    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+    // Sun
+    ctx.beginPath();ctx.arc(W*.5,H*.15,W*.05,0,Math.PI*2);ctx.fillStyle='#fffde0';ctx.fill();
+    // Scattering particles
+    for(let i=0;i<60;i++){
+      const x=Math.random()*W,y=Math.random()*H*.7;
+      ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fillStyle='rgba(100,180,255,.4)';ctx.fill();
+    }
+    // Blue scattered rays
+    for(let i=0;i<8;i++){
+      const sx=W*.3+Math.random()*W*.4,sy=H*.2+Math.random()*H*.3;
+      ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+Math.random()*60-30,sy+Math.random()*60-30);
+      ctx.strokeStyle='rgba(100,180,255,.5)';ctx.lineWidth=1.5;ctx.stroke();
+    }
+    // Observer
+    ctx.font='bold '+W*.02+'px DM Mono';ctx.fillStyle='#38bdf8';ctx.fillText('Sky appears BLUE',W*.3,H*.9);
+    ctx.fillStyle='#fff';ctx.fillText('Sun: White/Yellow',W*.35,H*.08);
+  } else if(scatterScene===1){// Sunset
+    const grad=ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'#0a0a20');grad.addColorStop(0.4,'#2a1a0a');grad.addColorStop(0.7,'#4a2a0a');grad.addColorStop(1,'#1a2a1a');
+    ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+    // Sun near horizon
+    ctx.beginPath();ctx.arc(W*.5,H*.7,W*.06,0,Math.PI*2);ctx.fillStyle='#ff4500';ctx.fill();
+    // Long atmosphere path
+    ctx.strokeStyle='rgba(255,100,0,.3)';ctx.lineWidth=2;ctx.setLineDash([8,4]);
+    ctx.beginPath();ctx.moveTo(W*.1,H*.7);ctx.lineTo(W*.9,H*.7);ctx.stroke();
+    ctx.setLineDash([]);
+    // Scattered blue particles (scattered away)
+    for(let i=0;i<30;i++){
+      const x=W*.2+Math.random()*W*.6,y=H*.3+Math.random()*H*.2;
+      ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fillStyle='rgba(100,100,255,.3)';ctx.fill();
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.random()*30-15,y-20-Math.random()*20);
+      ctx.strokeStyle='rgba(100,100,255,.2)';ctx.lineWidth=1;ctx.stroke();
+    }
+    ctx.font='bold '+W*.02+'px DM Mono';ctx.fillStyle='#ff6600';ctx.fillText('Sun appears RED (long path)',W*.2,H*.9);
+    ctx.fillStyle='#6666ff';ctx.fillText('Blue scattered away ↑',W*.3,H*.25);
+  } else {// Red signals
+    ctx.fillStyle='#0a1422';ctx.fillRect(0,0,W,H);
+    // Fog/dust
+    for(let i=0;i<100;i++){
+      const x=Math.random()*W,y=Math.random()*H;
+      ctx.beginPath();ctx.arc(x,y,Math.random()*3+1,0,Math.PI*2);ctx.fillStyle='rgba(100,120,140,.2)';ctx.fill();
+    }
+    // Red signal
+    ctx.beginPath();ctx.arc(W*.1,H*.4,W*.03,0,Math.PI*2);ctx.fillStyle='#ff0000';ctx.fill();
+    ctx.shadowColor='#ff0000';ctx.shadowBlur=20;ctx.fill();ctx.shadowBlur=0;
+    // Red ray travels far
+    ctx.strokeStyle='rgba(255,0,0,.6)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(W*.13,H*.4);ctx.lineTo(W*.9,H*.4);ctx.stroke();
+    // Blue signal (scattered)
+    ctx.beginPath();ctx.arc(W*.1,H*.65,W*.03,0,Math.PI*2);ctx.fillStyle='#0066ff';ctx.fill();
+    ctx.strokeStyle='rgba(0,100,255,.3)';ctx.lineWidth=2;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(W*.13,H*.65);ctx.lineTo(W*.4,H*.65);ctx.stroke();
+    ctx.setLineDash([]);
+    // Labels
+    ctx.font='bold '+W*.018+'px DM Mono';
+    ctx.fillStyle='#ff4444';ctx.fillText('Red: travels farthest (λ=700nm)',W*.2,H*.35);
+    ctx.fillStyle='#6688ff';ctx.fillText('Blue: scattered quickly (λ=450nm)',W*.2,H*.75);
+    ctx.fillStyle='var(--muted)';ctx.fillText('Through fog/dust/smoke',W*.3,H*.9);
+  }
+}
+setTimeout(drawScatter,100);
+
+// ═══ TAB 5: Phenomena toggle ═══
+function togglePhenom(el){el.classList.toggle('open');}
+</script>
+</body>
+</html>

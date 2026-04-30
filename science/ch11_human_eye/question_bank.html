@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — The Human Eye and the Colourful World</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080f1e;--card:#111c2e;--card2:#162236;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;--blue:#38bdf8;--green:#22c55e;--amber:#f59e0b;--purple:#a78bfa;--pink:#f472b6;--teal:#2dd4bf;--red:#f87171;--emerald:#10b981}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+header{text-align:center;padding:2.2rem 1rem 1rem;position:relative}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(16,185,129,.1),transparent 70%);pointer-events:none}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4.5vw,2.5rem);font-weight:800;background:linear-gradient(135deg,#10b981,#38bdf8,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;margin-top:.3rem}
+.container{max-width:900px;margin:auto;padding:0 1rem 3rem}
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;padding:1rem 0}
+.fbtn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .8rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.fbtn:hover{border-color:#64748b;color:var(--text)}
+.fbtn.active{border-color:var(--emerald);color:#fff;background:rgba(16,185,129,.12)}
+.score-bar{display:flex;align-items:center;gap:.8rem;padding:.6rem 0;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.score-bar .sbar{flex:1;height:6px;border-radius:3px;background:var(--card2);overflow:hidden}
+.score-bar .sfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--teal));transition:width .3s}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:1rem;overflow:hidden}
+.qcard .qhead{display:flex;align-items:flex-start;gap:.8rem;padding:1.2rem 1.2rem .8rem;cursor:pointer}
+.qcard .qnum{font-family:'Playfair Display',serif;font-weight:800;font-size:1rem;color:var(--emerald);min-width:30px}
+.qcard .qtag{font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:1px;padding:.15rem .5rem;border-radius:99px;margin-left:auto;white-space:nowrap}
+.qcard .qbody{padding:0 1.2rem;font-size:.9rem;line-height:1.7}
+.opts{list-style:none;padding:.3rem 0 .8rem}
+.opts li{padding:.45rem .8rem;margin:.3rem 0;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:.85rem;transition:all .2s;display:flex;align-items:center;gap:.5rem}
+.opts li:hover{border-color:#64748b}
+.opts li.correct{border-color:var(--green);background:rgba(34,197,94,.08);color:var(--green)}
+.opts li.wrong{border-color:var(--red);background:rgba(248,113,113,.08);color:var(--red)}
+.opts li .ol{font-family:'DM Mono',monospace;font-weight:700;font-size:.78rem;min-width:20px}
+.ans-toggle{font-family:'DM Mono',monospace;font-size:.75rem;padding:.35rem 1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;margin:.5rem 0 .8rem;display:inline-block;transition:all .2s}
+.ans-toggle:hover{border-color:var(--emerald);color:var(--text)}
+.model-ans{display:none;padding:.8rem 1rem;margin:0 0 1rem;background:rgba(16,185,129,.04);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;font-size:.85rem;line-height:1.75;color:var(--text)}
+.model-ans.show{display:block}
+.model-ans strong{color:var(--emerald)}
+.exam-tip{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--amber);margin-top:.4rem;display:block}
+.strip-eye{border-left:3px solid var(--green)}.strip-defect{border-left:3px solid var(--amber)}.strip-prism{border-left:3px solid var(--purple)}.strip-scatter{border-left:3px solid var(--blue)}.strip-atmo{border-left:3px solid var(--teal)}.strip-accom{border-left:3px solid var(--pink)}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(8,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.5);position:relative;z-index:100}
+.site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#64748b;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e2e8f0}
+@media(max-width:600px){.container{padding:0 .6rem 2rem}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>The Human Eye &amp; the Colourful World</h1>
+  <p>Question Bank · 30 Questions · CBSE Class X · Ch.11</p>
+</header>
+
+<div class="container">
+  <div class="filters" id="filters"></div>
+  <div class="score-bar"><span id="scoreText">0 / 0 correct</span><div class="sbar"><div class="sfill" id="sfill"></div></div></div>
+  <div id="qlist"></div>
+</div>
+
+<script>
+const QS = [
+  // ── MCQ (10) ──
+  {type:'mcq',cat:'eye',strip:'strip-eye',q:'The human eye forms the image of an object on the:',ops:['Cornea','Iris','Pupil','Retina'],ans:3,explain:'The retina acts as the screen of the eye. A real, inverted image is formed on the retina by the cornea-lens system.'},
+  {type:'mcq',cat:'defect',strip:'strip-defect',q:'A person cannot see distant objects clearly. This defect is called:',ops:['Hypermetropia','Presbyopia','Myopia','Astigmatism'],ans:2,explain:'Myopia (near-sightedness) — distant objects appear blurry because the image forms in front of the retina.'},
+  {type:'mcq',cat:'defect',strip:'strip-defect',q:'Myopia is corrected by using:',ops:['Convex lens','Concave lens','Cylindrical lens','Bifocal lens'],ans:1,explain:'A concave (diverging) lens diverges rays before they enter the eye, shifting the image back onto the retina.'},
+  {type:'mcq',cat:'prism',strip:'strip-prism',q:'When white light passes through a prism, the colour that deviates the most is:',ops:['Red','Green','Yellow','Violet'],ans:3,explain:'Violet has the shortest wavelength → highest refractive index in glass → bends the most. Red deviates the least.'},
+  {type:'mcq',cat:'scatter',strip:'strip-scatter',q:'The sky appears blue because of:',ops:['Reflection of light','Refraction of light','Scattering of light','Dispersion of light'],ans:2,explain:'Rayleigh scattering by air molecules. Blue light (short λ) scatters ~5.5× more than red (I ∝ 1/λ⁴) → sky looks blue.'},
+  {type:'mcq',cat:'scatter',strip:'strip-scatter',q:'Danger signals are red because red light:',ops:['Has the longest wavelength and scatters least','Has the shortest wavelength and scatters most','Travels fastest in air','Is most absorbed by fog'],ans:0,explain:'Red (λ ≈ 700 nm) scatters the least (∝ 1/λ⁴) → travels farthest through fog/dust → visible from maximum distance.'},
+  {type:'mcq',cat:'atmo',strip:'strip-atmo',q:'Stars appear to twinkle due to:',ops:['Dispersion of starlight','Total internal reflection','Atmospheric refraction','Scattering of light'],ans:2,explain:'Stars are point sources. Their light passes through atmosphere layers of varying density, continuously shifting the apparent position → intensity fluctuates → twinkling.'},
+  {type:'mcq',cat:'atmo',strip:'strip-atmo',q:'The Sun appears about 2 minutes before actual sunrise due to:',ops:['Scattering','Dispersion','Atmospheric refraction','Total internal reflection'],ans:2,explain:'Atmospheric refraction bends sunlight towards the denser layers below, making the Sun appear above its actual position, visible before it physically crosses the horizon.'},
+  {type:'mcq',cat:'prism',strip:'strip-prism',q:'A rainbow is formed due to:',ops:['Only refraction','Only dispersion','Dispersion and total internal reflection in water droplets','Only reflection'],ans:2,explain:'Rainbow: refraction at entry → dispersion → total internal reflection at back → refraction at exit of water droplets.'},
+  {type:'mcq',cat:'accom',strip:'strip-accom',q:'The least distance of distinct vision for a normal eye is:',ops:['10 cm','15 cm','25 cm','Infinity'],ans:2,explain:'The near point (D) = 25 cm for a normal adult eye. This is the closest distance at which the eye can focus without strain.'},
+
+  // ── ASSERTION-REASON (4) ──
+  {type:'ar',cat:'scatter',strip:'strip-scatter',q:'<strong>Assertion:</strong> The Sun appears reddish at sunrise and sunset.<br><strong>Reason:</strong> At the horizon, blue light is scattered away and only red/orange reaches the observer.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'Both are correct. The red appearance is directly caused by preferential scattering of shorter wavelengths over the long atmospheric path at the horizon.'},
+  {type:'ar',cat:'atmo',strip:'strip-atmo',q:'<strong>Assertion:</strong> Planets do not twinkle like stars.<br><strong>Reason:</strong> Planets are extended sources of light.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'Planets subtend a larger angle (extended source). The fluctuations from different points on the disc average out, giving steady light — unlike point-source stars.'},
+  {type:'ar',cat:'defect',strip:'strip-defect',q:'<strong>Assertion:</strong> A person suffering from hypermetropia should use a concave lens.<br><strong>Reason:</strong> In hypermetropia, the image forms behind the retina.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:3,explain:'A is false — hypermetropia is corrected with a CONVEX lens (not concave). R is true — the image does form behind the retina.'},
+  {type:'ar',cat:'prism',strip:'strip-prism',q:'<strong>Assertion:</strong> Dispersion occurs because white light is a mixture of seven colours.<br><strong>Reason:</strong> Different colours travel at different speeds in glass.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'Both true. Different speeds → different refractive indices → different bending angles → separation into VIBGYOR. This directly explains dispersion.'},
+
+  // ── SHORT ANSWER (12) ──
+  {type:'short',cat:'eye',strip:'strip-eye',q:'Draw a labelled diagram of the human eye and explain the function of any three parts.',
+   answer:'<strong>Key parts:</strong><br>1) <strong>Cornea</strong> — transparent front membrane; provides maximum refraction (about ⅔ of total focusing power).<br>2) <strong>Crystalline Lens</strong> — biconvex, adjustable focal length via ciliary muscles; fine-tunes focus.<br>3) <strong>Retina</strong> — contains photoreceptors (rods for dim light, cones for colour); acts as screen where real, inverted image forms.<br>Also label: iris, pupil, optic nerve, ciliary muscles, vitreous humour.',tip:'Always draw a neat labelled diagram first — 1 mark for diagram, 2 marks for explanation. Mention "real and inverted image on retina".'},
+  {type:'short',cat:'accom',strip:'strip-accom',q:'What is meant by power of accommodation? How does the focal length of the eye lens change when we shift focus from a distant to a nearby object?',
+   answer:'<strong>Power of accommodation:</strong> The ability of the eye lens to adjust its focal length to focus objects at various distances clearly on the retina.<br><br>When shifting from distant to nearby:<br>• Ciliary muscles <strong>contract</strong><br>• Lens becomes <strong>thicker</strong> (more curved)<br>• Focal length <strong>decreases</strong><br>• This increases converging power to focus nearby rays onto the retina.',tip:'Key phrase: "change in focal length by changing curvature of lens". Mention ciliary muscles explicitly.'},
+  {type:'short',cat:'defect',strip:'strip-defect',q:'A person needs a lens of power −5.5 D for correcting distant vision. What is the nature of the corrective lens? What is the far point of this person without correction?',
+   answer:'<strong>Nature:</strong> Concave (diverging) lens (negative power → myopia correction).<br><strong>Far point:</strong> f = 1/P = 1/(−5.5) = −0.182 m ≈ <strong>−18.2 cm</strong>.<br>The far point has shifted from infinity to approximately <strong>18.2 cm</strong> from the eye. Without glasses, this person can only see clearly up to ~18 cm.',tip:'Far point of myopic eye = |focal length of corrective lens|. Always state nature of defect clearly.'},
+  {type:'short',cat:'defect',strip:'strip-defect',q:'Explain the difference between myopia and hypermetropia. How is each corrected?',
+   answer:'<strong>Myopia (Near-sightedness):</strong><br>• Far objects blurry; near objects clear<br>• Image forms IN FRONT of retina<br>• Cause: elongated eyeball / excessive lens curvature<br>• Correction: <strong>Concave lens</strong> (diverging)<br><br><strong>Hypermetropia (Far-sightedness):</strong><br>• Near objects blurry; far objects clear<br>• Image forms BEHIND retina<br>• Cause: shortened eyeball / weak lens curvature<br>• Correction: <strong>Convex lens</strong> (converging)',tip:'Draw ray diagrams showing defective eye + corrected eye for full marks. This is a very common 3-5 mark question.'},
+  {type:'short',cat:'prism',strip:'strip-prism',q:'What is dispersion of white light? Draw a diagram showing dispersion through a prism and label the spectrum.',
+   answer:'<strong>Dispersion:</strong> The splitting of white light into its seven constituent colours when it passes through a transparent medium like a glass prism.<br><br>The spectrum produced is <strong>VIBGYOR</strong>: Violet (most deviated, λ≈380nm), Indigo, Blue, Green, Yellow, Orange, Red (least deviated, λ≈700nm).<br><br><strong>Cause:</strong> Different wavelengths have different refractive indices in glass. Violet has highest μ → bends most.',tip:'Draw the prism clearly with incident white ray on one face and VIBGYOR emerging from the other. Label angle of prism A.'},
+  {type:'short',cat:'prism',strip:'strip-prism',q:'How did Newton show that white light is composed of seven colours using two prisms?',
+   answer:'<strong>Newton\'s Experiment:</strong><br>1) First prism disperses white light into spectrum (VIBGYOR).<br>2) An inverted second prism is placed in the path of the dispersed light.<br>3) The second prism <strong>recombines all colours back into white light</strong>.<br><br>This proved that: (a) white light is a mixture of seven colours, (b) the prism does not add colour — it only separates, and (c) different colours can be recombined to give white.',tip:'Mention both experiments: first prism disperses, second recombines. This proves prism doesn\'t "create" colours.'},
+  {type:'short',cat:'scatter',strip:'strip-scatter',q:'Explain why the Sun appears white at noon but red at sunrise/sunset.',
+   answer:'<strong>At noon:</strong> Sunlight travels through a relatively <strong>short atmospheric path</strong>. Only a small amount of blue is scattered → most colours reach the eye → Sun appears <strong>white/yellowish</strong>.<br><br><strong>At sunrise/sunset:</strong> Sunlight travels through <strong>maximum atmosphere</strong> (long path near horizon). Blue and violet are <strong>completely scattered away</strong> (∝ 1/λ⁴). Only red and orange (long λ) survive the journey → Sun appears <strong>red/orange</strong>.',tip:'Key difference: PATH LENGTH through atmosphere. Noon = short path, horizon = long path.'},
+  {type:'short',cat:'scatter',strip:'strip-scatter',q:'What is Tyndall effect? Give two examples from daily life.',
+   answer:'<strong>Tyndall Effect:</strong> The scattering of a beam of light by <strong>colloidal particles</strong> (size comparable to wavelength of light). The path of light becomes visible.<br><br><strong>Examples:</strong><br>1) A beam of sunlight entering a <strong>dusty room</strong> through a window — dust particles scatter light, making the beam visible.<br>2) Light passing through <strong>fog or mist</strong> — tiny water droplets scatter light (headlight beams visible in fog).<br>3) Blue colour of smoke rising from incense stick (fine particles scatter blue preferentially).',tip:'Tyndall ≠ Rayleigh. Tyndall = colloidal particles (larger). Rayleigh = molecules (much smaller).'},
+  {type:'short',cat:'atmo',strip:'strip-atmo',q:'Why do stars twinkle but planets do not?',
+   answer:'<strong>Stars twinkle:</strong> Stars are extremely far → appear as <strong>point sources</strong>. Their light passes through atmosphere layers of varying temperature/density (varying refractive index). The apparent position shifts continuously → <strong>intensity fluctuates → twinkling</strong>.<br><br><strong>Planets don\'t twinkle:</strong> Planets are closer → appear as <strong>extended sources</strong> (like tiny discs). They are equivalent to many point sources. Individual fluctuations <strong>average out</strong> → steady light, no twinkling.',tip:'Key distinction: point source (star) vs extended source (planet). Board favourite — 2-3 marks.'},
+  {type:'short',cat:'atmo',strip:'strip-atmo',q:'Explain how atmospheric refraction causes the Sun to be visible about 2 minutes before actual sunrise.',
+   answer:'The Earth\'s atmosphere has layers of <strong>decreasing density</strong> (increasing altitude → rarer). Light from the Sun below the horizon travels from rarer to denser layers → bends continuously <strong>towards the normal</strong> (downward curve).<br><br>The observer\'s eye traces the refracted ray back in a straight line → Sun appears at a <strong>higher position</strong> than actual. Result: Sun is visible ~2 min before it actually crosses the horizon. Similarly, it remains visible ~2 min after actual sunset. Total extra daylight ≈ <strong>4 minutes</strong>.',tip:'Draw a diagram showing curved atmosphere layers with Sun below horizon but appearing above due to refraction.'},
+  {type:'short',cat:'prism',strip:'strip-prism',q:'State the conditions necessary for observing a rainbow. Why is it always seen as an arc?',
+   answer:'<strong>Conditions:</strong><br>1) Sun must be <strong>behind the observer</strong><br>2) Rain (water droplets) must be <strong>in front of the observer</strong><br>3) The angle between the incident sunlight and the line of sight to the rainbow is <strong>~42°</strong> (primary rainbow)<br><br><strong>Arc shape:</strong> The rainbow is actually a full circle, but the ground cuts off the lower half. From an aircraft, a full circular rainbow can be seen. The 42° cone around the antisolar point defines the arc geometry.',tip:'Mention the 42° angle for primary rainbow. Also mention conditions clearly — very common 2-3 mark question.'},
+  {type:'short',cat:'eye',strip:'strip-eye',q:'Why does the sky appear dark (black) to astronauts in space?',
+   answer:'In space, there is <strong>no atmosphere</strong> — no air molecules to scatter sunlight. Without scattering, light travels in straight lines directly from the source without being redirected towards the observer from other directions.<br><br>Therefore, in any direction where there is no luminous object, the sky appears <strong>completely black</strong>. Stars are visible even during daytime from space. On the Moon (no atmosphere), the sky is similarly black.',tip:'Simple but important — connect to Rayleigh scattering requiring molecules.'},
+
+  // ── LONG ANSWER (4) ──
+  {type:'long',cat:'defect',strip:'strip-defect',q:'What are the common defects of vision? Explain each with ray diagrams and state the corrective measures. A person\'s near point is 50 cm. Calculate the power of the corrective lens needed.',
+   answer:'<strong>Common Defects of Vision:</strong><br><br><strong>1. Myopia (Near-sightedness):</strong><br>• Cannot see far objects clearly. Image forms in front of retina.<br>• Cause: Elongated eyeball or too much curvature of lens.<br>• Correction: Concave lens (−ve power)<br><br><strong>2. Hypermetropia (Far-sightedness):</strong><br>• Cannot see near objects clearly. Image forms behind retina.<br>• Cause: Short eyeball or too little curvature. Near point > 25 cm.<br>• Correction: Convex lens (+ve power)<br><br><strong>3. Presbyopia:</strong><br>• Age-related (after ~40). Ciliary muscles weaken, lens loses flexibility.<br>• Both near and far vision may be affected.<br>• Correction: Bifocal lens or progressive lens.<br><br><strong>Numerical:</strong><br>Near point = 50 cm. Need to see at 25 cm (normal near point).<br>v = −50 cm (image at near point), u = −25 cm (object at normal near point)<br>1/f = 1/v − 1/u = 1/(−50) − 1/(−25) = −1/50 + 1/25 = 1/50<br>f = +50 cm = +0.5 m<br><strong>P = 1/f = +2 D</strong> (convex lens)',tip:'This is a guaranteed 5-mark question. Draw 3 ray diagrams: defective eye (2) + corrected eye (2). Show numerical steps clearly with sign convention.'},
+  {type:'long',cat:'prism',strip:'strip-prism',q:'Explain the phenomenon of dispersion of white light through a glass prism. Describe Newton\'s experiment with two prisms. How is a rainbow formed? Draw a neat diagram.',
+   answer:'<strong>Dispersion:</strong> The splitting of white light into seven colours (VIBGYOR) by a glass prism.<br><br><strong>Cause:</strong> Glass has different refractive indices for different wavelengths. Violet (μ highest, λ shortest) bends most; Red (μ lowest, λ longest) bends least.<br><br><strong>Newton\'s Two-Prism Experiment:</strong><br>1. First prism: white light → VIBGYOR spectrum<br>2. Second inverted prism placed in path → recombines spectrum back to white light<br>This proves white light = mixture of 7 colours, prism only separates them.<br><br><strong>Rainbow Formation:</strong><br>Steps inside each water droplet:<br>1. <strong>Refraction</strong> at front surface (entering droplet)<br>2. <strong>Dispersion</strong> into component colours<br>3. <strong>Total internal reflection</strong> at back surface<br>4. <strong>Refraction</strong> at front surface (exiting droplet)<br><br>Primary rainbow: 42° from antisolar point, VIBGYOR (red outside, violet inside), one TIR.<br>Secondary rainbow: 51°, reversed colours, two TIRs, fainter.',tip:'This is a frequent 5-mark question. Draw: (a) prism dispersion diagram, (b) Newton\'s two-prism setup, (c) rainbow formation in droplet. Label all angles and colours.'},
+  {type:'long',cat:'scatter',strip:'strip-scatter',q:'What is scattering of light? Explain with examples why (a) the sky is blue, (b) the Sun appears red at sunrise/sunset, and (c) danger signals use red colour.',
+   answer:'<strong>Scattering of Light:</strong> When light encounters particles, it gets redirected in different directions. The type depends on particle size relative to wavelength.<br><br><strong>Rayleigh Scattering:</strong> By particles much smaller than λ (air molecules). Intensity ∝ <strong>1/λ⁴</strong>.<br><br><strong>(a) Blue Sky:</strong><br>Blue light (λ≈450nm) scatters ~5.5× more than red (λ≈700nm) by air molecules. This scattered blue light reaches our eyes from ALL directions in the sky → sky appears blue. At noon, the path is shortest, so Sun appears white.<br><br><strong>(b) Red Sunrise/Sunset:</strong><br>Near the horizon, sunlight travels through maximum atmosphere (longer path). Blue and violet are completely scattered away in all directions. Only red and orange (long λ, least scattered) survive the long journey → Sun appears red/orange.<br><br><strong>(c) Red Danger Signals:</strong><br>Red has the longest visible wavelength → scatters LEAST → can penetrate through fog, smoke, and dust to travel the maximum distance. Hence visible from far away, ideal for warning signals, traffic lights, brake lights.',tip:'For 5 marks: Define scattering clearly, state Rayleigh law (∝ 1/λ⁴), then explain each case with reference to path length and wavelength. Diagrams of noon vs sunset path lengths help.'},
+  {type:'long',cat:'atmo',strip:'strip-atmo',q:'Explain atmospheric refraction. How does it account for (i) twinkling of stars, (ii) advanced sunrise and delayed sunset, and (iii) the Sun appearing oval at the horizon?',
+   answer:'<strong>Atmospheric Refraction:</strong> The Earth\'s atmosphere has layers of air with gradually changing refractive index (denser near surface, rarer above). Light passing through these layers bends continuously towards the denser region.<br><br><strong>(i) Twinkling of Stars:</strong><br>Stars are point sources at enormous distances. Their light passes through turbulent atmosphere with constantly changing density (temperature fluctuations). The refractive index changes randomly → apparent position shifts continuously → intensity reaching the eye fluctuates → twinkling. Planets don\'t twinkle (extended sources, fluctuations average out).<br><br><strong>(ii) Advanced Sunrise & Delayed Sunset:</strong><br>When the Sun is slightly below the horizon, atmospheric refraction bends its rays downward (from rarer to denser layers). Observer traces rays back in straight line → Sun appears above its actual position. Result: Sun visible ~2 min early and ~2 min late → 4 minutes extra daylight daily.<br><br><strong>(iii) Oval/Flattened Sun:</strong><br>Light from the lower edge passes through more atmosphere than from the upper edge → refracted (lifted) more. The bottom is raised more than the top → vertical dimension compressed → Sun appears <strong>flattened/oval</strong> (horizontal dimension unchanged).',tip:'This is a 5-mark question covering all atmospheric refraction effects. Draw diagrams showing: curved light path through atmosphere layers, and Sun below horizon but appearing above.'},
+];
+
+const CATS = [
+  {id:'all',label:'All'},{id:'mcq',label:'MCQ'},{id:'ar',label:'Assert-Reason'},
+  {id:'short',label:'Short Answer'},{id:'long',label:'Long Answer'}
+];
+const TOPIC_COLORS = {eye:'var(--green)',defect:'var(--amber)',prism:'var(--purple)',scatter:'var(--blue)',atmo:'var(--teal)',accom:'var(--pink)'};
+
+let activeCat='all',score=0,attempted=0;
+
+const filtersEl=document.getElementById('filters');
+CATS.forEach(c=>{
+  const b=document.createElement('button');
+  b.className='fbtn'+(c.id==='all'?' active':'');
+  const cnt=c.id==='all'?QS.length:QS.filter(q=>q.type===c.id).length;
+  b.textContent=c.label+` (${cnt})`;
+  b.onclick=()=>{activeCat=c.id;filtersEl.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderAll();};
+  filtersEl.appendChild(b);
+});
+
+function renderAll(){
+  const list=document.getElementById('qlist');
+  list.innerHTML='';
+  const qs=activeCat==='all'?QS:QS.filter(q=>q.type===activeCat);
+  qs.forEach((q,qi)=>{
+    const gi=QS.indexOf(q);
+    const div=document.createElement('div');
+    div.className='qcard '+(q.strip||'');
+    const typeLabel=q.type==='mcq'?'MCQ':q.type==='ar'?'Assertion-Reason':q.type==='short'?'Short Answer':'Long Answer';
+    const tagColor=TOPIC_COLORS[q.cat]||'var(--muted)';
+    let html=`<div class="qhead"><span class="qnum">Q${qi+1}</span><span style="flex:1;font-size:.9rem;line-height:1.6">${q.q}</span><span class="qtag" style="border:1px solid ${tagColor};color:${tagColor}">${typeLabel}</span></div><div class="qbody">`;
+    if(q.type==='mcq'||q.type==='ar'){
+      html+='<ul class="opts">';
+      q.ops.forEach((op,oi)=>{html+=`<li onclick="checkMCQ(this,${gi},${oi})"><span class="ol">${String.fromCharCode(65+oi)}.</span> ${op}</li>`;});
+      html+='</ul>';
+      html+=`<div class="model-ans" id="exp-${gi}"><strong>Explanation:</strong> ${q.explain}</div>`;
+    } else {
+      html+=`<button class="ans-toggle" onclick="toggleAns(${gi})">Show Model Answer</button>`;
+      html+=`<div class="model-ans" id="ans-${gi}">${q.answer}`;
+      if(q.tip)html+=`<span class="exam-tip">📝 Exam Tip: ${q.tip}</span>`;
+      html+='</div>';
+    }
+    html+='</div>';
+    div.innerHTML=html;
+    list.appendChild(div);
+  });
+  updateScore();
+}
+
+function checkMCQ(el,qi,oi){
+  const q=QS[qi];const parent=el.parentElement;
+  if(parent.dataset.done)return;
+  parent.dataset.done='1';attempted++;
+  if(oi===q.ans){el.classList.add('correct');score++;}
+  else{el.classList.add('wrong');parent.children[q.ans].classList.add('correct');}
+  document.getElementById('exp-'+qi).classList.add('show');
+  updateScore();
+}
+
+function toggleAns(qi){document.getElementById('ans-'+qi).classList.toggle('show');}
+
+function updateScore(){
+  const total=QS.filter(q=>q.type==='mcq'||q.type==='ar').length;
+  document.getElementById('scoreText').textContent=`${score} / ${attempted} correct (${total} MCQ+AR total)`;
+  document.getElementById('sfill').style.width=(total?score/total*100:0)+'%';
+}
+
+renderAll();
+</script>
+</body>
+</html>

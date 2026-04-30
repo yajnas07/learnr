@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagram — Development (Economics Ch.1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0a04;--card:#1a1208;--card2:#221a0a;
+  --border:#3a2e1a;--text:#e8d8b0;--muted:#8a7a5a;
+  --gold:#f5c842;--orange:#f97316;--blue:#38bdf8;
+  --green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--teal:#2dd4bf;--pink:#f472b6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(245,200,66,.04),transparent 55%),
+  radial-gradient(ellipse 50% 40% at 80% 85%,rgba(56,189,248,.03),transparent 55%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(14,10,4,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,46,26,.7);position:sticky;top:0;z-index:9999;}
+.site-nav img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#8a7a5a;text-decoration:none;transition:color .2s}
+.site-nav a.back:hover{color:#e8d8b0}
+
+header{text-align:center;padding:1.5rem 1rem .8rem;border-bottom:1px solid var(--border);}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--gold);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.tabs{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;padding:1rem 1rem .6rem;}
+.tab-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.75rem;padding:.4rem 1rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .22s;}
+.tab-btn:hover{color:var(--text);border-color:#5a4a2a;}
+.tab-btn.on{color:#1a1208;border-color:transparent;}
+
+main{max-width:900px;margin:0 auto;padding:0 1rem 3rem;}
+.panel{display:none;animation:fadeUp .35s ease;}
+.panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.sec-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;margin:1rem 0 .8rem;display:flex;align-items:center;gap:.5rem;}
+
+/* Data cards */
+.data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem;margin-bottom:1.2rem;}
+.data-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;transition:all .2s;}
+.data-card:hover{border-color:#5a4a2a;transform:translateY(-2px);}
+.data-val{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;margin-bottom:.2rem;}
+.data-label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);}
+.data-sub{font-size:.72rem;color:var(--muted);margin-top:.3rem;}
+
+/* Bar chart */
+.bar-chart{margin:1rem 0;}
+.bar-row{display:flex;align-items:center;gap:.6rem;margin:.5rem 0;}
+.bar-name{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);min-width:90px;text-align:right;}
+.bar-track{flex:1;height:24px;background:var(--card);border-radius:6px;overflow:hidden;border:1px solid var(--border);position:relative;}
+.bar-fill{height:100%;border-radius:6px;transition:width 1s ease;display:flex;align-items:center;padding-left:.5rem;}
+.bar-value{font-family:'DM Mono',monospace;font-size:.65rem;color:#1a1208;font-weight:700;}
+
+/* Comparison table */
+.cmp-table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.78rem;}
+.cmp-table th,.cmp-table td{border:1px solid var(--border);padding:.5rem .6rem;text-align:center;}
+.cmp-table th{background:var(--card);color:var(--gold);font-family:'DM Mono',monospace;font-weight:700;}
+.cmp-table td{color:var(--muted);}
+.cmp-table tr:hover td{background:rgba(245,200,66,.03);}
+
+/* Info box */
+.info-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem 1rem;margin:.8rem 0;font-size:.8rem;line-height:1.7;}
+.info-box strong{color:var(--gold);}
+.info-box em{color:var(--teal);font-style:normal;}
+
+/* Scenario cards */
+.scenario-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:.8rem;}
+.scenario{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all .2s;}
+.scenario:hover{border-color:var(--gold);background:rgba(245,200,66,.03);}
+.scenario-emoji{font-size:1.5rem;margin-bottom:.4rem;}
+.scenario-title{font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;margin-bottom:.3rem;}
+.scenario-text{font-size:.76rem;color:var(--muted);line-height:1.5;}
+.scenario-goals{margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.3rem;}
+.goal-tag{font-family:'DM Mono',monospace;font-size:.6rem;padding:.15rem .45rem;border-radius:4px;border:1px solid var(--border);color:var(--teal);}
+
+/* HDI wheel */
+.hdi-pillars{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin:1rem 0;}
+.pillar{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;text-align:center;width:200px;transition:all .2s;}
+.pillar:hover{border-color:var(--indigo);transform:translateY(-3px);}
+.pillar-icon{font-size:2rem;margin-bottom:.5rem;}
+.pillar-name{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;margin-bottom:.3rem;}
+.pillar-metric{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);line-height:1.5;}
+
+/* Sustainability */
+.resource-split{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0;}
+.res-col h3{font-family:'Playfair Display',serif;font-size:.9rem;margin-bottom:.5rem;}
+.res-item{display:flex;align-items:center;gap:.4rem;margin:.3rem 0;font-size:.78rem;color:var(--muted);}
+.res-dot{width:8px;height:8px;border-radius:50%;}
+
+@media(max-width:600px){.data-grid{grid-template-columns:1fr 1fr;}.resource-split{grid-template-columns:1fr;}.hdi-pillars{flex-direction:column;align-items:center;}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Development</h1>
+  <p>Class X · Economics Ch.1 · Interactive Explorations · 5 Modules</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn on" style="background:var(--gold)" onclick="showTab(0,this,'var(--gold)')">💡 What is Development?</button>
+  <button class="tab-btn" onclick="showTab(1,this,'var(--green)')">💰 Income & Comparison</button>
+  <button class="tab-btn" onclick="showTab(2,this,'var(--blue)')">📊 Key Indicators</button>
+  <button class="tab-btn" onclick="showTab(3,this,'var(--indigo)')">🏆 HDI</button>
+  <button class="tab-btn" onclick="showTab(4,this,'var(--teal)')">♻️ Sustainability</button>
+</div>
+
+<main>
+<!-- ═══ TAB 0: WHAT IS DEVELOPMENT ═══ -->
+<div class="panel active" id="p0">
+  <div class="sec-title" style="color:var(--gold)">💡 Different People, Different Goals</div>
+  <div class="info-box">
+    Development means different things to different people. What is <strong>development for one</strong> may be <em>harmful for another</em>. People seek not just income, but also <strong>freedom, equality, security</strong> and a good environment.
+  </div>
+
+  <div class="sec-title" style="color:var(--gold);font-size:1rem;">🎭 Stakeholder Goals — Who Wants What?</div>
+  <div class="scenario-grid">
+    <div class="scenario">
+      <div class="scenario-emoji">👩‍🌾</div>
+      <div class="scenario-title">Landless Rural Labourer</div>
+      <div class="scenario-text">Wants higher wages, quality education for children, no social discrimination, good healthcare.</div>
+      <div class="scenario-goals"><span class="goal-tag">Wages</span><span class="goal-tag">Education</span><span class="goal-tag">Equality</span></div>
+    </div>
+    <div class="scenario">
+      <div class="scenario-emoji">👨‍💼</div>
+      <div class="scenario-title">Urban Professional</div>
+      <div class="scenario-text">Wants job security, better working conditions, pollution-free environment, good transport.</div>
+      <div class="scenario-goals"><span class="goal-tag">Security</span><span class="goal-tag">Environment</span><span class="goal-tag">Transport</span></div>
+    </div>
+    <div class="scenario">
+      <div class="scenario-emoji">🏭</div>
+      <div class="scenario-title">Industrialist</div>
+      <div class="scenario-text">Wants more dams for electricity, infrastructure, cheap labour and resources.</div>
+      <div class="scenario-goals"><span class="goal-tag">Power</span><span class="goal-tag">Infrastructure</span><span class="goal-tag">Profit</span></div>
+    </div>
+    <div class="scenario">
+      <div class="scenario-emoji">🌿</div>
+      <div class="scenario-title">Tribal / Adivasi</div>
+      <div class="scenario-text">Wants to protect forests, traditional land, cultural identity. Against displacement by dams.</div>
+      <div class="scenario-goals"><span class="goal-tag">Land Rights</span><span class="goal-tag">Culture</span><span class="goal-tag">Forest</span></div>
+    </div>
+    <div class="scenario">
+      <div class="scenario-emoji">👧</div>
+      <div class="scenario-title">Girl Student</div>
+      <div class="scenario-text">Wants equal opportunity, safe environment, access to education, freedom from discrimination.</div>
+      <div class="scenario-goals"><span class="goal-tag">Education</span><span class="goal-tag">Safety</span><span class="goal-tag">Freedom</span></div>
+    </div>
+    <div class="scenario">
+      <div class="scenario-emoji">🧑‍⚕️</div>
+      <div class="scenario-title">Health Worker</div>
+      <div class="scenario-text">Wants better hospitals, sanitation, nutrition, clean drinking water for the community.</div>
+      <div class="scenario-goals"><span class="goal-tag">Health</span><span class="goal-tag">Sanitation</span><span class="goal-tag">Nutrition</span></div>
+    </div>
+  </div>
+
+  <div class="info-box" style="margin-top:1rem;">
+    ⚡ <strong>Key Insight:</strong> A dam may generate electricity (good for industrialist) but displace tribal communities (bad for them). Development decisions involve <em>trade-offs</em> and must consider all stakeholders.
+  </div>
+</div>
+
+<!-- ═══ TAB 1: INCOME & COMPARISON ═══ -->
+<div class="panel" id="p1">
+  <div class="sec-title" style="color:var(--green)">💰 Comparing Countries by Income</div>
+  
+  <div class="data-grid">
+    <div class="data-card">
+      <div class="data-val" style="color:var(--green)">$12,056+</div>
+      <div class="data-label">Rich Country Threshold</div>
+      <div class="data-sub">Per capita income/year (World Bank 2019)</div>
+    </div>
+    <div class="data-card">
+      <div class="data-val" style="color:var(--orange)">$1,036–</div>
+      <div class="data-label">Low-Income Country</div>
+      <div class="data-sub">Per capita income below this</div>
+    </div>
+    <div class="data-card">
+      <div class="data-val" style="color:var(--gold)">₹1.5L</div>
+      <div class="data-label">India's PCI (approx)</div>
+      <div class="data-sub">India = low middle-income</div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <strong>Per Capita Income</strong> = Total National Income ÷ Total Population<br>
+    Used by <em>World Bank</em> to classify countries. But it's just an <strong>average</strong> — hides inequality!
+  </div>
+
+  <div class="sec-title" style="color:var(--green);font-size:1rem;">📊 Per Capita Income Comparison</div>
+  <div class="bar-chart">
+    <div class="bar-row">
+      <span class="bar-name">USA</span>
+      <div class="bar-track"><div class="bar-fill" style="width:95%;background:var(--green)"><span class="bar-value">$64,530</span></div></div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-name">Sri Lanka</span>
+      <div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--blue)"><span class="bar-value">$12,707</span></div></div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-name">India</span>
+      <div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--gold)"><span class="bar-value">$6,681</span></div></div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-name">Pakistan</span>
+      <div class="bar-track"><div class="bar-fill" style="width:8%;background:var(--orange)"><span class="bar-value">$5,005</span></div></div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-name">Nepal</span>
+      <div class="bar-track"><div class="bar-fill" style="width:5%;background:var(--red)"><span class="bar-value">$3,457</span></div></div>
+    </div>
+  </div>
+  <div class="info-box" style="opacity:.8;">
+    ⚠️ <strong>Limitation:</strong> High average income doesn't mean everyone is well-off. Punjab has high PCI but <em>low HDI</em> compared to Kerala. Income alone ≠ development.
+  </div>
+</div>
+
+<!-- ═══ TAB 2: KEY INDICATORS ═══ -->
+<div class="panel" id="p2">
+  <div class="sec-title" style="color:var(--blue)">📊 Beyond Income — Key Development Indicators</div>
+  
+  <div class="data-grid">
+    <div class="data-card" style="border-color:var(--red)">
+      <div class="data-val" style="color:var(--red)">IMR</div>
+      <div class="data-label">Infant Mortality Rate</div>
+      <div class="data-sub">Deaths per 1000 live births (age &lt; 1 year)</div>
+    </div>
+    <div class="data-card" style="border-color:var(--blue)">
+      <div class="data-val" style="color:var(--blue)">Literacy</div>
+      <div class="data-label">Literacy Rate</div>
+      <div class="data-sub">% of population (age 7+) who can read & write</div>
+    </div>
+    <div class="data-card" style="border-color:var(--green)">
+      <div class="data-val" style="color:var(--green)">NAR</div>
+      <div class="data-label">Net Attendance Ratio</div>
+      <div class="data-sub">% of children in school (age 14–15)</div>
+    </div>
+    <div class="data-card" style="border-color:var(--teal)">
+      <div class="data-val" style="color:var(--teal)">LE</div>
+      <div class="data-label">Life Expectancy</div>
+      <div class="data-sub">Average expected lifespan at birth</div>
+    </div>
+  </div>
+
+  <div class="sec-title" style="color:var(--blue);font-size:1rem;">🗺️ Comparing Indian States</div>
+  <table class="cmp-table">
+    <tr><th>Indicator</th><th style="color:var(--green)">Kerala</th><th style="color:var(--orange)">Punjab</th><th style="color:var(--red)">Bihar</th></tr>
+    <tr><td>Per Capita Income (₹)</td><td>₹1,50,000</td><td><strong>₹2,10,000</strong></td><td>₹40,000</td></tr>
+    <tr><td>Infant Mortality Rate</td><td><strong>7</strong></td><td>25</td><td>38</td></tr>
+    <tr><td>Literacy Rate (%)</td><td><strong>94%</strong></td><td>82%</td><td>62%</td></tr>
+    <tr><td>Net Attendance (14–15)</td><td><strong>83%</strong></td><td>79%</td><td>43%</td></tr>
+    <tr><td>Life Expectancy</td><td><strong>75 yrs</strong></td><td>72 yrs</td><td>65 yrs</td></tr>
+  </table>
+  <div class="info-box">
+    ⚡ <strong>Key Insight:</strong> Punjab has the highest income but Kerala has better health & education indicators. Bihar is low on both income and social indicators. <em>Money alone doesn't ensure quality of life!</em>
+  </div>
+
+  <div class="sec-title" style="color:var(--blue);font-size:1rem;">🍽️ Body Mass Index (BMI)</div>
+  <div class="info-box">
+    <strong>BMI = Weight (kg) ÷ Height² (m²)</strong><br>
+    Used to measure nutritional status:<br>
+    • BMI < 18.5 → <em>Undernourished</em><br>
+    • BMI 18.5–24.9 → <em>Normal</em><br>
+    • BMI 25–29.9 → <em>Overweight</em><br>
+    • BMI ≥ 30 → <em>Obese</em>
+  </div>
+</div>
+
+<!-- ═══ TAB 3: HDI ═══ -->
+<div class="panel" id="p3">
+  <div class="sec-title" style="color:var(--indigo)">🏆 Human Development Index (HDI)</div>
+  <div class="info-box">
+    Published annually by <strong>UNDP</strong> (United Nations Development Programme). Ranks countries on a scale of <em>0 to 1</em>. Considers health, education, AND income — a more complete picture than per capita income alone.
+  </div>
+
+  <div class="hdi-pillars">
+    <div class="pillar" style="border-color:var(--red)">
+      <div class="pillar-icon">❤️</div>
+      <div class="pillar-name" style="color:var(--red)">Health</div>
+      <div class="pillar-metric">Measured by:<br><strong>Life Expectancy at Birth</strong><br>Higher = better healthcare, nutrition</div>
+    </div>
+    <div class="pillar" style="border-color:var(--blue)">
+      <div class="pillar-icon">📚</div>
+      <div class="pillar-name" style="color:var(--blue)">Education</div>
+      <div class="pillar-metric">Measured by:<br><strong>Mean Years of Schooling</strong><br>+ Expected years of schooling</div>
+    </div>
+    <div class="pillar" style="border-color:var(--green)">
+      <div class="pillar-icon">💵</div>
+      <div class="pillar-name" style="color:var(--green)">Standard of Living</div>
+      <div class="pillar-metric">Measured by:<br><strong>GNI per capita (PPP $)</strong><br>Purchasing Power Parity adjusted</div>
+    </div>
+  </div>
+
+  <div class="sec-title" style="color:var(--indigo);font-size:1rem;">🌍 Country Comparison (HDI)</div>
+  <table class="cmp-table">
+    <tr><th>Country</th><th>HDI Rank</th><th>Life Exp.</th><th>Mean Schooling</th><th>GNI/capita</th><th>Category</th></tr>
+    <tr><td>Sri Lanka</td><td>72</td><td>77 yrs</td><td>10.6 yrs</td><td>$12,707</td><td style="color:var(--green)">High</td></tr>
+    <tr><td>India</td><td>131</td><td>69 yrs</td><td>6.5 yrs</td><td>$6,681</td><td style="color:var(--orange)">Medium</td></tr>
+    <tr><td>Pakistan</td><td>154</td><td>67 yrs</td><td>5.2 yrs</td><td>$5,005</td><td style="color:var(--red)">Low</td></tr>
+  </table>
+  <div class="info-box">
+    💡 <strong>Notice:</strong> Sri Lanka has much lower per capita income than many countries but high HDI — because it invested heavily in <em>health and education</em>. India's PCI is higher than Pakistan's but the HDI gap is closing.
+  </div>
+
+  <div class="info-box" style="border-left:3px solid var(--gold);padding-left:1rem;">
+    <strong>World Bank vs UNDP:</strong><br>
+    • <em>World Bank</em> uses Per Capita Income to classify (rich/poor)<br>
+    • <em>UNDP</em> uses HDI (health + education + income) — more holistic<br>
+    Both are useful but HDI is a <strong>better indicator of development</strong>.
+  </div>
+</div>
+
+<!-- ═══ TAB 4: SUSTAINABILITY ═══ -->
+<div class="panel" id="p4">
+  <div class="sec-title" style="color:var(--teal)">♻️ Sustainable Development</div>
+  <div class="info-box">
+    <strong>Sustainable Development:</strong> Development that meets the needs of the present generation <em>without compromising</em> the ability of future generations to meet their own needs.<br>
+    (Brundtland Commission, 1987)
+  </div>
+
+  <div class="resource-split">
+    <div class="res-col">
+      <h3 style="color:var(--red)">⛽ Non-Renewable Resources</h3>
+      <div class="res-item"><div class="res-dot" style="background:var(--red)"></div>Coal — ~200 years left</div>
+      <div class="res-item"><div class="res-dot" style="background:var(--red)"></div>Petroleum — ~50 years left</div>
+      <div class="res-item"><div class="res-dot" style="background:var(--red)"></div>Natural Gas — ~60 years left</div>
+      <div class="res-item"><div class="res-dot" style="background:var(--red)"></div>Minerals — finite, take millions of years</div>
+      <div class="res-item" style="color:var(--orange);font-weight:600;">⚠️ Once exhausted, gone forever!</div>
+    </div>
+    <div class="res-col">
+      <h3 style="color:var(--green)">🌱 Renewable Resources</h3>
+      <div class="res-item"><div class="res-dot" style="background:var(--green)"></div>Solar energy — unlimited</div>
+      <div class="res-item"><div class="res-dot" style="background:var(--green)"></div>Wind energy — unlimited</div>
+      <div class="res-item"><div class="res-dot" style="background:var(--green)"></div>Biomass — replenishable</div>
+      <div class="res-item"><div class="res-dot" style="background:var(--green)"></div>Hydro power — renewable</div>
+      <div class="res-item" style="color:var(--teal);font-weight:600;">✅ Can be replenished naturally</div>
+    </div>
+  </div>
+
+  <div class="sec-title" style="color:var(--teal);font-size:1rem;">⚠️ Consequences of Overuse</div>
+  <div class="scenario-grid">
+    <div class="scenario">
+      <div class="scenario-emoji">💧</div>
+      <div class="scenario-title">Groundwater Depletion</div>
+      <div class="scenario-text">Excessive pumping for agriculture (esp. Punjab, Haryana). Water table falling rapidly. Future generations will face water crisis.</div>
+    </div>
+    <div class="scenario">
+      <div class="scenario-emoji">🏭</div>
+      <div class="scenario-title">Air & Water Pollution</div>
+      <div class="scenario-text">Industrial growth without environmental controls. Rivers polluted, air quality declining in cities. Health costs rising.</div>
+    </div>
+    <div class="scenario">
+      <div class="scenario-emoji">🌡️</div>
+      <div class="scenario-title">Climate Change</div>
+      <div class="scenario-text">Burning fossil fuels → CO₂ → global warming. Affects agriculture, causes floods/droughts, threatens biodiversity.</div>
+    </div>
+    <div class="scenario">
+      <div class="scenario-emoji">🌳</div>
+      <div class="scenario-title">Deforestation</div>
+      <div class="scenario-text">Clearing forests for development projects. Loss of biodiversity, soil erosion, disrupts water cycle, displaces tribals.</div>
+    </div>
+  </div>
+
+  <div class="info-box" style="margin-top:1rem;border-left:3px solid var(--teal);padding-left:1rem;">
+    🔑 <strong>Exam Key Point:</strong> "Economic development that we have achieved at the cost of the environment is <em>not real development</em>. We must balance growth with environmental protection for true sustainable development."
+  </div>
+</div>
+</main>
+
+<script>
+function showTab(i,btn,clr){
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';});
+  btn.classList.add('on');btn.style.background=clr;btn.style.color='#1a1208';
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+}
+</script>
+</body>
+</html>
