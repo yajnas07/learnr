@@ -59,9 +59,9 @@
 
   /* HERO */
   .hero {
-    min-height:100vh; display:flex; flex-direction:column;
+    min-height:88vh; display:flex; flex-direction:column;
     align-items:center; justify-content:center;
-    padding:8rem 1.5rem 5rem; text-align:center; position:relative; overflow:hidden;
+    padding:7rem 1.5rem 4rem; text-align:center; position:relative; overflow:hidden;
   }
   .hero::before {
     content:''; position:absolute; inset:0; pointer-events:none;
@@ -137,34 +137,7 @@
   }
   .btn-secondary:hover { border-color:var(--muted); background:rgba(255,255,255,.04); }
 
-  .hero-stats {
-    position:relative; z-index:1;
-    display:flex; gap:2.8rem; flex-wrap:wrap; justify-content:center;
-    margin-top:3.5rem; padding-top:2.5rem;
-    border-top:1px solid var(--border);
-    animation:fadeUp .7s .5s ease both;
-  }
-  .hstat { text-align:center; }
-  .hstat-val { font-family:'Syne',sans-serif; font-weight:800; font-size:2.1rem; line-height:1; }
-  .hstat-lbl { font-family:'DM Mono',monospace; font-size:.64rem; color:var(--muted); margin-top:.3rem; letter-spacing:.5px; }
-
   @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
-
-  /* MARQUEE */
-  .marquee-strip {
-    background:var(--card); border-top:1px solid var(--border); border-bottom:1px solid var(--border);
-    overflow:hidden; padding:.78rem 0;
-  }
-  .marquee-track {
-    display:inline-flex; gap:3rem; white-space:nowrap;
-    animation:marquee 30s linear infinite;
-  }
-  .marquee-strip:hover .marquee-track { animation-play-state:paused; }
-  .mq-item {
-    font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted);
-    display:inline-flex; align-items:center; gap:.45rem;
-  }
-  .mq-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
   @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
 
   /* SECTION SHARED */
@@ -296,17 +269,55 @@
   .footer-copy a { color:var(--gold); text-decoration:none; }
   .footer-copy a:hover { text-decoration:underline; }
 
+  /* CHAPTER TICKER */
+  .ch-ticker {
+    background:var(--card); border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    overflow:hidden; padding:.6rem 0;
+  }
+  .ch-ticker-track {
+    display:inline-flex; gap:1rem; white-space:nowrap;
+    animation:marquee 40s linear infinite;
+  }
+  .ch-ticker-track.reverse { animation-direction:reverse; animation-duration:50s; }
+  .ch-ticker:hover .ch-ticker-track { animation-play-state:paused; }
+  .ch-pill {
+    display:inline-flex; align-items:center; gap:.45rem;
+    padding:.35rem .9rem; border-radius:99px;
+    border:1px solid var(--border); background:var(--card2);
+    font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted);
+    text-decoration:none; transition:all .2s; cursor:pointer; white-space:nowrap;
+  }
+  .ch-pill:hover { color:var(--text); border-color:#2a3f5f; transform:translateY(-1px); }
+  .ch-pill-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+  /* STATS STRIP */
+  .stats-strip {
+    background:var(--card2); border-bottom:1px solid var(--border);
+  }
+  .stats-strip-inner {
+    max-width:1060px; margin:0 auto; padding:1.6rem 1.5rem;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1rem;
+  }
+  .stat-item { text-align:center; }
+  .stat-val {
+    font-family:'Syne',sans-serif; font-weight:800; font-size:2.2rem; line-height:1;
+  }
+  .stat-lbl { font-family:'DM Mono',monospace; font-size:.63rem; color:var(--muted); margin-top:.3rem; letter-spacing:.5px; text-transform:uppercase; }
+  .stat-divider { width:1px; background:var(--border); margin:0 auto; height:100%; display:none; }
+
   /* RESPONSIVE */
   @media(max-width:768px) {
     .nav-links { display:none; }
     .nav-hamburger { display:flex; }
     .mat-grid { grid-template-columns:1fr 1fr; }
+    .stats-strip-inner { grid-template-columns:repeat(2,1fr); }
   }
   @media(max-width:520px) {
     .mat-grid { grid-template-columns:1fr; }
     .material-grid { grid-template-columns:repeat(3,1fr); }
     .section-inner { padding:3.5rem 1.2rem; }
-    .hero-stats { gap:1.5rem; }
+    .stats-strip-inner { grid-template-columns:repeat(2,1fr); gap:.8rem; padding:1.2rem 1rem; }
+    .stat-val { font-size:1.7rem; }
   }
 </style>
 </head>
@@ -355,59 +366,62 @@
     <a href="#chapters" class="btn-primary">Explore Chapters &#8594;</a>
     <a href="#materials" class="btn-secondary">What&rsquo;s included</a>
   </div>
-
-  <div class="hero-stats">
-    <div class="hstat">
-      <div class="hstat-val" style="color:var(--science)">12</div>
-      <div class="hstat-lbl">Chapters Ready</div>
-    </div>
-    <div class="hstat">
-      <div class="hstat-val" style="color:var(--maths)">69</div>
-      <div class="hstat-lbl">Study Materials</div>
-    </div>
-    <div class="hstat">
-      <div class="hstat-val" style="color:var(--sst)">3</div>
-      <div class="hstat-lbl">Subjects</div>
-    </div>
-    <div class="hstat">
-      <div class="hstat-val" style="color:var(--gold)">100%</div>
-      <div class="hstat-lbl">Free &amp; Forever</div>
-    </div>
-  </div>
 </section>
 
-<!-- MARQUEE -->
-<div class="marquee-strip">
-  <div class="marquee-track">
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Acids, Bases &amp; Salts</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Life Processes</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Light &amp; Refraction</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Electricity</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Chemical Reactions</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Real Numbers</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Polynomials</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Quadratic Equations</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Trigonometry</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Statistics</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Nationalism in India</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Rise of Nationalism in Europe</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Power Sharing</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Federalism</span>
-    <!-- duplicate for seamless loop -->
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Acids, Bases &amp; Salts</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Life Processes</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Light &amp; Refraction</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Electricity</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--science)"></span>Chemical Reactions</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Real Numbers</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Polynomials</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Quadratic Equations</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Trigonometry</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--maths)"></span>Statistics</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Nationalism in India</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Rise of Nationalism in Europe</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Power Sharing</span>
-    <span class="mq-item"><span class="mq-dot" style="background:var(--sst)"></span>Federalism</span>
+<!-- CHAPTER TICKER ROW 1 -->
+<div class="ch-ticker">
+  <div class="ch-ticker-track">
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Chemical Reactions &amp; Equations</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Acids, Bases &amp; Salts</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Life Processes</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Control &amp; Coordination</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Light — Reflection &amp; Refraction</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Electricity</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Real Numbers</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Polynomials</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Quadratic Equations</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Trigonometry</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Rise of Nationalism in Europe</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Nationalism in India</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Resources and Development</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Power Sharing</a>
+    <!-- duplicate -->
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Chemical Reactions &amp; Equations</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Acids, Bases &amp; Salts</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Life Processes</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Control &amp; Coordination</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Light — Reflection &amp; Refraction</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Electricity</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Real Numbers</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Polynomials</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Quadratic Equations</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Trigonometry</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Rise of Nationalism in Europe</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Nationalism in India</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Resources and Development</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Power Sharing</a>
+  </div>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stats-strip-inner">
+    <div class="stat-item">
+      <div class="stat-val" style="color:var(--science)">12</div>
+      <div class="stat-lbl">Chapters Ready</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" style="color:var(--maths)">69</div>
+      <div class="stat-lbl">Study Materials</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" style="color:var(--sst)">3</div>
+      <div class="stat-lbl">Subjects Covered</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" style="color:var(--gold)">100%</div>
+      <div class="stat-lbl">Free &amp; Forever</div>
+    </div>
   </div>
 </div>
 
@@ -440,9 +454,9 @@
     </div>
 
     <div class="subj-tabs">
-      <button class="subj-tab active-sci" onclick="showSubject('sci',this)">&#128300; Science</button>
-      <button class="subj-tab" onclick="showSubject('mat',this)">&#128208; Maths</button>
-      <button class="subj-tab" onclick="showSubject('sst',this)">&#127758; Social Science</button>
+      <button class="subj-tab" data-subj="sci" onclick="showSubject('sci',this)">&#128300; Science</button>
+      <button class="subj-tab" data-subj="mat" onclick="showSubject('mat',this)">&#128208; Maths</button>
+      <button class="subj-tab" data-subj="sst" onclick="showSubject('sst',this)">&#127758; Social Science</button>
     </div>
 
     <!-- SCIENCE -->
@@ -713,15 +727,37 @@ window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.
 function toggleMenu() {
   document.getElementById('mobile-menu').classList.toggle('open');
 }
+
+// Subject map: id → active class name
+const SUBJ_CLASS = { sci:'active-sci', mat:'active-mat', sst:'active-sst' };
+
 function showSubject(id, btn) {
   document.querySelectorAll('.subject-section').forEach(s => s.classList.remove('visible'));
   document.getElementById('sec-' + id).classList.add('visible');
   document.querySelectorAll('.subj-tab').forEach(b => b.className = 'subj-tab');
-  btn.classList.add('active-' + id);
+  btn.classList.add(SUBJ_CLASS[id]);
+  // persist so returning visitors land on same subject
+  try { sessionStorage.setItem('learnr-subj', id); } catch(e) {}
 }
+
+// switchTo() is called by the chapter ticker pills — switches tab AND scrolls to chapters
+function switchTo(id) {
+  const btn = document.querySelector(`.subj-tab[data-subj="${id}"]`);
+  if (btn) showSubject(id, btn);
+}
+
 function toggleChapter(id) {
   document.getElementById(id).classList.toggle('open');
 }
+
+// Restore last subject on page load
+document.addEventListener('DOMContentLoaded', () => {
+  let saved = 'sci';
+  try { saved = sessionStorage.getItem('learnr-subj') || 'sci'; } catch(e) {}
+  const btn = document.querySelector(`.subj-tab[data-subj="${saved}"]`);
+  if (btn) showSubject(saved, btn);
+});
+
 const io = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.1 });
