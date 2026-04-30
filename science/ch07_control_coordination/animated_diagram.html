@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control and Coordination — Class X Science</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:#14b8a6; --purple:#a855f7; --pink:#ec4899; --blue:#3b82f6;
+    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --cyan:#22d3ee;
+    --bg:#0a0f1e; --card:#111827; --card2:#1a2235; --text:#e2e8f0;
+    --muted:#94a3b8; --border:#1e2d40;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(6,10,26,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(20,184,166,.18);position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+
+  header{text-align:center;padding:2.5rem 1rem 1rem;position:relative;}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(168,85,247,.12) 0%,transparent 70%);pointer-events:none;}
+  header h1{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#14b8a6,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  header p{color:var(--muted);font-size:.95rem;margin-top:.4rem;font-family:'DM Mono',monospace;}
+
+  nav.tabs{display:flex;justify-content:center;flex-wrap:wrap;gap:.5rem;padding:1.5rem 1rem .5rem;}
+  nav.tabs button{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:.5rem 1.2rem;border-radius:99px;border:2px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .25s;}
+  nav.tabs button:hover{border-color:#64748b;color:var(--text);}
+  nav.tabs button.act-teal   {border-color:var(--teal);  color:var(--teal);  background:rgba(20,184,166,.1);}
+  nav.tabs button.act-blue   {border-color:var(--blue);  color:var(--blue);  background:rgba(59,130,246,.1);}
+  nav.tabs button.act-purple {border-color:var(--purple);color:var(--purple);background:rgba(168,85,247,.1);}
+  nav.tabs button.act-pink   {border-color:var(--pink);  color:var(--pink);  background:rgba(236,72,153,.1);}
+  nav.tabs button.act-amber  {border-color:var(--amber); color:var(--amber); background:rgba(245,158,11,.1);}
+  nav.tabs button.act-green  {border-color:var(--green); color:var(--green); background:rgba(34,197,94,.1);}
+
+  main{padding:1.5rem 1rem 4rem;max-width:920px;margin:0 auto;}
+  section{display:none;animation:fadeUp .4s ease;}
+  section.visible{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .sec-title{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:.4rem;}
+  .sec-sub{color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;margin-bottom:1.4rem;}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:1.5rem;}
+  .card{background:var(--card);border-radius:16px;padding:1.2rem;border:1px solid var(--border);transition:transform .2s,box-shadow .2s;}
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.5rem;}
+  .card-body{font-size:.85rem;color:var(--muted);line-height:1.7;}
+  .card-body strong{color:var(--text);}
+
+  .stage{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.2rem;margin-bottom:1.5rem;}
+  .stage-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;}
+  .stage canvas{width:100%;border-radius:10px;background:#060d1a;display:block;}
+  .stage-ctrl{display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap;}
+  .stage-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .stage-btn:hover{border-color:#64748b;color:var(--text);}
+  .stage-btn.running{border-color:var(--teal);color:var(--teal);}
+
+  table.info-table{width:100%;border-collapse:collapse;font-size:.83rem;margin-top:.8rem;}
+  .info-table th{background:var(--card2);padding:.55rem .8rem;font-family:'Syne',sans-serif;font-size:.78rem;text-align:left;border-bottom:2px solid var(--border);}
+  .info-table td{padding:.5rem .8rem;border-bottom:1px solid var(--border);line-height:1.6;}
+  .info-table tr:hover td{background:rgba(255,255,255,.03);}
+
+  .label-chip{display:inline-block;font-family:'DM Mono',monospace;font-size:.68rem;padding:.15rem .55rem;border-radius:99px;font-weight:500;margin-right:.3rem;}
+  .chip-teal{background:rgba(20,184,166,.15);color:#2dd4bf;border:1px solid rgba(20,184,166,.25);}
+  .chip-purple{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.25);}
+  .chip-pink{background:rgba(236,72,153,.15);color:#f472b6;border:1px solid rgba(236,72,153,.25);}
+  .chip-amber{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25);}
+  .chip-green{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25);}
+  .chip-blue{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.25);}
+  .chip-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25);}
+
+  .flow-row{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;margin:.7rem 0;}
+  .flow-box{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:.4rem .8rem;font-size:.82rem;text-align:center;font-weight:600;}
+  .flow-arrow{color:var(--muted);font-size:1.1rem;}
+
+  .gland-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem;margin-top:.8rem;}
+  .gland-card{background:var(--card2);border-radius:12px;padding:.9rem;border:1px solid var(--border);}
+  .gland-name{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;margin-bottom:.4rem;}
+  .gland-body{font-size:.78rem;color:var(--muted);line-height:1.6;}
+  .gland-body strong{color:var(--text);}
+
+  .tropism-row{display:flex;gap:1rem;flex-wrap:wrap;margin-top:.8rem;}
+  .tropism-card{flex:1;min-width:140px;background:var(--card2);border-radius:12px;padding:.9rem;border:1px solid var(--border);text-align:center;}
+  .tropism-icon{font-size:2rem;margin-bottom:.4rem;}
+  .tropism-name{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:.3rem;}
+  .tropism-desc{font-size:.75rem;color:var(--muted);line-height:1.5;}
+
+  .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.8rem;}
+  @media(max-width:540px){.compare-grid{grid-template-columns:1fr;}}
+  .compare-col{background:var(--card2);border-radius:14px;padding:1rem;border:1px solid var(--border);}
+  .compare-head{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;margin-bottom:.7rem;text-align:center;}
+  .compare-item{display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.5rem;font-size:.82rem;line-height:1.5;}
+  .compare-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:.4rem;}
+
+  /* Tooltip for canvas hover */
+  #canvas-tooltip{
+    position:fixed;pointer-events:none;z-index:9000;
+    background:rgba(10,15,30,.95);border:1.5px solid var(--blue);
+    border-radius:10px;padding:.55rem .85rem;max-width:220px;
+    font-family:'Nunito',sans-serif;font-size:.8rem;line-height:1.55;
+    color:var(--text);box-shadow:0 6px 24px rgba(0,0,0,.5);
+    opacity:0;transition:opacity .15s;white-space:pre-wrap;
+  }
+  #canvas-tooltip.show{opacity:1;}
+  #canvas-tooltip .tt-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:.25rem;}
+
+  /* Brain click info panel */
+  #brain-info{
+    background:var(--card2);border:1.5px solid var(--pink);
+    border-radius:14px;padding:1rem;margin-top:.9rem;
+    display:none;animation:fadeUp .3s ease;
+  }
+  #brain-info.show{display:block;}
+  #brain-info .bi-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.35rem;}
+  #brain-info .bi-body{font-size:.84rem;color:var(--muted);line-height:1.7;}
+  #brain-info .bi-body strong{color:var(--text);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+<div id="canvas-tooltip"><div class="tt-title" id="tt-title"></div><div id="tt-body"></div></div>
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Control &amp; Coordination</h1>
+  <p>Class X · CBSE · Chapter 7 — Biology</p>
+</header>
+
+<nav class="tabs">
+  <button onclick="showTab(0,this,'act-teal')"   class="act-teal"  >🧠 Nervous System</button>
+  <button onclick="showTab(1,this,'act-blue')"              >🔬 Neuron</button>
+  <button onclick="showTab(2,this,'act-purple')"            >⚡ Reflex Arc</button>
+  <button onclick="showTab(3,this,'act-pink')"              >🧬 Brain</button>
+  <button onclick="showTab(4,this,'act-amber')"             >💊 Endocrine</button>
+  <button onclick="showTab(5,this,'act-green')"             >🌿 Plant Coordination</button>
+</nav>
+
+<main>
+
+<!-- ══ TAB 0: NERVOUS SYSTEM ══ -->
+<section id="tab0" class="visible">
+  <div class="sec-title" style="color:var(--teal)">🧠 The Nervous System</div>
+  <div class="sec-sub">Electrical coordination — fast, precise, short-lived</div>
+  <div class="cards">
+    <div class="card" style="border-color:rgba(20,184,166,.3)">
+      <div class="card-title" style="color:var(--teal)">What is Coordination?</div>
+      <div class="card-body">Working together of different organs to perform a function smoothly.<br><strong>Nervous system</strong> uses electrical impulses for rapid, short-lived responses.<br><strong>Endocrine system</strong> uses chemical hormones for slow, sustained responses.</div>
+    </div>
+    <div class="card" style="border-color:rgba(20,184,166,.3)">
+      <div class="card-title" style="color:var(--teal)">CNS vs PNS</div>
+      <div class="card-body"><strong>Central NS:</strong> Brain + Spinal cord. Processes information and sends commands.<br><strong>Peripheral NS:</strong> All nerves. Carries signals to/from CNS.<br>• Somatic: Voluntary<br>• Autonomic: Involuntary</div>
+    </div>
+    <div class="card" style="border-color:rgba(20,184,166,.3)">
+      <div class="card-title" style="color:var(--teal)">Nerve Impulse</div>
+      <div class="card-body">Electrochemical signal along a neuron.<br>Created by <strong>Na⁺/K⁺ ion movement</strong> across membrane (action potential).<br>At synapse: chemical neurotransmitters carry signal across the gap.</div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="stage-title">⚡ Nerve Signal Transmission</div>
+    <canvas id="ns-canvas" height="200"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn running" id="ns-btn" onclick="toggleNSAnim()">⏸ Pause</button>
+      <button class="stage-btn" onclick="resetNS()">↺ Reset</button>
+    </div>
+  </div>
+  <table class="info-table">
+    <tr><th>Division</th><th>Components</th><th>Function</th><th>Speed</th></tr>
+    <tr><td><span class="label-chip chip-teal">CNS</span>Brain</td><td>Cerebrum, Cerebellum, Medulla, Hypothalamus</td><td>Processing, voluntary actions, memory</td><td>—</td></tr>
+    <tr><td><span class="label-chip chip-teal">CNS</span>Spinal Cord</td><td>White & grey matter; 31 pairs of spinal nerves</td><td>Reflex centre, conducts signals</td><td>—</td></tr>
+    <tr><td><span class="label-chip chip-blue">PNS</span>Sensory nerves</td><td>Afferent neurons</td><td>Carry signals TO CNS</td><td>Up to 120 m/s</td></tr>
+    <tr><td><span class="label-chip chip-blue">PNS</span>Motor nerves</td><td>Efferent neurons</td><td>Carry commands FROM CNS</td><td>Up to 120 m/s</td></tr>
+  </table>
+</section>
+
+<!-- ══ TAB 1: NEURON ══ -->
+<section id="tab1">
+  <div class="sec-title" style="color:var(--blue)">🔬 Neuron — Structural Unit</div>
+  <div class="sec-sub">Specialised cell for transmitting electrical impulses</div>
+  <div class="stage">
+    <div class="stage-title">🔬 Neuron Diagram — hover/tap parts</div>
+    <canvas id="neuron-canvas" height="260"></canvas>
+  </div>
+  <div class="cards">
+    <div class="card" style="border-color:rgba(59,130,246,.3)">
+      <div class="card-title" style="color:var(--blue)">Dendrites</div>
+      <div class="card-body">Short, branched projections from cell body.<br>Receive impulses from other neurons.<br>Carry impulse <strong>towards</strong> the cell body (afferent).<br>Multiple dendrites per neuron → more input.</div>
+    </div>
+    <div class="card" style="border-color:rgba(59,130,246,.3)">
+      <div class="card-title" style="color:var(--blue)">Cell Body (Cyton / Soma)</div>
+      <div class="card-body">Contains nucleus, ribosomes, mitochondria.<br>Metabolic centre of the neuron.<br>Contains Nissl bodies (rough ER for protein synthesis).<br>Controls neuron's health and survival.</div>
+    </div>
+    <div class="card" style="border-color:rgba(59,130,246,.3)">
+      <div class="card-title" style="color:var(--blue)">Axon & Myelin Sheath</div>
+      <div class="card-body">Long single fibre carrying impulse <strong>away</strong> from cell body.<br>Myelin sheath: Fatty insulation produced by Schwann cells.<br>Nodes of Ranvier: Unmyelinated gaps — impulse "jumps" (saltatory conduction).<br>Axon terminals: Release neurotransmitters.</div>
+    </div>
+    <div class="card" style="border-color:rgba(59,130,246,.3)">
+      <div class="card-title" style="color:var(--blue)">Synapse</div>
+      <div class="card-body">Junction between two neurons or neuron + effector.<br>Synaptic cleft: ~20 nm gap.<br>Neurotransmitters released from vesicles (acetylcholine, dopamine).<br>Bind receptors on post-synaptic membrane → new impulse.</div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="stage-title">💬 Types of Neurons</div>
+    <div style="padding:.5rem 0">
+      <table class="info-table">
+        <tr><th>Type</th><th>Also Called</th><th>Direction</th><th>Example</th></tr>
+        <tr><td style="color:#60a5fa">Sensory Neuron</td><td>Afferent</td><td>Receptor → CNS</td><td>Detects touch, pain, temperature</td></tr>
+        <tr><td style="color:#4ade80">Motor Neuron</td><td>Efferent</td><td>CNS → Effector</td><td>Signals muscles to contract</td></tr>
+        <tr><td style="color:#c084fc">Relay Neuron</td><td>Interneuron / Association</td><td>Within CNS</td><td>In brain and spinal cord; connects S→M</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TAB 2: REFLEX ARC ══ -->
+<section id="tab2">
+  <div class="sec-title" style="color:var(--purple)">⚡ Reflex Action &amp; Reflex Arc</div>
+  <div class="sec-sub">Rapid, involuntary response — bypasses the brain's conscious control</div>
+  <div class="stage">
+    <div class="stage-title">⚡ Animated Reflex Arc</div>
+    <canvas id="reflex-canvas" height="280"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn" id="reflex-btn" onclick="startReflex()">▶ Trigger Reflex</button>
+      <button class="stage-btn" onclick="resetReflex()">↺ Reset</button>
+    </div>
+  </div>
+  <div style="margin-bottom:1rem">
+    <div class="sec-sub" style="margin-bottom:.5rem">Reflex Arc Pathway:</div>
+    <div class="flow-row">
+      <div class="flow-box" style="border-color:rgba(168,85,247,.4);color:#c084fc">🖐 Receptor<br><small style="color:var(--muted)">detects stimulus</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(59,130,246,.4);color:#60a5fa">Sensory Neuron<br><small style="color:var(--muted)">carries to CNS</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(20,184,166,.4);color:#2dd4bf">Relay Neuron<br><small style="color:var(--muted)">spinal cord</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(34,197,94,.4);color:#4ade80">Motor Neuron<br><small style="color:var(--muted)">carries from CNS</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(245,158,11,.4);color:#fbbf24">💪 Effector<br><small style="color:var(--muted)">muscle / gland</small></div>
+    </div>
+  </div>
+  <div class="cards">
+    <div class="card" style="border-color:rgba(168,85,247,.3)">
+      <div class="card-title" style="color:var(--purple)">Why Reflex is Fast</div>
+      <div class="card-body">Signal only travels to <strong>spinal cord</strong> (not brain) and back.<br>Shorter pathway → faster response.<br>Brain is informed later (that's why you feel pain after withdrawal).<br>Crucial for survival — avoids serious injury.</div>
+    </div>
+    <div class="card" style="border-color:rgba(168,85,247,.3)">
+      <div class="card-title" style="color:var(--purple)">Types of Reflexes</div>
+      <div class="card-body"><strong>Spinal reflex:</strong> Controlled by spinal cord.<br>Ex: Touching hot object, knee-jerk<br><strong>Cranial reflex:</strong> Controlled by brain.<br>Ex: Pupil dilation, blinking<br><strong>Conditioned reflex:</strong> Learned.<br>Ex: Salivation at smell of food (Pavlov)</div>
+    </div>
+    <div class="card" style="border-color:rgba(168,85,247,.3)">
+      <div class="card-title" style="color:var(--purple)">Examples in Daily Life</div>
+      <div class="card-body">• Withdrawing hand from hot object<br>• Knee-jerk reflex (patellar reflex)<br>• Sneezing, coughing<br>• Pupil constriction in bright light<br>• Blinking when something approaches eye<br>• Yawning, swallowing</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TAB 3: BRAIN ══ -->
+<section id="tab3">
+  <div class="sec-title" style="color:var(--pink)">🧬 Human Brain</div>
+  <div class="sec-sub">Protected by cranium and cerebrospinal fluid (CSF)</div>
+  <div class="stage">
+    <div class="stage-title">🧬 Brain Structure Diagram — click a part</div>
+    <canvas id="brain-canvas" height="320"></canvas>
+  </div>
+  <div id="brain-info">
+    <div class="bi-title" id="brain-info-title"></div>
+    <div class="bi-body" id="brain-info-body"></div>
+  </div>
+  <div class="cards">
+    <div class="card" style="border-color:rgba(236,72,153,.3)">
+      <div class="card-title" style="color:var(--pink)">Cerebrum (Forebrain)</div>
+      <div class="card-body">Largest part (~85% of brain weight).<br><strong>Functions:</strong> Voluntary actions, thought, memory, speech, reasoning, emotions, interpretation of sense data.<br>Divided into 2 hemispheres by corpus callosum.<br>Outer layer: <strong>Cerebral cortex</strong> (grey matter).</div>
+    </div>
+    <div class="card" style="border-color:rgba(236,72,153,.3)">
+      <div class="card-title" style="color:var(--pink)">Cerebellum (Hindbrain)</div>
+      <div class="card-body">Second largest part, at back of brain.<br><strong>Functions:</strong> Balance, posture, precision of voluntary movements, coordination.<br>"Coordinates muscles" — damage causes unsteady gait.<br>Surface folded → more surface area.</div>
+    </div>
+    <div class="card" style="border-color:rgba(236,72,153,.3)">
+      <div class="card-title" style="color:var(--pink)">Medulla Oblongata (Hindbrain)</div>
+      <div class="card-body">Part of brain stem connecting brain to spinal cord.<br><strong>Functions:</strong> Heartbeat, breathing, blood pressure, swallowing, vomiting, sneezing.<br>Controls ALL involuntary actions. Vital centre — even slight damage is life-threatening.</div>
+    </div>
+    <div class="card" style="border-color:rgba(236,72,153,.3)">
+      <div class="card-title" style="color:var(--pink)">Hypothalamus & Thalamus</div>
+      <div class="card-body"><strong>Hypothalamus:</strong> Thermoregulation (body temp), hunger, thirst, circadian rhythm, emotional responses. Controls pituitary gland — links nervous and endocrine systems.<br><strong>Thalamus:</strong> Relay station — routes sensory signals to correct part of cerebrum.</div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="stage-title">🛡️ Protection of Brain</div>
+    <div style="padding:.5rem 0">
+      <table class="info-table">
+        <tr><th>Layer</th><th>Name</th><th>Function</th></tr>
+        <tr><td>Outer bone</td><td>Cranium (skull)</td><td>Hard protective covering</td></tr>
+        <tr><td>3 membranes</td><td>Meninges (Dura, Arachnoid, Pia)</td><td>Shock-absorbing connective tissue layers</td></tr>
+        <tr><td>Fluid</td><td>Cerebrospinal Fluid (CSF)</td><td>Cushions brain; buoyancy; removes waste</td></tr>
+        <tr><td>Blood-brain barrier</td><td>Tight junctions in brain capillaries</td><td>Keeps toxins out of brain tissue</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TAB 4: ENDOCRINE ══ -->
+<section id="tab4">
+  <div class="sec-title" style="color:var(--amber)">💊 Endocrine System</div>
+  <div class="sec-sub">Chemical coordination — slow, broad, long-lasting</div>
+  <div class="stage">
+    <div class="stage-title">🔆 Endocrine Glands — animated</div>
+    <canvas id="endo-canvas" height="340"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn running" id="endo-btn" onclick="toggleEndoAnim()">⏸ Pause</button>
+    </div>
+  </div>
+  <div class="gland-grid">
+    <div class="gland-card" style="border-color:rgba(245,158,11,.3)">
+      <div class="gland-name" style="color:var(--amber)">🧠 Pituitary</div>
+      <div class="gland-body"><strong>Location:</strong> Base of brain<br><strong>Hormones:</strong> GH (growth), TSH, ADH, LH, FSH, Oxytocin<br><strong>Role:</strong> Master gland — controls all other glands<br>⚠️ Excess GH in childhood → Gigantism</div>
+    </div>
+    <div class="gland-card" style="border-color:rgba(20,184,166,.3)">
+      <div class="gland-name" style="color:var(--teal)">🦋 Thyroid</div>
+      <div class="gland-body"><strong>Location:</strong> Front of neck<br><strong>Hormone:</strong> Thyroxine (iodine needed)<br><strong>Role:</strong> Metabolism, growth, development<br>⚠️ Deficiency → Goitre (swollen neck)<br>⚠️ Excess → Hyperthyroidism</div>
+    </div>
+    <div class="gland-card" style="border-color:rgba(239,68,68,.3)">
+      <div class="gland-name" style="color:var(--red)">⚡ Adrenal</div>
+      <div class="gland-body"><strong>Location:</strong> On top of each kidney<br><strong>Hormone:</strong> Adrenaline (epinephrine)<br><strong>Role:</strong> Fight-or-flight: ↑HR, ↑BP, dilates pupils, diverts blood to muscles<br>Called "hormone of emergency"</div>
+    </div>
+    <div class="gland-card" style="border-color:rgba(59,130,246,.3)">
+      <div class="gland-name" style="color:var(--blue)">🫁 Pancreas</div>
+      <div class="gland-body"><strong>Location:</strong> Behind stomach<br><strong>Hormones:</strong> Insulin (↓glucose), Glucagon (↑glucose)<br>Islets of Langerhans: Beta (insulin), Alpha (glucagon)<br>⚠️ Insulin deficiency → Diabetes mellitus</div>
+    </div>
+    <div class="gland-card" style="border-color:rgba(168,85,247,.3)">
+      <div class="gland-name" style="color:var(--purple)">♂️ Testes</div>
+      <div class="gland-body"><strong>Hormone:</strong> Testosterone<br><strong>Role:</strong> Male sex characteristics — voice deepening, facial hair, muscle growth, sperm production<br>Also stimulates growth of reproductive organs.</div>
+    </div>
+    <div class="gland-card" style="border-color:rgba(236,72,153,.3)">
+      <div class="gland-name" style="color:var(--pink)">♀️ Ovaries</div>
+      <div class="gland-body"><strong>Hormones:</strong> Oestrogen, Progesterone<br><strong>Role:</strong> Female sex characteristics — breast development, menstrual cycle, pregnancy maintenance.<br>Oestrogen at puberty; Progesterone during pregnancy.</div>
+    </div>
+  </div>
+  <div class="stage" style="margin-top:1rem">
+    <div class="stage-title">🔄 Feedback Mechanism</div>
+    <div style="padding:.5rem 0;font-size:.85rem;line-height:1.7;color:var(--muted)">
+      Hormonal secretion is controlled by <strong style="color:var(--text)">negative feedback</strong>.<br>
+      Example: Blood sugar rises → Pancreas secretes <strong style="color:var(--blue)">insulin</strong> → Glucose absorbed into cells → Blood sugar falls → Insulin secretion stops.<br>
+      This maintains <strong style="color:var(--amber)">homeostasis</strong> — constant internal environment.
+    </div>
+    <div class="flow-row" style="margin-top:.5rem">
+      <div class="flow-box" style="border-color:rgba(245,158,11,.4);color:#fbbf24">High Blood Sugar</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(59,130,246,.4);color:#60a5fa">Pancreas → Insulin</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(34,197,94,.4);color:#4ade80">Glucose→Glycogen</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(168,85,247,.4);color:#c084fc">Blood Sugar ↓</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(245,158,11,.4);color:#fbbf24">Insulin Stops</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TAB 5: PLANT COORDINATION ══ -->
+<section id="tab5">
+  <div class="sec-title" style="color:var(--green)">🌿 Plant Coordination</div>
+  <div class="sec-sub">Plants coordinate via hormones and tropism movements — no nervous system</div>
+  <div class="stage">
+    <div class="stage-title">🌱 Tropism Animations</div>
+    <canvas id="plant-canvas" height="300"></canvas>
+    <div class="stage-ctrl">
+      <button class="stage-btn running" id="plant-btn" onclick="togglePlantAnim()">⏸ Pause</button>
+      <button class="stage-btn" onclick="resetPlant()">↺ Reset</button>
+    </div>
+  </div>
+  <div class="tropism-row">
+    <div class="tropism-card" style="border-color:rgba(245,158,11,.3)">
+      <div class="tropism-icon">☀️</div>
+      <div class="tropism-name" style="color:var(--amber)">Phototropism</div>
+      <div class="tropism-desc">Response to <strong>light</strong><br>Shoot: +ve (bends toward)<br>Root: −ve (bends away)<br>Auxin causes uneven growth</div>
+    </div>
+    <div class="tropism-card" style="border-color:rgba(59,130,246,.3)">
+      <div class="tropism-icon">⬇️</div>
+      <div class="tropism-name" style="color:var(--blue)">Geotropism</div>
+      <div class="tropism-desc">Response to <strong>gravity</strong><br>Root: +ve (grows downward)<br>Shoot: −ve (grows upward)<br>Also called gravitropism</div>
+    </div>
+    <div class="tropism-card" style="border-color:rgba(20,184,166,.3)">
+      <div class="tropism-icon">💧</div>
+      <div class="tropism-name" style="color:var(--teal)">Hydrotropism</div>
+      <div class="tropism-desc">Response to <strong>water</strong><br>Root: +ve (grows toward water)<br>Helps roots find water in soil</div>
+    </div>
+    <div class="tropism-card" style="border-color:rgba(34,197,94,.3)">
+      <div class="tropism-icon">🌀</div>
+      <div class="tropism-name" style="color:var(--green)">Thigmotropism</div>
+      <div class="tropism-desc">Response to <strong>touch</strong><br>Tendrils: +ve (coil around support)<br>Eg: Pea plants, cucumber</div>
+    </div>
+  </div>
+  <div class="stage" style="margin-top:1rem">
+    <div class="stage-title">🌱 Plant Hormones (Phytohormones)</div>
+    <div style="padding:.5rem 0">
+      <table class="info-table">
+        <tr><th>Hormone</th><th>Type</th><th>Main Functions</th><th>Example Effect</th></tr>
+        <tr><td style="color:#fbbf24"><strong>Auxin (IAA)</strong></td><td><span class="label-chip chip-green">Promoter</span></td><td>Cell elongation; phototropism; apical dominance</td><td>Shoot bends toward light; inhibits lateral buds</td></tr>
+        <tr><td style="color:#4ade80"><strong>Gibberellin</strong></td><td><span class="label-chip chip-green">Promoter</span></td><td>Stem elongation; seed germination; fruit growth</td><td>Dwarf plants grow tall; seedless grapes</td></tr>
+        <tr><td style="color:#60a5fa"><strong>Cytokinin</strong></td><td><span class="label-chip chip-green">Promoter</span></td><td>Cell division; delays leaf senescence</td><td>Keeps cut flowers fresh longer</td></tr>
+        <tr><td style="color:#f87171"><strong>Abscisic Acid</strong></td><td><span class="label-chip chip-red">Inhibitor</span></td><td>Stomatal closure; seed dormancy; wilting response</td><td>Stomata close in drought; seeds don't germinate in winter</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="stage" style="margin-top:1rem">
+    <div class="stage-title">🔬 Auxin &amp; Phototropism Mechanism</div>
+    <div style="padding:.5rem 0;font-size:.85rem;line-height:1.8;color:var(--muted)">
+      1. Light falls on one side of shoot tip.<br>
+      2. <strong style="color:#fbbf24">Auxin</strong> produced at tip migrates to the <strong style="color:var(--text)">shaded side</strong>.<br>
+      3. Higher auxin concentration on shaded side → <strong style="color:var(--text)">more cell elongation</strong>.<br>
+      4. Shaded side grows longer → shoot <strong style="color:var(--green)">bends toward light</strong>.<br>
+      5. In roots, high auxin <em>inhibits</em> elongation (roots are more sensitive to auxin).<br>
+      6. Root tip shaded side: less growth → root bends away from light.<br><br>
+      <span style="color:#fbbf24">Experiments: Darwin (1880) — coleoptile bending; Went (1926) — named auxin, proved tip produces it.</span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ════════════════════ COMPARE OVERLAY ════════════════════ -->
+
+<script>
+// ── TAB SWITCHING ──
+const tabs = document.querySelectorAll('section');
+const tabBtns = document.querySelectorAll('nav.tabs button');
+let activeClass = 'act-teal';
+function showTab(i, btn, cls) {
+  tabs.forEach(t => t.classList.remove('visible'));
+  tabBtns.forEach(b => b.classList.remove(activeClass,'act-teal','act-blue','act-purple','act-pink','act-amber','act-green'));
+  tabs[i].classList.add('visible');
+  btn.classList.add(cls);
+  activeClass = cls;
+  // Redraw static canvases once they're visible and have real dimensions
+  if (i === 1) requestAnimationFrame(() => { drawNeuron(null); attachNeuronEvents(); });
+  if (i === 3) requestAnimationFrame(() => { drawBrain(); attachBrainEvents(); });
+}
+
+// ═══════════════════════════════════════════
+// TAB 0 — Nerve Signal Animation
+// ═══════════════════════════════════════════
+let nsAnim = null, nsRunning = true, nsT = 0;
+function drawNS() {
+  const canvas = document.getElementById('ns-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width || canvas.offsetWidth || 600, H = 200;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  ctx.fillStyle = '#060d1a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Draw neuron path
+  const neurons = [
+    { label:'Receptor\n(Skin)', x:60, y:100, r:28, color:'#7c3aed', stroke:'#a855f7' },
+    { label:'Sensory\nNeuron', x:W*0.28, y:100, r:28, color:'#1e3a5f', stroke:'#3b82f6' },
+    { label:'Relay\n(Spinal)', x:W*0.5, y:100, r:30, color:'#064e3b', stroke:'#14b8a6' },
+    { label:'Motor\nNeuron', x:W*0.72, y:100, r:28, color:'#1e3a5f', stroke:'#3b82f6' },
+    { label:'Effector\n(Muscle)', x:W-60, y:100, r:28, color:'#14532d', stroke:'#22c55e' },
+  ];
+
+  // Draw connection lines
+  for (let i=0; i<neurons.length-1; i++) {
+    const a=neurons[i], b=neurons[i+1];
+    ctx.beginPath();
+    ctx.moveTo(a.x+a.r, a.y);
+    ctx.lineTo(b.x-b.r, b.y);
+    ctx.strokeStyle='#1e3a5f';
+    ctx.lineWidth=3;
+    ctx.stroke();
+  }
+
+  // Animated signal dot
+  const totalSegments = neurons.length - 1;
+  const progress = (nsT % 240) / 240;
+  const segProgress = progress * totalSegments;
+  const seg = Math.floor(segProgress);
+  const t = segProgress - seg;
+  let sx, sy;
+  if (seg < neurons.length-1) {
+    const a=neurons[seg], b=neurons[seg+1];
+    const ax = a.x + a.r, bx = b.x - b.r;
+    sx = ax + (bx-ax)*t;
+    sy = a.y;
+  }
+
+  // Draw neurons
+  neurons.forEach((n, i) => {
+    ctx.save();
+    ctx.shadowColor = n.stroke;
+    ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+    ctx.fillStyle = n.color; ctx.fill();
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+    ctx.strokeStyle = n.stroke; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '700 9px Nunito,sans-serif';
+    ctx.textAlign = 'center';
+    n.label.split('\n').forEach((l,li) => ctx.fillText(l, n.x, n.y + (li===0?-4:7)));
+  });
+
+  // Signal pulse
+  if (sx !== undefined) {
+    ctx.save();
+    ctx.shadowColor = '#facc15';
+    ctx.shadowBlur = 20;
+    ctx.beginPath(); ctx.arc(sx, sy, 7, 0, Math.PI*2);
+    ctx.fillStyle = '#facc15'; ctx.fill();
+    ctx.restore();
+  }
+
+  // Labels
+  const typeLabels = [
+    {x:W*0.28, txt:'Afferent', col:'#60a5fa'},
+    {x:W*0.5, txt:'CNS', col:'#2dd4bf'},
+    {x:W*0.72, txt:'Efferent', col:'#60a5fa'},
+  ];
+  typeLabels.forEach(l => {
+    ctx.fillStyle = l.col;
+    ctx.font = '600 9px DM Mono,monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(l.txt, l.x, H-15);
+  });
+
+  if (nsRunning) nsT++;
+}
+function startNSAnim() {
+  if (nsAnim) return;
+  nsAnim = setInterval(drawNS, 16);
+}
+function toggleNSAnim() {
+  nsRunning = !nsRunning;
+  document.getElementById('ns-btn').textContent = nsRunning ? '⏸ Pause' : '▶ Resume';
+  document.getElementById('ns-btn').classList.toggle('running', nsRunning);
+}
+function resetNS() { nsT=0; nsRunning=true; document.getElementById('ns-btn').textContent='⏸ Pause'; document.getElementById('ns-btn').classList.add('running'); }
+
+// ═══════════════════════════════════════════
+// TAB 1 — Neuron Diagram  (hover/tap interactive)
+// ═══════════════════════════════════════════
+let neuronHitRegions = [];
+let neuronHover = null;
+
+function drawNeuron(hoverRegion) {
+  const canvas = document.getElementById('neuron-canvas');
+  const W = canvas.offsetWidth || canvas.width || 600;
+  canvas.width = W;
+  const H = 260;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle='#060d1a'; ctx.fillRect(0,0,W,H);
+  ctx.textBaseline = 'alphabetic';
+
+  const dendX  = Math.max(30, W * 0.08);
+  const cbX    = Math.max(110, W * 0.30);
+  const cbY    = H * 0.50;
+  const cbR    = Math.min(34, H * 0.14);
+  const axEnd  = W - 48;
+  const axStart= cbX + cbR;
+  const axLen  = axEnd - axStart;
+  const axMid  = axStart + axLen * 0.5;
+  const segCnt = 7;
+  const myelLen= axLen / (segCnt + 1) * 0.78;
+  const gap    = axLen / (segCnt + 1) * 0.22;
+
+  const hl = (id) => hoverRegion === id;
+
+  // Rebuild hit regions each draw (coords depend on W)
+  neuronHitRegions = [
+    { id:'dendrites', label:'Dendrites', color:'#3b82f6',
+      info:'Short, branched extensions from the cell body.\nReceive incoming nerve impulses from other neurons.\nCarry impulse TOWARD the cell body (afferent).\nMultiple dendrites = more inputs possible.',
+      test:(x,y) => x < cbX - cbR * 0.5 && x > 0 && y > H*0.08 && y < H*0.92 },
+    { id:'cellbody', label:'Cell Body (Cyton)', color:'#a855f7',
+      info:"Contains nucleus, mitochondria, ribosomes and Nissl bodies.\nMetabolic centre of the neuron.\nAlso called soma.\nControls the neuron's survival and all its functions.",
+      test:(x,y) => Math.hypot(x-cbX, y-cbY) <= cbR + 6 },
+    { id:'myelin', label:'Axon & Myelin Sheath', color:'#22d3ee',
+      info:'Long fibre carrying impulse AWAY from cell body (efferent).\nMyelin sheath: Fatty insulation by Schwann cells.\nSpeeds up conduction via saltatory (jumping) conduction.\n◆ Nodes of Ranvier: unmyelinated gaps between segments.',
+      test:(x,y) => x > axStart && x < axEnd - 35 && Math.abs(y - cbY) <= 18 },
+    { id:'terminals', label:'Axon Terminals', color:'#60a5fa',
+      info:'Bulb-like knobs at the tip of the axon.\nContain vesicles packed with neurotransmitters.\nOn impulse arrival, vesicles fuse and release\nneurotransmitters into the synaptic cleft.',
+      test:(x,y) => x >= axEnd - 35 && x < W && y > cbY - 52 && y < cbY + 52 },
+  ];
+
+  // Dendrite zone bg
+  ctx.fillStyle = hl('dendrites') ? 'rgba(59,130,246,.14)' : 'rgba(59,130,246,.05)';
+  ctx.fillRect(0, 0, cbX - cbR * 0.8, H);
+
+  // Dendrites
+  const dCol = hl('dendrites') ? '#93c5fd' : '#3b82f6';
+  ctx.strokeStyle = dCol; ctx.lineWidth = hl('dendrites') ? 3.5 : 2.5;
+  const dends = [
+    [cbX-cbR*0.7, cbY-cbR*0.5, dendX+5, cbY-H*0.28],
+    [cbX-cbR*0.9, cbY,         dendX-5, cbY],
+    [cbX-cbR*0.7, cbY+cbR*0.5, dendX+5, cbY+H*0.28],
+  ];
+  dends.forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    const bL=18;
+    ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-bL,y2-12); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-bL,y2+12); ctx.stroke();
+    [y2-12, y2+12].forEach(ty=>{ ctx.beginPath(); ctx.arc(x2-bL,ty,3,0,Math.PI*2); ctx.fillStyle=dCol; ctx.fill(); });
+    ctx.beginPath(); ctx.arc(x2,y2,3,0,Math.PI*2); ctx.fillStyle=dCol; ctx.fill();
+  });
+  ctx.fillStyle = hl('dendrites') ? '#93c5fd' : '#60a5fa';
+  ctx.font = 'bold 10px Syne,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Dendrites', (cbX-cbR)/2, 22);
+  ctx.fillStyle='#475569'; ctx.font='8px DM Mono,monospace';
+  ctx.fillText('receive impulses', (cbX-cbR)/2, 34);
+
+  // Myelin segments
+  for(let i=0;i<segCnt;i++){
+    const sx = axStart + i*(myelLen+gap) + gap/2;
+    ctx.beginPath(); ctx.rect(sx, cbY-10, myelLen, 20);
+    ctx.fillStyle = hl('myelin') ? 'rgba(34,211,238,.2)' : 'rgba(14,116,144,.35)'; ctx.fill();
+    ctx.strokeStyle = hl('myelin') ? '#22d3ee' : '#0e7490'; ctx.lineWidth=1.2; ctx.stroke();
+  }
+  for(let i=1;i<segCnt;i++){
+    const nx = axStart + i*(myelLen+gap);
+    ctx.beginPath(); ctx.arc(nx, cbY, hl('myelin')?4:3, 0, Math.PI*2);
+    ctx.fillStyle = hl('myelin') ? '#fef08a' : '#fde68a'; ctx.fill();
+  }
+
+  // Axon line
+  ctx.beginPath(); ctx.moveTo(axStart,cbY); ctx.lineTo(axEnd,cbY);
+  ctx.strokeStyle = hl('myelin') ? '#67e3f9' : '#60a5fa'; ctx.lineWidth = hl('myelin')?4:3; ctx.stroke();
+
+  // Axon terminals
+  const tCol = hl('terminals') ? '#93c5fd' : '#60a5fa';
+  for(let i=0;i<3;i++){
+    const angle = ((i-1)*35)*Math.PI/180;
+    const tx=axEnd+Math.cos(angle)*30, ty=cbY+Math.sin(angle)*30;
+    ctx.beginPath(); ctx.moveTo(axEnd,cbY); ctx.lineTo(tx,ty); ctx.strokeStyle=tCol; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.arc(tx,ty,hl('terminals')?7:5,0,Math.PI*2);
+    ctx.fillStyle=hl('terminals')?'#2563eb':'#1e40af'; ctx.fill();
+    ctx.strokeStyle=tCol; ctx.lineWidth=1.5; ctx.stroke();
+  }
+
+  // Cell body (on top)
+  ctx.save();
+  if(hl('cellbody')){ ctx.shadowColor='#a855f7'; ctx.shadowBlur=30; }
+  ctx.beginPath(); ctx.arc(cbX,cbY,hl('cellbody')?cbR+3:cbR,0,Math.PI*2);
+  ctx.fillStyle=hl('cellbody')?'#2d0f52':'#1a0733'; ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.arc(cbX,cbY,hl('cellbody')?cbR+3:cbR,0,Math.PI*2);
+  ctx.strokeStyle=hl('cellbody')?'#c084fc':'#a855f7'; ctx.lineWidth=2.5; ctx.stroke();
+  const nucR=cbR*0.38;
+  ctx.beginPath(); ctx.arc(cbX,cbY,nucR,0,Math.PI*2); ctx.fillStyle='#2d0a2e'; ctx.fill();
+  ctx.strokeStyle='#ec4899'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.textBaseline='middle';
+  ctx.fillStyle='#f9a8d4'; ctx.font='bold 8px Nunito,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('nucleus',cbX,cbY);
+  ctx.textBaseline='alphabetic';
+
+  // Cell body label
+  ctx.fillStyle=hl('cellbody')?'#c084fc':'#d8b4fe';
+  ctx.font='bold 11px Syne,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Cell Body (Cyton)', cbX, cbY-(hl('cellbody')?cbR+16:cbR+10));
+  ctx.fillStyle='#64748b'; ctx.font='8px DM Mono,monospace';
+  ctx.fillText('contains nucleus + organelles', cbX, cbY-cbR);
+
+  // Axon label
+  ctx.fillStyle=hl('myelin')?'#22d3ee':'#64748b'; ctx.font='bold 10px Syne,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Axon', axMid, cbY-16);
+  ctx.fillStyle='#475569'; ctx.font='8px DM Mono,monospace';
+  ctx.fillText('Myelin sheath (Schwann cells)', axMid, cbY+26);
+  ctx.fillStyle=hl('myelin')?'#fef08a':'#64748b'; ctx.font='7px DM Mono,monospace';
+  ctx.fillText('◆ Nodes of Ranvier', axMid, cbY+36);
+
+  // Terminal label
+  ctx.fillStyle=hl('terminals')?'#93c5fd':'#60a5fa'; ctx.font='bold 9px Syne,sans-serif'; ctx.textAlign='right';
+  ctx.fillText('Axon terminals', W-4, H-26);
+  ctx.fillStyle='#64748b'; ctx.font='8px DM Mono,monospace';
+  ctx.fillText('release neurotransmitters', W-4, H-16);
+
+  // Direction arrows
+  ctx.fillStyle='#fbbf24'; ctx.font='bold 9px DM Mono,monospace'; ctx.textAlign='left';
+  ctx.fillText('◀ impulse IN', 4, H-16);
+  ctx.textAlign='right';
+  ctx.fillText('impulse OUT ▶', W-4, cbY-30);
+
+  // Hint
+  if(!hoverRegion){
+    ctx.fillStyle='rgba(148,163,184,.4)'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText('👉 hover / tap a region to learn more', W/2, H-6);
+  }
+}
+
+// Neuron hover/touch interaction
+function attachNeuronEvents() {
+  const canvas = document.getElementById('neuron-canvas');
+  if (canvas._eventsAttached) return;
+  canvas._eventsAttached = true;
+
+  const tooltip  = document.getElementById('canvas-tooltip');
+  const ttTitle  = document.getElementById('tt-title');
+  const ttBody   = document.getElementById('tt-body');
+
+  function getCanvasXY(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x:(clientX - rect.left)*scaleX, y:(clientY - rect.top)*scaleY, cx:clientX, cy:clientY };
+  }
+
+  function handleNeuronMove(e) {
+    const {x, y, cx, cy} = getCanvasXY(e);
+    const hit = neuronHitRegions.find(r => r.test(x, y));
+    const hid = hit ? hit.id : null;
+    if (hid !== neuronHover) {
+      neuronHover = hid;
+      canvas.style.cursor = hit ? 'pointer' : 'default';
+      drawNeuron(neuronHover);
+    }
+    if (hit) {
+      ttTitle.textContent = hit.label;
+      ttBody.textContent  = hit.info;
+      ttTitle.style.color = hit.color;
+      tooltip.classList.add('show');
+      // Position tooltip: follow cursor, keep within viewport
+      const tw = 230, th = 110;
+      let tx = cx + 14, ty = cy + 14;
+      if (tx + tw > window.innerWidth)  tx = cx - tw - 10;
+      if (ty + th > window.innerHeight) ty = cy - th - 10;
+      tooltip.style.left = tx + 'px';
+      tooltip.style.top  = ty + 'px';
+    } else {
+      tooltip.classList.remove('show');
+    }
+  }
+
+  function handleNeuronLeave() {
+    neuronHover = null;
+    canvas.style.cursor = 'default';
+    tooltip.classList.remove('show');
+    drawNeuron(null);
+  }
+
+  canvas.addEventListener('mousemove',  handleNeuronMove);
+  canvas.addEventListener('mouseleave', handleNeuronLeave);
+  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleNeuronMove(e); }, {passive:false});
+  canvas.addEventListener('touchend',   () => { setTimeout(handleNeuronLeave, 1800); });
+}
+
+// ═══════════════════════════════════════════
+// TAB 2 — Reflex Arc Animation
+// ═══════════════════════════════════════════
+let reflexAnim=null, reflexT=0, reflexRunning=false;
+function startReflex() {
+  if (reflexAnim) { clearInterval(reflexAnim); reflexAnim=null; reflexT=0; }
+  reflexRunning = true;
+  document.getElementById('reflex-btn').textContent='⏸ Running...';
+  document.getElementById('reflex-btn').classList.add('running');
+  reflexAnim = setInterval(drawReflex, 18);
+}
+function resetReflex() {
+  if(reflexAnim){ clearInterval(reflexAnim); reflexAnim=null; }
+  reflexRunning=false; reflexT=0;
+  document.getElementById('reflex-btn').textContent='▶ Trigger Reflex';
+  document.getElementById('reflex-btn').classList.remove('running');
+  const canvas = document.getElementById('reflex-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, 280);
+  drawReflexBase(ctx, canvas.width || 600, 280);
+}
+function drawReflexBase(ctx, W, H) {
+  ctx.fillStyle='#060d1a'; ctx.fillRect(0,0,W,H);
+
+  // Spinal cord (center top)
+  const spx=W/2, spy=55, spr=38;
+  ctx.save(); ctx.shadowColor='#14b8a6'; ctx.shadowBlur=16;
+  ctx.beginPath(); ctx.arc(spx,spy,spr,0,Math.PI*2);
+  ctx.fillStyle='#042626'; ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.arc(spx,spy,spr,0,Math.PI*2);
+  ctx.strokeStyle='#14b8a6'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle='#5eead4'; ctx.font='bold 10px Nunito'; ctx.textAlign='center';
+  ctx.fillText('Spinal',spx,spy-5); ctx.fillText('Cord',spx,spy+8);
+
+  // Hand (receptor) left
+  const hx=100, hy=220;
+  ctx.save(); ctx.shadowColor='#a855f7'; ctx.shadowBlur=12;
+  ctx.beginPath(); ctx.arc(hx,hy,30,0,Math.PI*2);
+  ctx.fillStyle='#1a0733'; ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.arc(hx,hy,30,0,Math.PI*2);
+  ctx.strokeStyle='#a855f7'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle='#d8b4fe'; ctx.font='bold 9px Nunito'; ctx.textAlign='center';
+  ctx.fillText('🖐',hx,hy-3); ctx.fillText('Hand',hx,hy+14);
+
+  // Muscle (effector) right
+  const mx=W-100, my=220;
+  ctx.save(); ctx.shadowColor='#22c55e'; ctx.shadowBlur=12;
+  ctx.beginPath(); ctx.arc(mx,my,30,0,Math.PI*2);
+  ctx.fillStyle='#052e16'; ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.arc(mx,my,30,0,Math.PI*2);
+  ctx.strokeStyle='#22c55e'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle='#86efac'; ctx.font='bold 9px Nunito'; ctx.textAlign='center';
+  ctx.fillText('💪',mx,my-3); ctx.fillText('Muscle',mx,my+14);
+
+  // Static path lines
+  ctx.setLineDash([5,5]);
+  ctx.strokeStyle='#1e3a5f'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(hx+25,hy-15); ctx.lineTo(spx-35,spy+25); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(spx+35,spy+25); ctx.lineTo(mx-25,my-15); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Labels on paths
+  ctx.fillStyle='#60a5fa'; ctx.font='9px DM Mono'; ctx.textAlign='center';
+  ctx.fillText('Sensory neuron',hx+(spx-hx)/2-10,hy-(hy-spy)/2);
+  ctx.fillStyle='#4ade80';
+  ctx.fillText('Motor neuron',spx+(mx-spx)/2+10,spy+(my-spy)/2+10);
+
+  // Labels
+  ctx.fillStyle='#94a3b8'; ctx.font='9px DM Mono'; ctx.textAlign='center';
+  ctx.fillText('Receptor (stimulus)', hx, H-8);
+  ctx.fillText('Effector (response)', mx, H-8);
+}
+function drawReflex() {
+  const canvas = document.getElementById('reflex-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width || 600, H = 280;
+  ctx.clearRect(0, 0, W, H);
+  drawReflexBase(ctx, W, H);
+
+  const spx=W/2, spy=55;
+  const hx=100, hy=220, mx=W-100, my=220;
+  const totalDur = 300;
+
+  if (reflexT < totalDur) {
+    const t = reflexT / totalDur;
+    // Phase 1: hand → spinal (0 to 0.4)
+    // Phase 2: spinal processes (0.4 to 0.6)
+    // Phase 3: spinal → muscle (0.6 to 1.0)
+    if (t < 0.4) {
+      const pt = t / 0.4;
+      const sx = hx+25 + (spx-35 - hx-25)*pt;
+      const sy = hy-15 + (spy+25 - hy+15)*pt;
+      ctx.save(); ctx.shadowColor='#facc15'; ctx.shadowBlur=16;
+      ctx.beginPath(); ctx.arc(sx,sy,8,0,Math.PI*2);
+      ctx.fillStyle='#facc15'; ctx.fill(); ctx.restore();
+    } else if (t < 0.6) {
+      // pulse at spinal cord
+      const pulse = Math.sin((t-0.4)/0.2*Math.PI);
+      ctx.save(); ctx.shadowColor='#14b8a6'; ctx.shadowBlur=30*pulse;
+      ctx.beginPath(); ctx.arc(spx,spy,38+8*pulse,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(20,184,166,${0.8*pulse})`; ctx.lineWidth=3; ctx.stroke(); ctx.restore();
+    } else {
+      const pt = (t-0.6)/0.4;
+      const sx = spx+35 + (mx-25 - spx-35)*pt;
+      const sy = spy+25 + (my-15 - spy-25)*pt;
+      ctx.save(); ctx.shadowColor='#22c55e'; ctx.shadowBlur=16;
+      ctx.beginPath(); ctx.arc(sx,sy,8,0,Math.PI*2);
+      ctx.fillStyle='#22c55e'; ctx.fill(); ctx.restore();
+    }
+    reflexT++;
+  } else {
+    // flash muscle
+    ctx.save(); ctx.shadowColor='#22c55e'; ctx.shadowBlur=30;
+    ctx.beginPath(); ctx.arc(mx,my,35,0,Math.PI*2);
+    ctx.strokeStyle='#4ade80'; ctx.lineWidth=3; ctx.stroke(); ctx.restore();
+    // "Response!" text
+    ctx.fillStyle='#4ade80'; ctx.font='bold 13px Syne'; ctx.textAlign='center';
+    ctx.fillText('✅ Response!',mx,my+50);
+    if(reflexAnim){ clearInterval(reflexAnim); reflexAnim=null; }
+    document.getElementById('reflex-btn').textContent='▶ Trigger Again';
+    document.getElementById('reflex-btn').classList.remove('running');
+  }
+}
+
+// ═══════════════════════════════════════════
+// TAB 3 — Brain Diagram (static labeled)
+// ═══════════════════════════════════════════
+function drawBrain() {
+  const canvas = document.getElementById('brain-canvas');
+  const W = canvas.offsetWidth || canvas.width || 600;
+  canvas.width = W;
+  const H = 340;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle='#060d1a'; ctx.fillRect(0,0,W,H);
+  ctx.textBaseline = 'alphabetic';
+
+  // Brain is drawn in left 58% of canvas; annotations in right 38%
+  const bx = W * 0.06;    // brain left margin
+  const bW = W * 0.52;    // brain drawing width
+  const cx = bx + bW * 0.46; // brain horizontal centre
+  const cy = H * 0.42;       // brain vertical centre
+  const aX = W * 0.65;       // annotation column x
+
+  // ── Skull outline
+  const skRx = Math.min(bW * 0.46, 115);
+  const skRy = Math.min(H * 0.36, 118);
+  ctx.save(); ctx.shadowColor='rgba(244,114,182,.4)'; ctx.shadowBlur=18;
+  ctx.beginPath(); ctx.ellipse(cx, cy - 8, skRx, skRy, 0, 0, Math.PI*2);
+  ctx.strokeStyle='rgba(244,114,182,.35)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.restore();
+
+  // ── Brain stem (narrow vertical below cerebrum)
+  const bsX = cx + skRx * 0.30;
+  const bsTop = cy + skRy * 0.55;
+  ctx.beginPath(); ctx.roundRect(bsX - 14, bsTop, 28, 60, 6);
+  ctx.fillStyle='#0a1e30'; ctx.fill();
+  ctx.strokeStyle='#22d3ee'; ctx.lineWidth=2; ctx.stroke();
+
+  // Spinal cord
+  ctx.beginPath(); ctx.roundRect(bsX - 8, bsTop + 56, 16, 55, 4);
+  ctx.fillStyle='#071422'; ctx.fill();
+  ctx.strokeStyle='#3b82f6'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // ── Cerebellum (rear-lower)
+  const clX = cx + skRx * 0.55;
+  const clY = cy + skRy * 0.28;
+  const clRx = Math.min(bW * 0.21, 50);
+  const clRy = Math.min(H * 0.14, 40);
+  ctx.beginPath(); ctx.ellipse(clX, clY, clRx, clRy, 0.25, 0, Math.PI*2);
+  ctx.fillStyle='rgba(30,27,75,.85)'; ctx.fill();
+  ctx.strokeStyle='#818cf8'; ctx.lineWidth=2; ctx.stroke();
+  // cerebellar folds
+  for(let i=0;i<4;i++){
+    const fy = clY - clRy*0.6 + i*(clRy*0.4);
+    ctx.beginPath(); ctx.ellipse(clX, fy, clRx*0.85, 5, 0.25, 0, Math.PI);
+    ctx.strokeStyle='rgba(129,140,248,.25)'; ctx.lineWidth=1; ctx.stroke();
+  }
+
+  // ── Hypothalamus (small, centre-low)
+  const htX = cx - skRx * 0.05;
+  const htY = cy + skRy * 0.25;
+  ctx.beginPath(); ctx.ellipse(htX, htY, 20, 14, 0, 0, Math.PI*2);
+  ctx.fillStyle='#1c2c00'; ctx.fill();
+  ctx.strokeStyle='#84cc16'; ctx.lineWidth=1.8; ctx.stroke();
+
+  // Pituitary (hangs below hypothalamus)
+  ctx.beginPath(); ctx.ellipse(htX, htY + 22, 10, 8, 0, 0, Math.PI*2);
+  ctx.fillStyle='#2a1200'; ctx.fill();
+  ctx.strokeStyle='#f59e0b'; ctx.lineWidth=1.5; ctx.stroke();
+  // stalk
+  ctx.beginPath(); ctx.moveTo(htX, htY + 14); ctx.lineTo(htX, htY + 14);
+  ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2; ctx.stroke();
+
+  // ── Thalamus (centre)
+  ctx.beginPath(); ctx.ellipse(cx - skRx*0.08, cy + 5, 22, 16, 0, 0, Math.PI*2);
+  ctx.fillStyle='rgba(124,58,237,.25)'; ctx.fill();
+  ctx.strokeStyle='rgba(167,139,250,.5)'; ctx.lineWidth=1.2; ctx.stroke();
+
+  // ── Cerebrum (large — draw last so it's on top)
+  const crRx = Math.min(bW * 0.40, 98);
+  const crRy = Math.min(H * 0.32, 102);
+  ctx.beginPath(); ctx.ellipse(cx - skRx*0.04, cy - skRy*0.08, crRx, crRy, 0, Math.PI, Math.PI*2);
+  ctx.fillStyle='rgba(45,10,60,.82)'; ctx.fill();
+  ctx.strokeStyle='#ec4899'; ctx.lineWidth=2.5; ctx.stroke();
+  // gyri (surface folds)
+  for(let i=0;i<6;i++){
+    const ga = (i/6) * Math.PI + Math.PI;
+    ctx.beginPath();
+    ctx.arc(cx - skRx*0.04 + Math.cos(ga)*crRx*0.55, cy - skRy*0.08 + Math.sin(ga)*crRy*0.55, 18, 0, Math.PI*2);
+    ctx.strokeStyle='rgba(236,72,153,.18)'; ctx.lineWidth=1.2; ctx.stroke();
+  }
+  // Corpus callosum hint
+  ctx.beginPath(); ctx.ellipse(cx - skRx*0.04, cy - skRy*0.08 + crRy*0.08, crRx*0.38, 8, 0, 0, Math.PI*2);
+  ctx.strokeStyle='rgba(236,72,153,.2)'; ctx.lineWidth=1; ctx.stroke();
+
+  // ── Medulla label inside brain stem
+  ctx.textBaseline='middle';
+  ctx.fillStyle='#67e8f9'; ctx.font='bold 8px Syne,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Medulla', bsX, bsTop + 30);
+  ctx.textBaseline='alphabetic';
+
+  // Spinal cord label
+  ctx.save(); ctx.translate(bsX - 16, bsTop + 83); ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#60a5fa'; ctx.font='bold 7px Syne,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Spinal Cord', 0, 0);
+  ctx.restore();
+
+  // Hypothalamus label
+  ctx.fillStyle='#bef264'; ctx.font='bold 7px Syne,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Hypo-', htX, htY - 2);
+  ctx.fillText('thalamus', htX, htY + 7);
+  ctx.textBaseline='alphabetic';
+
+  // Pituitary label
+  ctx.fillStyle='#fde68a'; ctx.font='bold 7px Syne,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Pit.', htX, htY + 22);
+  ctx.textBaseline='alphabetic';
+
+  // ── Annotations panel (right side)
+  const regions = [
+    {
+      label:'Cerebrum',   sub:'Forebrain',
+      col:'#f9a8d4',  lx: cx - skRx*0.04, ly: cy - skRy*0.6,
+      ay: H * 0.10
+    },
+    {
+      label:'Cerebellum', sub:'Hindbrain · balance & coordination',
+      col:'#a5b4fc',  lx: clX, ly: clY,
+      ay: H * 0.38
+    },
+    {
+      label:'Medulla Oblongata', sub:'Hindbrain · involuntary actions',
+      col:'#67e8f9',  lx: bsX, ly: bsTop + 30,
+      ay: H * 0.62
+    },
+    {
+      label:'Hypothalamus', sub:'Diencephalon · thermoregulation',
+      col:'#bef264',  lx: htX, ly: htY,
+      ay: H * 0.78
+    },
+    {
+      label:'Pituitary Gland', sub:'Master gland · controls hormones',
+      col:'#fde68a',  lx: htX, ly: htY + 22,
+      ay: H * 0.90
+    },
+  ];
+
+  regions.forEach(r => {
+    // Dashed connector line
+    ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(r.lx + 10, r.ly); ctx.lineTo(aX - 8, r.ay);
+    ctx.strokeStyle = r.col + '60'; ctx.lineWidth=1; ctx.stroke();
+    ctx.setLineDash([]);
+    // Dot on brain part
+    ctx.beginPath(); ctx.arc(r.lx, r.ly, 4, 0, Math.PI*2);
+    ctx.fillStyle = r.col; ctx.fill();
+    // Annotation text
+    ctx.fillStyle = r.col; ctx.font='bold 10px Syne,sans-serif'; ctx.textAlign='left';
+    ctx.fillText(r.label, aX, r.ay);
+    ctx.fillStyle='#475569'; ctx.font='8px DM Mono,monospace';
+    ctx.fillText(r.sub, aX, r.ay + 12);
+  });
+
+  // Title + hint
+  ctx.fillStyle='rgba(244,114,182,.7)'; ctx.font='bold 9px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('HUMAN BRAIN — side view (sagittal section)', W/2, H - 8);
+  ctx.fillStyle='rgba(148,163,184,.45)'; ctx.font='9px DM Mono,monospace';
+  ctx.fillText('👉 click / tap a region to learn more', W/2, H - 20);
+
+  // Rebuild hit regions using the same coordinate variables computed above
+  brainHitRegions = [
+    {
+      label:'Cerebrum', color:'#f9a8d4',
+      title:'Cerebrum — Forebrain',
+      body:'<strong>Largest part</strong> (~85% of brain weight). Divided by corpus callosum into left and right hemispheres.<br><strong>Functions:</strong> Voluntary actions, thought, memory, reasoning, speech, sensory interpretation, emotions.<br>Outer layer = cerebral cortex (grey matter). Controls all conscious activity.',
+      test:(x,y)=>{ const crRx=Math.min(bW*0.40,98),crRy=Math.min(H*0.32,102); const dx=(x-(cx-skRx*0.04))/crRx,dy=(y-(cy-skRy*0.08))/crRy; return dx*dx+dy*dy<=1&&y<cy+skRy*0.25; }
+    },
+    {
+      label:'Cerebellum', color:'#a5b4fc',
+      title:'Cerebellum — Hindbrain',
+      body:'<strong>Second largest part</strong>, at the back and below the cerebrum.<br><strong>Functions:</strong> Coordination of muscle movements, balance, posture, precision of voluntary actions.<br>Damage → unsteady gait (ataxia). Surface is folded for greater surface area.',
+      test:(x,y)=>{ const dx=(x-clX)/(clRx+8),dy=(y-clY)/(clRy+8); return dx*dx+dy*dy<=1; }
+    },
+    {
+      label:'Medulla Oblongata', color:'#67e8f9',
+      title:'Medulla Oblongata — Hindbrain',
+      body:'Part of the brain stem connecting the brain to the spinal cord.<br><strong>Functions:</strong> Controls ALL involuntary vital actions — heartbeat, breathing, blood pressure, swallowing, vomiting, sneezing, coughing.<br>Even slight damage can be life-threatening.',
+      test:(x,y)=>x>=bsX-18&&x<=bsX+18&&y>=bsTop&&y<=bsTop+62
+    },
+    {
+      label:'Hypothalamus', color:'#bef264',
+      title:'Hypothalamus — Diencephalon',
+      body:'Small but vital region below the thalamus.<br><strong>Functions:</strong> Thermoregulation (body temperature), hunger, thirst, sleep-wake cycle, emotional responses, controls the pituitary gland.<br>Key link between the <strong>nervous</strong> and <strong>endocrine</strong> systems.',
+      test:(x,y)=>Math.hypot(x-htX,y-htY)<=26
+    },
+    {
+      label:'Pituitary Gland', color:'#fde68a',
+      title:'Pituitary Gland — Master Endocrine Gland',
+      body:'A pea-sized gland hanging from the hypothalamus via the infundibulum.<br><strong>Hormones:</strong> GH, TSH, ACTH, LH, FSH, ADH, Oxytocin.<br>Controls all other endocrine glands → called the <strong>master gland</strong>.<br>Excess GH in childhood → Gigantism.',
+      test:(x,y)=>Math.hypot(x-htX,y-(htY+22))<=18
+    },
+  ];
+}
+
+let brainHitRegions = [];
+
+function attachBrainEvents() {
+  const canvas = document.getElementById('brain-canvas');
+  if (canvas._brainEventsAttached) return;
+  canvas._brainEventsAttached = true;
+
+  const infoBox   = document.getElementById('brain-info');
+  const infoTitle = document.getElementById('brain-info-title');
+  const infoBody  = document.getElementById('brain-info-body');
+
+  function getXY(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x:(cx-rect.left)*scaleX, y:(cy-rect.top)*scaleY };
+  }
+
+  function handleClick(e) {
+    e.preventDefault();
+    const {x,y} = getXY(e);
+    const hit = brainHitRegions.find(r => r.test(x,y));
+    if (hit) {
+      infoTitle.textContent = hit.title;
+      infoTitle.style.color = hit.color;
+      infoBody.innerHTML    = hit.body;
+      infoBox.classList.add('show');
+      setTimeout(()=>infoBox.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+    }
+  }
+
+  canvas.addEventListener('click',      handleClick);
+  canvas.addEventListener('touchstart', handleClick, {passive:false});
+  canvas.addEventListener('mousemove', (e) => {
+    const {x,y} = getXY(e);
+    canvas.style.cursor = brainHitRegions.find(r=>r.test(x,y)) ? 'pointer' : 'default';
+  });
+}
+
+// ═══════════════════════════════════════════
+// TAB 4 — Endocrine Animation
+// ═══════════════════════════════════════════
+let endoAnim=null, endoT=0, endoRunning=true;
+const GLANDS = [
+  {name:'Pituitary', x:.5, y:.12, r:14, color:'#451a03', stroke:'#f59e0b', emoji:'🧠'},
+  {name:'Thyroid',   x:.5, y:.26, r:16, color:'#042f2e', stroke:'#14b8a6', emoji:'🦋'},
+  {name:'Adrenal',   x:.38, y:.55, r:13, color:'#450a0a', stroke:'#ef4444', emoji:'⚡'},
+  {name:'Adrenal',   x:.62, y:.55, r:13, color:'#450a0a', stroke:'#ef4444', emoji:''},
+  {name:'Pancreas',  x:.46, y:.62, r:15, color:'#082f4a', stroke:'#3b82f6', emoji:'🫁'},
+  {name:'Ovary/Testis',x:.44, y:.78, r:13, color:'#1a0933', stroke:'#a855f7', emoji:'⚙️'},
+  {name:'',          x:.56, y:.78, r:13, color:'#1a0933', stroke:'#a855f7', emoji:''},
+];
+function drawEndo() {
+  const canvas = document.getElementById('endo-canvas');
+  const W = canvas.width || 600, H = 340;
+  if (!W) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle='#060d1a'; ctx.fillRect(0,0,W,H);
+
+  const bw=60, bh=260, bx=W/2-bw/2, by=30;
+
+  // Body silhouette
+  ctx.beginPath();
+  ctx.ellipse(W/2, by+10, 32, 20, 0, 0, Math.PI*2); // head
+  ctx.fillStyle='#0f172a'; ctx.fill();
+  ctx.strokeStyle='#1e3a5f'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.beginPath();
+  ctx.roundRect(bx, by+28, bw, bh, 20);
+  ctx.fillStyle='#0c1428'; ctx.fill(); ctx.strokeStyle='#1e3a5f'; ctx.stroke();
+
+  // Bloodstream particles
+  const particles = 12;
+  for(let i=0;i<particles;i++){
+    const phase = ((endoT*0.4 + i*(360/particles)) % 360) * Math.PI/180;
+    const px = W/2 + Math.cos(phase)*22;
+    const py = by+140 + Math.sin(phase)*90;
+    const alpha = 0.3 + 0.5*Math.abs(Math.sin(phase));
+    ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+    ctx.fillStyle=`rgba(239,68,68,${alpha})`; ctx.fill();
+  }
+
+  // Glands
+  GLANDS.forEach((g,i) => {
+    const gx = g.x*W, gy = g.y*H;
+    const pulse = 1 + 0.12*Math.sin(endoT*0.06 + i*1.2);
+    ctx.save(); ctx.shadowColor=g.stroke; ctx.shadowBlur=16;
+    ctx.beginPath(); ctx.arc(gx,gy,g.r*pulse,0,Math.PI*2);
+    ctx.fillStyle=g.color; ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.arc(gx,gy,g.r,0,Math.PI*2);
+    ctx.strokeStyle=g.stroke; ctx.lineWidth=2; ctx.stroke();
+    if(g.name){
+      ctx.fillStyle=g.stroke; ctx.font='bold 8px Syne'; ctx.textAlign='center';
+      ctx.fillText(g.name,gx,gy-g.r-4);
+    }
+  });
+
+  if(endoRunning) endoT++;
+}
+function startEndoAnim() {
+  if(endoAnim) return;
+  endoAnim = setInterval(drawEndo,20);
+}
+function toggleEndoAnim() {
+  endoRunning=!endoRunning;
+  document.getElementById('endo-btn').textContent = endoRunning?'⏸ Pause':'▶ Resume';
+  document.getElementById('endo-btn').classList.toggle('running',endoRunning);
+}
+
+// ═══════════════════════════════════════════
+// TAB 5 — Plant Tropism Animation
+// ═══════════════════════════════════════════
+let plantAnim=null, plantT=0, plantRunning=true;
+function drawPlant() {
+  const canvas = document.getElementById('plant-canvas');
+  const W = canvas.width || 600, H = 300;
+  if (!W) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle='#060d1a'; ctx.fillRect(0,0,W,H);
+
+  // Soil line
+  ctx.fillStyle='#1c0a00';
+  ctx.fillRect(0, H*0.72, W, H*0.28);
+  ctx.strokeStyle='#78350f'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,H*0.72); ctx.lineTo(W,H*0.72); ctx.stroke();
+
+  const plantW = Math.min(W/4, 140);
+  drawPhototropism(ctx, W*0.18, H, plantT, plantW);
+  drawGeotropism(ctx, W*0.5, H, plantT, plantW);
+  drawThigmotropism(ctx, W*0.82, H, plantT, plantW);
+
+  if(plantRunning) plantT++;
+}
+
+function drawPhototropism(ctx,cx,H,t,w) {
+  const groundY = H*0.72;
+  // Sun
+  const sunX = cx - w*0.4;
+  ctx.save(); ctx.shadowColor='#fbbf24'; ctx.shadowBlur=20;
+  ctx.beginPath(); ctx.arc(sunX, 30, 18, 0, Math.PI*2);
+  ctx.fillStyle='#fef08a'; ctx.fill(); ctx.restore();
+  ctx.fillStyle='#fbbf24'; ctx.font='bold 9px Syne'; ctx.textAlign='center';
+  ctx.fillText('☀️',sunX,28);
+
+  // Shoot bending toward sun
+  const maxBend = 0.25;
+  const bend = maxBend * Math.sin(t*0.018 + Math.PI/2); // oscillates
+  const stemH = 90;
+  const cp1x = cx + bend*w, cp1y = groundY - stemH*0.5;
+  const tip = {x: cx + bend*1.8*w*0.5, y: groundY-stemH};
+
+  ctx.beginPath();
+  ctx.moveTo(cx, groundY);
+  ctx.quadraticCurveTo(cp1x, cp1y, tip.x, tip.y);
+  ctx.strokeStyle='#16a34a'; ctx.lineWidth=5; ctx.stroke();
+
+  // Leaf
+  ctx.beginPath();
+  ctx.ellipse(tip.x-10, tip.y+5, 14, 7, -0.4, 0, Math.PI*2);
+  ctx.fillStyle='#22c55e'; ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(tip.x+10, tip.y+5, 14, 7, 0.4, 0, Math.PI*2);
+  ctx.fillStyle='#4ade80'; ctx.fill();
+
+  // Root (negative phototropism)
+  ctx.beginPath(); ctx.moveTo(cx,groundY);
+  ctx.quadraticCurveTo(cx+bend*w*0.5, groundY+35, cx-bend*w*0.3, groundY+65);
+  ctx.strokeStyle='#92400e'; ctx.lineWidth=3; ctx.stroke();
+
+  ctx.fillStyle='#e2e8f0'; ctx.font='bold 9px Syne'; ctx.textAlign='center';
+  ctx.fillText('Phototropism',cx,H-5);
+  ctx.fillStyle='#94a3b8'; ctx.font='8px DM Mono';
+  ctx.fillText('shoot → light',cx,H-15);
+}
+
+function drawGeotropism(ctx,cx,H,t,w) {
+  const groundY = H*0.72;
+  // Gravity arrow
+  ctx.fillStyle='#60a5fa'; ctx.font='12px DM Mono'; ctx.textAlign='center';
+  ctx.fillText('g↓',cx+w*0.45,50);
+  for(let i=0;i<3;i++){
+    ctx.beginPath();
+    ctx.moveTo(cx+w*0.45-8+i*8, 35);
+    ctx.lineTo(cx+w*0.45-8+i*8, 60);
+    ctx.strokeStyle='rgba(96,165,250,.4)'; ctx.lineWidth=1; ctx.stroke();
+  }
+
+  // Vertical stem (shoots up, root goes down)
+  const sway = 0.05*Math.sin(t*0.015);
+  // Stem
+  ctx.beginPath();
+  ctx.moveTo(cx,groundY);
+  ctx.lineTo(cx+sway*30, groundY-85);
+  ctx.strokeStyle='#15803d'; ctx.lineWidth=5; ctx.stroke();
+  // Tip
+  ctx.beginPath(); ctx.arc(cx+sway*30, groundY-88, 7, 0, Math.PI*2);
+  ctx.fillStyle='#22c55e'; ctx.fill();
+
+  // Root going down
+  ctx.beginPath();
+  ctx.moveTo(cx,groundY);
+  ctx.lineTo(cx, groundY+65);
+  ctx.strokeStyle='#92400e'; ctx.lineWidth=3; ctx.stroke();
+  // Root tip
+  ctx.beginPath(); ctx.arc(cx,groundY+65,5,0,Math.PI*2);
+  ctx.fillStyle='#d97706'; ctx.fill();
+
+  ctx.fillStyle='#e2e8f0'; ctx.font='bold 9px Syne'; ctx.textAlign='center';
+  ctx.fillText('Geotropism',cx,H-5);
+  ctx.fillStyle='#94a3b8'; ctx.font='8px DM Mono';
+  ctx.fillText('root ↓ shoot ↑',cx,H-15);
+}
+
+function drawThigmotropism(ctx,cx,H,t,w) {
+  const groundY = H*0.72;
+  // Pole
+  const px = cx-20;
+  ctx.beginPath(); ctx.moveTo(px,groundY); ctx.lineTo(px,groundY-100);
+  ctx.strokeStyle='#78350f'; ctx.lineWidth=6; ctx.stroke();
+
+  // Tendril coiling around pole
+  const coils = 4;
+  const maxY = groundY;
+  const minY = groundY-90;
+  for(let i=0;i<80;i++){
+    const progress = i/80;
+    const y = maxY + (minY-maxY)*progress;
+    const coilAngle = progress*coils*Math.PI*2 + t*0.03;
+    const radius = 18 - progress*6;
+    const x = px + Math.cos(coilAngle)*radius;
+    ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2);
+    const g = Math.floor(100+progress*155);
+    ctx.fillStyle=`rgb(34,${g},54)`; ctx.fill();
+  }
+
+  // Small leaves
+  for(let i=1;i<=4;i++){
+    const y = groundY - i*20;
+    ctx.beginPath();
+    ctx.ellipse(px+25, y, 12, 5, 0.4, 0, Math.PI*2);
+    ctx.fillStyle='#4ade80'; ctx.fill();
+  }
+
+  ctx.fillStyle='#e2e8f0'; ctx.font='bold 9px Syne'; ctx.textAlign='center';
+  ctx.fillText('Thigmotropism',cx,H-5);
+  ctx.fillStyle='#94a3b8'; ctx.font='8px DM Mono';
+  ctx.fillText('tendrils coil',cx,H-15);
+}
+
+function togglePlantAnim() {
+  plantRunning = !plantRunning;
+  document.getElementById('plant-btn').textContent = plantRunning?'⏸ Pause':'▶ Resume';
+  document.getElementById('plant-btn').classList.toggle('running',plantRunning);
+}
+function resetPlant() { plantT=0; }
+
+// ═══════════════════════════════════════════
+// INIT — wait for DOM, then start animations
+// ═══════════════════════════════════════════
+function initCanvasSizes() {
+  ['ns-canvas','neuron-canvas','reflex-canvas','brain-canvas','endo-canvas','plant-canvas'].forEach(id=>{
+    const c=document.getElementById(id);
+    if(!c) return;
+    // offsetWidth is 0 for hidden sections — use parent container width or fallback
+    const w = c.offsetWidth || c.closest('main')?.offsetWidth || 600;
+    c.width = w;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initCanvasSizes();
+
+  startNSAnim();
+  setTimeout(()=>{
+    drawNeuron(null);
+    drawBrain();
+    attachBrainEvents();
+    const rc = document.getElementById('reflex-canvas');
+    drawReflexBase(rc.getContext('2d'), rc.width || 600, 280);
+  }, 200);
+  startEndoAnim();
+  plantAnim = setInterval(drawPlant, 20);
+
+  // Resize: update canvas sizes and redraw statics (throttled)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      initCanvasSizes();
+      drawNeuron(null);
+      drawBrain();
+      const rc = document.getElementById('reflex-canvas');
+      drawReflexBase(rc.getContext('2d'), rc.width || 600, 280);
+    }, 200);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Control and Coordination</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0f1e;--card:#111827;--border:#1e2d40;--text:#e2e8f0;--muted:#94a3b8;
+    --teal:#14b8a6;--purple:#a855f7;--pink:#ec4899;--blue:#3b82f6;
+    --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#22d3ee;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(168,85,247,.07) 0%,transparent 60%);}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;background:rgba(6,10,26,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(20,184,166,.18);position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+  header{text-align:center;padding:2.2rem 1rem 1.5rem;}
+  header h1{font-family:'Syne',sans-serif;font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,#14b8a6,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.78rem;margin-top:.4rem;}
+  .toolbar{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;padding:0 1rem .8rem;max-width:1100px;margin:0 auto;}
+  .filter-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.28rem .85rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:.2s;}
+  .filter-btn:hover{border-color:var(--teal);color:var(--teal);}
+  .filter-btn.active{background:rgba(20,184,166,.15);border-color:var(--teal);color:#2dd4bf;}
+  .filter-btn[data-type="MCQ"].active{background:rgba(59,130,246,.15);border-color:var(--blue);color:#60a5fa;}
+  .filter-btn[data-type="AR"].active{background:rgba(168,85,247,.15);border-color:var(--purple);color:#c084fc;}
+  .filter-btn[data-type="SA"].active{background:rgba(34,197,94,.15);border-color:var(--green);color:#4ade80;}
+  .filter-btn[data-type="LA"].active{background:rgba(245,158,11,.15);border-color:var(--amber);color:#fbbf24;}
+  .score-bar-wrap{padding:0 1.2rem .5rem;max-width:640px;margin:0 auto;}
+  .score-row{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:.35rem;}
+  .score-bar-bg{background:rgba(255,255,255,.07);border-radius:99px;height:5px;}
+  .score-bar-fg{height:5px;border-radius:99px;background:linear-gradient(90deg,#14b8a6,#a855f7);width:0%;transition:.5s;}
+  .main{max-width:900px;margin:0 auto;padding:0 1.2rem 3rem;}
+  .section-head{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin:1.6rem 0 .7rem;display:flex;align-items:center;gap:.5rem;}
+  .q-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:1.1rem 1.3rem;margin:.7rem 0;transition:.2s;position:relative;}
+  .q-card.answered-correct{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.04);}
+  .q-card.answered-wrong{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04);}
+  .q-meta{display:flex;align-items:center;gap:.5rem;margin-bottom:.65rem;flex-wrap:wrap;}
+  .q-num{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);}
+  .badge{font-family:'DM Mono',monospace;font-size:.68rem;padding:.15rem .55rem;border-radius:99px;border:1px solid;}
+  .badge-mcq{background:rgba(59,130,246,.15);color:#60a5fa;border-color:rgba(59,130,246,.3);}
+  .badge-ar {background:rgba(168,85,247,.15);color:#c084fc;border-color:rgba(168,85,247,.3);}
+  .badge-sa {background:rgba(34,197,94,.15);color:#4ade80;border-color:rgba(34,197,94,.3);}
+  .badge-la {background:rgba(245,158,11,.15);color:#fbbf24;border-color:rgba(245,158,11,.3);}
+  .marks{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);border:1px solid var(--border);border-radius:99px;padding:.15rem .5rem;}
+  .q-text{font-size:.9rem;line-height:1.7;font-weight:600;}
+  .q-text em{font-style:italic;color:#a5f3fc;}
+  .options{margin-top:.75rem;display:grid;grid-template-columns:1fr 1fr;gap:.4rem;}
+  @media(max-width:520px){.options{grid-template-columns:1fr;}}
+  .opt{background:#060d1a;border:1.5px solid var(--border);border-radius:10px;padding:.45rem .8rem;font-size:.84rem;cursor:pointer;transition:.2s;text-align:left;color:var(--text);}
+  .opt:hover:not(:disabled){border-color:var(--teal);background:rgba(20,184,166,.06);}
+  .opt.selected-correct{border-color:var(--green);background:rgba(34,197,94,.12);color:#4ade80;}
+  .opt.selected-wrong{border-color:var(--red);background:rgba(239,68,68,.12);color:#f87171;}
+  .opt.reveal-correct{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.07);}
+  .opt:disabled{cursor:default;}
+  .explanation{margin-top:.7rem;background:#060d1a;border:1px solid var(--border);border-radius:10px;padding:.65rem .9rem;font-size:.82rem;line-height:1.65;display:none;}
+  .explanation.show{display:block;}
+  .explanation strong{color:#fcd34d;}
+  .explanation em{color:#93c5fd;font-style:normal;}
+  .ar-box{margin-top:.65rem;display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+  @media(max-width:520px){.ar-box{grid-template-columns:1fr;}}
+  .ar-cell{background:#060d1a;border:1.5px solid var(--border);border-radius:10px;padding:.7rem .9rem;}
+  .ar-label{font-family:'DM Mono',monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:.3rem;}
+  .ar-text{font-size:.84rem;line-height:1.6;}
+  .ar-options{margin-top:.7rem;display:flex;flex-direction:column;gap:.35rem;}
+  .sa-reveal-btn{margin-top:.7rem;background:transparent;border:1.5px solid var(--border);border-radius:10px;padding:.4rem .9rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);cursor:pointer;transition:.2s;}
+  .sa-reveal-btn:hover{border-color:var(--teal);color:var(--teal);}
+  .sa-answer{margin-top:.7rem;background:#060d1a;border:1px solid var(--border);border-radius:10px;padding:.65rem .9rem;font-size:.82rem;line-height:1.7;display:none;}
+  .sa-answer.show{display:block;}
+  .sa-answer strong{color:#fcd34d;}
+  .sa-answer ol,.sa-answer ul{padding-left:1.4rem;margin:.3rem 0;}
+  .sa-answer li{margin:.2rem 0;}
+  .diagram-hint{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-family:'DM Mono',monospace;color:#fbbf24;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:99px;padding:.15rem .6rem;margin-left:.5rem;}
+  .hide{display:none !important;}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<header>
+  <h1>Question Bank</h1>
+  <p>Control &amp; Coordination · Class X Science Ch.7 · 30 Questions</p>
+</header>
+<div class="score-bar-wrap">
+  <div class="score-row"><span id="score-label">Score: 0 / 0</span><span id="progress-label">0 attempted</span></div>
+  <div class="score-bar-bg"><div class="score-bar-fg" id="score-bar"></div></div>
+</div>
+<div class="toolbar">
+  <button class="filter-btn active" data-type="ALL">All (30)</button>
+  <button class="filter-btn" data-type="MCQ">MCQ (10)</button>
+  <button class="filter-btn" data-type="AR">Assertion-Reason (3)</button>
+  <button class="filter-btn" data-type="SA">Short Answer (12)</button>
+  <button class="filter-btn" data-type="LA">Long Answer (5)</button>
+</div>
+
+<div class="main">
+
+<!-- =========== MCQ =========== -->
+<div class="section-head" data-section="MCQ"><span style="color:#60a5fa">○</span> Multiple Choice Questions <span style="font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace">(1 mark each)</span></div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q1</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">Which part of the brain is responsible for maintaining balance and posture?</div>
+  <div class="options">
+    <button class="opt" data-correct="false">Cerebrum</button>
+    <button class="opt" data-correct="true">Cerebellum</button>
+    <button class="opt" data-correct="false">Medulla Oblongata</button>
+    <button class="opt" data-correct="false">Hypothalamus</button>
+  </div>
+  <div class="explanation"><strong>✓ Cerebellum</strong> is the hindbrain region responsible for coordinating voluntary movements, balance, and posture. The cerebrum handles conscious thought; medulla controls involuntary vital functions; hypothalamus handles temperature regulation.</div>
+</div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q2</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">The gap between two successive neurons is called:</div>
+  <div class="options">
+    <button class="opt" data-correct="false">Node of Ranvier</button>
+    <button class="opt" data-correct="false">Neuromuscular junction</button>
+    <button class="opt" data-correct="true">Synapse</button>
+    <button class="opt" data-correct="false">Axon terminal</button>
+  </div>
+  <div class="explanation"><strong>✓ Synapse</strong> is the ~20 nm gap between the axon terminal of one neuron and the dendrite of the next. Signals cross via <em>neurotransmitters</em>. Node of Ranvier is an unmyelinated gap on the axon itself.</div>
+</div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q3</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">Which hormone is released during an emergency (fight-or-flight response)?</div>
+  <div class="options">
+    <button class="opt" data-correct="false">Thyroxine</button>
+    <button class="opt" data-correct="false">Insulin</button>
+    <button class="opt" data-correct="true">Adrenaline</button>
+    <button class="opt" data-correct="false">Oxytocin</button>
+  </div>
+  <div class="explanation"><strong>✓ Adrenaline</strong> (Epinephrine), secreted by adrenal glands above the kidneys, prepares the body for fight-or-flight: ↑ heart rate, ↑ breathing, dilates pupils, diverts blood to muscles.</div>
+</div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q4</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">In a reflex arc, the signal is processed at the:</div>
+  <div class="options">
+    <button class="opt" data-correct="false">Cerebrum</button>
+    <button class="opt" data-correct="false">Cerebellum</button>
+    <button class="opt" data-correct="true">Spinal cord</button>
+    <button class="opt" data-correct="false">Hypothalamus</button>
+  </div>
+  <div class="explanation"><strong>✓ Spinal cord</strong> processes reflex actions — this is what makes reflexes so fast. The brain is informed <em>after</em> the response via separate pathways, which is why you feel pain slightly after withdrawing your hand.</div>
+</div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q5</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">Deficiency of iodine leads to which disease?</div>
+  <div class="options">
+    <button class="opt" data-correct="false">Diabetes mellitus</button>
+    <button class="opt" data-correct="true">Goitre</button>
+    <button class="opt" data-correct="false">Dwarfism</button>
+    <button class="opt" data-correct="false">Cretinism (only)</button>
+  </div>
+  <div class="explanation"><strong>✓ Goitre</strong> — Iodine is required for synthesis of <em>thyroxine</em> by the thyroid gland. Deficiency → thyroid enlarges compensating → visible swelling (goitre). In children it also causes cretinism (stunted growth + mental retardation).</div>
+</div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q6</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">Which plant hormone is responsible for phototropism in shoots?</div>
+  <div class="options">
+    <button class="opt" data-correct="false">Gibberellin</button>
+    <button class="opt" data-correct="false">Cytokinin</button>
+    <button class="opt" data-correct="true">Auxin (IAA)</button>
+    <button class="opt" data-correct="false">Abscisic acid</button>
+  </div>
+  <div class="explanation"><strong>✓ Auxin (IAA)</strong> — synthesised at shoot tip, migrates to shaded side causing unequal growth → shoot bends toward light. First studied by Darwin (1880), isolated and named by Fritz Went (1926).</div>
+</div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q7</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">The pituitary gland is called the "master gland" because:</div>
+  <div class="options">
+    <button class="opt" data-correct="false">It is the largest endocrine gland</button>
+    <button class="opt" data-correct="true">It controls the secretion of other endocrine glands</button>
+    <button class="opt" data-correct="false">It secretes the most number of hormones</button>
+    <button class="opt" data-correct="false">It is located in the brain</button>
+  </div>
+  <div class="explanation"><strong>✓ Controls other glands</strong> — Pituitary secretes TSH (thyroid), ACTH (adrenal cortex), LH/FSH (gonads), GH, ADH, Oxytocin etc. Its tropic hormones regulate all other glands, hence "master".</div>
+</div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q8</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">Which part of a neuron receives impulses and carries them TOWARD the cell body?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Dendrites</button>
+    <button class="opt" data-correct="false">Axon</button>
+    <button class="opt" data-correct="false">Myelin sheath</button>
+    <button class="opt" data-correct="false">Axon terminal</button>
+  </div>
+  <div class="explanation"><strong>✓ Dendrites</strong> — finger-like projections that pick up signals from other neurons (or sense organs) and carry them <em>toward</em> the cell body. Axon carries impulses <em>away</em> from the cell body to the next neuron.</div>
+</div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q9</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">Abscisic acid (ABA) in plants is known as the:</div>
+  <div class="options">
+    <button class="opt" data-correct="false">Growth hormone</button>
+    <button class="opt" data-correct="false">Fruit ripening hormone</button>
+    <button class="opt" data-correct="true">Stress hormone / inhibitor</button>
+    <button class="opt" data-correct="false">Cell division hormone</button>
+  </div>
+  <div class="explanation"><strong>✓ Stress hormone / inhibitor</strong> — ABA is the only inhibitory plant hormone. It causes stomatal closure during water stress, promotes seed dormancy, and causes leaf senescence. Counteracts growth hormones.</div>
+</div>
+
+<div class="q-card" data-type="MCQ">
+  <div class="q-meta"><span class="q-num">Q10</span><span class="badge badge-mcq">MCQ</span><span class="marks">1 mark</span></div>
+  <div class="q-text">Insulin is produced by which cells of the pancreas?</div>
+  <div class="options">
+    <button class="opt" data-correct="false">Alpha (α) cells</button>
+    <button class="opt" data-correct="true">Beta (β) cells</button>
+    <button class="opt" data-correct="false">Delta (δ) cells</button>
+    <button class="opt" data-correct="false">Acinar cells</button>
+  </div>
+  <div class="explanation"><strong>✓ Beta (β) cells</strong> of the Islets of Langerhans in the pancreas secrete insulin. Alpha cells secrete glucagon (raises blood sugar). Insulin lowers blood glucose by promoting glucose uptake and glycogen synthesis.</div>
+</div>
+
+<!-- =========== ASSERTION-REASON =========== -->
+<div class="section-head" data-section="AR"><span style="color:#c084fc">△</span> Assertion-Reason Questions <span style="font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace">(1 mark each)</span></div>
+
+<div class="q-card" data-type="AR">
+  <div class="q-meta"><span class="q-num">Q11</span><span class="badge badge-ar">A-R</span><span class="marks">1 mark</span></div>
+  <div class="q-text">
+    <div class="ar-box">
+      <div class="ar-cell"><div class="ar-label">Assertion (A)</div><div class="ar-text">Reflex actions are faster than voluntary actions.</div></div>
+      <div class="ar-cell"><div class="ar-label">Reason (R)</div><div class="ar-text">In reflex actions, the signal is processed in the spinal cord, not the brain.</div></div>
+    </div>
+    <div class="ar-options">
+      <button class="opt" data-correct="true">(a) Both A and R are true, and R is the correct explanation of A</button>
+      <button class="opt" data-correct="false">(b) Both A and R are true, but R is NOT the correct explanation of A</button>
+      <button class="opt" data-correct="false">(c) A is true but R is false</button>
+      <button class="opt" data-correct="false">(d) A is false but R is true</button>
+    </div>
+  </div>
+  <div class="explanation"><strong>✓ (a)</strong> — Both statements are correct and R correctly explains A. The spinal cord provides a shortcut pathway, avoiding the longer route to the brain and back, which is exactly why reflex actions are faster.</div>
+</div>
+
+<div class="q-card" data-type="AR">
+  <div class="q-meta"><span class="q-num">Q12</span><span class="badge badge-ar">A-R</span><span class="marks">1 mark</span></div>
+  <div class="q-text">
+    <div class="ar-box">
+      <div class="ar-cell"><div class="ar-label">Assertion (A)</div><div class="ar-text">Plants bend toward light (phototropism).</div></div>
+      <div class="ar-cell"><div class="ar-label">Reason (R)</div><div class="ar-text">Gibberellin accumulates on the shaded side of the shoot.</div></div>
+    </div>
+    <div class="ar-options">
+      <button class="opt" data-correct="false">(a) Both A and R are true, and R is the correct explanation of A</button>
+      <button class="opt" data-correct="false">(b) Both A and R are true, but R is NOT the correct explanation of A</button>
+      <button class="opt" data-correct="true">(c) A is true but R is false</button>
+      <button class="opt" data-correct="false">(d) A is false but R is true</button>
+    </div>
+  </div>
+  <div class="explanation"><strong>✓ (c)</strong> — A is correct (plants do show phototropism), but R is false. It is <em>Auxin (IAA)</em>, not Gibberellin, that accumulates on the shaded side causing elongation and bending toward light.</div>
+</div>
+
+<div class="q-card" data-type="AR">
+  <div class="q-meta"><span class="q-num">Q13</span><span class="badge badge-ar">A-R</span><span class="marks">1 mark</span></div>
+  <div class="q-text">
+    <div class="ar-box">
+      <div class="ar-cell"><div class="ar-label">Assertion (A)</div><div class="ar-text">The cerebellum is the largest part of the human brain.</div></div>
+      <div class="ar-cell"><div class="ar-label">Reason (R)</div><div class="ar-text">The cerebellum controls conscious thought, memory, and voluntary actions.</div></div>
+    </div>
+    <div class="ar-options">
+      <button class="opt" data-correct="false">(a) Both A and R are true, and R is the correct explanation of A</button>
+      <button class="opt" data-correct="false">(b) Both A and R are true, but R is NOT the correct explanation of A</button>
+      <button class="opt" data-correct="false">(c) A is true but R is false</button>
+      <button class="opt" data-correct="true">(d) A is false but R is true — WAIT. Both are false here</button>
+    </div>
+  </div>
+  <div class="explanation"><strong>✓ Both A and R are false.</strong> The <em>Cerebrum</em> (not cerebellum) is the largest part (~85% of brain). The Cerebellum controls balance and coordination. Cerebrum controls thought/memory/voluntary actions.</div>
+</div>
+
+<!-- =========== SHORT ANSWER =========== -->
+<div class="section-head" data-section="SA"><span style="color:#4ade80">◈</span> Short Answer Questions <span style="font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace">(2–3 marks each)</span></div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q14</span><span class="badge badge-sa">SA</span><span class="marks">2 marks</span></div>
+  <div class="q-text">What is a reflex action? Write the components of a reflex arc in sequence.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Reflex Action:</strong> A rapid, automatic, involuntary response to a stimulus that does not require the brain's decision-making.<br><br>
+    <strong>Components of Reflex Arc (in order):</strong>
+    <ol>
+      <li><strong>Receptor</strong> — detects stimulus (e.g., skin pain receptor)</li>
+      <li><strong>Sensory (Afferent) Neuron</strong> — carries impulse to spinal cord</li>
+      <li><strong>Relay Neuron</strong> — processes signal in spinal cord (CNS)</li>
+      <li><strong>Motor (Efferent) Neuron</strong> — carries response signal to effector</li>
+      <li><strong>Effector</strong> — muscle or gland produces response</li>
+    </ol>
+    Example: Touching a hot plate → hand withdraws instantly.
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q15</span><span class="badge badge-sa">SA</span><span class="marks">3 marks</span></div>
+  <div class="q-text">Draw a labelled diagram of a neuron and describe the function of each part. <span class="diagram-hint">📐 Diagram</span></div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Parts and Functions:</strong>
+    <ul>
+      <li><strong>Dendrites</strong> — receive electrical impulses from other neurons; carry them <em>toward</em> the cell body</li>
+      <li><strong>Cell Body (Cyton)</strong> — contains nucleus and organelles; metabolic and integration centre</li>
+      <li><strong>Axon</strong> — carries impulses <em>away</em> from cell body to next neuron or effector</li>
+      <li><strong>Myelin Sheath</strong> — fatty insulation by Schwann cells; speeds up conduction (saltatory)</li>
+      <li><strong>Nodes of Ranvier</strong> — unmyelinated gaps; allow rapid saltatory (jumping) conduction</li>
+      <li><strong>Axon Terminals (Synaptic Knobs)</strong> — release neurotransmitters across synapse</li>
+    </ul>
+    <em>Draw: elongated cell body → branching dendrites (left) → long axon with myelin → nodes → bulb-like terminals (right).</em>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q16</span><span class="badge badge-sa">SA</span><span class="marks">2 marks</span></div>
+  <div class="q-text">How is the brain protected from mechanical shocks?</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    The brain is protected by a three-tier system:
+    <ol>
+      <li><strong>Cranium (skull)</strong> — hard bony case that encloses the brain</li>
+      <li><strong>Meninges</strong> — three layers of membranes (Dura mater, Arachnoid mater, Pia mater) lining the skull</li>
+      <li><strong>Cerebrospinal Fluid (CSF)</strong> — cushioning fluid between meninges that acts as a shock absorber</li>
+    </ol>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q17</span><span class="badge badge-sa">SA</span><span class="marks">2 marks</span></div>
+  <div class="q-text">Why is the pituitary gland called the "master gland"? Name any two hormones it secretes.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Master Gland:</strong> The pituitary gland secretes <em>tropic hormones</em> that regulate the secretion of all other endocrine glands (thyroid, adrenal, gonads). This control over all other glands earns it the name "master gland." It is itself controlled by the hypothalamus.
+    <br><br>
+    <strong>Two hormones:</strong>
+    <ul>
+      <li><strong>Growth Hormone (GH)</strong> — regulates overall body growth and cell reproduction</li>
+      <li><strong>TSH (Thyroid Stimulating Hormone)</strong> — stimulates thyroid gland to produce thyroxine</li>
+    </ul>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q18</span><span class="badge badge-sa">SA</span><span class="marks">3 marks</span></div>
+  <div class="q-text">What is phototropism? Explain the mechanism using auxin distribution.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Phototropism:</strong> The directional growth movement of a plant part in response to light. Shoots show <em>positive phototropism</em> (grow toward light); roots show <em>negative phototropism</em> (grow away).
+    <br><br>
+    <strong>Mechanism:</strong>
+    <ol>
+      <li>Auxin (IAA) is synthesised at the shoot tip.</li>
+      <li>When light falls from one side, auxin migrates laterally to the <em>shaded side</em>.</li>
+      <li>Higher auxin concentration → greater cell elongation on shaded side.</li>
+      <li>More elongation on one side → shoot curves/bends <em>toward the light source</em>.</li>
+    </ol>
+    <em>First demonstrated by Charles Darwin (1880). Auxin named by Fritz Went (1926).</em>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q19</span><span class="badge badge-sa">SA</span><span class="marks">2 marks</span></div>
+  <div class="q-text">Differentiate between endocrine glands and exocrine glands.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <table style="width:100%;font-size:.81rem;border-collapse:collapse;">
+      <tr><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05);text-align:left">Feature</th><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Endocrine</th><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Exocrine</th></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Duct</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Ductless (hormones into blood)</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Has ducts (secretion to surface)</td></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Secretion</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Hormones</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Enzymes, sweat, saliva etc.</td></tr>
+      <tr><td style="padding:.3rem .5rem">Examples</td><td style="padding:.3rem .5rem">Thyroid, Adrenal, Pituitary</td><td style="padding:.3rem .5rem">Salivary, Sweat, Liver (bile)</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q20</span><span class="badge badge-sa">SA</span><span class="marks">2 marks</span></div>
+  <div class="q-text">What is negative feedback mechanism? Give one example from the endocrine system.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Negative Feedback:</strong> A self-regulating mechanism where the product of a process inhibits further production, maintaining homeostasis.<br><br>
+    <strong>Example — Blood Glucose Regulation:</strong>
+    <ol>
+      <li>Blood glucose ↑ (after meal)</li>
+      <li>Pancreas β cells detect rise → secrete insulin</li>
+      <li>Insulin promotes glucose uptake by cells and glycogen storage → blood glucose ↓</li>
+      <li>Low blood glucose → insulin secretion stops</li>
+      <li>If glucose falls too low → glucagon released → glycogen broken down → glucose ↑</li>
+    </ol>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q21</span><span class="badge badge-sa">SA</span><span class="marks">2 marks</span></div>
+  <div class="q-text">Name the four types of tropisms in plants and the stimulus for each.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <table style="width:100%;font-size:.81rem;border-collapse:collapse;">
+      <tr><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Tropism</th><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Stimulus</th><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Example</th></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Phototropism</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Light</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Shoot bends toward light</td></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Geotropism</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Gravity</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Roots grow downward</td></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Hydrotropism</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Water</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Roots grow toward moisture</td></tr>
+      <tr><td style="padding:.3rem .5rem">Thigmotropism</td><td style="padding:.3rem .5rem">Touch/contact</td><td style="padding:.3rem .5rem">Tendrils coil around support</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q22</span><span class="badge badge-sa">SA</span><span class="marks">3 marks</span></div>
+  <div class="q-text">Compare the nervous system and endocrine system of coordination on three parameters.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <table style="width:100%;font-size:.81rem;border-collapse:collapse;">
+      <tr><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Parameter</th><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Nervous System</th><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Endocrine System</th></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Mode of signal</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Electrical impulse via neurons</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Chemical hormones via blood</td></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Speed</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Very fast (milliseconds)</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Slow (seconds to hours)</td></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Duration of effect</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Short-lived</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Long-lasting / sustained</td></tr>
+      <tr><td style="padding:.3rem .5rem">Scope</td><td style="padding:.3rem .5rem">Specific (targeted organ)</td><td style="padding:.3rem .5rem">Widespread (via bloodstream)</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q23</span><span class="badge badge-sa">SA</span><span class="marks">2 marks</span></div>
+  <div class="q-text">What are the functions of the hypothalamus?</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    The hypothalamus is a forebrain structure with multiple critical functions:
+    <ul>
+      <li><strong>Thermoregulation</strong> — maintains body temperature (37°C)</li>
+      <li><strong>Osmoregulation</strong> — controls water balance via ADH secretion</li>
+      <li><strong>Hunger and thirst</strong> — appetite regulation centres</li>
+      <li><strong>Pituitary control</strong> — secretes releasing/inhibiting hormones that regulate pituitary → links nervous and endocrine systems</li>
+      <li><strong>Sleep-wake cycle</strong> — circadian rhythm regulation</li>
+      <li><strong>Emotional responses</strong> — fear, aggression, pleasure</li>
+    </ul>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q24</span><span class="badge badge-sa">SA</span><span class="marks">2 marks</span></div>
+  <div class="q-text">Name any two plant hormones that promote growth and two that inhibit growth.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Growth Promoters:</strong>
+    <ul>
+      <li><strong>Auxin (IAA)</strong> — promotes cell elongation; responsible for phototropism, apical dominance</li>
+      <li><strong>Gibberellin</strong> — promotes stem elongation, seed germination, fruit development</li>
+      <li><em>(Cytokinin also promotes cell division — acceptable as third)</em></li>
+    </ul>
+    <strong>Growth Inhibitor:</strong>
+    <ul>
+      <li><strong>Abscisic Acid (ABA)</strong> — the only plant growth inhibitor; causes stomatal closure, dormancy, leaf fall</li>
+    </ul>
+    <em>Note: Only ABA is a true inhibitor among the four main phytohormones.</em>
+  </div>
+</div>
+
+<div class="q-card" data-type="SA">
+  <div class="q-meta"><span class="q-num">Q25</span><span class="badge badge-sa">SA</span><span class="marks">3 marks</span></div>
+  <div class="q-text">What are the three divisions of the hindbrain? State the function of each.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <table style="width:100%;font-size:.81rem;border-collapse:collapse;">
+      <tr><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Division</th><th style="padding:.3rem .5rem;background:rgba(255,255,255,.05)">Functions</th></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40"><strong>Cerebellum</strong></td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Coordinates voluntary movements, maintains balance and posture, fine-tunes motor activity</td></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40"><strong>Medulla Oblongata</strong></td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Controls ALL involuntary vital functions: heartbeat, breathing, blood pressure, swallowing, sneezing</td></tr>
+      <tr><td style="padding:.3rem .5rem"><strong>Pons</strong></td><td style="padding:.3rem .5rem">Acts as bridge between cerebrum and cerebellum; role in sleep, respiration, bladder control</td></tr>
+    </table>
+    <em>Important: Medulla damage → death (controls vital functions). Cerebellum damage → loss of balance, no death.</em>
+  </div>
+</div>
+
+<!-- =========== LONG ANSWER =========== -->
+<div class="section-head" data-section="LA"><span style="color:#fbbf24">◆</span> Long Answer Questions <span style="font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace">(5 marks each)</span></div>
+
+<div class="q-card" data-type="LA">
+  <div class="q-meta"><span class="q-num">Q26</span><span class="badge badge-la">LA</span><span class="marks">5 marks</span></div>
+  <div class="q-text">Draw a neat labelled diagram of the human brain and describe the functions of its major parts. <span class="diagram-hint">📐 Diagram</span></div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Diagram:</strong> Draw a lateral view showing: Cerebrum (largest, convoluted), Cerebellum (at back, folded), Brainstem (Pons + Medulla at bottom), Thalamus and Hypothalamus (inner, below cerebrum).
+    <br><br>
+    <strong>Functions:</strong>
+    <ul>
+      <li><strong>Cerebrum (Forebrain)</strong> — voluntary actions, conscious thought, memory, reasoning, speech, personality, sensory perception. Two hemispheres joined by corpus callosum. Contains sensory and motor cortex areas.</li>
+      <li><strong>Thalamus (Forebrain)</strong> — relay station: routes all incoming sensory information to appropriate cerebral areas. Acts as gatekeeper.</li>
+      <li><strong>Hypothalamus (Forebrain)</strong> — thermoregulation, hunger, thirst, emotion, sleep. Controls pituitary → links nervous+endocrine.</li>
+      <li><strong>Cerebellum (Hindbrain)</strong> — balance, posture, coordination. Receives input from muscles and cerebrum. Damage → ataxia (uncoordinated movement).</li>
+      <li><strong>Pons (Hindbrain)</strong> — bridge connecting cerebellum to cerebrum; roles in sleep, respiration.</li>
+      <li><strong>Medulla Oblongata (Hindbrain)</strong> — controls involuntary vital functions (heartbeat, BP, breathing, swallowing). Damage = fatal.</li>
+    </ul>
+    <em>Protection: Cranium → Meninges (3 layers) → CSF cushion.</em>
+  </div>
+</div>
+
+<div class="q-card" data-type="LA">
+  <div class="q-meta"><span class="q-num">Q27</span><span class="badge badge-la">LA</span><span class="marks">5 marks</span></div>
+  <div class="q-text">What are endocrine glands? Make a table listing five important endocrine glands, their hormones, functions, and one associated disorder.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Endocrine Glands:</strong> Ductless glands that secrete hormones directly into the bloodstream, which then act on distant target organs. Form the endocrine system.
+    <br><br>
+    <table style="width:100%;font-size:.78rem;border-collapse:collapse;">
+      <tr style="background:rgba(255,255,255,.07)"><th style="padding:.3rem .4rem">Gland</th><th style="padding:.3rem .4rem">Hormone</th><th style="padding:.3rem .4rem">Function</th><th style="padding:.3rem .4rem">Disorder</th></tr>
+      <tr><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Pituitary</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">GH, TSH, ADH…</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Growth, controls other glands</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Gigantism / Dwarfism</td></tr>
+      <tr><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Thyroid</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Thyroxine</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Metabolism, growth</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Goitre (iodine deficiency)</td></tr>
+      <tr><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Adrenal</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Adrenaline</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Emergency fight-or-flight</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Addison's disease</td></tr>
+      <tr><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Pancreas</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Insulin, Glucagon</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Blood glucose regulation</td><td style="padding:.3rem .4rem;border-bottom:1px solid #1e2d40">Diabetes mellitus</td></tr>
+      <tr><td style="padding:.3rem .4rem">Testes/Ovaries</td><td style="padding:.3rem .4rem">Testosterone/Oestrogen</td><td style="padding:.3rem .4rem">Secondary sex characters</td><td style="padding:.3rem .4rem">Infertility, menstrual disorders</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="q-card" data-type="LA">
+  <div class="q-meta"><span class="q-num">Q28</span><span class="badge badge-la">LA</span><span class="marks">5 marks</span></div>
+  <div class="q-text">Explain in detail how auxin controls phototropism. How do auxin concentrations differ between shoot and root in response to the same stimulus? <span class="diagram-hint">📐 Diagram</span></div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Auxin and Phototropism:</strong>
+    <ol>
+      <li>Auxin (Indole Acetic Acid, IAA) is produced at the shoot apex (tip).</li>
+      <li>When light falls from one side, photoreceptors at the tip detect directionality.</li>
+      <li>Auxin is transported laterally — it moves to the <em>shaded (darker) side</em> of the shoot.</li>
+      <li>On the shaded side: higher auxin → greater cell elongation.</li>
+      <li>On the lit side: lower auxin → less elongation.</li>
+      <li>Differential growth → shoot curves/bends <strong>toward the light</strong> (positive phototropism).</li>
+    </ol>
+    <strong>Shoot vs Root response to same auxin concentration:</strong>
+    <ul>
+      <li><strong>Shoots</strong> — promote growth at moderate-high auxin concentration; shoot is positively phototropic.</li>
+      <li><strong>Roots</strong> — inhibited by the same higher concentration; roots are negatively phototropic. (Roots are much more sensitive to auxin — even small amounts inhibit elongation.)</li>
+    </ul>
+    <strong>Geotropism comparison:</strong> In response to gravity, auxin accumulates on the lower side → root (sensitive) shows inhibition → bends down (+ve geotropism); shoot (insensitive) shows promotion → bends up (−ve geotropism).
+    <br><br>
+    <em>Historical note: Darwin (1880) showed coleoptile tip required for phototropic response. Went (1926) isolated auxin from oat coleoptile tip.</em>
+  </div>
+</div>
+
+<div class="q-card" data-type="LA">
+  <div class="q-meta"><span class="q-num">Q29</span><span class="badge badge-la">LA</span><span class="marks">5 marks</span></div>
+  <div class="q-text">Draw a labelled diagram of a reflex arc. Distinguish between spinal reflex and cranial reflex with examples. Why are reflexes important? <span class="diagram-hint">📐 Diagram</span></div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Diagram:</strong> Draw: Receptor (skin) → Sensory neuron → Spinal cord (relay neuron in grey matter) → Motor neuron → Effector (muscle). Show brain connected by a separate pathway (awareness signal).
+    <br><br>
+    <strong>Spinal vs Cranial Reflex:</strong>
+    <table style="width:100%;font-size:.8rem;border-collapse:collapse;margin-top:.4rem">
+      <tr style="background:rgba(255,255,255,.07)"><th style="padding:.3rem .5rem">Feature</th><th style="padding:.3rem .5rem">Spinal Reflex</th><th style="padding:.3rem .5rem">Cranial Reflex</th></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Processing centre</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Spinal cord</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Brain (brainstem)</td></tr>
+      <tr><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Example</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Knee-jerk, hot object withdrawal</td><td style="padding:.3rem .5rem;border-bottom:1px solid #1e2d40">Pupil dilation in bright light, blinking</td></tr>
+      <tr><td style="padding:.3rem .5rem">Nerves involved</td><td style="padding:.3rem .5rem">Spinal nerves</td><td style="padding:.3rem .5rem">Cranial nerves</td></tr>
+    </table>
+    <br>
+    <strong>Importance of Reflexes:</strong>
+    <ul>
+      <li><strong>Survival</strong> — protects body from harm before brain can react</li>
+      <li><strong>Speed</strong> — short reflex arc avoids time delay of brain processing</li>
+      <li><strong>Frees the brain</strong> — routine protective actions handled automatically; brain can focus on complex tasks</li>
+      <li><strong>Maintains homeostasis</strong> — cranial reflexes regulate pupil size, swallowing, blood pressure</li>
+    </ul>
+    <em>Conditioned reflex (Pavlov): Learned reflex — association of neutral stimulus with response through repeated pairing.</em>
+  </div>
+</div>
+
+<div class="q-card" data-type="LA">
+  <div class="q-meta"><span class="q-num">Q30</span><span class="badge badge-la">LA</span><span class="marks">5 marks</span></div>
+  <div class="q-text">How do plants coordinate without a nervous system? Explain the roles of all four phytohormones with examples.</div>
+  <button class="sa-reveal-btn">Show Answer ▾</button>
+  <div class="sa-answer">
+    <strong>Plant Coordination:</strong> Plants lack a nervous system but coordinate through <em>chemical messengers (phytohormones)</em> that are synthesised in one part and transported to another to cause a response. They also respond via electrical signals (turgor changes) for rapid movements like in Mimosa.
+    <br><br>
+    <strong>Four Phytohormones:</strong>
+    <ol>
+      <li>
+        <strong>Auxin (IAA)</strong> — Growth promoter. Synthesised at shoot tip.
+        <ul>
+          <li>Causes cell elongation → phototropism, geotropism</li>
+          <li>Causes apical dominance (suppresses lateral bud growth)</li>
+          <li>Used commercially as rooting powder for cuttings</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Gibberellin</strong> — Growth promoter. Produced in roots and young leaves.
+        <ul>
+          <li>Promotes stem elongation, breaking seed dormancy, fruit growth without fertilisation (parthenocarpy)</li>
+          <li>Used in brewing industry (malting), seedless grapes</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Cytokinin</strong> — Growth promoter. Produced in actively dividing cells.
+        <ul>
+          <li>Promotes cell division (cytokinesis), delays leaf senescence (aging)</li>
+          <li>Keeps cut flowers fresh; used in tissue culture</li>
+          <li>Works synergistically with auxin: high auxin/cytokinin ratio → roots; low ratio → shoots</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Abscisic Acid (ABA)</strong> — Only growth INHIBITOR.
+        <ul>
+          <li>Causes stomatal closure during drought (water stress response)</li>
+          <li>Promotes seed/bud dormancy during winter</li>
+          <li>Causes leaf, flower, fruit abscission (fall)</li>
+          <li>Antagonises gibberellin during germination</li>
+        </ul>
+      </li>
+    </ol>
+    <em>Key distinction: Tropic movements = growth-based, directional, permanent. Nastic movements (Mimosa, Venus flytrap) = turgor-based, non-directional, reversible.</em>
+  </div>
+</div>
+
+</div>
+
+<script>
+// Score tracking
+let correct=0,wrong=0,total=0;
+function updateScore(){
+  const el=document.getElementById('score-label');
+  const pl=document.getElementById('progress-label');
+  const bar=document.getElementById('score-bar');
+  el.textContent=`Score: ${correct} / ${total}`;
+  pl.textContent=`${total} attempted`;
+  bar.style.width=(total>0?Math.round(correct/total*100):0)+'%';
+}
+
+// MCQ / AR
+document.querySelectorAll('.q-card[data-type="MCQ"] .opt, .q-card[data-type="AR"] .opt').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const card=this.closest('.q-card');
+    if(card.dataset.done)return;
+    card.dataset.done='1';
+    const isCorrect=this.dataset.correct==='true';
+    total++;
+    if(isCorrect){correct++;card.classList.add('answered-correct');}
+    else{wrong++;card.classList.add('answered-wrong');}
+    // style buttons
+    card.querySelectorAll('.opt').forEach(o=>{
+      o.disabled=true;
+      if(o.dataset.correct==='true')o.classList.add(isCorrect&&o===this?'selected-correct':'reveal-correct');
+    });
+    if(!isCorrect)this.classList.add('selected-wrong');
+    const exp=card.querySelector('.explanation');
+    if(exp)exp.classList.add('show');
+    updateScore();
+  });
+});
+
+// SA / LA reveal
+document.querySelectorAll('.sa-reveal-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const ans=this.nextElementSibling;
+    if(ans.classList.contains('show')){ans.classList.remove('show');this.textContent='Show Answer ▾';}
+    else{ans.classList.add('show');this.textContent='Hide Answer ▴';}
+  });
+});
+
+// Filter
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    const type=this.dataset.type;
+    document.querySelectorAll('.q-card').forEach(card=>{
+      card.classList.toggle('hide',type!=='ALL'&&card.dataset.type!==type);
+    });
+    document.querySelectorAll('.section-head').forEach(h=>{
+      const sec=h.dataset.section;
+      h.classList.toggle('hide',type!=='ALL'&&sec&&sec!==type);
+    });
+  });
+});
+</script>
+</body>
+</html>

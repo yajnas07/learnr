@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheatsheet — Control and Coordination</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0f1e;--card:#111827;--border:#1e2d40;--text:#e2e8f0;--muted:#94a3b8;
+    --teal:#14b8a6;--purple:#a855f7;--pink:#ec4899;--blue:#3b82f6;
+    --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#22d3ee;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(168,85,247,.07) 0%,transparent 60%);}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;background:rgba(6,10,26,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(20,184,166,.18);position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+  header{text-align:center;padding:2.2rem 1rem 1.5rem;}
+  header h1{font-family:'Syne',sans-serif;font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,#14b8a6,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.78rem;margin-top:.4rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:1.2rem;padding:0 1.2rem 3rem;max-width:1300px;margin:0 auto;}
+  .panel{background:var(--card);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;}
+  .panel.span2{grid-column:span 2;}
+  @media(max-width:720px){.panel.span2{grid-column:span 1;}}
+  .panel-head{padding:.65rem 1.2rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.03em;display:flex;align-items:center;gap:.5rem;}
+  .panel-body{padding:1rem 1.2rem 1.2rem;}
+  .ph-teal   .panel-head{background:rgba(20,184,166,.12);color:#2dd4bf;border-bottom:1px solid rgba(20,184,166,.2);}
+  .ph-blue   .panel-head{background:rgba(59,130,246,.12);color:#60a5fa;border-bottom:1px solid rgba(59,130,246,.2);}
+  .ph-purple .panel-head{background:rgba(168,85,247,.12);color:#c084fc;border-bottom:1px solid rgba(168,85,247,.2);}
+  .ph-pink   .panel-head{background:rgba(236,72,153,.12);color:#f472b6;border-bottom:1px solid rgba(236,72,153,.2);}
+  .ph-amber  .panel-head{background:rgba(245,158,11,.12);color:#fbbf24;border-bottom:1px solid rgba(245,158,11,.2);}
+  .ph-green  .panel-head{background:rgba(34,197,94,.12); color:#4ade80;border-bottom:1px solid rgba(34,197,94,.2);}
+  .ph-cyan   .panel-head{background:rgba(34,211,238,.12);color:#22d3ee;border-bottom:1px solid rgba(34,211,238,.2);}
+  .ph-red    .panel-head{background:rgba(239,68,68,.12); color:#f87171;border-bottom:1px solid rgba(239,68,68,.2);}
+  table{width:100%;border-collapse:collapse;font-size:.82rem;}
+  th{background:rgba(255,255,255,.04);color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;padding:.4rem .7rem;text-align:left;}
+  td{padding:.45rem .7rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;line-height:1.55;}
+  tr:last-child td{border-bottom:none;}
+  .fact{background:#060d1a;border-radius:10px;padding:.55rem .9rem;margin:.4rem 0;font-size:.83rem;border:1px solid var(--border);line-height:1.6;}
+  .fact strong{color:#fcd34d;}
+  .fact em{color:#93c5fd;font-style:normal;}
+  p.body{font-size:.85rem;line-height:1.65;margin:.35rem 0;}
+  h4{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;margin:.8rem 0 .25rem;color:var(--muted);}
+  .tag{font-family:'DM Mono',monospace;font-size:.7rem;padding:.15rem .55rem;border-radius:99px;border:1px solid var(--border);display:inline-block;margin:.2rem .1rem;}
+  .tag-teal  {background:rgba(20,184,166,.15);color:#2dd4bf;border-color:rgba(20,184,166,.25);}
+  .tag-blue  {background:rgba(59,130,246,.15);color:#60a5fa;border-color:rgba(59,130,246,.25);}
+  .tag-purple{background:rgba(168,85,247,.15);color:#c084fc;border-color:rgba(168,85,247,.25);}
+  .tag-pink  {background:rgba(236,72,153,.15);color:#f472b6;border-color:rgba(236,72,153,.25);}
+  .tag-amber {background:rgba(245,158,11,.15);color:#fbbf24;border-color:rgba(245,158,11,.25);}
+  .tag-green {background:rgba(34,197,94,.15); color:#4ade80;border-color:rgba(34,197,94,.25);}
+  .tag-red   {background:rgba(239,68,68,.15); color:#f87171;border-color:rgba(239,68,68,.25);}
+  .arc-row{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;margin:.6rem 0;}
+  .arc-box{background:#060d1a;border:1.5px solid var(--border);border-radius:10px;padding:.4rem .8rem;font-size:.8rem;font-weight:700;text-align:center;}
+  .arc-arrow{color:var(--muted);font-size:1rem;}
+  .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.6rem;}
+  @media(max-width:480px){.compare-grid{grid-template-columns:1fr;}}
+  .compare-col{background:#060d1a;border-radius:12px;padding:.8rem;border:1px solid var(--border);}
+  .compare-head{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;margin-bottom:.5rem;text-align:center;}
+  .compare-item{font-size:.78rem;color:var(--muted);line-height:1.6;padding:.15rem 0;}
+  .compare-item strong{color:var(--text);}
+  .hormone-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:.55rem;margin-top:.6rem;}
+  .hcard{background:#060d1a;border-radius:10px;padding:.65rem .8rem;border:1px solid var(--border);}
+  .hcard-name{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;margin-bottom:.3rem;}
+  .hcard-body{font-size:.73rem;color:var(--muted);line-height:1.55;}
+  .hcard-body strong{color:var(--text);}
+  .tropism-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.55rem;margin-top:.6rem;}
+  .tcard{background:#060d1a;border-radius:10px;padding:.65rem .8rem;border:1px solid var(--border);text-align:center;}
+  .tcard-icon{font-size:1.5rem;margin-bottom:.3rem;}
+  .tcard-name{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;margin-bottom:.2rem;}
+  .tcard-body{font-size:.72rem;color:var(--muted);line-height:1.5;}
+  .memory-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.6rem;margin-top:.6rem;}
+  .mcard{background:#060d1a;border-radius:10px;padding:.7rem;border:1px solid var(--border);}
+  .mcard-head{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;color:var(--amber);margin-bottom:.3rem;}
+  .mcard-body{font-size:.75rem;line-height:1.55;color:var(--muted);}
+  .flow-box{display:inline-block;background:#060d1a;border:1.5px solid;border-radius:8px;padding:.3rem .7rem;font-size:.78rem;font-weight:600;}
+  .bullet-list{list-style:none;padding:0;margin:.4rem 0;}
+  .bullet-list li{font-size:.83rem;line-height:1.65;padding:.12rem 0;padding-left:1.2rem;position:relative;color:var(--muted);}
+  .bullet-list li::before{content:'›';position:absolute;left:0;color:var(--teal);}
+  .bullet-list li strong{color:var(--text);}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<header>
+  <h1>Cheatsheet</h1>
+  <p>Control &amp; Coordination · Class X Science Ch.7 · Biology</p>
+</header>
+
+<div class="grid">
+
+  <!-- OVERVIEW -->
+  <div class="panel ph-teal span2">
+    <div class="panel-head">🧠 Overview — Control &amp; Coordination</div>
+    <div class="panel-body">
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-head" style="color:#2dd4bf">⚡ Nervous System</div>
+          <div class="compare-item"><strong>Medium:</strong> Electrical impulse via neurons</div>
+          <div class="compare-item"><strong>Speed:</strong> Very fast (milliseconds)</div>
+          <div class="compare-item"><strong>Duration:</strong> Short-lived</div>
+          <div class="compare-item"><strong>Scope:</strong> Specific — through nerves</div>
+          <div class="compare-item"><strong>Components:</strong> CNS + PNS</div>
+          <div class="compare-item"><strong>Response:</strong> Immediate, precise</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-head" style="color:#fbbf24">💊 Endocrine System</div>
+          <div class="compare-item"><strong>Medium:</strong> Chemical hormones via blood</div>
+          <div class="compare-item"><strong>Speed:</strong> Slow (seconds to minutes)</div>
+          <div class="compare-item"><strong>Duration:</strong> Long-lasting</div>
+          <div class="compare-item"><strong>Scope:</strong> Broad — via bloodstream</div>
+          <div class="compare-item"><strong>Components:</strong> Glands + hormones</div>
+          <div class="compare-item"><strong>Response:</strong> Diffuse, sustained</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEURON STRUCTURE -->
+  <div class="panel ph-blue">
+    <div class="panel-head">🔬 Neuron — Structural Unit</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Part</th><th>Function</th></tr>
+        <tr><td><strong style="color:#60a5fa">Dendrites</strong></td><td>Receive impulses; carry <em>toward</em> cell body</td></tr>
+        <tr><td><strong style="color:#c084fc">Cell Body (Cyton)</strong></td><td>Nucleus + organelles; metabolic centre</td></tr>
+        <tr><td><strong style="color:#22d3ee">Axon</strong></td><td>Carry impulses <em>away</em> from cell body</td></tr>
+        <tr><td><strong style="color:#fbbf24">Myelin Sheath</strong></td><td>Fatty insulation by Schwann cells; speeds conduction</td></tr>
+        <tr><td><strong style="color:#fde68a">Nodes of Ranvier</strong></td><td>Unmyelinated gaps; saltatory conduction</td></tr>
+        <tr><td><strong style="color:#4ade80">Axon Terminals</strong></td><td>Release neurotransmitters at synapse</td></tr>
+      </table>
+      <div class="fact" style="margin-top:.6rem"><strong>Synapse:</strong> ~20 nm gap between neurons. Signal crosses via <strong>neurotransmitters</strong> (acetylcholine, dopamine). Unidirectional.</div>
+      <div class="fact"><strong>Types:</strong> <span class="tag tag-blue">Sensory (Afferent)</span> <span class="tag tag-teal">Relay (Interneuron)</span> <span class="tag tag-green">Motor (Efferent)</span></div>
+    </div>
+  </div>
+
+  <!-- REFLEX ARC -->
+  <div class="panel ph-purple">
+    <div class="panel-head">⚡ Reflex Action &amp; Reflex Arc</div>
+    <div class="panel-body">
+      <p class="body">Rapid, <strong>involuntary</strong> response to stimulus. Signal does NOT go to brain — processed in <strong>spinal cord</strong>. Brain informed <em>after</em> response.</p>
+      <h4>Pathway:</h4>
+      <div class="arc-row">
+        <div class="arc-box" style="border-color:rgba(168,85,247,.4);color:#c084fc">🖐 Receptor</div>
+        <div class="arc-arrow">→</div>
+        <div class="arc-box" style="border-color:rgba(59,130,246,.4);color:#60a5fa">Sensory Neuron</div>
+        <div class="arc-arrow">→</div>
+        <div class="arc-box" style="border-color:rgba(20,184,166,.4);color:#2dd4bf">Relay Neuron<br><small style="color:#64748b;font-weight:400">(spinal cord)</small></div>
+        <div class="arc-arrow">→</div>
+        <div class="arc-box" style="border-color:rgba(34,197,94,.4);color:#4ade80">Motor Neuron</div>
+        <div class="arc-arrow">→</div>
+        <div class="arc-box" style="border-color:rgba(245,158,11,.4);color:#fbbf24">💪 Effector</div>
+      </div>
+      <table style="margin-top:.7rem">
+        <tr><th>Type</th><th>Centre</th><th>Example</th></tr>
+        <tr><td><span class="tag tag-purple">Spinal</span></td><td>Spinal cord</td><td>Touch hot object, knee-jerk</td></tr>
+        <tr><td><span class="tag tag-blue">Cranial</span></td><td>Brain</td><td>Pupil dilation, blinking</td></tr>
+        <tr><td><span class="tag tag-teal">Conditioned</span></td><td>Brain (learned)</td><td>Pavlov's salivation experiment</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- HUMAN BRAIN -->
+  <div class="panel ph-pink">
+    <div class="panel-head">🧬 Human Brain</div>
+    <div class="panel-body">
+      <div class="fact"><strong>Protection:</strong> Cranium → Meninges (3 layers: Dura, Arachnoid, Pia) → Cerebrospinal Fluid (CSF)</div>
+      <table style="margin-top:.6rem">
+        <tr><th>Region</th><th>Division</th><th>Key Functions</th></tr>
+        <tr><td><strong style="color:#f472b6">Cerebrum</strong></td><td>Forebrain</td><td>Voluntary actions, memory, thought, speech, emotions</td></tr>
+        <tr><td><strong style="color:#a5b4fc">Cerebellum</strong></td><td>Hindbrain</td><td>Balance, posture, coordination of voluntary movements</td></tr>
+        <tr><td><strong style="color:#67e8f9">Medulla Oblongata</strong></td><td>Hindbrain</td><td>Heartbeat, breathing, BP, swallowing — ALL involuntary</td></tr>
+        <tr><td><strong style="color:#bef264">Hypothalamus</strong></td><td>Forebrain</td><td>Thermoregulation, hunger, thirst, pituitary control</td></tr>
+        <tr><td><strong style="color:#fde68a">Thalamus</strong></td><td>Forebrain</td><td>Relay station — routes sensory signals to cerebrum</td></tr>
+        <tr><td><strong style="color:#fb923c">Pons</strong></td><td>Hindbrain</td><td>Bridge between cerebellum and cerebrum; sleep</td></tr>
+      </table>
+      <div class="fact" style="margin-top:.6rem">Cerebrum = <strong>85%</strong> of brain weight. Two hemispheres joined by <strong>corpus callosum</strong>. Left hemisphere controls right side of body.</div>
+    </div>
+  </div>
+
+  <!-- ENDOCRINE GLANDS -->
+  <div class="panel ph-amber span2">
+    <div class="panel-head">💊 Endocrine Glands &amp; Hormones</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Gland</th><th>Location</th><th>Hormone(s)</th><th>Function</th><th>Deficiency/Excess</th></tr>
+        <tr>
+          <td><strong style="color:#fbbf24">Pituitary</strong></td><td>Base of brain</td>
+          <td>GH, TSH, ACTH, LH, FSH, ADH, Oxytocin</td>
+          <td>Master gland — controls all other glands</td>
+          <td>Excess GH → Gigantism; Deficiency → Dwarfism</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#2dd4bf">Thyroid</strong></td><td>Front of neck</td>
+          <td>Thyroxine (needs iodine)</td>
+          <td>Metabolism, growth, development, protein synthesis</td>
+          <td>Deficiency → Goitre; Cretinism (in children)</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#f87171">Adrenal</strong></td><td>On kidneys</td>
+          <td>Adrenaline (Epinephrine)</td>
+          <td>Fight-or-flight: ↑HR, ↑BP, dilates pupils</td>
+          <td>"Hormone of emergency" — stress response</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#60a5fa">Pancreas</strong></td><td>Behind stomach</td>
+          <td>Insulin (β cells), Glucagon (α cells)</td>
+          <td>Blood sugar regulation — insulin ↓, glucagon ↑</td>
+          <td>Insulin deficiency → Diabetes mellitus</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#c084fc">Testes</strong></td><td>Scrotum</td>
+          <td>Testosterone</td>
+          <td>Male secondary sexual characters, sperm production</td>
+          <td>Deficiency → delayed puberty, reduced fertility</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#f472b6">Ovaries</strong></td><td>Pelvic cavity</td>
+          <td>Oestrogen, Progesterone</td>
+          <td>Female characters, menstrual cycle, pregnancy</td>
+          <td>Imbalance → menstrual disorders</td>
+        </tr>
+      </table>
+      <div class="fact" style="margin-top:.7rem"><strong>Negative Feedback:</strong> Blood sugar ↑ → Insulin released → Glucose stored → Blood sugar ↓ → Insulin stops. Maintains <strong>homeostasis</strong>.</div>
+    </div>
+  </div>
+
+  <!-- PLANT HORMONES -->
+  <div class="panel ph-green">
+    <div class="panel-head">🌿 Plant Hormones (Phytohormones)</div>
+    <div class="panel-body">
+      <div class="hormone-grid">
+        <div class="hcard" style="border-color:rgba(245,158,11,.25)">
+          <div class="hcard-name" style="color:#fbbf24">Auxin (IAA)</div>
+          <div class="hcard-body"><strong>Type:</strong> Promoter<br>Cell elongation, phototropism, apical dominance<br><strong>Tip:</strong> Shoot bends toward light</div>
+        </div>
+        <div class="hcard" style="border-color:rgba(34,197,94,.25)">
+          <div class="hcard-name" style="color:#4ade80">Gibberellin</div>
+          <div class="hcard-body"><strong>Type:</strong> Promoter<br>Stem elongation, seed germination, fruit growth<br><strong>Tip:</strong> Dwarf plants grow tall</div>
+        </div>
+        <div class="hcard" style="border-color:rgba(59,130,246,.25)">
+          <div class="hcard-name" style="color:#60a5fa">Cytokinin</div>
+          <div class="hcard-body"><strong>Type:</strong> Promoter<br>Cell division, delays leaf senescence<br><strong>Tip:</strong> Keeps cut flowers fresh</div>
+        </div>
+        <div class="hcard" style="border-color:rgba(239,68,68,.25)">
+          <div class="hcard-name" style="color:#f87171">Abscisic Acid</div>
+          <div class="hcard-body"><strong>Type:</strong> Inhibitor<br>Stomatal closure, seed dormancy, wilting<br><strong>Tip:</strong> Stress hormone of plants</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TROPISMS -->
+  <div class="panel ph-cyan">
+    <div class="panel-head">🌱 Tropisms</div>
+    <div class="panel-body">
+      <div class="tropism-grid">
+        <div class="tcard" style="border-color:rgba(245,158,11,.25)">
+          <div class="tcard-icon">☀️</div>
+          <div class="tcard-name" style="color:#fbbf24">Phototropism</div>
+          <div class="tcard-body">Stimulus: <strong>Light</strong><br>Shoot: +ve (toward)<br>Root: −ve (away)<br>Auxin → shaded side</div>
+        </div>
+        <div class="tcard" style="border-color:rgba(59,130,246,.25)">
+          <div class="tcard-icon">⬇️</div>
+          <div class="tcard-name" style="color:#60a5fa">Geotropism</div>
+          <div class="tcard-body">Stimulus: <strong>Gravity</strong><br>Root: +ve (downward)<br>Shoot: −ve (upward)</div>
+        </div>
+        <div class="tcard" style="border-color:rgba(20,184,166,.25)">
+          <div class="tcard-icon">💧</div>
+          <div class="tcard-name" style="color:#2dd4bf">Hydrotropism</div>
+          <div class="tcard-body">Stimulus: <strong>Water</strong><br>Root: +ve (toward)<br>Helps roots find water</div>
+        </div>
+        <div class="tcard" style="border-color:rgba(34,197,94,.25)">
+          <div class="tcard-icon">🌀</div>
+          <div class="tcard-name" style="color:#4ade80">Thigmotropism</div>
+          <div class="tcard-body">Stimulus: <strong>Touch</strong><br>Tendrils coil around support<br>e.g. Pea, cucumber</div>
+        </div>
+      </div>
+      <div class="fact" style="margin-top:.7rem"><strong>Phototropism mechanism:</strong> Light → Auxin migrates to shaded side → More cell elongation → Shoot bends toward light. Darwin (1880) → Went (1926, named auxin).</div>
+      <div class="fact"><strong>Nastic movements</strong> (non-directional): <em>Mimosa pudica</em> — leaves fold on touch. <em>Venus flytrap</em> — snaps shut. Not tropism — no growth involved.</div>
+    </div>
+  </div>
+
+  <!-- MEMORY AIDS -->
+  <div class="panel ph-purple">
+    <div class="panel-head">💡 Memory Tricks &amp; Quick Facts</div>
+    <div class="panel-body">
+      <div class="memory-grid">
+        <div class="mcard">
+          <div class="mcard-head">DAMN Mnemonic</div>
+          <div class="mcard-body"><strong>D</strong>endrites — <strong>A</strong>xon — <strong>M</strong>yelin — <strong>N</strong>odes. The four structures of a neuron in signal order.</div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-head">Brain Divisions</div>
+          <div class="mcard-body"><strong>Fore</strong> = Think/Feel (Cerebrum, Hypothalamus, Thalamus)<br><strong>Hind</strong> = Move/Live (Cerebellum, Medulla, Pons)</div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-head">Reflex vs Voluntary</div>
+          <div class="mcard-body">Reflex → Spinal cord (fast). Voluntary → Brain (slow). You <em>feel</em> pain after withdrawing hand.</div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-head">Plant Hormones AGCA</div>
+          <div class="mcard-body"><strong>A</strong>uxin, <strong>G</strong>ibberellin, <strong>C</strong>ytokinin = PROMOTERS. <strong>A</strong>bscisic Acid = INHIBITOR.</div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-head">Endocrine Memory</div>
+          <div class="mcard-body">Pituitary = MASTER (controls all). Adrenal = EMERGENCY. Thyroid = METABOLISM. Pancreas = SUGAR.</div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-head">Medulla = Vital</div>
+          <div class="mcard-body">Controls heartbeat, breathing, BP. Even slight damage → death. Never confuse with <em>adrenal medulla</em> (produces adrenaline).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIGH YIELD POINTS -->
+  <div class="panel ph-red span2">
+    <div class="panel-head">⭐ High-Yield CBSE Points</div>
+    <div class="panel-body">
+      <ul class="bullet-list">
+        <li><strong>Neuron is the structural and functional unit</strong> of the nervous system.</li>
+        <li><strong>Myelin sheath</strong> speeds up nerve impulse by saltatory (jumping) conduction at Nodes of Ranvier.</li>
+        <li><strong>Reflex arc</strong> does not involve the brain — processed at spinal cord. Brain informed <em>after</em>.</li>
+        <li><strong>Cerebrum</strong> = largest brain part (~85%). Controls all voluntary and conscious activities.</li>
+        <li><strong>Medulla oblongata</strong> = controls ALL involuntary vital functions. Critical for survival.</li>
+        <li><strong>Hypothalamus</strong> = thermoregulation centre AND controls the pituitary gland (links NS + endocrine).</li>
+        <li><strong>Pituitary</strong> = master gland. All other endocrine glands are under its control.</li>
+        <li><strong>Adrenaline</strong> = "hormone of emergency". Prepares body for fight-or-flight.</li>
+        <li><strong>Insulin</strong> deficiency → Diabetes mellitus. Insulin lowers blood sugar; glucagon raises it.</li>
+        <li><strong>Thyroxine</strong> requires iodine. Deficiency → Goitre (swollen neck).</li>
+        <li><strong>Auxin</strong> causes phototropism — migrates to shaded side, causes elongation → bending toward light.</li>
+        <li><strong>Abscisic Acid (ABA)</strong> = only inhibitory plant hormone. Causes stomatal closure during drought.</li>
+        <li>Plants do NOT have nervous system — coordination only through <strong>phytohormones</strong>.</li>
+        <li><strong>Negative feedback</strong> maintains hormonal homeostasis — rising hormone level suppresses further secretion.</li>
+        <li><strong>Conditioned reflex</strong> (Pavlov) = learned reflex. Example: salivation at bell sound.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

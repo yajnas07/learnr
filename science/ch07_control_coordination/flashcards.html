@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Control and Coordination</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0f1e; --card:#111827; --border:#1e2d40; --text:#e2e8f0; --muted:#94a3b8;
+    --teal:#14b8a6; --purple:#a855f7; --pink:#ec4899; --blue:#3b82f6;
+    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --cyan:#22d3ee;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(168,85,247,.08) 0%,transparent 60%);}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;background:rgba(6,10,26,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(20,184,166,.18);position:sticky;top:0;z-index:9999;}
+  .site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+  .site-nav-img{height:28px;}
+  .site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+  .site-nav-back:hover{color:#dde6f5;}
+  header{text-align:center;padding:2rem 1rem 1rem;}
+  header h1{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#14b8a6,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.78rem;margin-top:.3rem;}
+  .prog-row{display:flex;align-items:center;gap:1rem;padding:.5rem 1rem 1rem;width:100%;max-width:560px;}
+  .prog-bar{flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--purple));transition:width .4s ease;}
+  .prog-text{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);white-space:nowrap;}
+  .filters{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;padding:.3rem 1rem .8rem;}
+  .f-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;padding:.3rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .f-btn:hover{color:var(--text);}
+  .f-btn.on{color:#0a0f1e;border-color:transparent;}
+  .f-all.on{background:var(--muted);}
+  .f-nervous.on{background:var(--teal);color:#fff !important;}
+  .f-neuron.on{background:var(--blue);color:#fff !important;}
+  .f-reflex.on{background:var(--purple);color:#fff !important;}
+  .f-brain.on{background:var(--pink);color:#fff !important;}
+  .f-endo.on{background:var(--amber);color:#0a0f1e !important;}
+  .f-plant.on{background:var(--green);color:#0a0f1e !important;}
+  .stage{width:100%;max-width:560px;padding:0 1rem;perspective:1200px;}
+  .fc-wrap{width:100%;aspect-ratio:3/2;position:relative;cursor:pointer;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);}
+  .fc-wrap.flipped{transform:rotateY(180deg);}
+  .fc-face{position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;text-align:center;}
+  .fc-front{background:var(--card);border:1.5px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.5);}
+  .fc-back{transform:rotateY(180deg);background:var(--card);border:1.5px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.5);}
+  .fc-tag{font-family:'DM Mono',monospace;font-size:.68rem;font-weight:500;padding:.2rem .7rem;border-radius:99px;margin-bottom:.8rem;align-self:center;}
+  .fc-q{font-family:'Syne',sans-serif;font-size:clamp(.9rem,2.5vw,1.12rem);font-weight:700;line-height:1.4;}
+  .fc-hint{font-size:.72rem;color:var(--muted);margin-top:.6rem;font-family:'DM Mono',monospace;}
+  .fc-flip-hint{position:absolute;bottom:.8rem;font-size:.68rem;font-family:'DM Mono',monospace;color:#334155;animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+  .fc-ans-label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--teal);margin-bottom:.6rem;}
+  .fc-ans{font-size:clamp(.82rem,2.2vw,.98rem);line-height:1.65;color:var(--text);}
+  .fc-ans strong{color:#fcd34d;}
+  .fc-ans em{color:#93c5fd;font-style:normal;}
+  .nav-row{display:flex;gap:.8rem;align-items:center;padding:1rem;}
+  .nav-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;padding:.55rem 1.4rem;border-radius:99px;border:2px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .nav-btn:hover:not(:disabled){border-color:#64748b;color:var(--text);}
+  .nav-btn:disabled{opacity:.3;cursor:default;}
+  .card-counter{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--muted);min-width:70px;text-align:center;}
+  .bottom-row{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;padding:.3rem 1rem 2rem;}
+  .bot-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;padding:.4rem 1.1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .bot-btn:hover{border-color:var(--teal);color:var(--teal);}
+  .known-badge{position:absolute;top:.8rem;right:.8rem;font-size:.68rem;font-family:'DM Mono',monospace;padding:.15rem .5rem;border-radius:99px;}
+  .known{background:rgba(34,197,94,.15);color:#4ade80;}
+  .unknown{background:rgba(239,68,68,.1);color:#f87171;}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<header>
+  <h1>Flashcard Deck</h1>
+  <p>Control &amp; Coordination · Class X Science Ch.7 · 40 Cards · Tap to flip</p>
+</header>
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 40</div>
+</div>
+<div class="filters">
+  <button class="f-btn f-all on"     onclick="setFilter('all',this)">All (40)</button>
+  <button class="f-btn f-nervous"    onclick="setFilter('nervous',this)">🧠 Nervous System</button>
+  <button class="f-btn f-neuron"     onclick="setFilter('neuron',this)">🔬 Neuron</button>
+  <button class="f-btn f-reflex"     onclick="setFilter('reflex',this)">⚡ Reflex</button>
+  <button class="f-btn f-brain"      onclick="setFilter('brain',this)">🧬 Brain</button>
+  <button class="f-btn f-endo"       onclick="setFilter('endo',this)">💊 Endocrine</button>
+  <button class="f-btn f-plant"      onclick="setFilter('plant',this)">🌿 Plant</button>
+</div>
+<div class="stage"><div class="fc-wrap" id="fc" onclick="flip()">
+  <div class="fc-face fc-front">
+    <div class="fc-tag" id="fc-tag"></div>
+    <div class="fc-q" id="fc-q"></div>
+    <div class="fc-hint" id="fc-hint"></div>
+    <div class="fc-flip-hint">tap to reveal ↓</div>
+    <div class="known-badge" id="known-badge" style="display:none"></div>
+  </div>
+  <div class="fc-face fc-back">
+    <div class="fc-ans-label">ANSWER</div>
+    <div class="fc-ans" id="fc-ans"></div>
+  </div>
+</div></div>
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="navigate(-1)" disabled>← Prev</button>
+  <div class="card-counter" id="counter">1 / 40</div>
+  <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next →</button>
+</div>
+<div class="bottom-row">
+  <button class="bot-btn" onclick="markKnown(true)">✅ Got it</button>
+  <button class="bot-btn" onclick="markKnown(false)">🔁 Review again</button>
+  <button class="bot-btn" onclick="shuffle()">🔀 Shuffle</button>
+  <button class="bot-btn" onclick="resetDeck()">↺ Reset</button>
+</div>
+
+<script>
+const ALL_CARDS = [
+  // ── NERVOUS SYSTEM
+  { cat:'nervous', tag:'🧠 Nervous System', tagCol:'#14b8a6',
+    q:'What is coordination in living organisms?',
+    a:'Working together of <strong>different organs and systems</strong> to produce a smooth, appropriate response to stimuli. Achieved by two systems: <em>Nervous</em> (electrical, fast) and <em>Endocrine</em> (chemical, slow).' },
+  { cat:'nervous', tag:'🧠 Nervous System', tagCol:'#14b8a6',
+    q:'What is a stimulus? Give two examples.',
+    a:'Any change in the environment that causes a response. Examples: <strong>touch, light, heat, sound, smell</strong>. Detected by receptors in sense organs.' },
+  { cat:'nervous', tag:'🧠 Nervous System', tagCol:'#14b8a6',
+    q:'Name the two main divisions of the nervous system.',
+    a:'<strong>Central Nervous System (CNS):</strong> Brain + Spinal cord<br><strong>Peripheral Nervous System (PNS):</strong> All nerves connecting CNS to body. PNS = Somatic (voluntary) + Autonomic (involuntary).' },
+  { cat:'nervous', tag:'🧠 Nervous System', tagCol:'#14b8a6',
+    q:'What is a nerve impulse and how is it generated?',
+    a:'An electrochemical signal transmitted along a neuron. Created by <strong>movement of Na⁺ and K⁺ ions</strong> across the neuronal membrane — called an <em>action potential</em>. Speed: up to 120 m/s.' },
+  { cat:'nervous', tag:'🧠 Nervous System', tagCol:'#14b8a6',
+    q:'What are the three types of neurons based on function?',
+    a:'<strong>Sensory (Afferent):</strong> Carry impulses TO CNS<br><strong>Motor (Efferent):</strong> Carry impulses FROM CNS to effectors<br><strong>Relay (Interneuron):</strong> Connect sensory and motor neurons within CNS' },
+  { cat:'nervous', tag:'🧠 Nervous System', tagCol:'#14b8a6',
+    q:'What is the role of the spinal cord?',
+    a:'<strong>Dual role:</strong><br>1. <em>Reflex centre</em> — mediates spinal reflexes without brain involvement<br>2. <em>Conduction pathway</em> — carries signals between body and brain. Contains 31 pairs of spinal nerves.' },
+
+  // ── NEURON
+  { cat:'neuron', tag:'🔬 Neuron', tagCol:'#3b82f6',
+    q:'What are dendrites and what is their function?',
+    a:'Short, branched projections from the cell body. <strong>Receive impulses</strong> from other neurons or receptors. Carry impulse <em>toward</em> the cell body. Multiple dendrites → multiple inputs possible.' },
+  { cat:'neuron', tag:'🔬 Neuron', tagCol:'#3b82f6',
+    q:'What is the cell body (cyton/soma) of a neuron?',
+    a:'The enlarged part containing the <strong>nucleus, mitochondria, ribosomes</strong> and Nissl bodies (rough ER). Metabolic centre of the neuron. Controls the neuron\'s survival and health.' },
+  { cat:'neuron', tag:'🔬 Neuron', tagCol:'#3b82f6',
+    q:'What is the axon? How does it differ from dendrites?',
+    a:'A single long fibre carrying impulses <strong>away</strong> from cell body (efferent). Unlike dendrites (short, many, toward cell body), axon is long, single, and carries impulse away. Can be up to 1 metre long.' },
+  { cat:'neuron', tag:'🔬 Neuron', tagCol:'#3b82f6',
+    q:'What is the myelin sheath and what is its function?',
+    a:'Fatty (lipid) insulation around the axon produced by <strong>Schwann cells</strong>. Functions:<br>• Speeds up conduction (saltatory/jumping conduction)<br>• Insulates axon from neighbouring neurons<br>• Protects the axon' },
+  { cat:'neuron', tag:'🔬 Neuron', tagCol:'#3b82f6',
+    q:'What are Nodes of Ranvier?',
+    a:'Small <strong>unmyelinated gaps</strong> between adjacent myelin sheaths along the axon. Impulse "jumps" from node to node — called <strong>saltatory conduction</strong>. This greatly increases the speed of transmission.' },
+  { cat:'neuron', tag:'🔬 Neuron', tagCol:'#3b82f6',
+    q:'What is a synapse? How does signal pass across it?',
+    a:'The <strong>junction between two neurons</strong> (or neuron + effector). Synaptic cleft ~20 nm wide. Signal crosses by:<br>1. Impulse reaches axon terminal<br>2. <strong>Neurotransmitters</strong> (e.g. acetylcholine) released from vesicles<br>3. Bind receptors on post-synaptic membrane → new impulse' },
+  { cat:'neuron', tag:'🔬 Neuron', tagCol:'#3b82f6',
+    q:'What are Nissl bodies (Nissl granules)?',
+    a:'Clumps of <strong>rough endoplasmic reticulum</strong> (ribosomes + ER) found in the cell body of neurons. Function: protein synthesis for the neuron\'s growth and repair. Absent in axon and axon hillock.' },
+
+  // ── REFLEX ACTION
+  { cat:'reflex', tag:'⚡ Reflex Arc', tagCol:'#a855f7',
+    q:'What is a reflex action? Why is it important?',
+    a:'A <strong>rapid, involuntary response</strong> to a stimulus that does NOT involve conscious brain processing. Important for survival — protects body from harm (e.g., withdrawing hand from hot object) before pain is felt.' },
+  { cat:'reflex', tag:'⚡ Reflex Arc', tagCol:'#a855f7',
+    q:'Define reflex arc. Name its five components in order.',
+    a:'The <strong>pathway of a nerve impulse</strong> during a reflex action:<br><em>Receptor → Sensory neuron → Relay neuron (spinal cord) → Motor neuron → Effector</em>' },
+  { cat:'reflex', tag:'⚡ Reflex Arc', tagCol:'#a855f7',
+    q:'Why is a reflex action faster than a voluntary action?',
+    a:'Signal travels to <strong>spinal cord only</strong> (not up to brain) and back. Shorter pathway = faster response. Brain is informed <em>after</em> the response — that\'s why you feel pain after withdrawing your hand.' },
+  { cat:'reflex', tag:'⚡ Reflex Arc', tagCol:'#a855f7',
+    q:'Distinguish between spinal and cranial reflexes.',
+    a:'<strong>Spinal reflex:</strong> Coordinated by spinal cord. E.g., touching hot object, knee-jerk reflex.<br><strong>Cranial reflex:</strong> Coordinated by brain. E.g., pupil dilation, blinking, salivation.' },
+  { cat:'reflex', tag:'⚡ Reflex Arc', tagCol:'#a855f7',
+    q:'What is a conditioned reflex? Give an example.',
+    a:'A <strong>learned reflex</strong> acquired through repeated association. Example: Pavlov\'s experiment — dogs salivate at the sound of a bell (associated with food). Also called <em>acquired reflex</em>.' },
+  { cat:'reflex', tag:'⚡ Reflex Arc', tagCol:'#a855f7',
+    q:'What is the role of the receptor in a reflex arc?',
+    a:'Detects the <strong>stimulus</strong> (e.g., pain, heat, pressure) and converts it into a nerve impulse. Examples: Pain receptors (nociceptors) in skin, stretch receptors in muscles (proprioceptors).' },
+
+  // ── BRAIN
+  { cat:'brain', tag:'🧬 Human Brain', tagCol:'#ec4899',
+    q:'How is the brain protected?',
+    a:'Three layers of protection:<br>1. <strong>Cranium (skull)</strong> — hard outer bone<br>2. <strong>Meninges</strong> — 3 membranes (Dura mater, Arachnoid, Pia mater)<br>3. <strong>Cerebrospinal fluid (CSF)</strong> — cushions against shock, removes waste' },
+  { cat:'brain', tag:'🧬 Human Brain', tagCol:'#ec4899',
+    q:'What are the three main divisions of the human brain?',
+    a:'<strong>Forebrain:</strong> Cerebrum, Thalamus, Hypothalamus<br><strong>Midbrain:</strong> Connects forebrain and hindbrain; visual and auditory reflexes<br><strong>Hindbrain:</strong> Cerebellum, Pons, Medulla oblongata' },
+  { cat:'brain', tag:'🧬 Human Brain', tagCol:'#ec4899',
+    q:'What are the functions of the cerebrum?',
+    a:'Largest brain part (~85% of weight). Functions: <strong>voluntary actions, thought, memory, reasoning, speech, language, emotions, sensory interpretation</strong>. Left hemisphere controls right side of body and vice versa.' },
+  { cat:'brain', tag:'🧬 Human Brain', tagCol:'#ec4899',
+    q:'What is the cerebellum and what does it do?',
+    a:'Part of hindbrain, at back of skull. Functions: <strong>coordination of voluntary movements, balance, posture, fine motor skills</strong>. Damage causes ataxia (unsteady gait). Surface is highly folded (folia) for large area.' },
+  { cat:'brain', tag:'🧬 Human Brain', tagCol:'#ec4899',
+    q:'What is the medulla oblongata? Why is it vital?',
+    a:'Part of brain stem (hindbrain). Controls <strong>ALL involuntary vital functions</strong>: heartbeat, breathing rate, blood pressure, swallowing, vomiting, sneezing, coughing. Even slight damage = death. Called "vital centre".' },
+  { cat:'brain', tag:'🧬 Human Brain', tagCol:'#ec4899',
+    q:'What is the hypothalamus and what are its functions?',
+    a:'Part of forebrain (diencephalon). Functions: <strong>body temperature, hunger, thirst, sleep-wake cycle, emotional responses, circadian rhythm</strong>. Controls pituitary gland → key link between nervous and endocrine systems.' },
+  { cat:'brain', tag:'🧬 Human Brain', tagCol:'#ec4899',
+    q:'What is the corpus callosum?',
+    a:'A thick band of <strong>nerve fibres</strong> connecting the left and right cerebral hemispheres. Allows communication and coordination between the two hemispheres. Largest white matter structure in the brain.' },
+
+  // ── ENDOCRINE
+  { cat:'endo', tag:'💊 Endocrine System', tagCol:'#f59e0b',
+    q:'What are hormones? Name key properties.',
+    a:'Chemical messengers secreted by <strong>ductless glands</strong> directly into blood. Properties: transported via bloodstream, act on specific target organs, effective in tiny amounts, slow but long-lasting effects.' },
+  { cat:'endo', tag:'💊 Endocrine System', tagCol:'#f59e0b',
+    q:'Why is the pituitary gland called the "master gland"?',
+    a:'It secretes hormones that <strong>control all other endocrine glands</strong>: TSH (thyroid), ACTH (adrenal), LH/FSH (gonads), GH (growth), ADH (kidneys), Oxytocin. Located at base of brain, controlled by hypothalamus.' },
+  { cat:'endo', tag:'💊 Endocrine System', tagCol:'#f59e0b',
+    q:'What hormone does the thyroid gland secrete? What is its function?',
+    a:'<strong>Thyroxine</strong> (requires iodine). Functions: regulates metabolism, growth, development, protein synthesis, heart rate. Deficiency → Goitre (enlarged thyroid due to iodine deficiency); Cretinism in children.' },
+  { cat:'endo', tag:'💊 Endocrine System', tagCol:'#f59e0b',
+    q:'What is adrenaline? When is it released?',
+    a:'Hormone from <strong>adrenal gland</strong> (on top of kidneys). Released during <em>emergency/stress</em>. Effects: ↑ heart rate, ↑ BP, dilates pupils, redirects blood to muscles, raises blood sugar. Called "hormone of emergency" / fight-or-flight.' },
+  { cat:'endo', tag:'💊 Endocrine System', tagCol:'#f59e0b',
+    q:'How does the pancreas regulate blood sugar?',
+    a:'Islets of Langerhans in pancreas secrete:<br><strong>Insulin</strong> (beta cells): blood sugar ↑ → insulin released → glucose→glycogen → blood sugar ↓<br><strong>Glucagon</strong> (alpha cells): blood sugar ↓ → glucagon → glycogen→glucose<br>Insulin deficiency → Diabetes mellitus.' },
+  { cat:'endo', tag:'💊 Endocrine System', tagCol:'#f59e0b',
+    q:'Compare nervous and hormonal (endocrine) coordination.',
+    a:'<strong>Nervous:</strong> Electrical impulse, very fast (ms), short-lived, specific target via nerves.<br><strong>Endocrine:</strong> Chemical hormone, slow (secs-min), long-lasting, broad target via bloodstream.' },
+  { cat:'endo', tag:'💊 Endocrine System', tagCol:'#f59e0b',
+    q:'What is negative feedback in hormone regulation? Give an example.',
+    a:'When rising hormone levels <strong>suppress further secretion</strong>. E.g., blood sugar ↑ → insulin released → blood sugar ↓ → insulin secretion stops. Maintains homeostasis (constant internal environment).' },
+
+  // ── PLANT COORDINATION
+  { cat:'plant', tag:'🌿 Plant Coordination', tagCol:'#22c55e',
+    q:'How do plants coordinate without a nervous system?',
+    a:'Plants use <strong>chemical hormones (phytohormones)</strong> that regulate growth and movement. No nervous system — responses are slower, mainly through differential growth. Two types: <em>Tropic movements</em> and <em>Nastic movements</em>.' },
+  { cat:'plant', tag:'🌿 Plant Coordination', tagCol:'#22c55e',
+    q:'What is tropism? Name four types.',
+    a:'Directional growth response to a stimulus. Types:<br><strong>Phototropism</strong> (light), <strong>Geotropism</strong> (gravity), <strong>Hydrotropism</strong> (water), <strong>Thigmotropism</strong> (touch). Can be positive (+ve, toward) or negative (−ve, away).' },
+  { cat:'plant', tag:'🌿 Plant Coordination', tagCol:'#22c55e',
+    q:'Explain how auxin causes phototropism in a shoot.',
+    a:'1. Light falls on one side of shoot tip<br>2. <strong>Auxin</strong> migrates to the <em>shaded side</em><br>3. Higher auxin → more cell elongation on shaded side<br>4. Shoot bends <strong>toward light</strong> (+ve phototropism)<br>Darwin (1880) & Went (1926) experiments proved this.' },
+  { cat:'plant', tag:'🌿 Plant Coordination', tagCol:'#22c55e',
+    q:'Name four plant hormones and their main roles.',
+    a:'<strong>Auxin (IAA):</strong> Cell elongation, phototropism, apical dominance<br><strong>Gibberellin:</strong> Stem elongation, seed germination<br><strong>Cytokinin:</strong> Cell division, delays leaf ageing<br><strong>Abscisic Acid (ABA):</strong> Stomatal closure, seed dormancy (inhibitor)' },
+  { cat:'plant', tag:'🌿 Plant Coordination', tagCol:'#22c55e',
+    q:'What is geotropism? How do roots and shoots differ?',
+    a:'Response to <strong>gravity</strong>. Roots: <em>positively geotropic</em> (grow downward). Shoots: <em>negatively geotropic</em> (grow upward). In roots, auxin inhibits elongation (roots are more sensitive to auxin than shoots).' },
+  { cat:'plant', tag:'🌿 Plant Coordination', tagCol:'#22c55e',
+    q:'What is thigmotropism? Give an example.',
+    a:'Response to <strong>touch/contact</strong>. Tendrils are positively thigmotropic — coil around support on contact. Example: pea plant tendrils, cucumber. Caused by unequal growth on contact vs. non-contact side.' },
+  { cat:'plant', tag:'🌿 Plant Coordination', tagCol:'#22c55e',
+    q:'What is the difference between tropic and nastic movements?',
+    a:'<strong>Tropic (Tropism):</strong> Directional, in response to directional stimulus, involves <em>permanent growth</em>. E.g., phototropism.<br><strong>Nastic:</strong> Non-directional, independent of stimulus direction, often reversible. E.g., touch-me-not (<em>Mimosa pudica</em>) leaf folding.' },
+  { cat:'plant', tag:'🌿 Plant Coordination', tagCol:'#22c55e',
+    q:'What is apical dominance? Which hormone is responsible?',
+    a:'Suppression of lateral (side) bud growth by the <strong>apical (tip) bud</strong>. Caused by high <strong>auxin</strong> concentration from apical bud diffusing down, inhibiting lateral bud growth. Removing tip → bushy plant growth.' },
+];
+
+let deck = [], idx = 0, known = {}, activeFilter = 'all';
+
+function buildDeck(filter) {
+  deck = filter === 'all' ? [...ALL_CARDS] : ALL_CARDS.filter(c => c.cat === filter);
+  idx = 0;
+  renderCard();
+  updateProgress();
+}
+
+function setFilter(f, btn) {
+  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  activeFilter = f;
+  buildDeck(f);
+}
+
+function renderCard() {
+  const c = deck[idx];
+  if (!c) return;
+  const fc = document.getElementById('fc');
+  fc.classList.remove('flipped');
+  setTimeout(() => {
+    document.getElementById('fc-tag').textContent = c.tag;
+    document.getElementById('fc-tag').style.background = c.tagCol + '25';
+    document.getElementById('fc-tag').style.color = c.tagCol;
+    document.getElementById('fc-q').innerHTML = c.q;
+    document.getElementById('fc-hint').textContent = c.hint || '';
+    document.getElementById('fc-ans').innerHTML = c.a;
+    const badge = document.getElementById('known-badge');
+    if (known[idx] !== undefined) {
+      badge.style.display = 'block';
+      badge.className = 'known-badge ' + (known[idx] ? 'known' : 'unknown');
+      badge.textContent = known[idx] ? '✅ Got it' : '🔁 Review';
+    } else { badge.style.display = 'none'; }
+    document.getElementById('counter').textContent = (idx+1) + ' / ' + deck.length;
+    document.getElementById('prev-btn').disabled = idx === 0;
+    document.getElementById('next-btn').disabled = idx === deck.length - 1;
+  }, fc.classList.contains('flipped') ? 280 : 0);
+}
+
+function flip() { document.getElementById('fc').classList.toggle('flipped'); }
+function navigate(d) { idx = Math.max(0, Math.min(deck.length-1, idx+d)); renderCard(); }
+function markKnown(v) { known[idx] = v; renderCard(); updateProgress(); if (v && idx < deck.length-1) setTimeout(()=>navigate(1), 400); }
+function shuffle() {
+  for (let i = deck.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
+  idx = 0; known = {}; renderCard(); updateProgress();
+}
+function resetDeck() { known = {}; idx = 0; buildDeck(activeFilter); }
+function updateProgress() {
+  const total = deck.length, done = Object.values(known).filter(Boolean).length;
+  document.getElementById('prog-fill').style.width = (done/total*100) + '%';
+  document.getElementById('prog-text').textContent = done + ' / ' + total;
+}
+
+buildDeck('all');
+</script>
+</body>
+</html>

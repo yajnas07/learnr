@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Control and Coordination</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #060d1a; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#14b8a6,#a855f7,#ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 280px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%;
+  background:rgba(6,13,26,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(20,184,166,.15);
+  position:relative; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a9ab8; text-decoration:none;
+  border:1px solid rgba(26,45,69,.9); border-radius:99px;
+  padding:.2rem .65rem;
+}
+.site-nav-back:hover { color:#dde6f5; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<div id="ui">
+  <div>
+    <h1>Control and Coordination</h1>
+    <p>Class X · CBSE · Mind Map — drag &amp; hover to explore</p>
+  </div>
+</div>
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale = 1, ox = 0, oy = 0;
+let dragging = false, dragStart = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight - 46;
+  ox = W/2; oy = H/2 + 30;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Control &\nCoordination', x:0, y:0, r:66,
+  color:'#0d1f2d', stroke:'#14b8a6', textColor:'#99f6e4', fontSize:12
+};
+
+const BRANCHES = [
+  // ── Nervous System ──
+  {
+    id:'nervous', label:'Nervous\nSystem', x:-320, y:-180, r:46,
+    color:'#042626', stroke:'#14b8a6', textColor:'#5eead4',
+    info:'Controls and coordinates body activities through electrical impulses.\nTwo main divisions: CNS and PNS.',
+    children:[
+      { id:'ns1', label:'CNS', x:-520, y:-300, r:36,
+        color:'#042626', stroke:'#2dd4bf', textColor:'#ccfbf1',
+        info:'Central Nervous System:\n• Brain — protected by cranium\n• Spinal cord — protected by vertebral column\nProcesses all information and sends commands.' },
+      { id:'ns2', label:'PNS', x:-560, y:-160, r:36,
+        color:'#042626', stroke:'#2dd4bf', textColor:'#ccfbf1',
+        info:'Peripheral Nervous System:\nAll nerves connecting CNS to body organs.\n• Somatic NS: Voluntary actions\n• Autonomic NS: Involuntary (heart, digestion)' },
+      { id:'ns3', label:'Nerve\nImpulse', x:-460, y:-30, r:36,
+        color:'#042626', stroke:'#2dd4bf', textColor:'#ccfbf1',
+        info:'Electrical signal that travels along a neuron.\nCreated by movement of Na⁺/K⁺ ions across nerve membrane.\nSpeed: 1–100 m/s depending on neuron type.' },
+    ]
+  },
+  // ── Neuron ──
+  {
+    id:'neuron', label:'Neuron\nStructure', x:-320, y:180, r:46,
+    color:'#08133d', stroke:'#3b82f6', textColor:'#93c5fd',
+    info:'Structural and functional unit of the nervous system.\nSpecialised for transmission of electrical signals.',
+    children:[
+      { id:'nr1', label:'Dendrites', x:-540, y:90, r:36,
+        color:'#08133d', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'Short, branched projections from the cell body.\nReceive impulses from other neurons or receptor cells.\nCarry impulse TOWARDS the cell body.' },
+      { id:'nr2', label:'Cell Body\n(Cyton)', x:-560, y:210, r:36,
+        color:'#08133d', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'Contains nucleus and most cellular machinery.\nAlso called soma or cyton.\nMetabolic centre of the neuron.' },
+      { id:'nr3', label:'Axon &\nMyelin', x:-500, y:330, r:36,
+        color:'#08133d', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'Axon: Long fibre that carries impulse AWAY from cell body.\nMyelin sheath: Fatty insulation around axon (speeds up signal).\nNodes of Ranvier: Gaps in myelin sheath.' },
+      { id:'nr4', label:'Synapse', x:-340, y:370, r:36,
+        color:'#08133d', stroke:'#60a5fa', textColor:'#bfdbfe',
+        info:'Junction between two neurons or neuron and effector.\nGap is called synaptic cleft.\nNeurotransmitters (acetylcholine, dopamine) carry signal across gap.' },
+    ]
+  },
+  // ── Reflex Action ──
+  {
+    id:'reflex', label:'Reflex\nAction', x:0, y:-320, r:46,
+    color:'#1a0733', stroke:'#a855f7', textColor:'#d8b4fe',
+    info:'Rapid, involuntary response to a stimulus.\nDoes NOT involve conscious thought.\nControlled by spinal cord.',
+    children:[
+      { id:'ra1', label:'Reflex Arc', x:-200, y:-460, r:36,
+        color:'#1a0733', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'Pathway of reflex action:\nReceptor → Sensory neuron → Spinal cord (relay) → Motor neuron → Effector\nEx: Knee-jerk, touching hot object' },
+      { id:'ra2', label:'Types of\nReflexes', x:10, y:-490, r:36,
+        color:'#1a0733', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'Spinal reflex: Controlled by spinal cord (touching hot object).\nCranial reflex: Controlled by brain (pupil dilation, sneezing).\nConditioned reflex: Learned response (Pavlov\'s dog).' },
+      { id:'ra3', label:'Importance', x:200, y:-460, r:36,
+        color:'#1a0733', stroke:'#c084fc', textColor:'#ede9fe',
+        info:'• Fast response — no time for brain analysis\n• Protects body from injury\n• Allows brain to focus on complex tasks\n• Frees cerebrum for higher functions' },
+    ]
+  },
+  // ── Brain ──
+  {
+    id:'brain', label:'Human\nBrain', x:320, y:-180, r:46,
+    color:'#2d0a2e', stroke:'#ec4899', textColor:'#f9a8d4',
+    info:'Protected by cranium (skull) and meninges.\nFloats in cerebrospinal fluid (CSF) for shock absorption.\nThree main parts: Forebrain, Midbrain, Hindbrain.',
+    children:[
+      { id:'br1', label:'Cerebrum', x:510, y:-310, r:36,
+        color:'#2d0a2e', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Largest part of the brain.\nControls: Thought, memory, reasoning, voluntary actions, speech, senses.\nDivided into two hemispheres by corpus callosum.' },
+      { id:'br2', label:'Cerebellum', x:560, y:-170, r:36,
+        color:'#2d0a2e', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Located at the back of the brain.\nControls: Balance, posture, coordination of muscle movements.\nMakes movements smooth and precise.\n"Coordination centre"' },
+      { id:'br3', label:'Medulla\nOblongata', x:540, y:-30, r:36,
+        color:'#2d0a2e', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Part of the brain stem.\nControls: Involuntary actions — heartbeat, breathing, blood pressure, swallowing, vomiting.\n"Vital centre" — damage is fatal.' },
+      { id:'br4', label:'Hypothalamus\n& Thalamus', x:380, y:-360, r:36,
+        color:'#2d0a2e', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Hypothalamus: Controls body temperature, hunger, thirst, sleep. Links nervous & endocrine systems. Controls pituitary gland.\nThalamus: Relay station for sensory signals to cerebrum.' },
+    ]
+  },
+  // ── Endocrine System ──
+  {
+    id:'endocrine', label:'Endocrine\nSystem', x:320, y:180, r:46,
+    color:'#2a1500', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'Chemical coordination through hormones secreted into bloodstream.\nSlower but longer-lasting than nervous system.',
+    children:[
+      { id:'en1', label:'Pituitary\nGland', x:520, y:80, r:36,
+        color:'#2a1500', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Master gland — controls all other endocrine glands.\nLocation: Base of brain (sella turcica).\nHormones: GH (growth), TSH, ADH, Oxytocin.\nPituitary tumour → gigantism/acromegaly.' },
+      { id:'en2', label:'Thyroid &\nAdrenal', x:560, y:200, r:36,
+        color:'#2a1500', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Thyroid (neck): Thyroxine — regulates metabolism, growth.\nDeficiency → Goitre (iodine deficiency).\nAdrenal (on kidneys): Adrenaline — "fight or flight" hormone.\nIncreases heart rate, blood pressure, dilates pupils.' },
+      { id:'en3', label:'Pancreas &\nGonads', x:510, y:320, r:36,
+        color:'#2a1500', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Pancreas: Islets of Langerhans.\n• Insulin (Beta cells) → lowers blood sugar\n• Glucagon (Alpha cells) → raises blood sugar\nDeficiency of insulin → Diabetes mellitus.\nTestes: Testosterone (male sex hormone)\nOvaries: Oestrogen & Progesterone (female)' },
+      { id:'en4', label:'Hormones\nvs Nerves', x:360, y:380, r:36,
+        color:'#2a1500', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Nervous: Fast (ms), electrical, short-lived, specific target.\nEndocrine: Slow (minutes-hours), chemical (blood), long-lasting, broad effect.\nFeedback mechanism maintains hormonal balance (homeostasis).' },
+    ]
+  },
+  // ── Plant Coordination ──
+  {
+    id:'plant', label:'Plant\nCoordination', x:0, y:320, r:46,
+    color:'#052012', stroke:'#22c55e', textColor:'#86efac',
+    info:'Plants lack nervous system. Coordinate via:\n1. Plant hormones (phytohormones)\n2. Directional growth movements (tropisms)',
+    children:[
+      { id:'pl1', label:'Plant\nHormones', x:-230, y:450, r:36,
+        color:'#052012', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'Auxin: Promotes cell elongation; phototropism.\nGibberellin: Stem elongation, seed germination.\nCytokinin: Cell division, delays senescence.\nAbscisic Acid (ABA): Inhibitor — seed dormancy, wilting, stomata closure.' },
+      { id:'pl2', label:'Tropisms', x:0, y:490, r:36,
+        color:'#052012', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'Directional growth movements in response to stimuli:\n• Phototropism: Light (shoots +ve, roots −ve)\n• Geotropism: Gravity (roots +ve, shoots −ve)\n• Hydrotropism: Water (roots +ve)\n• Thigmotropism: Touch (climbing tendrils +ve)' },
+      { id:'pl3', label:'Auxin &\nPhototropism', x:230, y:450, r:36,
+        color:'#052012', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'Light from one side:\nAuxin moves to shaded side of shoot.\nShaded side grows more → shoot bends TOWARDS light.\nRoot tip: auxin inhibits growth → root bends AWAY from light.\nExperiment: Darwin (1880), Went (1926)' },
+    ]
+  },
+];
+
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+function getNode(id) { return allNodes.find(n=>n.id===id); }
+
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { ox=dragOrigin.x+(e.clientX-dragStart.x); oy=dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy+46)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){
+    tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>dragging=false);
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:0.91; zoomAt(f,e.clientX,e.clientY); },{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }});
+canvas.addEventListener('touchmove',e=>{ e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d; }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.3,Math.min(2.5,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+30; draw(); }
+
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy);
+  ctx.scale(scale,scale);
+
+  // background grid
+  ctx.save();
+  ctx.strokeStyle='rgba(20,184,166,.04)';
+  ctx.lineWidth=1;
+  for(let x=-1200;x<1200;x+=60){ ctx.beginPath();ctx.moveTo(x,-1200);ctx.lineTo(x,1200);ctx.stroke(); }
+  for(let y=-1200;y<1200;y+=60){ ctx.beginPath();ctx.moveTo(-1200,y);ctx.lineTo(1200,y);ctx.stroke(); }
+  ctx.restore();
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'99');
+    grd.addColorStop(1,b.stroke+'44');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2-30;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[4,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?35:18;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||11}px Nunito,sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=14;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>
