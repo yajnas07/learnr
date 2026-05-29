@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Introduction to Trigonometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8;
+    --correct:#22c55e; --wrong:#ef4444;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 40% at 50% 0%, rgba(245,158,11,.04) 0%, transparent 60%); }
+
+  header { text-align:center; padding:1.8rem 1rem 1rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2rem); font-weight:900; color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .dash { display:flex; justify-content:center; gap:.9rem; flex-wrap:wrap; padding:.8rem 1rem 1.2rem; }
+  .dcard { background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:.6rem 1.2rem; text-align:center; min-width:84px; }
+  .dval { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; }
+  .dlbl { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-top:.1rem; }
+
+  nav { display:flex; justify-content:center; flex-wrap:wrap; gap:.45rem; padding:0 1rem 1.2rem; }
+  nav button { font-family:'Playfair Display',serif; font-weight:700; font-size:.76rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  nav button:hover { color:var(--text); }
+  nav button.active { border-color:var(--amber); color:var(--amber); background:rgba(245,158,11,.08); }
+
+  main { max-width:800px; margin:0 auto; padding:0 1rem 4rem; }
+
+  .q-card { background:var(--card); border:1px solid var(--border); border-radius:14px;
+    margin-bottom:1rem; overflow:hidden; transition:box-shadow .2s;
+    animation:slideIn .3s ease both; }
+  .q-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.5); }
+  @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .q-header { display:flex; align-items:flex-start; gap:.7rem; padding:1rem 1.1rem .7rem; }
+  .q-num { font-family:'DM Mono',monospace; font-size:.68rem; min-width:28px; height:28px;
+    border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .q-text { font-family:'Playfair Display',serif; font-size:.92rem; font-weight:700; line-height:1.45; flex:1; }
+  .q-meta { display:flex; gap:.35rem; flex-wrap:wrap; padding:0 1.1rem .7rem 4rem; }
+
+  .badge { font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .48rem; border-radius:2px; }
+  .b-mcq    { background:rgba(56,189,248,.12);  color:var(--blue); }
+  .b-short  { background:rgba(34,197,94,.12);   color:var(--green); }
+  .b-long   { background:rgba(245,158,11,.12);  color:var(--amber); }
+  .b-assert { background:rgba(129,140,248,.12); color:var(--indigo); }
+  .b-1m { background:rgba(148,163,184,.08); color:#94a3b8; }
+  .b-2m { background:rgba(245,158,11,.1);   color:#fde68a; }
+  .b-3m { background:rgba(249,115,22,.1);   color:#fed7aa; }
+  .b-5m { background:rgba(239,68,68,.12);   color:#fca5a5; }
+
+  .strip-rat { border-left:4px solid var(--teal); }
+  .strip-ang { border-left:4px solid var(--amber); }
+  .strip-idt { border-left:4px solid var(--blue); }
+  .strip-cmp { border-left:4px solid var(--indigo); }
+  .strip-prb { border-left:4px solid var(--green); }
+
+  .mcq-body { padding:0 1.1rem .6rem; }
+  .mcq-opts { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; margin-bottom:.5rem; }
+  @media(max-width:480px){ .mcq-opts { grid-template-columns:1fr; } }
+  .opt-btn { display:flex; align-items:center; gap:.55rem; background:var(--card2);
+    border:1.5px solid var(--border); border-radius:8px; padding:.55rem .75rem;
+    cursor:pointer; transition:all .16s; text-align:left; color:var(--text);
+    font-family:'Lato',sans-serif; font-size:.82rem; font-weight:600; }
+  .opt-btn:hover:not(:disabled) { border-color:#2a4a6a; background:#0f2035; }
+  .opt-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); min-width:18px; }
+  .opt-btn.correct { border-color:var(--correct); background:rgba(34,197,94,.1); color:#4ade80; }
+  .opt-btn.wrong   { border-color:var(--wrong);   background:rgba(239,68,68,.08); color:#fca5a5; }
+  .feedback { font-size:.76rem; font-family:'DM Mono',monospace; padding:.35rem .7rem;
+    border-radius:6px; margin:.25rem 0 .5rem; display:none; }
+  .feedback.correct { background:rgba(34,197,94,.08);  color:#4ade80; display:block; }
+  .feedback.wrong   { background:rgba(239,68,68,.08); color:#f87171; display:block; }
+
+  .ans-reveal { overflow:hidden; max-height:0; transition:max-height .38s ease; }
+  .ans-reveal.open { max-height:900px; }
+  .ans-body { padding:.75rem 1.1rem 1rem; border-top:1px solid var(--border); }
+  .ans-lbl { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--green); margin-bottom:.4rem; }
+  .ans-text { font-size:.84rem; color:var(--text); line-height:1.75; }
+  .ans-text strong { color:var(--amber); }
+  .ans-text em { color:var(--teal); font-style:normal; }
+  .ans-mono { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--teal);
+    background:rgba(45,212,191,.06); border:1px solid rgba(45,212,191,.12);
+    border-radius:6px; padding:.5rem .75rem; margin:.4rem 0; line-height:1.8; }
+  .tip { font-size:.74rem; color:var(--amber); background:rgba(245,158,11,.06);
+    border-left:3px solid var(--amber); border-radius:0 6px 6px 0;
+    padding:.38rem .65rem; margin-top:.5rem; }
+
+  .show-btn { display:inline-flex; align-items:center; gap:.35rem; font-family:'Playfair Display',serif;
+    font-weight:700; font-size:.74rem; padding:.38rem .9rem; border-radius:3px;
+    border:1px solid var(--border); background:transparent; color:var(--muted);
+    cursor:pointer; transition:all .18s; margin:.15rem 0 .7rem 1.1rem; }
+  .show-btn:hover { color:var(--text); border-color:#2a4a6a; }
+  .show-btn.active { color:var(--green); border-color:var(--green); background:rgba(34,197,94,.06); }
+
+  .reset-bar { text-align:center; padding:1rem; }
+  .reset-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.82rem;
+    padding:.55rem 1.6rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .reset-btn:hover { border-color:var(--red); color:var(--red); }
+
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Trigonometry · Mathematics Ch.8 · Class X CBSE · 30 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dcard"><div class="dval">30</div><div class="dlbl">Total</div></div>
+  <div class="dcard"><div class="dval" id="d-att" style="color:var(--amber)">0</div><div class="dlbl">Attempted</div></div>
+  <div class="dcard"><div class="dval" id="d-cor" style="color:var(--correct)">0</div><div class="dlbl">Correct</div></div>
+  <div class="dcard"><div class="dval" id="d-sc" style="color:var(--indigo)">0%</div><div class="dlbl">Score</div></div>
+</div>
+
+<nav>
+  <button class="active" onclick="filter('all',this)">All (30)</button>
+  <button onclick="filter('mcq',this)">MCQ</button>
+  <button onclick="filter('short',this)">Short Answer</button>
+  <button onclick="filter('long',this)">Long Answer</button>
+  <button onclick="filter('assert',this)">Assertion–Reason</button>
+</nav>
+
+<main id="qlist"></main>
+<div class="reset-bar"><button class="reset-btn" onclick="resetAll()">↺ Reset All</button></div>
+
+<script>
+const Q = [
+  // ── MCQ ──
+  {id:1,type:'mcq',topic:'rat',marks:1,
+   q:'If in a right triangle, sin θ = 3/5, then cos θ is:',
+   opts:['4/5','3/4','5/3','5/4'],
+   ans:0,
+   explain:'sin θ = O/H = 3/5, so O=3, H=5. By Pythagoras, A = √(25−9) = 4. cos θ = A/H = 4/5.'},
+
+  {id:2,type:'mcq',topic:'ang',marks:1,
+   q:'The value of sin 30° + cos 60° is:',
+   opts:['1','1/2','√3/2','0'],
+   ans:0,
+   explain:'sin 30° = 1/2 and cos 60° = 1/2. So sin 30° + cos 60° = 1/2 + 1/2 = 1.'},
+
+  {id:3,type:'mcq',topic:'idt',marks:1,
+   q:'If sin²θ + cos²θ = 1, then 1 + tan²θ equals:',
+   opts:['cosec²θ','sec²θ','cot²θ','sin²θ'],
+   ans:1,
+   explain:'Dividing sin²θ + cos²θ = 1 by cos²θ gives tan²θ + 1 = sec²θ. This is the second fundamental identity.'},
+
+  {id:4,type:'mcq',topic:'ang',marks:1,
+   q:'The value of tan 45° is:',
+   opts:['0','1','√3','1/√3'],
+   ans:1,
+   explain:'In a 45-45-90 triangle, both legs are equal, so tan 45° = opposite/adjacent = 1/1 = 1.'},
+
+  {id:5,type:'mcq',topic:'cmp',marks:1,
+   q:'sin(90° − θ) is equal to:',
+   opts:['sin θ','−sin θ','cos θ','tan θ'],
+   ans:2,
+   explain:'Complementary angle formula: sin(90°−θ) = cos θ. The "co" in cosine literally means complement\'s sine.'},
+
+  {id:6,type:'mcq',topic:'ang',marks:1,
+   q:'Which of the following is NOT defined?',
+   opts:['sin 0°','cos 90°','tan 90°','cot 90°'],
+   ans:2,
+   explain:'tan 90° = sin 90°/cos 90° = 1/0, which is undefined. sin 0°=0, cos 90°=0, cot 90°=cos 90°/sin 90°=0/1=0 are all defined.'},
+
+  {id:7,type:'mcq',topic:'idt',marks:1,
+   q:'(sec²θ − 1) is equal to:',
+   opts:['sin²θ','cos²θ','tan²θ','cot²θ'],
+   ans:2,
+   explain:'From 1 + tan²θ = sec²θ, rearranging gives sec²θ − 1 = tan²θ.'},
+
+  {id:8,type:'mcq',topic:'rat',marks:1,
+   q:'If tan θ = 1/√3, then the value of θ is:',
+   opts:['30°','45°','60°','90°'],
+   ans:0,
+   explain:'From the standard table, tan 30° = 1/√3. So θ = 30°.'},
+
+  {id:9,type:'mcq',topic:'cmp',marks:1,
+   q:'The value of cos 48° − sin 42° is:',
+   opts:['1','0','1/2','−1'],
+   ans:1,
+   explain:'cos 48° = cos(90°−42°) = sin 42°. So cos 48° − sin 42° = sin 42° − sin 42° = 0.'},
+
+  {id:10,type:'mcq',topic:'rat',marks:1,
+   q:'If cos θ = 0, then θ is:',
+   opts:['0°','30°','60°','90°'],
+   ans:3,
+   explain:'From the standard table, cos 90° = 0. So θ = 90°.'},
+
+  // ── ASSERTION-REASON ──
+  {id:11,type:'assert',topic:'idt',marks:1,
+   q:'Assertion (A): sin²θ + cos²θ = 1 for all acute angles θ.\nReason (R): This identity is derived from the Pythagoras Theorem.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both are true, and R correctly explains A. Proof: In right △, O²+A²=H². Dividing by H² gives (O/H)²+(A/H)²=1, i.e., sin²θ+cos²θ=1.'},
+
+  {id:12,type:'assert',topic:'cmp',marks:1,
+   q:'Assertion (A): sin 50° = cos 40°.\nReason (R): sin(90°−θ) = cos θ for all acute angles θ.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both are true, and R explains A. sin 50° = sin(90°−40°) = cos 40° by the complementary angle formula.'},
+
+  {id:13,type:'assert',topic:'ang',marks:1,
+   q:'Assertion (A): tan 90° = 1.\nReason (R): tan θ = sin θ / cos θ.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:3,
+   explain:'A is FALSE — tan 90° is undefined (not equal to 1). R is TRUE — tan θ = sin θ/cos θ is correct. In fact, R helps explain why A is false: tan 90° = sin 90°/cos 90° = 1/0 = undefined.'},
+
+  {id:14,type:'assert',topic:'idt',marks:1,
+   q:'Assertion (A): sec²θ − tan²θ = 1.\nReason (R): (sec θ − tan θ)(sec θ + tan θ) = 1.',
+   opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+   ans:0,
+   explain:'Both are true, and R explains A. sec²θ − tan²θ = 1 can be factored as (secθ−tanθ)(secθ+tanθ) = 1 using difference of squares.'},
+
+  // ── SHORT ANSWER ──
+  {id:15,type:'short',topic:'rat',marks:2,
+   q:'If tan θ = 5/12, find all other trigonometric ratios of θ.',
+   ans:'tan θ = O/A = 5/12\nO = 5, A = 12\nH = √(25 + 144) = √169 = <strong>13</strong>\n\nsin θ = O/H = <strong>5/13</strong>\ncos θ = A/H = <strong>12/13</strong>\ncosec θ = H/O = <strong>13/5</strong>\nsec θ = H/A = <strong>13/12</strong>\ncot θ = A/O = <strong>12/5</strong>',
+   tip:'Draw the right triangle, label O and A, use Pythagoras for H. 5-12-13 is a standard triplet.'},
+
+  {id:16,type:'short',topic:'ang',marks:2,
+   q:'Evaluate: 2 tan²45° + cos²30° − sin²60°',
+   ans:'= 2(1)² + (√3/2)² − (√3/2)²\n= 2 + 3/4 − 3/4\n= <strong>2</strong>\n\nNote: cos 30° = sin 60° = √3/2, so their squares cancel out!',
+   tip:'Substitute standard values first, then simplify step by step.'},
+
+  {id:17,type:'short',topic:'cmp',marks:2,
+   q:'Evaluate: (sin²63° + sin²27°) / (cos²17° + cos²73°)',
+   ans:'sin 63° = sin(90°−27°) = cos 27°\n∴ sin²63° + sin²27° = cos²27° + sin²27° = <strong>1</strong>\n\ncos 73° = cos(90°−17°) = sin 17°\n∴ cos²17° + cos²73° = cos²17° + sin²17° = <strong>1</strong>\n\n∴ Answer = 1/1 = <strong>1</strong>',
+   tip:'Look for complementary pairs. 63+27=90 and 73+17=90.'},
+
+  {id:18,type:'short',topic:'idt',marks:3,
+   q:'Prove that: (1 + tan²θ) / (1 + cot²θ) = tan²θ',
+   ans:'LHS = (1 + tan²θ) / (1 + cot²θ)\n= sec²θ / cosec²θ  [using identities ② and ③]\n= (1/cos²θ) / (1/sin²θ)\n= sin²θ / cos²θ\n= <strong>tan²θ = RHS</strong>\n\n∴ LHS = RHS. Hence proved. ■',
+   tip:'Replace 1+tan²θ with sec²θ and 1+cot²θ with cosec²θ, then convert to sin and cos.'},
+
+  {id:19,type:'short',topic:'cmp',marks:2,
+   q:'If tan A = cot B, prove that A + B = 90°.',
+   ans:'Given: tan A = cot B\nWe know: cot B = tan(90°−B)\n∴ tan A = tan(90°−B)\n∴ A = 90° − B\n∴ <strong>A + B = 90°</strong>\n\nHence proved. ■',
+   tip:'Convert cot B to tan using the complementary formula, then compare arguments.'},
+
+  {id:20,type:'short',topic:'ang',marks:2,
+   q:'If sin(A+B) = 1 and cos(A−B) = √3/2, where 0° < A+B ≤ 90°, find A and B.',
+   ans:'sin(A+B) = 1 → A+B = 90° ...(i)\ncos(A−B) = √3/2 → A−B = 30° ...(ii)\n\nAdding (i) and (ii): 2A = 120° → <strong>A = 60°</strong>\nSubtracting: 2B = 60° → <strong>B = 30°</strong>\n\nVerify: sin 90°=1 ✓, cos 30°=√3/2 ✓',
+   tip:'Convert trig equations to angle equations, then solve simultaneous equations.'},
+
+  {id:21,type:'short',topic:'idt',marks:3,
+   q:'Prove that: (cosec θ − cot θ)² = (1 − cos θ) / (1 + cos θ)',
+   ans:'LHS = (cosec θ − cot θ)²\n= (1/sinθ − cosθ/sinθ)²\n= ((1−cosθ)/sinθ)²\n= (1−cosθ)² / sin²θ\n= (1−cosθ)² / (1−cos²θ)  [sin²θ = 1−cos²θ]\n= (1−cosθ)² / ((1−cosθ)(1+cosθ))\n= (1−cosθ) / (1+cosθ) = <strong>RHS</strong> ■',
+   tip:'Convert cosec and cot to sin and cos, then factorise using difference of squares.'},
+
+  {id:22,type:'short',topic:'rat',marks:2,
+   q:'In △PQR, right-angled at Q, PQ = 3 cm and PR = 6 cm. Find ∠QPR and ∠QRP.',
+   ans:'sin(∠QPR) = QR/PR\nFirst find QR: QR = √(PR²−PQ²) = √(36−9) = √27 = 3√3\n\nsin(∠QPR) = QR/PR = 3√3/6 = √3/2\n∴ <strong>∠QPR = 60°</strong>\n\ncos(∠QPR) = PQ/PR = 3/6 = 1/2 ✓ (confirms 60°)\n\n∠QRP = 90° − 60° = <strong>30°</strong>',
+   tip:'Use Pythagoras for the missing side, then match ratios with standard values.'},
+
+  {id:23,type:'short',topic:'cmp',marks:2,
+   q:'Evaluate: tan 1° · tan 2° · tan 3° · … · tan 89°',
+   ans:'Pair: tan k° × tan(90°−k°) = tan k° × cot k° = 1\n\nPairs: (1°,89°), (2°,88°), ..., (44°,46°) → 44 pairs, each = 1\nMiddle term: tan 45° = 1\n\n∴ Product = 1⁴⁴ × 1 = <strong>1</strong>',
+   tip:'The pairing trick: tan k° × tan(90°−k°) = tan k° × cot k° = 1.'},
+
+  {id:24,type:'short',topic:'idt',marks:3,
+   q:'Prove that: (sin θ + cosec θ)² + (cos θ + sec θ)² = 7 + tan²θ + cot²θ',
+   ans:'LHS = sin²θ + 2·sinθ·cosecθ + cosec²θ + cos²θ + 2·cosθ·secθ + sec²θ\n= sin²θ + cos²θ + 2 + 2 + cosec²θ + sec²θ\n= 1 + 4 + (1+cot²θ) + (1+tan²θ)\n= 1 + 4 + 1 + cot²θ + 1 + tan²θ\n= <strong>7 + tan²θ + cot²θ = RHS</strong> ■',
+   tip:'Expand the squares, use sinθ·cosecθ=1 and cosθ·secθ=1, then apply identities.'},
+
+  // ── LONG ANSWER ──
+  {id:25,type:'long',topic:'idt',marks:5,
+   q:'Prove that: (cos A − sin A + 1) / (cos A + sin A − 1) = cosec A + cot A, using the identity cosec²A = 1 + cot²A.',
+   ans:'<strong>Divide numerator and denominator by sin A:</strong>\nLHS = (cotA − 1 + cosecA) / (cotA + 1 − cosecA)\n= (cotA + cosecA − 1) / (cotA − cosecA + 1)\n\n<strong>Use cosec²A − cot²A = 1, so 1 = (cosecA−cotA)(cosecA+cotA):</strong>\n\nMultiply numerator & denominator by (cosecA − cotA):\n= (cosecA−cotA)(cotA+cosecA−1) / ((cosecA−cotA)(cotA−cosecA+1))\n\nNumerator: (cosec²A−cot²A) − (cosecA−cotA) = 1 − cosecA + cotA\nDenominator: (cosecA−cotA)(cotA−cosecA+1) = (cosecA−cotA)(1−(cosecA−cotA))\n\nAfter simplification:\n= 1/(cosecA − cotA)\n= (cosecA + cotA)/((cosecA−cotA)(cosecA+cotA))\n= (cosecA + cotA)/1\n= <strong>cosecA + cotA = RHS</strong> ■',
+   tip:'HOTS level. Key trick: divide by sin A first, then multiply by the conjugate (cosec A − cot A).'},
+
+  {id:26,type:'long',topic:'prb',marks:5,
+   q:'If sin θ + cos θ = √2, prove that tan θ + cot θ = 2.',
+   ans:'<strong>Given:</strong> sin θ + cos θ = √2\n\n<strong>Square both sides:</strong>\nsin²θ + 2 sin θ cos θ + cos²θ = 2\n1 + 2 sin θ cos θ = 2\n2 sin θ cos θ = 1\n<strong>sin θ cos θ = 1/2</strong> ...(i)\n\n<strong>Now find tan θ + cot θ:</strong>\ntan θ + cot θ = sin θ/cos θ + cos θ/sin θ\n= (sin²θ + cos²θ) / (sin θ cos θ)\n= 1 / (sin θ cos θ)\n= 1 / (1/2)  [from (i)]\n= <strong>2</strong>\n\n∴ tan θ + cot θ = 2. Hence proved. ■',
+   tip:'Square the given condition to get sinθ cosθ, then express tanθ+cotθ in terms of sinθ cosθ.'},
+
+  {id:27,type:'long',topic:'idt',marks:5,
+   q:'Prove that: (1 + sin θ) / (1 − sin θ) = (sec θ + tan θ)²',
+   ans:'<strong>Method: Start from RHS</strong>\nRHS = (sec θ + tan θ)²\n= (1/cosθ + sinθ/cosθ)²\n= ((1 + sinθ)/cosθ)²\n= (1 + sinθ)² / cos²θ\n= (1 + sinθ)² / (1 − sin²θ)  [cos²θ = 1−sin²θ]\n= (1 + sinθ)² / ((1−sinθ)(1+sinθ))\n= (1 + sinθ) / (1 − sinθ)\n= <strong>LHS</strong>\n\n∴ LHS = RHS. Hence proved. ■',
+   tip:'Start from RHS (simpler to expand). Convert to sinθ and cosθ, use cos²θ = 1−sin²θ, factorise.'},
+
+  {id:28,type:'long',topic:'prb',marks:5,
+   q:'In a right triangle ABC, right-angled at B, if tan A = 1/√3, find the values of:\n(i) sin A cos C + cos A sin C\n(ii) cos A cos C − sin A sin C',
+   ans:'<strong>Given:</strong> tan A = 1/√3 → A = 30° → C = 60° (since A+C=90°)\n\nAlternatively: tan A = 1/√3 = O/A → O=1, A=√3, H=2\nsin A = 1/2, cos A = √3/2\nsin C = cos A = √3/2, cos C = sin A = 1/2\n\n<strong>(i) sin A cos C + cos A sin C</strong>\n= (1/2)(1/2) + (√3/2)(√3/2)\n= 1/4 + 3/4\n= <strong>1</strong>\n\n<strong>(ii) cos A cos C − sin A sin C</strong>\n= (√3/2)(1/2) − (1/2)(√3/2)\n= √3/4 − √3/4\n= <strong>0</strong>\n\nNote: (i) = sin(A+C) = sin 90° = 1 ✓\n(ii) = cos(A+C) = cos 90° = 0 ✓',
+   tip:'Find the actual angles first (30° and 60°), then substitute. Verify using compound angle identities.'},
+
+  {id:29,type:'short',topic:'rat',marks:3,
+   q:'If sec θ = 13/5, find all other trigonometric ratios.',
+   ans:'sec θ = H/A = 13/5 → H=13, A=5\nO = √(H²−A²) = √(169−25) = √144 = <strong>12</strong>\n\nsin θ = O/H = <strong>12/13</strong>\ncos θ = A/H = <strong>5/13</strong>\ntan θ = O/A = <strong>12/5</strong>\ncosec θ = H/O = <strong>13/12</strong>\ncot θ = A/O = <strong>5/12</strong>',
+   tip:'sec θ = H/A gives H and A directly. Use Pythagoras for O. 5-12-13 triplet!'},
+
+  {id:30,type:'short',topic:'idt',marks:3,
+   q:'Prove that: √((1 − cos θ)/(1 + cos θ)) = cosec θ − cot θ',
+   ans:'LHS = √((1−cosθ)/(1+cosθ))\n\nRationalise: multiply inside by (1−cosθ)/(1−cosθ):\n= √((1−cosθ)² / (1−cos²θ))\n= √((1−cosθ)² / sin²θ)\n= (1−cosθ) / sinθ\n= 1/sinθ − cosθ/sinθ\n= <strong>cosecθ − cotθ = RHS</strong> ■',
+   tip:'Rationalise the expression under the root by multiplying by (1−cosθ)/(1−cosθ). Then use 1−cos²θ = sin²θ.'},
+];
+
+const state = {};
+let currentFilter = 'all';
+
+const topicStrip = {rat:'strip-rat',ang:'strip-ang',idt:'strip-idt',cmp:'strip-cmp',prb:'strip-prb'};
+const topicBg    = {rat:'rgba(45,212,191,.1)',ang:'rgba(245,158,11,.1)',idt:'rgba(56,189,248,.1)',cmp:'rgba(129,140,248,.1)',prb:'rgba(34,197,94,.1)'};
+const topicCol   = {rat:'#2dd4bf',ang:'#f59e0b',idt:'#38bdf8',cmp:'#818cf8',prb:'#22c55e'};
+const typeBadge  = {mcq:'b-mcq MCQ',short:'b-short Short Answer',long:'b-long Long Answer',assert:'b-assert Assertion–Reason'};
+const markBadge  = m => { const c={1:'b-1m',2:'b-2m',3:'b-3m',5:'b-5m'}[m]||'b-1m'; return `<span class="badge ${c}">${m} mark${m>1?'s':''}</span>`; };
+
+function getVisible() { return currentFilter==='all'?Q:Q.filter(q=>q.type===currentFilter); }
+
+function filter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function renderMCQ(q) {
+  const s=state[q.id]||{}; const done=s.chosen!==undefined;
+  return `<div class="mcq-body">
+    <div class="mcq-opts">
+      ${q.opts.map((o,i)=>{
+        let cls='';
+        if(done){ if(i===q.ans)cls='correct'; else if(i===s.chosen&&i!==q.ans)cls='wrong'; }
+        return `<button class="opt-btn ${cls}" onclick="chooseMCQ(${q.id},${i})" ${done?'disabled':''}>
+          <span class="opt-lbl">${String.fromCharCode(65+i)}</span>${o}</button>`;
+      }).join('')}
+    </div>
+    ${done?`<div class="feedback ${s.chosen===q.ans?'correct':'wrong'}">
+      ${s.chosen===q.ans?'✓ Correct!':'✗ Incorrect — correct answer: '+String.fromCharCode(65+q.ans)}</div>
+      <div class="ans-body" style="border-top:1px solid var(--border);padding:.6rem 0 .3rem">
+        <div class="ans-lbl">💡 Explanation</div>
+        <div class="ans-text">${q.explain}</div>
+      </div>`:''}
+  </div>`;
+}
+
+function renderShortLong(q) {
+  const s=state[q.id]||{}; const open=s.open;
+  const ansHtml=`<div class="ans-lbl">✅ Model Answer</div>
+    <div class="ans-mono">${(q.ans||'').replace(/\n/g,'<br>')}</div>
+    ${q.tip?`<div class="tip">🎯 Exam tip: ${q.tip}</div>`:''}`;
+  return `<button class="show-btn ${open?'active':''}" onclick="toggleAns(${q.id})">
+    ${open?'▲ Hide Answer':'▼ Show Model Answer'}
+  </button>
+  <div class="ans-reveal ${open?'open':''}">
+    <div class="ans-body">${ansHtml}</div>
+  </div>`;
+}
+
+function render() {
+  const list=getVisible(); const el=document.getElementById('qlist');
+  el.innerHTML=list.map((q,i)=>{
+    const tb=typeBadge[q.type].split(' ');
+    return `<div class="q-card ${topicStrip[q.topic]||''}" id="qcard-${q.id}">
+      <div class="q-header">
+        <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+        <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>
+        ${markBadge(q.marks)}
+      </div>
+      ${q.type==='mcq'||q.type==='assert'?renderMCQ(q):renderShortLong(q)}
+    </div>`;
+  }).join('');
+}
+
+function chooseMCQ(id,idx) {
+  const q=Q.find(x=>x.id===id); if(!q||state[id]?.chosen!==undefined)return;
+  if(!state[id])state[id]={};
+  state[id].chosen=idx;
+  updateDash();
+  const visible=getVisible(), i=visible.findIndex(x=>x.id===id);
+  const tb=typeBadge[q.type].split(' ');
+  const newHtml=`<div class="q-card ${topicStrip[q.topic]||''}" id="qcard-${id}">
+    <div class="q-header">
+      <div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div>
+      <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="q-meta"><span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>${markBadge(q.marks)}</div>
+    ${renderMCQ(q)}
+  </div>`;
+  const el=document.getElementById('qcard-'+id);
+  const tmp=document.createElement('div'); tmp.innerHTML=newHtml;
+  el.replaceWith(tmp.firstElementChild);
+}
+
+function toggleAns(id) {
+  if(!state[id])state[id]={};
+  state[id].open=!state[id].open;
+  if(!state[id].viewed){state[id].viewed=true;updateDash();}
+  const btn=document.querySelector(`#qcard-${id} .show-btn`);
+  const rev=document.querySelector(`#qcard-${id} .ans-reveal`);
+  if(btn&&rev){
+    const open=state[id].open;
+    btn.classList.toggle('active',open);
+    btn.textContent=open?'▲ Hide Answer':'▼ Show Model Answer';
+    rev.classList.toggle('open',open);
+  }
+}
+
+function updateDash() {
+  const att=Object.keys(state).length;
+  const cor=Q.filter(q=>state[q.id]?.chosen===q.ans).length;
+  const mcqTotal=Q.filter(q=>q.type==='mcq'||q.type==='assert').length;
+  document.getElementById('d-att').textContent=att;
+  document.getElementById('d-cor').textContent=cor;
+  document.getElementById('d-sc').textContent=mcqTotal>0?Math.round((cor/mcqTotal)*100)+'%':'—';
+}
+
+function resetAll(){for(const k in state)delete state[k];updateDash();render();}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Introduction to Trigonometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8; --purple:#d946ef;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; padding:1.2rem; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 50% 30% at 10% 5%, rgba(245,158,11,.04) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 30% at 90% 90%, rgba(56,189,248,.03) 0%, transparent 50%); }
+
+  header { text-align:center; padding:.8rem 0 1.4rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4vw,2.2rem); font-weight:900;
+    color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:.9rem; max-width:1100px; margin:0 auto; }
+  .panel { background:var(--card); border-radius:12px; border:1px solid var(--border); overflow:hidden; }
+  .panel-head { display:flex; align-items:center; gap:.55rem; padding:.75rem 1rem;
+    border-bottom:1px solid var(--border); font-family:'Playfair Display',serif; font-weight:700; font-size:.92rem; }
+  .panel-body { padding:.8rem 1rem; }
+
+  .ph-rat  .panel-head { background:rgba(45,212,191,.08);  color:var(--teal); }
+  .ph-ang  .panel-head { background:rgba(245,158,11,.08);  color:var(--amber); }
+  .ph-idt  .panel-head { background:rgba(56,189,248,.08);  color:var(--blue); }
+  .ph-cmp  .panel-head { background:rgba(129,140,248,.08); color:var(--indigo); }
+  .ph-prb  .panel-head { background:rgba(34,197,94,.08);   color:var(--green); }
+  .ph-mem  .panel-head { background:rgba(217,70,239,.08);  color:var(--purple); }
+  .ph-rng  .panel-head { background:rgba(244,63,94,.08);   color:var(--red); }
+
+  table { width:100%; border-collapse:collapse; font-size:.78rem; }
+  th { font-family:'DM Mono',monospace; font-size:.67rem; padding:.45rem .6rem;
+    background:var(--card2); color:var(--muted); text-align:center; }
+  td { padding:.4rem .6rem; border-top:1px solid var(--border); line-height:1.5; vertical-align:top; text-align:center; }
+  tr:hover td { background:rgba(255,255,255,.015); }
+  .hl { color:var(--amber); font-family:'DM Mono',monospace; font-size:.75rem; }
+  .te { color:var(--teal); } .am { color:var(--amber); } .bl { color:var(--blue); }
+  .gr { color:var(--green); } .re { color:var(--red); } .in { color:var(--indigo); }
+
+  .fact { display:flex; gap:.5rem; font-size:.8rem; padding:.3rem 0;
+    line-height:1.55; border-top:1px solid var(--border); }
+  .fact:first-child { border-top:none; }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  .formula-block { background:var(--card2); border-radius:8px; padding:.65rem .9rem; margin:.4rem 0; }
+  .formula-block .f-label { font-family:'DM Mono',monospace; font-size:.63rem; color:var(--muted); margin-bottom:.25rem; }
+  .formula-block .f-eq { font-family:'DM Mono',monospace; font-size:.92rem; color:var(--amber); font-weight:500; }
+  .formula-block .f-note { font-size:.72rem; color:var(--muted); margin-top:.2rem; line-height:1.5; }
+
+  .proof-step { display:flex; gap:.55rem; align-items:flex-start; padding:.3rem 0; border-top:1px solid var(--border); font-size:.78rem; line-height:1.55; }
+  .proof-step:first-child { border-top:none; }
+  .ps-num { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); min-width:18px; margin-top:.05rem; }
+
+  .trick { background:var(--card2); border-radius:8px; padding:.55rem .75rem; margin:.35rem 0; font-size:.78rem; }
+  .trick strong { color:var(--amber); font-family:'Playfair Display',serif; font-size:.85rem; }
+  .trick p { color:var(--muted); font-size:.72rem; margin-top:.15rem; }
+
+  .hbox { border-left:3px solid; border-radius:0 6px 6px 0; padding:.5rem .75rem;
+    margin:.4rem 0; font-size:.78rem; line-height:1.6; }
+  .hbox strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.15rem; font-size:.85rem; }
+
+  .span2 { grid-column:1/-1; }
+  @media(max-width:620px){ .span2 { grid-column:1; } }
+
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>📋 Cheat Sheet</h1>
+  <p>Trigonometry · Mathematics Ch.8 · Class X CBSE · Quick Revision</p>
+</header>
+
+<div class="grid">
+
+  <!-- ── Trig Ratios ── -->
+  <div class="panel ph-rat">
+    <div class="panel-head">📐 Trigonometric Ratios</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">IN RIGHT △ABC, ∠B = 90°, FOR ANGLE A (= θ)</div>
+        <div class="f-eq">sin θ = O/H &nbsp; cos θ = A/H &nbsp; tan θ = O/A</div>
+        <div class="f-note">O = BC (opposite), A = AB (adjacent), H = AC (hypotenuse)</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">RECIPROCAL RATIOS</div>
+        <div class="f-eq">cosec θ = H/O &nbsp; sec θ = H/A &nbsp; cot θ = A/O</div>
+        <div class="f-note">sin·cosec = 1 &nbsp; cos·sec = 1 &nbsp; tan·cot = 1</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><span><strong>tan θ = sin θ / cos θ</strong> &nbsp;&nbsp; <strong>cot θ = cos θ / sin θ</strong></span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span>Mnemonic: <strong>SOH-CAH-TOA</strong> or "Some People Have Curly Brown Hair Through Proper Brushing"</span></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><span>Hypotenuse is always opposite the 90° angle — it never changes.</span></div>
+    </div>
+  </div>
+
+  <!-- ── Standard Angle Table ── -->
+  <div class="panel ph-ang span2">
+    <div class="panel-head">📊 Standard Angle Values Table</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>θ</th><th style="color:var(--teal)">0°</th><th style="color:var(--amber)">30°</th><th style="color:var(--blue)">45°</th><th style="color:var(--green)">60°</th><th style="color:var(--red)">90°</th></tr>
+        <tr><td class="hl">sin θ</td><td class="te">0</td><td class="am">1/2</td><td class="bl">1/√2</td><td class="gr">√3/2</td><td class="re">1</td></tr>
+        <tr><td class="hl">cos θ</td><td class="te">1</td><td class="am">√3/2</td><td class="bl">1/√2</td><td class="gr">1/2</td><td class="re">0</td></tr>
+        <tr><td class="hl">tan θ</td><td class="te">0</td><td class="am">1/√3</td><td class="bl">1</td><td class="gr">√3</td><td class="re">N.D.</td></tr>
+        <tr><td class="hl">cosec θ</td><td class="te">N.D.</td><td class="am">2</td><td class="bl">√2</td><td class="gr">2/√3</td><td class="re">1</td></tr>
+        <tr><td class="hl">sec θ</td><td class="te">1</td><td class="am">2/√3</td><td class="bl">√2</td><td class="gr">2</td><td class="re">N.D.</td></tr>
+        <tr><td class="hl">cot θ</td><td class="te">N.D.</td><td class="am">√3</td><td class="bl">1</td><td class="gr">1/√3</td><td class="re">0</td></tr>
+      </table>
+      <div class="hbox" style="border-color:var(--amber);margin-top:.6rem">
+        <strong style="color:var(--amber)">Memory Trick for sin</strong>
+        sin 0°, 30°, 45°, 60°, 90° = √0/2, √1/2, √2/2, √3/2, √4/2. &nbsp;cos = same in reverse order. &nbsp;tan = sin ÷ cos.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Special Triangles ── -->
+  <div class="panel ph-ang">
+    <div class="panel-head">🔺 Special Triangles</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">30-60-90 TRIANGLE (half of equilateral △, side 2)</div>
+        <div class="f-eq">Sides: 1, √3, 2</div>
+        <div class="f-note">sin 30°=1/2, cos 30°=√3/2, tan 30°=1/√3<br>sin 60°=√3/2, cos 60°=1/2, tan 60°=√3</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">45-45-90 TRIANGLE (isosceles right triangle)</div>
+        <div class="f-eq">Sides: 1, 1, √2</div>
+        <div class="f-note">sin 45° = cos 45° = 1/√2, tan 45° = 1</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span>These two triangles give <strong>ALL</strong> standard angle values!</span></div>
+    </div>
+  </div>
+
+  <!-- ── Trig Identities ── -->
+  <div class="panel ph-idt">
+    <div class="panel-head">🔗 Trigonometric Identities</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">IDENTITY ① (MASTER IDENTITY)</div>
+        <div class="f-eq">sin²θ + cos²θ = 1</div>
+        <div class="f-note">Proof: Pythagoras → O²+A²=H² → divide by H²</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">IDENTITY ② (divide ① by cos²θ)</div>
+        <div class="f-eq">1 + tan²θ = sec²θ</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-label">IDENTITY ③ (divide ① by sin²θ)</div>
+        <div class="f-eq">1 + cot²θ = cosec²θ</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><span><strong>Useful:</strong> sec²θ − tan²θ = 1 → (secθ−tanθ)(secθ+tanθ) = 1</span></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><span><strong>Useful:</strong> cosec²θ − cot²θ = 1 → (cosecθ−cotθ)(cosecθ+cotθ) = 1</span></div>
+    </div>
+  </div>
+
+  <!-- ── Complementary Angles ── -->
+  <div class="panel ph-cmp">
+    <div class="panel-head">🔄 Complementary Angles (A + B = 90°)</div>
+    <div class="panel-body">
+      <div class="formula-block">
+        <div class="f-label">COMPLEMENTARY ANGLE FORMULAS</div>
+        <div class="f-eq">sin(90°−θ) = cos θ &nbsp;&nbsp; cos(90°−θ) = sin θ</div>
+      </div>
+      <div class="formula-block">
+        <div class="f-eq" style="font-size:.82rem">tan(90°−θ) = cot θ &nbsp;&nbsp; sec(90°−θ) = cosec θ</div>
+        <div class="f-note">Each ratio → its "co-" partner. The "co" in cosine = complement's sine.</div>
+      </div>
+      <div class="fact"><div class="dot" style="background:var(--indigo)"></div><span>sin 72° = cos 18° &nbsp;|&nbsp; tan 55° = cot 35° &nbsp;|&nbsp; sec 80° = cosec 10°</span></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><span><strong>Key result:</strong> sin²A + sin²(90°−A) = sin²A + cos²A = 1</span></div>
+    </div>
+  </div>
+
+  <!-- ── Ranges ── -->
+  <div class="panel ph-rng">
+    <div class="panel-head">📏 Range of Trig Ratios (0° ≤ θ ≤ 90°)</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>Ratio</th><th>Range</th><th>Notes</th></tr>
+        <tr><td class="hl">sin θ</td><td class="gr">0 to 1</td><td style="font-size:.72rem;text-align:left">Increases: 0→1</td></tr>
+        <tr><td class="hl">cos θ</td><td class="gr">1 to 0</td><td style="font-size:.72rem;text-align:left">Decreases: 1→0</td></tr>
+        <tr><td class="hl">tan θ</td><td class="am">0 to ∞</td><td style="font-size:.72rem;text-align:left">Increases: 0→N.D.</td></tr>
+        <tr><td class="hl">cosec θ</td><td class="bl">∞ to 1</td><td style="font-size:.72rem;text-align:left">cosec θ ≥ 1</td></tr>
+        <tr><td class="hl">sec θ</td><td class="bl">1 to ∞</td><td style="font-size:.72rem;text-align:left">sec θ ≥ 1</td></tr>
+        <tr><td class="hl">cot θ</td><td class="am">∞ to 0</td><td style="font-size:.72rem;text-align:left">Decreases</td></tr>
+      </table>
+      <div class="hbox" style="border-color:var(--red);margin-top:.5rem">
+        <strong style="color:var(--red)">Quick Check</strong>
+        If your answer gives sin θ = 2 or cos θ = −3 for an acute angle → it's WRONG.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Proving Identities Strategy ── -->
+  <div class="panel ph-prb">
+    <div class="panel-head">✏️ Strategy for Proving Identities</div>
+    <div class="panel-body">
+      <div class="proof-step"><div class="ps-num">1.</div><div>Start from the <strong>more complex side</strong> (usually LHS)</div></div>
+      <div class="proof-step"><div class="ps-num">2.</div><div>Convert everything to <strong>sin θ and cos θ</strong></div></div>
+      <div class="proof-step"><div class="ps-num">3.</div><div>Use <strong>sin²θ + cos²θ = 1</strong> to simplify</div></div>
+      <div class="proof-step"><div class="ps-num">4.</div><div>Factor, combine fractions, rationalise denominators</div></div>
+      <div class="proof-step"><div class="ps-num">5.</div><div><strong>Never</strong> cross the = sign — don't assume the result!</div></div>
+      <div class="fact" style="margin-top:.4rem"><div class="dot" style="background:var(--green)"></div><span><strong>Conjugate trick:</strong> Multiply by (secθ+tanθ)/(secθ+tanθ) or (1+sinθ)/(1+sinθ) to simplify.</span></div>
+    </div>
+  </div>
+
+  <!-- ── Worked Examples ── -->
+  <div class="panel ph-prb">
+    <div class="panel-head">📝 Worked Examples</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--teal)"></div><span><strong>Given tan θ = 3/4, find all ratios:</strong><br><span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">O=3, A=4, H=√(9+16)=5<br>sin=3/5, cos=4/5, cosec=5/3, sec=5/4, cot=4/3</span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--amber)"></div><span><strong>Evaluate sin 65°/cos 25°:</strong><br><span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">sin 65° = cos 25° → answer = <span class="gr">1</span></span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--blue)"></div><span><strong>Prove (1+tan²θ)/(1+cot²θ) = tan²θ:</strong><br><span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">= sec²θ/cosec²θ = sin²θ/cos²θ = tan²θ ■</span></span></div>
+      <div class="fact"><div class="dot" style="background:var(--green)"></div><span><strong>sin(A+B)=1, cos(A−B)=√3/2 → find A, B:</strong><br><span style="font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)">A+B=90°, A−B=30° → <span class="am">A=60°, B=30°</span></span></span></div>
+    </div>
+  </div>
+
+  <!-- ── Common Mistakes ── -->
+  <div class="panel ph-rng">
+    <div class="panel-head">⚠️ Common Mistakes to Avoid</div>
+    <div class="panel-body">
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><span><strong>sin²θ ≠ sin(θ²)</strong> — sin²θ means (sin θ)² i.e. square of sine value</span></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><span><strong>sin(A+B) ≠ sin A + sin B</strong> — trig functions are NOT linear!</span></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><span><strong>√(sin²θ + cos²θ) ≠ sin θ + cos θ</strong> — √1 = 1, not sin θ + cos θ</span></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><span><strong>tan 90° is undefined</strong>, not infinity — division by zero is not defined</span></div>
+      <div class="fact"><div class="dot" style="background:var(--red)"></div><span><strong>1/sin θ = cosec θ</strong>, NOT sin⁻¹θ (that's inverse sine — different concept)</span></div>
+    </div>
+  </div>
+
+  <!-- ── Pythagorean Triplets ── -->
+  <div class="panel ph-rat">
+    <div class="panel-head">🔢 Common Pythagorean Triplets</div>
+    <div class="panel-body">
+      <table>
+        <tr><th>O</th><th>A</th><th>H</th><th>If tan θ = O/A</th></tr>
+        <tr><td class="te">3</td><td class="te">4</td><td class="am">5</td><td style="font-size:.72rem">sin=3/5, cos=4/5</td></tr>
+        <tr><td class="te">5</td><td class="te">12</td><td class="am">13</td><td style="font-size:.72rem">sin=5/13, cos=12/13</td></tr>
+        <tr><td class="te">8</td><td class="te">15</td><td class="am">17</td><td style="font-size:.72rem">sin=8/17, cos=15/17</td></tr>
+        <tr><td class="te">7</td><td class="te">24</td><td class="am">25</td><td style="font-size:.72rem">sin=7/25, cos=24/25</td></tr>
+      </table>
+      <div class="fact" style="margin-top:.3rem"><div class="dot" style="background:var(--teal)"></div><span>Multiples also work: 6-8-10, 9-12-15, 10-24-26, etc.</span></div>
+    </div>
+  </div>
+
+  <!-- ── Memory Tricks ── -->
+  <div class="panel ph-mem span2">
+    <div class="panel-head">🧠 Memory Tricks &amp; Mnemonics</div>
+    <div class="panel-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.5rem">
+      <div class="trick">
+        <strong>sin Table: "√0, √1, √2, √3, √4 — all over 2"</strong>
+        <p>sin 0°=√0/2=0, sin 30°=√1/2=1/2, sin 45°=√2/2=1/√2, sin 60°=√3/2, sin 90°=√4/2=1</p>
+      </div>
+      <div class="trick">
+        <strong>cos = sin in Reverse</strong>
+        <p>cos 0°=1, cos 30°=√3/2, cos 45°=1/√2, cos 60°=1/2, cos 90°=0 — exactly reversed!</p>
+      </div>
+      <div class="trick">
+        <strong>"co-" means "complement"</strong>
+        <p>co-sine = complement's sine. co-tangent = complement's tangent. co-secant = complement's secant.</p>
+      </div>
+      <div class="trick">
+        <strong>Indian Mnemonic: "Pandit Badri Prasad Har Har Bole"</strong>
+        <p>sin=P/H, cos=B/H, tan=P/B (P=perpendicular, B=base, H=hypotenuse)</p>
+      </div>
+      <div class="trick">
+        <strong>Identity Derivation: "Divide by cos² → Identity ②, Divide by sin² → Identity ③"</strong>
+        <p>Both come from sin²θ+cos²θ=1. One master identity gives you all three!</p>
+      </div>
+      <div class="trick">
+        <strong>As θ increases (0°→90°): sin ↑, cos ↓, tan ↑</strong>
+        <p>Use this to quick-check your answers. If sin 60° < sin 30° in your answer, something is wrong.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

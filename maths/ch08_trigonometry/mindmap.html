@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Introduction to Trigonometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#040810; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(4,8,16,.92) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#f59e0b; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#3a5a78; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #1a2d45; background:rgba(4,10,20,.85);
+  color:#3a5a78; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#f59e0b; color:#f59e0b; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#0a1422; border:1px solid #1e3550;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:290px; font-size:.8rem; color:#9cc0e0;
+  line-height:1.65; display:none;
+  box-shadow:0 8px 28px rgba(0,0,0,.85);
+}
+#tooltip strong {
+  font-family:'Playfair Display',serif; display:block;
+  margin-bottom:.3rem; color:#f59e0b; font-size:.9rem;
+}
+
+  /* ---- learnr site-nav ---- */
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<div id="ui">
+  <div>
+    <h1>Introduction to Trigonometry</h1>
+    <p>Class X · Mathematics Ch.8 — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize() { W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Trigono-\nmetry',
+  x:0, y:0, r:62, color:'#050e1c', stroke:'#f59e0b', textColor:'#f59e0b', fontSize:14
+};
+
+const BRANCHES = [
+  // ── Trigonometric Ratios ──
+  {
+    id:'ratios', label:'Trig\nRatios', x:-320, y:-200, r:46,
+    color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:"In a right triangle with angle θ:\nsin θ = Opposite / Hypotenuse\ncos θ = Adjacent / Hypotenuse\ntan θ = Opposite / Adjacent\nRemember: SOH-CAH-TOA\nThese ratios depend only on the angle, not on the size of the triangle.",
+    children:[
+      { id:'r1', label:'sin θ\n= O/H', x:-520, y:-320, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'sin θ = Opposite side / Hypotenuse\nIn △ABC with ∠B = 90°, for angle A:\nsin A = BC / AC\nRange: 0 ≤ sin θ ≤ 1 (for 0° ≤ θ ≤ 90°)\nsin 0° = 0, sin 30° = 1/2, sin 45° = 1/√2\nsin 60° = √3/2, sin 90° = 1' },
+      { id:'r2', label:'cos θ\n= A/H', x:-555, y:-180, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'cos θ = Adjacent side / Hypotenuse\nIn △ABC with ∠B = 90°, for angle A:\ncos A = AB / AC\nRange: 0 ≤ cos θ ≤ 1 (for 0° ≤ θ ≤ 90°)\ncos 0° = 1, cos 30° = √3/2, cos 45° = 1/√2\ncos 60° = 1/2, cos 90° = 0' },
+      { id:'r3', label:'tan θ\n= O/A', x:-480, y:-55, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'tan θ = Opposite / Adjacent = sin θ / cos θ\nIn △ABC with ∠B = 90°, for angle A:\ntan A = BC / AB\ntan 0° = 0, tan 30° = 1/√3, tan 45° = 1\ntan 60° = √3, tan 90° = not defined\ntan θ can be any non-negative value (for acute angles)' },
+      { id:'r4', label:'cosec, sec\n& cot', x:-340, y:-365, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'Reciprocal ratios:\ncosec θ = 1/sin θ = H/O\nsec θ = 1/cos θ = H/A\ncot θ = 1/tan θ = A/O = cos θ/sin θ\n\ncosec 30° = 2, sec 60° = 2, cot 45° = 1\nThese are just the "flips" of sin, cos, tan.' },
+    ]
+  },
+  // ── Standard Angles ──
+  {
+    id:'angles', label:'Standard\nAngles', x:320, y:-200, r:46,
+    color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+    info:"Values of trig ratios at standard angles:\n0°, 30°, 45°, 60°, 90°\nThese must be memorised — they appear in almost every exam question!\nTrick: sin values follow √0/2, √1/2, √2/2, √3/2, √4/2",
+    children:[
+      { id:'a1', label:'0° and\n90°', x:520, y:-320, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'At 0°: sin=0, cos=1, tan=0\nAt 90°: sin=1, cos=0, tan=undefined\ncosec 0° = undefined (1/0)\nsec 90° = undefined (1/0)\ncot 0° = undefined, cot 90° = 0\n\nBoundary values — handle carefully in proofs!' },
+      { id:'a2', label:'30° and\n60°', x:555, y:-175, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'30°: sin=1/2, cos=√3/2, tan=1/√3\n60°: sin=√3/2, cos=1/2, tan=√3\n\nNotice the symmetry:\nsin 30° = cos 60° = 1/2\nsin 60° = cos 30° = √3/2\ntan 30° × tan 60° = (1/√3)(√3) = 1\n\nDerived from equilateral triangle split in half.' },
+      { id:'a3', label:'45°', x:490, y:-50, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'45°: sin=1/√2, cos=1/√2, tan=1\nsin 45° = cos 45° (equal sides!)\ncosec 45° = sec 45° = √2\ncot 45° = 1\n\nDerived from isosceles right triangle (45-45-90)\nwith legs = 1, hypotenuse = √2' },
+      { id:'a4', label:'Memory\nTrick', x:340, y:-368, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'sin values for 0°,30°,45°,60°,90°:\n√0/2, √1/2, √2/2, √3/2, √4/2\n= 0, 1/2, 1/√2, √3/2, 1\n\ncos is the REVERSE order:\n1, √3/2, 1/√2, 1/2, 0\n\ntan = sin/cos for each angle.\nJust memorise sin row → derive everything else!' },
+    ]
+  },
+  // ── Trigonometric Identities ──
+  {
+    id:'ident', label:'Trig\nIdentities', x:-310, y:210, r:46,
+    color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+    info:"Three fundamental identities (from Pythagoras Theorem):\n1. sin²θ + cos²θ = 1\n2. 1 + tan²θ = sec²θ\n3. 1 + cot²θ = cosec²θ\nAll three are equivalent forms — each can be derived from the others by dividing.",
+    children:[
+      { id:'i1', label:'sin²θ +\ncos²θ = 1', x:-530, y:120, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'The most important identity!\nProof: In right △, O² + A² = H² (Pythagoras)\nDivide by H²: (O/H)² + (A/H)² = 1\n→ sin²θ + cos²θ = 1\n\nUseful rearrangements:\nsin²θ = 1 − cos²θ\ncos²θ = 1 − sin²θ\nUsed in almost every "prove that" question!' },
+      { id:'i2', label:'1 + tan²θ\n= sec²θ', x:-548, y:258, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Proof: Start with sin²θ + cos²θ = 1\nDivide both sides by cos²θ:\nsin²θ/cos²θ + 1 = 1/cos²θ\ntan²θ + 1 = sec²θ\n\nRearrangements:\nsec²θ − tan²θ = 1\ntan²θ = sec²θ − 1\n(sec θ − tan θ)(sec θ + tan θ) = 1' },
+      { id:'i3', label:'1 + cot²θ\n= cosec²θ', x:-450, y:382, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Proof: Start with sin²θ + cos²θ = 1\nDivide both sides by sin²θ:\n1 + cos²θ/sin²θ = 1/sin²θ\n1 + cot²θ = cosec²θ\n\nRearrangements:\ncosec²θ − cot²θ = 1\ncot²θ = cosec²θ − 1\n(cosec θ − cot θ)(cosec θ + cot θ) = 1' },
+      { id:'i4', label:'Proving\nIdentities', x:-290, y:400, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Strategy for proving trig identities:\n1. Start from the more complex side (LHS or RHS)\n2. Convert everything to sin θ and cos θ\n3. Use sin²θ + cos²θ = 1 to simplify\n4. Factor, combine fractions, rationalise\n5. Show LHS = RHS\n\nNever move terms across = sign — that assumes the result!' },
+    ]
+  },
+  // ── Complementary Angles ──
+  {
+    id:'comp', label:'Comple-\nmentary\nAngles', x:0, y:-300, r:46,
+    color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+    info:"Two angles are complementary if they add to 90°.\nIn a right triangle, the two acute angles are complementary.\nKey results:\nsin(90°−θ) = cos θ\ncos(90°−θ) = sin θ\ntan(90°−θ) = cot θ\nand vice versa.",
+    children:[
+      { id:'c1', label:'sin(90°−θ)\n= cos θ', x:-175, y:-428, r:33, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'In right △ABC, ∠B = 90°:\nFor angle A: sin A = BC/AC\nFor angle C = (90°−A): sin C = AB/AC = cos A\n∴ sin(90°−A) = cos A\n\nSimilarly: cos(90°−A) = sin A\n\nExample: sin 70° = cos 20° (since 70+20=90)' },
+      { id:'c2', label:'tan(90°−θ)\n= cot θ', x:0, y:-462, r:33, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'tan(90°−θ) = cot θ\ncot(90°−θ) = tan θ\nsec(90°−θ) = cosec θ\ncosec(90°−θ) = sec θ\n\nEach ratio pairs with its "co-" partner:\nsin ↔ cos, tan ↔ cot, sec ↔ cosec\nThe "co" in cosine literally means "complement\'s sine"!' },
+      { id:'c3', label:'Exam\nExamples', x:175, y:-428, r:33, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Example 1: Evaluate sin 65° / cos 25°\n= sin 65° / cos(90°−65°) = sin 65°/sin 65° = 1\n\nExample 2: If tan A = cot B, prove A+B = 90°\ntan A = cot B = tan(90°−B)\n∴ A = 90°−B → A+B = 90° ■\n\nExample 3: sin²20° + sin²70° = sin²20° + cos²20° = 1' },
+    ]
+  },
+  // ── Applications & Problem Solving ──
+  {
+    id:'app', label:'Problem\nSolving', x:0, y:300, r:46,
+    color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+    info:"Common problem types in CBSE exams:\n1. Find trig ratios given one ratio\n2. Evaluate expressions using standard angles\n3. Prove trigonometric identities\n4. Simplify using complementary angles\n5. Find angle when trig value is given",
+    children:[
+      { id:'p1', label:'Find Other\nRatios', x:-180, y:425, r:33, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Given: tan θ = 3/4. Find all other ratios.\nMethod: Draw right △ with O=3, A=4\nH = √(3²+4²) = √25 = 5\n\nsin θ = 3/5, cos θ = 4/5\ntan θ = 3/4 (given)\ncosec θ = 5/3, sec θ = 5/4, cot θ = 4/3\n\nAlways use Pythagoras to find the third side!' },
+      { id:'p2', label:'Evaluate\nExpressions', x:0, y:462, r:33, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Example: Find (sin 30° + cos 60°)/(1 + sin 60° cos 30°)\n= (1/2 + 1/2) / (1 + (√3/2)(√3/2))\n= 1 / (1 + 3/4)\n= 1 / (7/4) = 4/7\n\nTip: Substitute standard values first, then simplify step by step.\nWatch for complementary angle pairs!' },
+      { id:'p3', label:'Verify\nIdentities', x:180, y:425, r:33, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Example: Prove (1+tan²θ)/(1+cot²θ) = tan²θ\n\nLHS = sec²θ / cosec²θ\n= (1/cos²θ) / (1/sin²θ)\n= sin²θ / cos²θ\n= tan²θ = RHS ■\n\nStrategy: Replace tan²θ+1 and cot²θ+1 with sec²θ and cosec²θ.\nThen convert to sin and cos.' },
+    ]
+  },
+  // ── Right Triangle Setup ──
+  {
+    id:'tri', label:'Right\nTriangle', x:310, y:210, r:46,
+    color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:"The right triangle is the foundation of trigonometry.\n∠B = 90° (right angle)\nFor angle A:\n• BC = opposite side (facing A)\n• AB = adjacent side (next to A)\n• AC = hypotenuse (longest side, facing 90°)\nChanging the reference angle changes which side is 'opposite' and 'adjacent'.",
+    children:[
+      { id:'t1', label:'Sides\nNaming', x:520, y:125, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'For angle A in right △ABC (∠B=90°):\n• Hypotenuse = AC (always opposite the right angle)\n• Opposite = BC (the side facing angle A)\n• Adjacent = AB (the side next to angle A)\n\nFor angle C:\n• Opposite = AB (now THIS faces C)\n• Adjacent = BC\n• Hypotenuse = AC (unchanged)\n\nThe hypotenuse never changes!' },
+      { id:'t2', label:'Pythagoras\nLink', x:548, y:252, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Pythagoras Theorem: H² = O² + A²\nThis is the geometric basis for all trig identities.\n\nDivide by H²: (O/H)² + (A/H)² = 1\n→ sin²θ + cos²θ = 1\n\nDivide by A²: (O/A)² + 1 = (H/A)²\n→ tan²θ + 1 = sec²θ\n\nDivide by O²: 1 + (A/O)² = (H/O)²\n→ 1 + cot²θ = cosec²θ' },
+      { id:'t3', label:'Special\nTriangles', x:468, y:375, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'45-45-90 triangle: legs = 1, 1; hyp = √2\n→ sin 45° = cos 45° = 1/√2, tan 45° = 1\n\n30-60-90 triangle: sides = 1, √3, 2\n→ sin 30° = 1/2, cos 30° = √3/2\n→ sin 60° = √3/2, cos 60° = 1/2\n\nThese two triangles give ALL standard angle values!' },
+      { id:'t4', label:'SOH-CAH\n-TOA', x:300, y:392, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'The universal mnemonic:\nSOH: Sin = Opposite / Hypotenuse\nCAH: Cos = Adjacent / Hypotenuse\nTOA: Tan = Opposite / Adjacent\n\nIndian mnemonic:\n"Some People Have Curly Brown Hair Through Proper Brushing"\nsin=P/H, cos=B/H, tan=P/B\n(P=perpendicular, B=base, H=hypotenuse)' },
+    ]
+  },
+];
+
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+function getNode(id) { return allNodes.find(n => n.id===id); }
+
+// ── pan / zoom ──
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; canvas.style.cursor='grabbing'; });
+canvas.addEventListener('mousemove', e => {
+  if(dragging){ ox=dragOrigin.x+(e.clientX-dragStart.x); oy=dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x, dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10, window.innerHeight-230)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', () => { dragging=false; canvas.style.cursor='grab'; });
+canvas.addEventListener('mouseleave', () => { dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY); }, {passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart', e => {
+  if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2, cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d;
+  }
+}, {passive:false});
+canvas.addEventListener('touchend', () => { dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.2,Math.min(3,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2; draw(); }
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(56,189,248,.035)';
+  ctx.lineWidth=1;
+  for(let x=-1500;x<1500;x+=70){ ctx.beginPath(); ctx.moveTo(x,-1500); ctx.lineTo(x,1500); ctx.stroke(); }
+  for(let y=-1500;y<1500;y+=70){ ctx.beginPath(); ctx.moveTo(-1500,y); ctx.lineTo(1500,y); ctx.stroke(); }
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+
+  allEdges.forEach(e => {
+    const a=getNode(e.from), b=getNode(e.to);
+    if(!a||!b) return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0, a.stroke+'55');
+    grd.addColorStop(1, b.stroke+'22');
+    const cx=(a.x+b.x)/2+(b.y-a.y)*.15, cy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n => {
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?40:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-8,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'33'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=n.id==='c'?14:12;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

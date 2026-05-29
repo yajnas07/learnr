@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Introduction to Trigonometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#040810; --card:#0a1422; --card2:#0f1c30;
+    --border:#1a2d45; --text:#cce4ff; --muted:#4a6890;
+    --amber:#f59e0b; --teal:#2dd4bf; --blue:#38bdf8;
+    --green:#22c55e; --red:#f43f5e; --indigo:#818cf8;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,158,11,.05) 0%, transparent 60%); }
+
+  header { text-align:center; padding:1.8rem 1rem .8rem; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.3rem,4vw,2rem); font-weight:900;
+    color:var(--amber); }
+  header p { color:var(--muted); font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.3rem; }
+
+  .prog-row { display:flex; align-items:center; gap:1rem; padding:.5rem 1rem .8rem; width:100%; max-width:560px; }
+  .prog-bar { flex:1; height:5px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:99px;
+    background:linear-gradient(90deg,var(--teal),var(--amber));
+    transition:width .4s ease; }
+  .prog-text { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); white-space:nowrap; }
+
+  .filters { display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center; padding:.2rem 1rem .8rem; }
+  .f-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.72rem;
+    padding:.3rem .9rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .f-btn:hover { color:var(--text); }
+  .f-btn.on { color:#040810; border-color:transparent; }
+  .f-all.on  { background:var(--muted); color:var(--text) !important; }
+  .f-rat.on  { background:var(--teal); }
+  .f-ang.on  { background:var(--amber); }
+  .f-idt.on  { background:var(--blue); }
+  .f-cmp.on  { background:var(--indigo); }
+  .f-prb.on  { background:var(--green); }
+
+  .stage { width:100%; max-width:560px; padding:0 1rem; perspective:1200px; }
+  .fc-wrap { width:100%; aspect-ratio:3/2; position:relative; cursor:pointer;
+    transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1); }
+  .fc-wrap.flipped { transform:rotateY(180deg); }
+  .fc-face { position:absolute; inset:0; border-radius:16px;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:1.4rem; text-align:center; }
+  .fc-front { background:var(--card); border:1px solid var(--border);
+    box-shadow:0 8px 32px rgba(0,0,0,.6); }
+  .fc-back  { transform:rotateY(180deg); background:var(--card);
+    border:1px solid var(--border); box-shadow:0 8px 32px rgba(0,0,0,.6); }
+  .fc-tag { font-family:'DM Mono',monospace; font-size:.65rem; font-weight:500;
+    padding:.18rem .65rem; border-radius:2px; margin-bottom:.7rem; }
+  .fc-q { font-family:'Playfair Display',serif; font-size:clamp(.88rem,2.4vw,1.1rem);
+    font-weight:700; line-height:1.45; }
+  .fc-hint { font-size:.68rem; color:var(--muted); margin-top:.5rem; font-family:'DM Mono',monospace; }
+  .fc-flip-hint { position:absolute; bottom:.75rem; font-size:.65rem;
+    font-family:'DM Mono',monospace; color:#1a2d45; animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+  .fc-ans-lbl { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--green); margin-bottom:.5rem; }
+  .fc-ans { font-size:clamp(.78rem,2vw,.95rem); line-height:1.65; color:var(--text); }
+  .fc-ans strong { color:var(--amber); }
+  .fc-ans em { color:var(--teal); font-style:normal; }
+  .known-badge { position:absolute; top:.7rem; right:.7rem;
+    font-size:.62rem; font-family:'DM Mono',monospace; padding:.12rem .45rem; border-radius:2px; }
+  .known   { background:rgba(34,197,94,.15); color:#4ade80; }
+  .unknown { background:rgba(239,68,68,.1);  color:#f87171; }
+  .nav-row { display:flex; gap:.7rem; align-items:center; padding:1rem; }
+  .nav-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.85rem;
+    padding:.5rem 1.3rem; border-radius:4px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .nav-btn:hover:not(:disabled) { border-color:#2a4a6a; color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; }
+  .card-ctr { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--muted);
+    min-width:70px; text-align:center; }
+  .bottom-row { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; padding:.3rem 1rem 2rem; }
+  .bot-btn { font-family:'Playfair Display',serif; font-weight:700; font-size:.75rem;
+    padding:.38rem 1rem; border-radius:3px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); cursor:pointer; transition:all .2s; }
+  .bot-btn:hover { border-color:var(--amber); color:var(--amber); }
+
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+    background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,45,69,.75);
+    position:sticky; top:0; z-index:9999;
+  }
+  .site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+  .site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+  .site-nav-back {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    color:#7a9ab8; text-decoration:none; transition:all .2s;
+    border:1px solid rgba(26,45,69,.9); border-radius:99px;
+    padding:.2rem .65rem; white-space:nowrap;
+  }
+  .site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<header>
+  <h1>Flashcard Deck</h1>
+  <p>Trigonometry · Mathematics Ch.8 · 40 Cards · Tap to flip</p>
+</header>
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 40</div>
+</div>
+<div class="filters">
+  <button class="f-btn f-all on" onclick="setFilter('all',this)">All (40)</button>
+  <button class="f-btn f-rat" onclick="setFilter('rat',this)">📐 Ratios</button>
+  <button class="f-btn f-ang" onclick="setFilter('ang',this)">📊 Std Angles</button>
+  <button class="f-btn f-idt" onclick="setFilter('idt',this)">🔗 Identities</button>
+  <button class="f-btn f-cmp" onclick="setFilter('cmp',this)">🔄 Complementary</button>
+  <button class="f-btn f-prb" onclick="setFilter('prb',this)">✏️ Problems</button>
+</div>
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flipCard()">
+    <div class="fc-face fc-front" id="fc-front"></div>
+    <div class="fc-face fc-back"  id="fc-back"></div>
+  </div>
+</div>
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="prevCard()" disabled>← Prev</button>
+  <div class="card-ctr" id="card-ctr">1 / 40</div>
+  <button class="nav-btn" id="next-btn" onclick="nextCard()">Next →</button>
+</div>
+<div class="bottom-row">
+  <button class="bot-btn" onclick="markKnown()">✓ Know it</button>
+  <button class="bot-btn" onclick="markUnknown()">✗ Still learning</button>
+  <button class="bot-btn" onclick="shuffleDeck()">🔀 Shuffle</button>
+  <button class="bot-btn" onclick="resetDeck()">↺ Reset</button>
+</div>
+
+<script>
+const ALL_CARDS = [
+  // ── TRIG RATIOS (rat) ──
+  { cat:'rat', tag:'📐 Trig Ratios', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'What are the six trigonometric ratios for an angle θ in a right triangle?',
+    a:'<em>sin θ = O/H</em>, <em>cos θ = A/H</em>, <em>tan θ = O/A</em><br><em>cosec θ = H/O</em>, <em>sec θ = H/A</em>, <em>cot θ = A/O</em><br>O=Opposite, A=Adjacent, H=Hypotenuse' },
+  { cat:'rat', tag:'📐 Trig Ratios', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'What does SOH-CAH-TOA stand for?',
+    a:'<strong>S</strong>in = <strong>O</strong>pposite / <strong>H</strong>ypotenuse<br><strong>C</strong>os = <strong>A</strong>djacent / <strong>H</strong>ypotenuse<br><strong>T</strong>an = <strong>O</strong>pposite / <strong>A</strong>djacent' },
+  { cat:'rat', tag:'📐 Trig Ratios', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'What are the three reciprocal pairs of trig ratios?',
+    a:'<em>sin θ × cosec θ = 1</em><br><em>cos θ × sec θ = 1</em><br><em>tan θ × cot θ = 1</em><br>Each ratio is the "flip" of its partner.' },
+  { cat:'rat', tag:'📐 Trig Ratios', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'Express tan θ and cot θ in terms of sin θ and cos θ.',
+    a:'<strong>tan θ = sin θ / cos θ</strong><br><strong>cot θ = cos θ / sin θ</strong><br>These relationships are used constantly in identity proofs.' },
+  { cat:'rat', tag:'📐 Trig Ratios', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'In right △ABC with ∠B = 90°, which side is the hypotenuse?',
+    a:'The hypotenuse is <strong>AC</strong> — always the side <em>opposite the right angle</em>.<br>It is the longest side of the right triangle.<br>The hypotenuse never changes regardless of which acute angle you consider.' },
+  { cat:'rat', tag:'📐 Trig Ratios', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'Do trig ratios depend on the size of the triangle?',
+    a:'<strong>No!</strong> Trig ratios depend <em>only on the angle θ</em>, not on the size of the triangle.<br>All right triangles with the same acute angle are similar, so the ratios of sides are equal.' },
+  { cat:'rat', tag:'📐 Trig Ratios', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'What is the range of sin θ and cos θ for 0° ≤ θ ≤ 90°?',
+    a:'<strong>0 ≤ sin θ ≤ 1</strong><br><strong>0 ≤ cos θ ≤ 1</strong><br>If your answer gives sin θ > 1 or cos θ < 0 for an acute angle, it\'s wrong!' },
+  { cat:'rat', tag:'📐 Trig Ratios', tagBg:'rgba(45,212,191,.15)', tagCol:'#2dd4bf',
+    q:'Given sin θ = 3/5, find cos θ and tan θ.',
+    a:'sin θ = O/H = 3/5 → O=3, H=5<br>A = √(H²−O²) = √(25−9) = <strong>4</strong><br>cos θ = A/H = <em>4/5</em><br>tan θ = O/A = <em>3/4</em>' },
+
+  // ── STANDARD ANGLES (ang) ──
+  { cat:'ang', tag:'📊 Standard Angles', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'What are the sin values for 0°, 30°, 45°, 60°, 90°?',
+    a:'<strong>sin 0° = 0</strong>, <strong>sin 30° = 1/2</strong><br><strong>sin 45° = 1/√2</strong>, <strong>sin 60° = √3/2</strong><br><strong>sin 90° = 1</strong><br>Trick: √0/2, √1/2, √2/2, √3/2, √4/2' },
+  { cat:'ang', tag:'📊 Standard Angles', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'What are the cos values for 0°, 30°, 45°, 60°, 90°?',
+    a:'<strong>cos 0° = 1</strong>, <strong>cos 30° = √3/2</strong><br><strong>cos 45° = 1/√2</strong>, <strong>cos 60° = 1/2</strong><br><strong>cos 90° = 0</strong><br>cos values = sin values in <em>reverse order</em>!' },
+  { cat:'ang', tag:'📊 Standard Angles', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'What are the tan values for 0°, 30°, 45°, 60°, 90°?',
+    a:'<strong>tan 0° = 0</strong>, <strong>tan 30° = 1/√3</strong><br><strong>tan 45° = 1</strong>, <strong>tan 60° = √3</strong><br><strong>tan 90° = Not Defined</strong> (division by zero)' },
+  { cat:'ang', tag:'📊 Standard Angles', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Why is tan 90° not defined?',
+    a:'tan 90° = sin 90° / cos 90° = <em>1/0</em><br>Division by zero is undefined.<br>Similarly, <strong>cosec 0°</strong> and <strong>sec 90°</strong> and <strong>cot 0°</strong> are all undefined.' },
+  { cat:'ang', tag:'📊 Standard Angles', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Where do the values of sin 30° and cos 30° come from?',
+    a:'From a <strong>30-60-90 triangle</strong>:<br>Take equilateral △ (side 2), drop perpendicular.<br>Sides: 1, √3, 2<br>sin 30° = 1/2 (shortest / hypotenuse)<br>cos 30° = √3/2 (medium / hypotenuse)' },
+  { cat:'ang', tag:'📊 Standard Angles', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'Where does sin 45° = 1/√2 come from?',
+    a:'From a <strong>45-45-90 triangle</strong> (isosceles right triangle):<br>Both legs = 1, hypotenuse = √2<br>sin 45° = 1/√2 = cos 45°<br>tan 45° = 1/1 = <em>1</em>' },
+  { cat:'ang', tag:'📊 Standard Angles', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'What is the memory trick for sin values at standard angles?',
+    a:'Write <strong>√0, √1, √2, √3, √4</strong> and divide each by 2:<br>√0/2=0, √1/2=1/2, √2/2=1/√2, √3/2, √4/2=1<br>For cos: same values in <em>reverse</em>.<br>For tan: divide sin by cos for each angle.' },
+  { cat:'ang', tag:'📊 Standard Angles', tagBg:'rgba(245,158,11,.15)', tagCol:'#f59e0b',
+    q:'What are cosec 30°, sec 60°, and cot 45°?',
+    a:'cosec 30° = 1/sin 30° = 1/(1/2) = <strong>2</strong><br>sec 60° = 1/cos 60° = 1/(1/2) = <strong>2</strong><br>cot 45° = 1/tan 45° = 1/1 = <strong>1</strong>' },
+
+  // ── IDENTITIES (idt) ──
+  { cat:'idt', tag:'🔗 Identities', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'State the three fundamental trigonometric identities.',
+    a:'<strong>① sin²θ + cos²θ = 1</strong><br><strong>② 1 + tan²θ = sec²θ</strong><br><strong>③ 1 + cot²θ = cosec²θ</strong><br>All three come from Pythagoras Theorem.' },
+  { cat:'idt', tag:'🔗 Identities', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'How is sin²θ + cos²θ = 1 proved?',
+    a:'In right △: O² + A² = H² (Pythagoras)<br>Divide by H²: (O/H)² + (A/H)² = 1<br>→ <strong>sin²θ + cos²θ = 1</strong> ■<br>This is the "master identity" — the other two are derived from it.' },
+  { cat:'idt', tag:'🔗 Identities', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'How do you get 1 + tan²θ = sec²θ from identity ①?',
+    a:'Start: sin²θ + cos²θ = 1<br>Divide every term by <em>cos²θ</em>:<br>sin²θ/cos²θ + 1 = 1/cos²θ<br>→ <strong>tan²θ + 1 = sec²θ</strong> ■' },
+  { cat:'idt', tag:'🔗 Identities', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'How do you get 1 + cot²θ = cosec²θ from identity ①?',
+    a:'Start: sin²θ + cos²θ = 1<br>Divide every term by <em>sin²θ</em>:<br>1 + cos²θ/sin²θ = 1/sin²θ<br>→ <strong>1 + cot²θ = cosec²θ</strong> ■' },
+  { cat:'idt', tag:'🔗 Identities', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'What useful rearrangements of the identities should you memorise?',
+    a:'sin²θ = 1 − cos²θ, &nbsp; cos²θ = 1 − sin²θ<br>sec²θ − tan²θ = 1<br>cosec²θ − cot²θ = 1<br>(secθ−tanθ)(secθ+tanθ) = 1<br>(cosecθ−cotθ)(cosecθ+cotθ) = 1' },
+  { cat:'idt', tag:'🔗 Identities', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'What is the strategy for proving trig identities?',
+    a:'1. Start from the <strong>more complex side</strong><br>2. Convert everything to <em>sin θ and cos θ</em><br>3. Use sin²θ + cos²θ = 1 to simplify<br>4. Factor, combine fractions, rationalise<br>5. <strong>Never</strong> cross the = sign (don\'t assume the result!)' },
+  { cat:'idt', tag:'🔗 Identities', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'Prove: (1 + tan²θ)/(1 + cot²θ) = tan²θ',
+    a:'LHS = sec²θ / cosec²θ<br>= (1/cos²θ) / (1/sin²θ)<br>= sin²θ / cos²θ<br>= <strong>tan²θ = RHS ■</strong>' },
+  { cat:'idt', tag:'🔗 Identities', tagBg:'rgba(56,189,248,.15)', tagCol:'#38bdf8',
+    q:'What is meant by sin²θ? Is it the same as sin(θ²)?',
+    a:'<strong>sin²θ = (sin θ)²</strong> — the square of the sine value.<br><strong>sin(θ²)</strong> means the sine of θ-squared — completely different!<br>Example: sin²30° = (1/2)² = 1/4, but sin(30²) = sin 900°.' },
+
+  // ── COMPLEMENTARY ANGLES (cmp) ──
+  { cat:'cmp', tag:'🔄 Complementary', tagBg:'rgba(129,140,248,.15)', tagCol:'#818cf8',
+    q:'What are complementary angles?',
+    a:'Two angles that <strong>add up to 90°</strong>.<br>In a right triangle, the two acute angles are always complementary.<br>If ∠A + ∠C = 90°, then A and C are complementary.' },
+  { cat:'cmp', tag:'🔄 Complementary', tagBg:'rgba(129,140,248,.15)', tagCol:'#818cf8',
+    q:'State the complementary angle formulas for sin and cos.',
+    a:'<strong>sin(90°−θ) = cos θ</strong><br><strong>cos(90°−θ) = sin θ</strong><br>Example: sin 70° = cos 20° (since 70+20=90)' },
+  { cat:'cmp', tag:'🔄 Complementary', tagBg:'rgba(129,140,248,.15)', tagCol:'#818cf8',
+    q:'State the complementary angle formulas for tan, cot, sec, cosec.',
+    a:'<strong>tan(90°−θ) = cot θ</strong><br><strong>cot(90°−θ) = tan θ</strong><br><strong>sec(90°−θ) = cosec θ</strong><br><strong>cosec(90°−θ) = sec θ</strong><br>Each pairs with its "co-" partner.' },
+  { cat:'cmp', tag:'🔄 Complementary', tagBg:'rgba(129,140,248,.15)', tagCol:'#818cf8',
+    q:'Evaluate: sin 65° / cos 25°',
+    a:'sin 65° = sin(90°−25°) = cos 25°<br>∴ sin 65° / cos 25° = cos 25° / cos 25° = <strong>1</strong>' },
+  { cat:'cmp', tag:'🔄 Complementary', tagBg:'rgba(129,140,248,.15)', tagCol:'#818cf8',
+    q:'If tan A = cot B, what is the relationship between A and B?',
+    a:'tan A = cot B = tan(90°−B)<br>∴ A = 90°−B<br>→ <strong>A + B = 90°</strong><br>A and B are complementary angles.' },
+  { cat:'cmp', tag:'🔄 Complementary', tagBg:'rgba(129,140,248,.15)', tagCol:'#818cf8',
+    q:'Evaluate: sin²20° + sin²70°',
+    a:'sin 70° = sin(90°−20°) = cos 20°<br>∴ sin²20° + sin²70° = sin²20° + cos²20°<br>= <strong>1</strong> &nbsp;(by identity ①)' },
+  { cat:'cmp', tag:'🔄 Complementary', tagBg:'rgba(129,140,248,.15)', tagCol:'#818cf8',
+    q:'Evaluate: tan 1° · tan 2° · tan 3° · … · tan 89°',
+    a:'Pair: tan k° · tan(90°−k°) = tan k° · cot k° = 1<br>44 such pairs (1&89, 2&88, … 44&46)<br>Middle term: tan 45° = 1<br>∴ Product = 1⁴⁴ × 1 = <strong>1</strong>' },
+
+  // ── PROBLEM SOLVING (prb) ──
+  { cat:'prb', tag:'✏️ Problems', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Given tan θ = 3/4, find all six trig ratios.',
+    a:'O=3, A=4 → H=√(9+16)=<strong>5</strong><br>sin θ=3/5, cos θ=4/5, tan θ=3/4<br>cosec θ=5/3, sec θ=5/4, cot θ=4/3<br>3-4-5 is a Pythagorean triplet!' },
+  { cat:'prb', tag:'✏️ Problems', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'If sin(A+B) = 1 and cos(A−B) = √3/2, find A and B.',
+    a:'sin(A+B)=1 → A+B=<em>90°</em> …(i)<br>cos(A−B)=√3/2 → A−B=<em>30°</em> …(ii)<br>Adding: 2A=120° → <strong>A=60°</strong><br>Subtracting: 2B=60° → <strong>B=30°</strong>' },
+  { cat:'prb', tag:'✏️ Problems', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Evaluate: 2 tan²45° + cos²30° − sin²60°',
+    a:'= 2(1)² + (√3/2)² − (√3/2)²<br>= 2 + 3/4 − 3/4<br>= <strong>2</strong><br>cos 30° = sin 60° = √3/2, so their squares cancel!' },
+  { cat:'prb', tag:'✏️ Problems', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'What common Pythagorean triplets are useful for finding trig ratios?',
+    a:'<strong>3, 4, 5</strong> &nbsp; <strong>5, 12, 13</strong><br><strong>8, 15, 17</strong> &nbsp; <strong>7, 24, 25</strong><br>Multiples also work: 6, 8, 10 etc.<br>Use these to quickly identify all sides when one ratio is given.' },
+  { cat:'prb', tag:'✏️ Problems', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Is sin(A+B) = sin A + sin B? Why or why not?',
+    a:'<strong>No!</strong> sin(A+B) ≠ sin A + sin B<br>Example: sin(30°+60°) = sin 90° = 1<br>But sin 30° + sin 60° = 1/2 + √3/2 ≈ 1.37<br>1 ≠ 1.37. Trig functions are <em>not</em> linear!' },
+  { cat:'prb', tag:'✏️ Problems', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'If cos θ = 12/13, find sin θ and tan θ.',
+    a:'cos θ = A/H = 12/13 → A=12, H=13<br>O = √(13²−12²) = √(169−144) = √25 = <strong>5</strong><br>sin θ = O/H = <em>5/13</em><br>tan θ = O/A = <em>5/12</em>' },
+  { cat:'prb', tag:'✏️ Problems', tagBg:'rgba(34,197,94,.15)', tagCol:'#22c55e',
+    q:'Evaluate: (sin²63° + sin²27°) / (cos²17° + cos²73°)',
+    a:'sin 63° = cos 27° → sin²63° + sin²27° = cos²27° + sin²27° = 1<br>cos 73° = sin 17° → cos²17° + cos²73° = cos²17° + sin²17° = 1<br>∴ Answer = <strong>1/1 = 1</strong>' },
+];
+
+let deck = [...ALL_CARDS];
+let current = 0;
+let known = new Set();
+
+function renderCard() {
+  const c = deck[current];
+  const isKnown = known.has(current);
+  const fc = document.getElementById('fc');
+  fc.classList.remove('flipped');
+  const front = document.getElementById('fc-front');
+  const back  = document.getElementById('fc-back');
+  front.innerHTML = `
+    <div class="fc-tag" style="background:${c.tagBg};color:${c.tagCol}">${c.tag}</div>
+    <div class="fc-q">${c.q}</div>
+    <div class="fc-hint">tap to reveal answer</div>
+    <div class="fc-flip-hint">↻ flip</div>
+    ${isKnown !== undefined ? `<div class="known-badge ${isKnown?'known':'unknown'}">${isKnown?'✓ Know it':'✗ Learning'}</div>` : ''}
+  `;
+  back.innerHTML = `
+    <div class="fc-tag" style="background:${c.tagBg};color:${c.tagCol}">${c.tag}</div>
+    <div class="fc-ans-lbl">✅ Answer</div>
+    <div class="fc-ans">${c.a}</div>
+    ${isKnown !== undefined ? `<div class="known-badge ${isKnown?'known':'unknown'}">${isKnown?'✓ Know it':'✗ Learning'}</div>` : ''}
+  `;
+  document.getElementById('card-ctr').textContent = `${current+1} / ${deck.length}`;
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').disabled = current === deck.length-1;
+  const pct = deck.length > 0 ? ((current+1)/deck.length*100) : 0;
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('prog-text').textContent = `${current+1} / ${deck.length}`;
+}
+
+function flipCard() { document.getElementById('fc').classList.toggle('flipped'); }
+function nextCard() { if(current < deck.length-1){ current++; renderCard(); } }
+function prevCard() { if(current > 0){ current--; renderCard(); } }
+function markKnown()   { known.add(current); renderCard(); if(current < deck.length-1) setTimeout(nextCard, 400); }
+function markUnknown() { known.delete(current); renderCard(); if(current < deck.length-1) setTimeout(nextCard, 400); }
+
+function shuffleDeck() {
+  for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
+  current=0; known.clear(); renderCard();
+}
+
+function resetDeck() { deck=[...ALL_CARDS]; current=0; known.clear(); renderCard(); updateFilterUI('all'); }
+
+function setFilter(cat, btn) {
+  deck = cat==='all' ? [...ALL_CARDS] : ALL_CARDS.filter(c=>c.cat===cat);
+  current=0; known.clear();
+  updateFilterUI(cat);
+  renderCard();
+}
+
+function updateFilterUI(cat) {
+  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+  const map = {all:'.f-all',rat:'.f-rat',ang:'.f-ang',idt:'.f-idt',cmp:'.f-cmp',prb:'.f-prb'};
+  document.querySelector(map[cat])?.classList.add('on');
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key==='ArrowRight') nextCard();
+  else if(e.key==='ArrowLeft') prevCard();
+  else if(e.key===' ') { e.preventDefault(); flipCard(); }
+});
+
+renderCard();
+</script>
+</body>
+</html>
