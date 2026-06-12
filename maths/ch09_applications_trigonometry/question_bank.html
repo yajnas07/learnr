@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Some Applications of Trigonometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;--amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--correct:#22c55e;--wrong:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(245,158,11,.04) 0%,transparent 60%)}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--amber)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.dash{display:flex;justify-content:center;gap:.9rem;flex-wrap:wrap;padding:.8rem 1rem 1.2rem}
+.dcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.6rem 1.2rem;text-align:center;min-width:84px}
+.dval{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900}
+.dlbl{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.1rem}
+
+nav{display:flex;justify-content:center;flex-wrap:wrap;gap:.45rem;padding:0 1rem 1.2rem}
+nav button{font-family:'Playfair Display',serif;font-weight:700;font-size:.76rem;padding:.38rem 1rem;border-radius:3px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+nav button:hover{color:var(--text)}
+nav button.active{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.08)}
+
+main{max-width:800px;margin:0 auto;padding:0 1rem 4rem}
+
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:1rem;overflow:hidden;transition:box-shadow .2s;animation:slideIn .3s ease both}
+.q-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.5)}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.q-header{display:flex;align-items:flex-start;gap:.7rem;padding:1rem 1.1rem .7rem}
+.q-num{font-family:'DM Mono',monospace;font-size:.68rem;min-width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.q-text{font-family:'Playfair Display',serif;font-size:.92rem;font-weight:700;line-height:1.45;flex:1}
+.q-meta{display:flex;gap:.35rem;flex-wrap:wrap;padding:0 1.1rem .7rem 4rem}
+
+.badge{font-size:.62rem;font-family:'DM Mono',monospace;padding:.12rem .48rem;border-radius:2px}
+.b-mcq{background:rgba(56,189,248,.12);color:var(--blue)}
+.b-short{background:rgba(34,197,94,.12);color:var(--green)}
+.b-long{background:rgba(245,158,11,.12);color:var(--amber)}
+.b-assert{background:rgba(129,140,248,.12);color:var(--indigo)}
+.b-1m{background:rgba(148,163,184,.08);color:#94a3b8}
+.b-2m{background:rgba(245,158,11,.1);color:#fde68a}
+.b-3m{background:rgba(249,115,22,.1);color:#fed7aa}
+.b-5m{background:rgba(239,68,68,.12);color:#fca5a5}
+
+.strip-los{border-left:4px solid var(--teal)}
+.strip-hgt{border-left:4px solid var(--amber)}
+.strip-dst{border-left:4px solid var(--blue)}
+.strip-two{border-left:4px solid var(--indigo)}
+.strip-app{border-left:4px solid var(--green)}
+
+.mcq-body{padding:0 1.1rem .6rem}
+.mcq-opts{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem}
+@media(max-width:480px){.mcq-opts{grid-template-columns:1fr}}
+.opt-btn{display:flex;align-items:center;gap:.55rem;background:var(--card2);border:1.5px solid var(--border);border-radius:8px;padding:.55rem .75rem;cursor:pointer;transition:all .16s;text-align:left;color:var(--text);font-family:'Lato',sans-serif;font-size:.82rem;font-weight:600}
+.opt-btn:hover:not(:disabled){border-color:#2a4a6a;background:#0f2035}
+.opt-lbl{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);min-width:18px}
+.opt-btn.correct{border-color:var(--correct);background:rgba(34,197,94,.1);color:#4ade80}
+.opt-btn.wrong{border-color:var(--wrong);background:rgba(239,68,68,.08);color:#fca5a5}
+.feedback{font-size:.76rem;font-family:'DM Mono',monospace;padding:.35rem .7rem;border-radius:6px;margin:.25rem 0 .5rem;display:none}
+.feedback.correct{background:rgba(34,197,94,.08);color:#4ade80;display:block}
+.feedback.wrong{background:rgba(239,68,68,.08);color:#f87171;display:block}
+
+.ans-reveal{overflow:hidden;max-height:0;transition:max-height .38s ease}
+.ans-reveal.open{max-height:900px}
+.ans-body{padding:.75rem 1.1rem 1rem;border-top:1px solid var(--border)}
+.ans-lbl{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--green);margin-bottom:.4rem}
+.ans-text{font-size:.84rem;color:var(--text);line-height:1.75}
+.ans-text strong{color:var(--amber)}
+.ans-mono{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--teal);background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.12);border-radius:6px;padding:.5rem .75rem;margin:.4rem 0;line-height:1.8}
+.tip{font-size:.74rem;color:var(--amber);background:rgba(245,158,11,.06);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;padding:.38rem .65rem;margin-top:.5rem}
+
+.show-btn{display:inline-flex;align-items:center;gap:.35rem;font-family:'Playfair Display',serif;font-weight:700;font-size:.74rem;padding:.38rem .9rem;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;margin:.15rem 0 .7rem 1.1rem}
+.show-btn:hover{color:var(--text);border-color:#2a4a6a}
+.show-btn.active{color:var(--green);border-color:var(--green);background:rgba(34,197,94,.06)}
+
+.reset-bar{text-align:center;padding:1rem}
+.reset-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;padding:.55rem 1.6rem;border-radius:3px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.reset-btn:hover{border-color:var(--red);color:var(--red)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;background:rgba(7,16,31,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;width:auto;display:block;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;transition:all .2s;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;white-space:nowrap}
+.site-nav-back:hover{color:#dde6f5;border-color:#2a4060;background:rgba(255,255,255,.04)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Some Applications of Trigonometry · Ch.9 · 30 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dcard"><div class="dval">30</div><div class="dlbl">Total</div></div>
+  <div class="dcard"><div class="dval" id="d-att" style="color:var(--amber)">0</div><div class="dlbl">Attempted</div></div>
+  <div class="dcard"><div class="dval" id="d-cor" style="color:var(--correct)">0</div><div class="dlbl">Correct</div></div>
+  <div class="dcard"><div class="dval" id="d-sc" style="color:var(--indigo)">0%</div><div class="dlbl">Score</div></div>
+</div>
+
+<nav>
+  <button class="active" onclick="filter('all',this)">All (30)</button>
+  <button onclick="filter('mcq',this)">MCQ</button>
+  <button onclick="filter('short',this)">Short Answer</button>
+  <button onclick="filter('long',this)">Long Answer</button>
+  <button onclick="filter('assert',this)">Assertion–Reason</button>
+</nav>
+
+<main id="qlist"></main>
+<div class="reset-bar"><button class="reset-btn" onclick="resetAll()">↺ Reset All</button></div>
+
+<script>
+const Q=[
+// ── MCQ (10) ──
+{id:1,type:'mcq',topic:'los',marks:1,
+ q:'The angle of elevation of an object is measured from:',
+ opts:['The base of the object','The vertical line','The horizontal at observer\'s eye','The top of the object'],
+ ans:2,explain:'Angle of elevation is always measured from the horizontal line at the observer\'s eye level to the line of sight going upward.'},
+
+{id:2,type:'mcq',topic:'hgt',marks:1,
+ q:'If the angle of elevation of a tower from a point 100 m away is 45°, the height of the tower is:',
+ opts:['50 m','100 m','100√3 m','200 m'],
+ ans:1,explain:'h = 100 × tan 45° = 100 × 1 = 100 m. When angle = 45°, height equals distance.'},
+
+{id:3,type:'mcq',topic:'dst',marks:1,
+ q:'From the top of a 75 m building, angle of depression to a car is 30°. Distance of the car from the building is:',
+ opts:['75 m','75√3 m','25√3 m','75/√3 m'],
+ ans:1,explain:'d = 75/tan 30° = 75/(1/√3) = 75√3 m. At 30° depression, distance = √3 × height.'},
+
+{id:4,type:'mcq',topic:'los',marks:1,
+ q:'The angle of depression from the top of a tower to a point on the ground is 60°. The angle of elevation from that point to the top of the tower is:',
+ opts:['30°','60°','90°','120°'],
+ ans:1,explain:'Angle of depression from A to B = Angle of elevation from B to A (alternate interior angles). So it is 60°.'},
+
+{id:5,type:'mcq',topic:'hgt',marks:1,
+ q:'A pole casts a shadow equal to its height. The angle of elevation of the sun is:',
+ opts:['30°','45°','60°','90°'],
+ ans:1,explain:'If shadow = height, then tan θ = height/shadow = 1, so θ = 45°.'},
+
+{id:6,type:'mcq',topic:'two',marks:1,
+ q:'Two points are on the same side of a tower. If angles of elevation are 30° and 60° and points are 50 m apart, the height of the tower is:',
+ opts:['25√3 m','50√3 m','25 m','50 m'],
+ ans:0,explain:'h = 50·tan30°·tan60°/(tan60°−tan30°) = 50·(1/√3)(√3)/(√3−1/√3) = 50/(2/√3) = 50√3/2 = 25√3 m.'},
+
+{id:7,type:'mcq',topic:'dst',marks:1,
+ q:'From the top of a 60 m lighthouse, angles of depression to two ships are 30° and 60°. Distance between the ships is:',
+ opts:['40√3 m','60√3 m','80√3 m','20√3 m'],
+ ans:0,explain:'d₁ = 60/tan30° = 60√3, d₂ = 60/tan60° = 60/√3 = 20√3. Distance = 60√3 − 20√3 = 40√3 m.'},
+
+{id:8,type:'mcq',topic:'hgt',marks:1,
+ q:'If the height of a tower is 20√3 m and the angle of elevation is 60°, the distance from the base is:',
+ opts:['20 m','40 m','20√3 m','60 m'],
+ ans:0,explain:'d = h/tan θ = 20√3/tan60° = 20√3/√3 = 20 m.'},
+
+{id:9,type:'mcq',topic:'app',marks:1,
+ q:'In heights and distances problems, which trigonometric ratio is used most frequently?',
+ opts:['sin θ','cos θ','tan θ','sec θ'],
+ ans:2,explain:'tan θ = opposite/adjacent = height/distance. Since most problems involve finding height or horizontal distance, tan θ is used most.'},
+
+{id:10,type:'mcq',topic:'los',marks:1,
+ q:'If the angle of elevation increases as you walk towards a tower, it means:',
+ opts:['Tower is getting shorter','You are getting closer','Tower is getting taller','You are moving away'],
+ ans:1,explain:'As horizontal distance decreases, tan θ = h/d increases, so θ increases. Moving closer makes the angle of elevation larger.'},
+
+// ── ASSERTION-REASON (4) ──
+{id:11,type:'assert',topic:'los',marks:1,
+ q:'Assertion (A): Angle of depression from the top of a cliff to a boat = angle of elevation from the boat to the cliff top.\nReason (R): Alternate interior angles formed by a transversal cutting two parallel lines are equal.',
+ opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+ ans:0,explain:'Both true, R explains A. The horizontal at the top and the ground are parallel. The line of sight is the transversal, creating equal alternate interior angles.'},
+
+{id:12,type:'assert',topic:'hgt',marks:1,
+ q:'Assertion (A): If the shadow of a tower is √3 times its height, then the sun\'s elevation is 30°.\nReason (R): tan 30° = 1/√3.',
+ opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+ ans:0,explain:'tan θ = height/shadow = h/(h√3) = 1/√3 = tan 30°. So θ = 30°. R (tan 30° = 1/√3) directly explains A.'},
+
+{id:13,type:'assert',topic:'two',marks:1,
+ q:'Assertion (A): If two complementary angles of elevation from distances a and b give tower height √(ab).\nReason (R): tan θ × tan(90°−θ) = 1.',
+ opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+ ans:0,explain:'From distance a: h = a·tanθ. From distance b: h = b·tan(90°−θ) = b·cotθ. Multiply: h² = ab·tanθ·cotθ = ab·1 = ab. So h = √(ab). R explains the key step.'},
+
+{id:14,type:'assert',topic:'dst',marks:1,
+ q:'Assertion (A): From a 100 m cliff, if the angle of depression is 45°, the ship is 100 m away.\nReason (R): tan 45° = 1 means height equals distance.',
+ opts:['Both A and R true; R is the correct explanation of A','Both A and R true; R is NOT the correct explanation','A is true but R is false','A is false but R is true'],
+ ans:0,explain:'d = 100/tan45° = 100/1 = 100 m. R correctly explains why: tan 45° = 1 means opposite = adjacent, i.e., height = distance.'},
+
+// ── SHORT ANSWER (10) ──
+{id:15,type:'short',topic:'hgt',marks:2,
+ q:'The angle of elevation of the top of a tower from a point on the ground, which is 30 m away from the foot of the tower, is 30°. Find the height of the tower.',
+ ans:'tan 30° = h/30\n1/√3 = h/30\nh = 30/√3 = 30√3/3 = <strong>10√3 m ≈ 17.32 m</strong>',
+ tip:'Direct application: h = d × tan θ. Rationalise if needed.'},
+
+{id:16,type:'short',topic:'dst',marks:2,
+ q:'From the top of a building 50 m high, the angle of depression of a car is 60°. Find the distance of the car from the base of the building.',
+ ans:'Angle of depression = 60° = Angle of elevation from car\ntan 60° = 50/d\n√3 = 50/d\nd = 50/√3 = <strong>50√3/3 ≈ 28.87 m</strong>',
+ tip:'Use alternate angles: angle of depression at top = angle of elevation at bottom.'},
+
+{id:17,type:'short',topic:'hgt',marks:2,
+ q:'A kite is flying at a height of 60 m above the ground. The string makes an angle of 60° with the ground. Find the length of the string.',
+ ans:'sin 60° = height/string length\n√3/2 = 60/L\nL = 60 × 2/√3 = 120/√3 = <strong>40√3 ≈ 69.28 m</strong>',
+ tip:'Here we need the hypotenuse (string length), so use sin θ, not tan θ!'},
+
+{id:18,type:'short',topic:'dst',marks:3,
+ q:'From the top of a 7 m building, the angle of elevation of the top of a cable tower is 60° and the angle of depression of its foot is 45°. Find the height of the tower.',
+ ans:'Let tower height = H, distance between buildings = d\nAngle of depression of foot = 45°:\ntan 45° = 7/d → d = 7 m\n\nAngle of elevation of top = 60°:\ntan 60° = (H−7)/d → √3 = (H−7)/7\nH−7 = 7√3\n<strong>H = 7 + 7√3 = 7(1+√3) ≈ 19.12 m</strong>',
+ tip:'Classic two-triangle problem. Find d from the depression equation first.'},
+
+{id:19,type:'short',topic:'two',marks:3,
+ q:'The angle of elevation of the top of a tower from two points at distances of 4 m and 9 m from the base are complementary. Prove that the height of the tower is 6 m.',
+ ans:'Let angles be θ and (90°−θ)\nFrom 4 m: tan θ = h/4 → h = 4 tan θ ...(i)\nFrom 9 m: tan(90°−θ) = h/9 → cot θ = h/9 → h = 9/tan θ ...(ii)\n\nMultiply (i) × (ii):\nh² = 4 tan θ × 9/tan θ = 36\n<strong>h = √36 = 6 m</strong> ■',
+ tip:'Complementary angles → product eliminates tan θ. h = √(a×b) = √(4×9) = 6.'},
+
+{id:20,type:'short',topic:'hgt',marks:2,
+ q:'A tree breaks due to a storm and the broken part makes an angle of 30° with the ground. The distance from the foot of the tree to the point where the top touches the ground is 8 m. Find the height of the tree.',
+ ans:'Let broken part = L (hypotenuse), standing part = h\ntan 30° = h/8 → h = 8/√3 = 8√3/3\ncos 30° = 8/L → L = 8/(√3/2) = 16/√3 = 16√3/3\n\nTotal height = h + L = 8√3/3 + 16√3/3 = <strong>24√3/3 = 8√3 ≈ 13.86 m</strong>',
+ tip:'The broken part becomes the hypotenuse. You need both standing part (opposite) and broken part (hypotenuse).'},
+
+{id:21,type:'short',topic:'dst',marks:2,
+ q:'A 1.5 m tall boy is standing at some distance from a 30 m high building. The angle of elevation from his eyes to the top of the building increases from 30° to 60° as he walks towards it. Find the distance he walked.',
+ ans:'Effective height = 30 − 1.5 = 28.5 m\nInitial distance: d₁ = 28.5/tan30° = 28.5√3\nFinal distance: d₂ = 28.5/tan60° = 28.5/√3 = 9.5√3\n\nDistance walked = d₁ − d₂ = 28.5√3 − 9.5√3 = <strong>19√3 ≈ 32.91 m</strong>',
+ tip:'Subtract observer\'s height from tower height first. Then find both distances and subtract.'},
+
+{id:22,type:'short',topic:'app',marks:2,
+ q:'The shadow of a tower standing on a level ground is found to be 40 m longer when the sun\'s altitude is 30° than when it is 60°. Find the height of the tower.',
+ ans:'At 30°: d₁ = h/tan30° = h√3\nAt 60°: d₂ = h/tan60° = h/√3\n\nDifference: h√3 − h/√3 = 40\nh(√3 − 1/√3) = 40\nh(2/√3) = 40\n<strong>h = 40√3/2 = 20√3 ≈ 34.64 m</strong>',
+ tip:'Shadow difference problems: set up two equations for shadow length and subtract.'},
+
+{id:23,type:'short',topic:'hgt',marks:3,
+ q:'From a point on the ground, the angles of elevation of the bottom and top of a transmission tower on top of a 20 m building are 45° and 60°. Find the height of the tower.',
+ ans:'Let distance from point to building = d\nAngle to building top (= tower bottom) = 45°:\ntan 45° = 20/d → d = 20 m\n\nAngle to tower top = 60°:\ntan 60° = (20+h)/20 → √3 = (20+h)/20\n20+h = 20√3\n<strong>h = 20(√3−1) = 20√3 − 20 ≈ 14.64 m</strong>',
+ tip:'Two-triangle sharing the same base distance. Find d from the easier equation first.'},
+
+{id:24,type:'short',topic:'two',marks:3,
+ q:'From the top of a 9 m building, the angle of depression of the foot of another building opposite is 30°. The angle of elevation of the top of that building from the same point is 60°. Find the height of the second building and the distance between them.',
+ ans:'tan 30° = 9/d → d = 9√3 m (distance between buildings)\n\nLet extra height of second building above 9m = x\ntan 60° = x/d → √3 = x/(9√3) → x = 9√3·√3 = 27 m\n\nSecond building height = 9 + 27 = <strong>36 m</strong>\nDistance = <strong>9√3 ≈ 15.59 m</strong>',
+ tip:'Depression gives the distance; elevation gives the extra height above the observer.'},
+
+// ── LONG ANSWER (6) ──
+{id:25,type:'long',topic:'two',marks:5,
+ q:'The angles of elevation of the top of a tower from two points at a distance of \'a\' and \'b\' from the base of the tower and in the same straight line with it are complementary. Prove that the height of the tower is √(ab).',
+ ans:'Let the tower height = h and angles = θ and (90°−θ)\n\n<strong>From distance a:</strong>\ntan θ = h/a → h = a·tan θ ...(i)\n\n<strong>From distance b:</strong>\ntan(90°−θ) = h/b\ncot θ = h/b\n1/tan θ = h/b → h = b/tan θ ...(ii)\n\n<strong>Multiply (i) and (ii):</strong>\nh × h = (a·tan θ) × (b/tan θ)\nh² = ab\n\n<strong>∴ h = √(ab)</strong>\n\nHence proved. ■',
+ tip:'Key insight: complementary angles mean tan θ × cot θ = 1, which eliminates θ from the product.'},
+
+{id:26,type:'long',topic:'two',marks:5,
+ q:'A straight highway leads to the foot of a tower. A man standing at the top of the tower observes a car at an angle of depression of 30°, which is approaching the foot of the tower with uniform speed. Six seconds later, the angle of depression is 60°. Find the time taken by the car to reach the foot of the tower.',
+ ans:'Let tower height = h, initial distance of car = d₁, final distance = d₂\n\n<strong>At 30° depression:</strong> tan 30° = h/d₁ → d₁ = h√3\n\n<strong>At 60° depression:</strong> tan 60° = h/d₂ → d₂ = h/√3\n\n<strong>Distance covered in 6 sec:</strong>\nd₁ − d₂ = h√3 − h/√3 = h(√3 − 1/√3) = h(2/√3) = 2h/√3\n\n<strong>Speed:</strong> v = (2h/√3) / 6 = h/(3√3)\n\n<strong>Time to cover remaining d₂ = h/√3:</strong>\nt = d₂/v = (h/√3) / (h/(3√3)) = (h/√3) × (3√3/h) = <strong>3 seconds</strong>',
+ tip:'Speed = distance/time. Find both distances in terms of h, then ratio gives the time without needing h.'},
+
+{id:27,type:'long',topic:'hgt',marks:5,
+ q:'From a point on a bridge across a river, the angles of depression of the banks on opposite sides of the river are 30° and 45° respectively. If the bridge is at a height of 3 m from the banks, find the width of the river.',
+ ans:'Let bridge height = 3 m, distances to the two banks = d₁ and d₂\n\n<strong>Bank 1 (depression 30°):</strong>\ntan 30° = 3/d₁\n1/√3 = 3/d₁\nd₁ = 3√3 m\n\n<strong>Bank 2 (depression 45°):</strong>\ntan 45° = 3/d₂\n1 = 3/d₂\nd₂ = 3 m\n\n<strong>Width of river = d₁ + d₂:</strong>\n= 3√3 + 3 = 3(√3 + 1)\n= 3(1.732 + 1) = 3 × 2.732\n= <strong>3(√3 + 1) ≈ 8.20 m</strong>',
+ tip:'Banks are on OPPOSITE sides, so add the distances. Don\'t subtract!'},
+
+{id:28,type:'long',topic:'two',marks:5,
+ q:'Two poles of equal heights are standing opposite each other on either side of a road which is 80 m wide. From a point between them on the road, the angles of elevation of the tops of the poles are 60° and 30°. Find the heights of the poles and the distances of the point from the poles.',
+ ans:'Let height of each pole = h, distance from point to first pole = x\nDistance from point to second pole = 80 − x\n\n<strong>From first pole (elevation 60°):</strong>\ntan 60° = h/x → √3 = h/x → h = x√3 ...(i)\n\n<strong>From second pole (elevation 30°):</strong>\ntan 30° = h/(80−x) → 1/√3 = h/(80−x) → h = (80−x)/√3 ...(ii)\n\n<strong>Equate (i) and (ii):</strong>\nx√3 = (80−x)/√3\nx√3 × √3 = 80−x\n3x = 80−x\n4x = 80\n<strong>x = 20 m</strong> (distance from first pole)\n80−x = <strong>60 m</strong> (distance from second pole)\n\n<strong>Height:</strong> h = 20√3 = <strong>20√3 ≈ 34.64 m</strong>',
+ tip:'Equal heights + same road width = two equations in h and x. Equate h from both.'},
+
+{id:29,type:'long',topic:'hgt',marks:5,
+ q:'A TV tower stands vertically on the bank of a canal. From a point on the other bank directly opposite the tower, the angle of elevation of the top of the tower is 60°. From another point 20 m away from this point on the same bank, the angle of elevation is 30°. Find the height of the tower and the width of the canal.',
+ ans:'Let height = h, width of canal = d\n\n<strong>From directly opposite (elevation 60°):</strong>\ntan 60° = h/d → √3 = h/d → h = d√3 ...(i)\n\n<strong>From 20 m further (elevation 30°):</strong>\ntan 30° = h/(d+20) → 1/√3 = h/(d+20) → h = (d+20)/√3 ...(ii)\n\n<strong>Equate (i) and (ii):</strong>\nd√3 = (d+20)/√3\nd√3 × √3 = d+20\n3d = d+20\n2d = 20\n<strong>d = 10 m</strong> (width of canal)\n\n<strong>Height:</strong> h = 10√3 = <strong>10√3 ≈ 17.32 m</strong>',
+ tip:'Two-triangle with shared height h. Equate expressions for h to find d.'},
+
+{id:30,type:'long',topic:'app',marks:5,
+ q:'As observed from the top of a 75 m high lighthouse from the sea level, the angles of depression of two ships are 30° and 45°. If one ship is exactly behind the other on the same side of the lighthouse, find the distance between the two ships.',
+ ans:'Let ship 1 (angle 45°) be at distance d₁, ship 2 (angle 30°) at distance d₂\nShip 2 is farther (smaller angle of depression)\n\n<strong>Ship 1 (depression 45°):</strong>\ntan 45° = 75/d₁ → 1 = 75/d₁ → d₁ = 75 m\n\n<strong>Ship 2 (depression 30°):</strong>\ntan 30° = 75/d₂ → 1/√3 = 75/d₂ → d₂ = 75√3 m\n\n<strong>Distance between ships:</strong>\n= d₂ − d₁ = 75√3 − 75 = 75(√3 − 1)\n= 75(1.732 − 1) = 75 × 0.732\n= <strong>75(√3 − 1) ≈ 54.9 m</strong>',
+ tip:'Same side → subtract distances. Smaller depression angle = farther ship.'},
+];
+
+const state={};
+let currentFilter='all';
+const topicStrip={los:'strip-los',hgt:'strip-hgt',dst:'strip-dst',two:'strip-two',app:'strip-app'};
+const topicBg={los:'rgba(45,212,191,.1)',hgt:'rgba(245,158,11,.1)',dst:'rgba(56,189,248,.1)',two:'rgba(129,140,248,.1)',app:'rgba(34,197,94,.1)'};
+const topicCol={los:'#2dd4bf',hgt:'#f59e0b',dst:'#38bdf8',two:'#818cf8',app:'#22c55e'};
+const typeBadge={mcq:'b-mcq MCQ',short:'b-short Short Answer',long:'b-long Long Answer',assert:'b-assert Assertion–Reason'};
+const markBadge=m=>{const c={1:'b-1m',2:'b-2m',3:'b-3m',5:'b-5m'}[m]||'b-1m';return`<span class="badge ${c}">${m} mark${m>1?'s':''}</span>`;};
+
+function getVisible(){return currentFilter==='all'?Q:Q.filter(q=>q.type===currentFilter);}
+function filter(type,btn){currentFilter=type;document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
+
+function renderMCQ(q){
+  const s=state[q.id]||{};const done=s.chosen!==undefined;
+  return`<div class="mcq-body"><div class="mcq-opts">${q.opts.map((o,i)=>{
+    let cls='';if(done){if(i===q.ans)cls='correct';else if(i===s.chosen&&i!==q.ans)cls='wrong';}
+    return`<button class="opt-btn ${cls}" onclick="chooseMCQ(${q.id},${i})" ${done?'disabled':''}><span class="opt-lbl">${String.fromCharCode(65+i)}</span>${o}</button>`;
+  }).join('')}</div>${done?`<div class="feedback ${s.chosen===q.ans?'correct':'wrong'}">${s.chosen===q.ans?'✓ Correct!':'✗ Incorrect — correct: '+String.fromCharCode(65+q.ans)}</div><div class="ans-body" style="border-top:1px solid var(--border);padding:.6rem 0 .3rem"><div class="ans-lbl">💡 Explanation</div><div class="ans-text">${q.explain}</div></div>`:''}</div>`;
+}
+
+function renderShortLong(q){
+  const s=state[q.id]||{};const open=s.open;
+  return`<button class="show-btn ${open?'active':''}" onclick="toggleAns(${q.id})">${open?'▲ Hide Answer':'▼ Show Model Answer'}</button><div class="ans-reveal ${open?'open':''}"><div class="ans-body"><div class="ans-lbl">✅ Model Answer</div><div class="ans-mono">${(q.ans||'').replace(/\n/g,'<br>')}</div>${q.tip?`<div class="tip">🎯 Exam tip: ${q.tip}</div>`:''}</div></div>`;
+}
+
+function render(){
+  const list=getVisible();document.getElementById('qlist').innerHTML=list.map((q,i)=>{
+    const tb=typeBadge[q.type].split(' ');
+    return`<div class="q-card ${topicStrip[q.topic]||''}" id="qcard-${q.id}"><div class="q-header"><div class="q-num" style="background:${topicBg[q.topic]};color:${topicCol[q.topic]}">${i+1}</div><div class="q-text">${q.q.replace(/\n/g,'<br>')}</div></div><div class="q-meta"><span class="badge ${tb[0]}">${tb.slice(1).join(' ')}</span>${markBadge(q.marks)}</div>${q.type==='mcq'||q.type==='assert'?renderMCQ(q):renderShortLong(q)}</div>`;
+  }).join('');
+}
+
+function chooseMCQ(id,idx){
+  const q=Q.find(x=>x.id===id);if(!q||state[id]?.chosen!==undefined)return;
+  if(!state[id])state[id]={};state[id].chosen=idx;updateDash();render();
+}
+function toggleAns(id){
+  if(!state[id])state[id]={};state[id].open=!state[id].open;
+  if(!state[id].viewed){state[id].viewed=true;updateDash();}
+  const btn=document.querySelector(`#qcard-${id} .show-btn`);
+  const rev=document.querySelector(`#qcard-${id} .ans-reveal`);
+  if(btn&&rev){const open=state[id].open;btn.classList.toggle('active',open);btn.textContent=open?'▲ Hide Answer':'▼ Show Model Answer';rev.classList.toggle('open',open);}
+}
+function updateDash(){
+  const att=Object.keys(state).length;
+  const cor=Q.filter(q=>state[q.id]?.chosen===q.ans).length;
+  const mcqTotal=Q.filter(q=>q.type==='mcq'||q.type==='assert').length;
+  document.getElementById('d-att').textContent=att;
+  document.getElementById('d-cor').textContent=cor;
+  document.getElementById('d-sc').textContent=mcqTotal>0?Math.round((cor/mcqTotal)*100)+'%':'—';
+}
+function resetAll(){for(const k in state)delete state[k];updateDash();render();}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Some Applications of Trigonometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#040810; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(4,8,16,.92) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#f59e0b; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#3a5a78; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #1a2d45; background:rgba(4,10,20,.85);
+  color:#3a5a78; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#f59e0b; color:#f59e0b; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#0a1422; border:1px solid #1e3550;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:290px; font-size:.8rem; color:#9cc0e0;
+  line-height:1.65; display:none;
+  box-shadow:0 8px 28px rgba(0,0,0,.85);
+}
+#tooltip strong {
+  font-family:'Playfair Display',serif; display:block;
+  margin-bottom:.3rem; color:#f59e0b; font-size:.9rem;
+}
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,45,69,.75);
+  position:sticky; top:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a9ab8; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(26,45,69,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<div id="ui">
+  <div>
+    <h1>Some Applications of Trigonometry</h1>
+    <p>Class X · Mathematics Ch.9 — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize() { W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Heights &\nDistances',
+  x:0, y:0, r:62, color:'#050e1c', stroke:'#f59e0b', textColor:'#f59e0b', fontSize:14
+};
+
+const BRANCHES = [
+  // ── Line of Sight & Angles ──
+  {
+    id:'los', label:'Line of\nSight', x:-330, y:-180, r:46,
+    color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:"The line of sight is the straight line drawn from the eye of the observer to the point being viewed.\nIt forms the hypotenuse in the right triangle used for height/distance problems.\nThe angle between the line of sight and the horizontal gives us the angle of elevation or depression.",
+    children:[
+      { id:'l1', label:'Angle of\nElevation', x:-540, y:-300, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'The angle of elevation is formed when we look UPWARD from the horizontal.\nIf a person stands on the ground and looks at the top of a tower, the angle between the horizontal line of sight and the line to the top is the angle of elevation.\n\nAlways measured from the horizontal, never from vertical!\nThe object is ABOVE the observer.' },
+      { id:'l2', label:'Angle of\nDepression', x:-560, y:-130, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'The angle of depression is formed when we look DOWNWARD from the horizontal.\nIf a person stands on a cliff and looks at a boat below, the angle between the horizontal and the line of sight to the boat is the angle of depression.\n\nKey property: Angle of depression from A to B = Angle of elevation from B to A (alternate interior angles).' },
+      { id:'l3', label:'Horizontal\nLine', x:-480, y:-15, r:34, color:'#031818', stroke:'#2dd4bf', textColor:'#99f6e4',
+        info:'The horizontal line is the reference from which angles are measured.\nIt is parallel to the ground/flat surface.\n\nCommon mistake: Students confuse the angle at the base of the triangle with angle of elevation.\nRemember: angle of elevation/depression is ALWAYS at the observer\'s eye level!' },
+    ]
+  },
+  // ── Problem Setup ──
+  {
+    id:'setup', label:'Problem\nSetup', x:330, y:-180, r:46,
+    color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+    info:"Steps to solve heights & distances problems:\n1. Draw a clear diagram\n2. Mark the right angle (usually at the base)\n3. Identify the angle of elevation/depression\n4. Label known and unknown sides\n5. Choose the correct trig ratio\n6. Solve the equation",
+    children:[
+      { id:'s1', label:'Draw\nDiagram', x:540, y:-300, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'ALWAYS draw a figure first!\n• Mark the observer\'s position\n• Mark the object being viewed\n• Draw horizontal line at eye level\n• Draw line of sight to the object\n• Mark the right angle (90°)\n• Label the given angle (θ)\n• Label known/unknown sides\n\nA good diagram is half the solution!' },
+      { id:'s2', label:'Choose\nRatio', x:570, y:-130, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'After drawing the diagram:\n• Identify which sides you have/need\n• Use tan θ when you have opposite & adjacent\n• Use sin θ when you have opposite & hypotenuse\n• Use cos θ when you have adjacent & hypotenuse\n\nMost problems use tan θ = height/distance\nbecause height = opposite, distance = adjacent.' },
+      { id:'s3', label:'Common\nValues', x:490, y:-10, r:34, color:'#1a1000', stroke:'#f59e0b', textColor:'#fde68a',
+        info:'Angles commonly used in problems:\n• 30°: tan 30° = 1/√3, shadow is √3 × height\n• 45°: tan 45° = 1, height = distance\n• 60°: tan 60° = √3, height = √3 × distance\n\nKey values to remember:\n√3 ≈ 1.732\n1/√3 = √3/3 ≈ 0.577\nThese appear in almost every CBSE question!' },
+    ]
+  },
+  // ── Height Problems ──
+  {
+    id:'height', label:'Finding\nHeights', x:-310, y:200, r:46,
+    color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+    info:"Finding height of a tower, building, mountain, etc.\nGiven: distance from base + angle of elevation\nFormula: height = distance × tan(angle)\n\nOR given: angle from two points at known separation\nSolve using two equations with tan.",
+    children:[
+      { id:'h1', label:'Tower\nHeight', x:-540, y:110, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Example: A tower\'s angle of elevation from a point 20m away is 60°.\nFind the height.\n\ntan 60° = h/20\n√3 = h/20\nh = 20√3 m ≈ 34.64 m\n\nGeneral: h = d × tan θ\nwhere d = distance from base, θ = angle of elevation' },
+      { id:'h2', label:'Two-Angle\nProblems', x:-545, y:260, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'When angles are given from TWO positions:\nLet height = h, distances = d₁ and d₂\n\nFrom point A: tan α = h/d₁ → d₁ = h/tan α\nFrom point B: tan β = h/d₂ → d₂ = h/tan β\n\nIf A and B are d apart on same side:\nd₂ − d₁ = d (or d₁ − d₂ = d)\nSubstitute and solve for h.\n\nThis is the most common 5-mark question!' },
+      { id:'h3', label:'Height on\nPedestal', x:-440, y:380, r:34, color:'#00091a', stroke:'#38bdf8', textColor:'#bae6fd',
+        info:'Statue on a pedestal (or flag on a pole):\nAngle to top of pedestal = α\nAngle to top of statue = β\n\nLet pedestal height = p, statue height = s\ntan α = p/d → d = p/tan α\ntan β = (p+s)/d → d = (p+s)/tan β\n\nEquate d values and solve for the unknown.' },
+    ]
+  },
+  // ── Distance Problems ──
+  {
+    id:'dist', label:'Finding\nDistances', x:310, y:200, r:46,
+    color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:"Finding horizontal distance to an object.\nGiven: height of observation point + angle of depression\nFormula: distance = height / tan(angle)\n\nUsed for: ships from lighthouse, cars from building, etc.",
+    children:[
+      { id:'d1', label:'From\nLighthouse', x:540, y:110, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Example: From a 150m lighthouse, angle of depression to a ship is 30°.\nFind distance of ship from base.\n\ntan 30° = 150/d\n1/√3 = 150/d\nd = 150√3 m ≈ 259.8 m\n\nRemember: Angle of depression at top = Angle of elevation at base (alternate angles).' },
+      { id:'d2', label:'Width of\nRiver', x:550, y:260, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Finding width of a river/road:\nStand on one bank, observe a point on the other bank.\nAngle of depression from top of a known-height pillar.\n\nOr: Take two observations from different heights.\nWidth = h₁/tan α₁ or h₂/tan α₂\n\nAlternatively: Walk along the bank, take two angles, use the difference.' },
+      { id:'d3', label:'Moving\nObjects', x:440, y:370, r:34, color:'#0a0018', stroke:'#818cf8', textColor:'#c7d2fe',
+        info:'Object moving towards/away from observer:\nAngle changes from α to β as object moves.\n\nDistance covered = h/tan α − h/tan β\n(if moving towards, β > α)\n\nOr = h(cot α − cot β)\n\nExample: Car approaching a tower, angles change from 30° to 60°.\nDistance = h(cot 30° − cot 60°) = h(√3 − 1/√3) = 2h/√3' },
+    ]
+  },
+  // ── Real-Life Applications ──
+  {
+    id:'real', label:'Real-Life\nUses', x:0, y:-310, r:46,
+    color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+    info:"Trigonometry is used extensively in real life:\n• Surveying and mapping land\n• Navigation (ships, aircraft)\n• Architecture and construction\n• Astronomy (distances to stars)\n• Military (artillery range finding)\n• Satellite communication (dish angles)",
+    children:[
+      { id:'re1', label:'Surveying', x:-170, y:-440, r:33, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Surveyors use theodolites to measure angles.\nWith one known distance (baseline) and two angles, they can calculate heights and distances of inaccessible points.\n\nUsed for: measuring mountain heights, building heights, mapping terrain, road construction planning.\n\nThis is exactly how the height of Mount Everest was first calculated!' },
+      { id:'re2', label:'Navigation', x:0, y:-468, r:33, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Ships and aircraft use angles to determine position:\n• Bearing: angle measured clockwise from North\n• Pilots calculate descent angles for landing\n• GPS uses trigonometric triangulation\n\nLighthouse keepers measured angles of depression to determine ship distances and warn of dangerous rocks.' },
+      { id:'re3', label:'Architecture', x:170, y:-440, r:33, color:'#1a0005', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Architects use trigonometry for:\n• Calculating roof slopes and angles\n• Ensuring structural stability\n• Determining shadow lengths for sunlight planning\n• Designing ramps (angle of inclination)\n• Planning staircase rise and run\n\nA 30° roof slope means rise = run × tan 30° = run/√3' },
+    ]
+  },
+  // ── Exam Strategy ──
+  {
+    id:'exam', label:'Exam\nStrategy', x:0, y:310, r:46,
+    color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+    info:"Tips for CBSE exam questions on this chapter:\n1. Always draw a neat diagram (1 mark often given for this)\n2. Mark all angles and sides clearly\n3. Use √3 = 1.732 only if asked\n4. Most answers stay in surd form\n5. Check if the answer makes physical sense",
+    children:[
+      { id:'e1', label:'Common\nMistakes', x:-170, y:440, r:33, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Avoid these errors:\n❌ Confusing angle of elevation with angle at base\n❌ Forgetting to add observer\'s height to calculated height\n❌ Using wrong trig ratio (sin instead of tan)\n❌ Not considering both sides of the object\n❌ Rationalising when not needed\n❌ Drawing incorrect diagram\n\n✓ Always verify: does the answer make sense physically?' },
+      { id:'e2', label:'5-Mark\nPattern', x:0, y:468, r:33, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'CBSE 5-mark questions usually:\n1. Involve two triangles sharing a common side (height)\n2. Give two angles of elevation/depression\n3. Ask for height OR distance\n\nSolution pattern:\n• Let h = height, set up two tan equations\n• Eliminate the common unknown\n• Express answer in simplest surd form\n• Verify using approximate values' },
+      { id:'e3', label:'Diagram\nMarks', x:170, y:440, r:33, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Marks for diagram (usually 1 mark):\n✓ Show the right angle clearly (□ symbol)\n✓ Label all vertices with letters\n✓ Show angle of elevation/depression with arc\n✓ Mark horizontal with dashed line at eye level\n✓ Show line of sight with an arrow\n✓ Write given values on the figure\n\nA clean diagram also helps YOU solve the problem faster!' },
+    ]
+  },
+];
+
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+function getNode(id) { return allNodes.find(n => n.id===id); }
+
+// ── pan / zoom ──
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; canvas.style.cursor='grabbing'; });
+canvas.addEventListener('mousemove', e => {
+  if(dragging){ ox=dragOrigin.x+(e.clientX-dragStart.x); oy=dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x, dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10, window.innerHeight-230)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', () => { dragging=false; canvas.style.cursor='grab'; });
+canvas.addEventListener('mouseleave', () => { dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY); }, {passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart', e => {
+  if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2, cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d;
+  }
+}, {passive:false});
+canvas.addEventListener('touchend', () => { dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.2,Math.min(3,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2; draw(); }
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(56,189,248,.035)';
+  ctx.lineWidth=1;
+  for(let x=-1500;x<1500;x+=70){ ctx.beginPath(); ctx.moveTo(x,-1500); ctx.lineTo(x,1500); ctx.stroke(); }
+  for(let y=-1500;y<1500;y+=70){ ctx.beginPath(); ctx.moveTo(-1500,y); ctx.lineTo(1500,y); ctx.stroke(); }
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+
+  allEdges.forEach(e => {
+    const a=getNode(e.from), b=getNode(e.to);
+    if(!a||!b) return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0, a.stroke+'55');
+    grd.addColorStop(1, b.stroke+'22');
+    const cx2=(a.x+b.x)/2+(b.y-a.y)*.15, cy2=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx2,cy2,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n => {
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?40:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-8,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'33'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=n.id==='c'?14:12;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

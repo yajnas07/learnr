@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Some Applications of Trigonometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;--amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(245,158,11,.04) 0%,transparent 60%)}
+
+header{text-align:center;padding:1.8rem 1rem 1.2rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--amber)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:.85rem;padding:0 1.2rem 3rem;max-width:1100px;margin:0 auto}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;transition:transform .15s,box-shadow .15s}
+.panel:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.panel.span2{grid-column:span 2}
+@media(max-width:700px){.panel.span2{grid-column:span 1}}
+.panel-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem}
+.panel p,.panel li{font-size:.82rem;line-height:1.75;color:var(--muted)}
+.panel ul{padding-left:1.1rem}
+.panel strong{color:var(--text)}
+.panel em{color:var(--teal);font-style:normal}
+
+.formula-box{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:.6rem .9rem;margin:.5rem 0;font-family:'DM Mono',monospace;font-size:.82rem;line-height:1.8;color:var(--amber)}
+.formula-box .sub{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+
+table{width:100%;border-collapse:collapse;margin:.5rem 0;font-size:.78rem}
+th,td{padding:.4rem .6rem;border:1px solid var(--border);text-align:center}
+th{background:var(--card2);color:var(--amber);font-family:'DM Mono',monospace;font-size:.7rem}
+td{color:var(--text)}
+
+.tip{font-size:.76rem;color:var(--green);background:rgba(34,197,94,.06);border-left:3px solid var(--green);border-radius:0 6px 6px 0;padding:.4rem .7rem;margin-top:.5rem}
+.warn{font-size:.76rem;color:var(--red);background:rgba(244,63,94,.06);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:.4rem .7rem;margin-top:.5rem}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;background:rgba(7,16,31,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;width:auto;display:block;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;transition:all .2s;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;white-space:nowrap}
+.site-nav-back:hover{color:#dde6f5;border-color:#2a4060;background:rgba(255,255,255,.04)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Cheat Sheet</h1>
+  <p>Some Applications of Trigonometry · Ch.9 · Heights &amp; Distances</p>
+</header>
+
+<div class="grid">
+
+<!-- 1 -->
+<div class="panel" style="border-left:3px solid var(--teal)">
+  <div class="panel-title" style="color:var(--teal)">📐 Key Definitions</div>
+  <ul>
+    <li><strong>Line of Sight</strong> — line from observer's eye to the object</li>
+    <li><strong>Angle of Elevation</strong> — angle above horizontal (looking UP)</li>
+    <li><strong>Angle of Depression</strong> — angle below horizontal (looking DOWN)</li>
+    <li><strong>Horizontal</strong> — reference line parallel to ground at eye level</li>
+  </ul>
+  <div class="tip">💡 Angles are ALWAYS measured from the horizontal, never from the vertical!</div>
+</div>
+
+<!-- 2 -->
+<div class="panel" style="border-left:3px solid var(--amber)">
+  <div class="panel-title" style="color:var(--amber)">⚡ Core Formulas</div>
+  <div class="formula-box">
+    Finding height: <strong>h = d × tan θ</strong><br>
+    Finding distance: <strong>d = h / tan θ = h × cot θ</strong><br>
+    Line of sight length: <strong>L = h / sin θ</strong>
+    <div class="sub">θ = angle of elevation or depression; h = height; d = horizontal distance</div>
+  </div>
+</div>
+
+<!-- 3 - span2 -->
+<div class="panel span2" style="border-left:3px solid var(--blue)">
+  <div class="panel-title" style="color:var(--blue)">📊 Quick Reference Table</div>
+  <table>
+    <tr><th>Angle θ</th><th>tan θ</th><th>If h = 100 m, then d = ?</th><th>If d = 100 m, then h = ?</th><th>Key Relationship</th></tr>
+    <tr><td>30°</td><td>1/√3 ≈ 0.577</td><td>100√3 ≈ 173.2 m</td><td>100/√3 ≈ 57.7 m</td><td>d = √3 × h</td></tr>
+    <tr><td>45°</td><td>1</td><td>100 m</td><td>100 m</td><td>d = h (equal!)</td></tr>
+    <tr><td>60°</td><td>√3 ≈ 1.732</td><td>100/√3 ≈ 57.7 m</td><td>100√3 ≈ 173.2 m</td><td>h = √3 × d</td></tr>
+  </table>
+  <div class="tip">💡 At 30°, distance is √3 times the height. At 60°, height is √3 times the distance. At 45°, they're equal.</div>
+</div>
+
+<!-- 4 -->
+<div class="panel" style="border-left:3px solid var(--indigo)">
+  <div class="panel-title" style="color:var(--indigo)">🔺 Two-Angle Formula (Same Side)</div>
+  <div class="formula-box">
+    <strong>h = d · (tan α · tan β) / (tan β − tan α)</strong>
+    <div class="sub">d = distance between two points; α = far angle (smaller); β = near angle (larger)</div>
+  </div>
+  <p><strong>Setup:</strong> Let height = h, distance from nearer point to base = x</p>
+  <ul>
+    <li>tan β = h/x → x = h/tan β</li>
+    <li>tan α = h/(x+d) → x+d = h/tan α</li>
+    <li>Subtract and solve for h</li>
+  </ul>
+</div>
+
+<!-- 5 -->
+<div class="panel" style="border-left:3px solid var(--green)">
+  <div class="panel-title" style="color:var(--green)">🔺 Two-Angle Formula (Opposite Sides)</div>
+  <div class="formula-box">
+    <strong>h = d / (cot α + cot β)</strong>
+    <div class="sub">Points on opposite sides of the tower; d = total distance between them</div>
+  </div>
+  <p><strong>Setup:</strong> d₁ + d₂ = d</p>
+  <ul>
+    <li>d₁ = h·cot α, d₂ = h·cot β</li>
+    <li>h(cot α + cot β) = d</li>
+    <li>Solve for h</li>
+  </ul>
+</div>
+
+<!-- 6 -->
+<div class="panel" style="border-left:3px solid var(--amber)">
+  <div class="panel-title" style="color:var(--amber)">🏗️ Building + Tower Problem</div>
+  <p>From the top of a building of height <em>a</em>, angle of elevation of tower top = α, angle of depression of tower base = β.</p>
+  <div class="formula-box">
+    Distance to tower: <strong>d = a / tan β</strong><br>
+    Tower height: <strong>H = a + d·tan α = a(1 + tan α / tan β)</strong>
+  </div>
+  <div class="tip">💡 The building height gives you the depression equation; use it to find d first.</div>
+</div>
+
+<!-- 7 -->
+<div class="panel" style="border-left:3px solid var(--red)">
+  <div class="panel-title" style="color:var(--red)">⚠️ Common Mistakes</div>
+  <ul>
+    <li><strong>❌</strong> Measuring angle from the vertical instead of horizontal</li>
+    <li><strong>❌</strong> Forgetting to add observer's height to calculated height</li>
+    <li><strong>❌</strong> Confusing "angle at base" with "angle of elevation"</li>
+    <li><strong>❌</strong> Using sin/cos when tan is needed (most problems use tan!)</li>
+    <li><strong>❌</strong> Same side vs opposite sides — using wrong formula</li>
+    <li><strong>❌</strong> Not drawing the diagram (costs 1 mark!)</li>
+  </ul>
+</div>
+
+<!-- 8 -->
+<div class="panel" style="border-left:3px solid var(--teal)">
+  <div class="panel-title" style="color:var(--teal)">📝 Problem-Solving Steps</div>
+  <ol style="padding-left:1.1rem">
+    <li style="font-size:.82rem;color:var(--muted);line-height:1.75"><strong>Draw</strong> a neat labeled diagram (mark 90°, θ, sides)</li>
+    <li style="font-size:.82rem;color:var(--muted);line-height:1.75"><strong>Identify</strong> the right triangle(s)</li>
+    <li style="font-size:.82rem;color:var(--muted);line-height:1.75"><strong>Label</strong> known values and let unknown = h or x</li>
+    <li style="font-size:.82rem;color:var(--muted);line-height:1.75"><strong>Choose</strong> correct trig ratio (usually tan θ)</li>
+    <li style="font-size:.82rem;color:var(--muted);line-height:1.75"><strong>Solve</strong> the equation(s)</li>
+    <li style="font-size:.82rem;color:var(--muted);line-height:1.75"><strong>Verify</strong> — does the answer make sense?</li>
+  </ol>
+</div>
+
+<!-- 9 -->
+<div class="panel" style="border-left:3px solid var(--blue)">
+  <div class="panel-title" style="color:var(--blue)">🔢 Useful Values</div>
+  <div class="formula-box">
+    √3 ≈ 1.732 &nbsp; | &nbsp; 1/√3 ≈ 0.577<br>
+    √2 ≈ 1.414 &nbsp; | &nbsp; 1/√2 ≈ 0.707<br>
+    tan 30° = 1/√3 &nbsp; | &nbsp; tan 45° = 1 &nbsp; | &nbsp; tan 60° = √3
+  </div>
+  <p><strong>Rationalisation:</strong></p>
+  <ul>
+    <li>h/√3 → h√3/3 (multiply by √3/√3)</li>
+    <li>CBSE prefers <em>20√3 m</em> over <em>20/√3 × √3/√3</em></li>
+  </ul>
+</div>
+
+<!-- 10 -->
+<div class="panel" style="border-left:3px solid var(--indigo)">
+  <div class="panel-title" style="color:var(--indigo)">🎯 CBSE Exam Pattern</div>
+  <ul>
+    <li><strong>1–2 questions</strong> from this chapter (total 5–6 marks)</li>
+    <li>Usually one <strong>5-mark</strong> long answer (two-triangle problem)</li>
+    <li>Diagram carries <strong>1 mark</strong> — never skip it!</li>
+    <li>Most common angles: <em>30°, 45°, 60°</em></li>
+    <li>Leave answer in <strong>surd form</strong> unless told otherwise</li>
+    <li>Key phrase: "find height" → use tan θ = h/d</li>
+  </ul>
+  <div class="warn">⚠️ This is one of the highest-scoring chapters — problems are formulaic once you master the setup!</div>
+</div>
+
+<!-- 11 - span2 -->
+<div class="panel span2" style="border-left:3px solid var(--green)">
+  <div class="panel-title" style="color:var(--green)">✅ Worked Example (5-Mark Pattern)</div>
+  <p><strong>Q:</strong> The angles of elevation of the top of a tower from two points at distances a and b from the base (same side) are complementary. Prove that the height of the tower is √(ab).</p>
+  <div class="formula-box">
+    Let height = h, angles = θ and (90°−θ)<br><br>
+    From distance a: tan θ = h/a → h = a·tan θ ... (i)<br>
+    From distance b: tan(90°−θ) = h/b → cot θ = h/b → h = b·cot θ = b/tan θ ... (ii)<br><br>
+    Multiply (i) × (ii): h² = a·tan θ × b/tan θ = ab<br>
+    ∴ <strong>h = √(ab)</strong> ■
+  </div>
+  <div class="tip">💡 "Complementary angles" is a huge hint — it means their product eliminates tan θ!</div>
+</div>
+
+</div>
+</body>
+</html>
