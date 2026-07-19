@@ -20,7 +20,13 @@
   }
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
   html { scroll-behavior:smooth; }
-  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; min-height:100vh; overflow-x:hidden; display:flex; flex-direction:column; }
+  .chapters-section { order:1; }
+  .stats-strip { order:2; }
+  .materials-section { order:3; }
+  .how-section { order:4; }
+  .quote-section { order:5; }
+  footer { order:6; }
 
   /* NAV */
   .nav {
@@ -373,14 +379,17 @@
   <div class="ch-ticker-track">
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Chemical Reactions &amp; Equations</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Acids, Bases &amp; Salts</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Metals and Non-Metals</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Life Processes</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Control &amp; Coordination</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Light — Reflection &amp; Refraction</a>
-    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Electricity</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>The Human Eye &amp; Colourful World</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Real Numbers</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Polynomials</a>
-    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Linear Equations</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Linear Equations in Two Variables</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Quadratic Equations</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Introduction to Trigonometry</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Applications of Trigonometry</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Surface Areas &amp; Volumes</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Rise of Nationalism in Europe</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Nationalism in India</a>
@@ -388,17 +397,20 @@
     <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Power Sharing</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Federalism</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Development</a>
-    <!-- duplicate -->
+    <!-- duplicate for seamless loop -->
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Chemical Reactions &amp; Equations</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Acids, Bases &amp; Salts</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Metals and Non-Metals</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Life Processes</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Control &amp; Coordination</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Light — Reflection &amp; Refraction</a>
-    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>Human Eye &amp; Colourful World</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('sci')"><span class="ch-pill-dot" style="background:var(--science)"></span>The Human Eye &amp; Colourful World</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Real Numbers</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Polynomials</a>
-    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Linear Equations</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Linear Equations in Two Variables</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Quadratic Equations</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Introduction to Trigonometry</a>
+    <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Applications of Trigonometry</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('mat')"><span class="ch-pill-dot" style="background:var(--maths)"></span>Surface Areas &amp; Volumes</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Rise of Nationalism in Europe</a>
     <a class="ch-pill" href="#chapters" onclick="switchTo('sst')"><span class="ch-pill-dot" style="background:var(--sst)"></span>Nationalism in India</a>
@@ -413,11 +425,11 @@
 <div class="stats-strip">
   <div class="stats-strip-inner">
     <div class="stat-item">
-      <div class="stat-val" style="color:var(--science)">17</div>
+      <div class="stat-val" style="color:var(--science)">20</div>
       <div class="stat-lbl">Chapters Ready</div>
     </div>
     <div class="stat-item">
-      <div class="stat-val" style="color:var(--maths)">94</div>
+      <div class="stat-val" style="color:var(--maths)">110</div>
       <div class="stat-lbl">Study Materials</div>
     </div>
     <div class="stat-item">
@@ -499,6 +511,21 @@
           <a class="mat-link" href="science/ch02_acids/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards</div></a>
           <a class="mat-link" href="science/ch02_acids/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions</div></a>
           <a class="mat-link" href="science/ch02_acids/virtual_lab.html"><div class="mat-icon">&#128300;</div><div class="mat-name">Virtual Lab</div><div class="mat-type">Mix chemicals</div></a>
+        </div></div>
+      </div>
+      <div class="chapter" id="ch-metals">
+        <div class="ch-header" onclick="toggleChapter('ch-metals')">
+          <div class="ch-num" style="background:rgba(16,185,129,.12);color:#34d399">Ch.3</div>
+          <div class="ch-info"><div class="ch-name">Metals and Non-Metals</div><div class="ch-tags"><span class="ch-tag">Chemistry</span><span class="ch-tag">Reactivity Series</span><span class="ch-tag">Extraction</span><span class="ch-tag">Corrosion</span><span class="ch-tag">Ionic Bonds</span></div></div>
+          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <a class="mat-link" href="science/ch03_metals_nonmetals/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
+          <a class="mat-link" href="science/ch03_metals_nonmetals/animated_diagram.html"><div class="mat-icon">&#9879;&#65039;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive · 6 tabs</div></a>
+          <a class="mat-link" href="science/ch03_metals_nonmetals/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">Quick reference</div></a>
+          <a class="mat-link" href="science/ch03_metals_nonmetals/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards</div></a>
+          <a class="mat-link" href="science/ch03_metals_nonmetals/question_bank.html"><div class="mat-icon">&#10068;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 MCQs</div></a>
+          <a class="mat-link" href="science/ch03_metals_nonmetals/virtual_lab.html"><div class="mat-icon">&#129514;</div><div class="mat-name">Virtual Lab</div><div class="mat-type">4 experiments</div></a>
         </div></div>
       </div>
       <div class="chapter open" id="ch-life">
@@ -637,33 +664,6 @@
           <a class="mat-link" href="maths/ch04_quadratic_equations/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions · CBSE</div></a>
         </div></div>
       </div>
-      <div class="chapter" id="ch-trig">
-        <div class="ch-header" onclick="toggleChapter('ch-trig')">
-          <div class="ch-num" style="background:rgba(45,212,191,.12);color:#5eead4">Ch.8</div>
-          <div class="ch-info"><div class="ch-name">Introduction to Trigonometry</div><div class="ch-tags"><span class="ch-tag">Ratios</span><span class="ch-tag">Standard Angles</span><span class="ch-tag">Identities</span><span class="ch-tag">Complementary Angles</span></div></div>
-          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
-        </div>
-        <div class="ch-body"><div class="material-grid">
-          <a class="mat-link" href="maths/ch08_trigonometry/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
-          <a class="mat-link" href="maths/ch08_trigonometry/animated_diagram.html"><div class="mat-icon">&#128202;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive · 5 tabs</div></a>
-          <a class="mat-link" href="maths/ch08_trigonometry/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">10 panels · quick ref</div></a>
-          <a class="mat-link" href="maths/ch08_trigonometry/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards · flip deck</div></a>
-          <a class="mat-link" href="maths/ch08_trigonometry/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions · CBSE</div></a>
-        </div></div>
-        <div class="chapter" id="ch-app-trig">
-        <div class="ch-header" onclick="toggleChapter('ch-app-trig')">
-          <div class="ch-num" style="background:rgba(56,189,248,.12);color:#7dd3fc">Ch.9</div>
-          <div class="ch-info"><div class="ch-name">Some Applications of Trigonometry</div><div class="ch-tags"><span class="ch-tag">Heights</span><span class="ch-tag">Distances</span><span class="ch-tag">Angle of Elevation</span><span class="ch-tag">Angle of Depression</span></div></div>
-          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
-        </div>
-        <div class="ch-body"><div class="material-grid">
-          <a class="mat-link" href="maths/ch09_applications_trigonometry/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
-          <a class="mat-link" href="maths/ch09_applications_trigonometry/animated_diagram.html"><div class="mat-icon">&#128202;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive · 5 tabs</div></a>
-          <a class="mat-link" href="maths/ch09_applications_trigonometry/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">11 panels · quick ref</div></a>
-          <a class="mat-link" href="maths/ch09_applications_trigonometry/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards · flip deck</div></a>
-          <a class="mat-link" href="maths/ch09_applications_trigonometry/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions · CBSE</div></a>
-        </div></div>
-      </div>
       <div class="chapter open" id="ch-sav">
         <div class="ch-header" onclick="toggleChapter('ch-sav')">
           <div class="ch-num" style="background:rgba(245,158,11,.12);color:#fbbf24">Ch.13</div>
@@ -677,6 +677,34 @@
           <a class="mat-link" href="maths/ch13_surface_area_volume/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">42 cards · flip deck</div></a>
           <a class="mat-link" href="maths/ch13_surface_area_volume/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions</div></a>
           <a class="mat-link" href="maths/ch13_surface_area_volume/shape_lab.html" style="border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.04)"><div class="mat-icon">&#128300;</div><div class="mat-name">Shape Lab</div><div class="mat-type" style="color:var(--blue)">&#10024; Bonus &middot; Build-a-Solid</div></a>
+        </div></div>
+      </div>
+      <div class="chapter" id="ch-trig">
+        <div class="ch-header" onclick="toggleChapter('ch-trig')">
+          <div class="ch-num" style="background:rgba(45,212,191,.12);color:#5eead4">Ch.8</div>
+          <div class="ch-info"><div class="ch-name">Introduction to Trigonometry</div><div class="ch-tags"><span class="ch-tag">Ratios</span><span class="ch-tag">Standard Angles</span><span class="ch-tag">Identities</span><span class="ch-tag">Complementary Angles</span></div></div>
+          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <a class="mat-link" href="maths/ch08_trigonometry/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
+          <a class="mat-link" href="maths/ch08_trigonometry/animated_diagram.html"><div class="mat-icon">&#128202;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive · 5 tabs</div></a>
+          <a class="mat-link" href="maths/ch08_trigonometry/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">10 panels · quick ref</div></a>
+          <a class="mat-link" href="maths/ch08_trigonometry/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards · flip deck</div></a>
+          <a class="mat-link" href="maths/ch08_trigonometry/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions · CBSE</div></a>
+        </div></div>
+      </div>
+      <div class="chapter" id="ch-app-trig">
+        <div class="ch-header" onclick="toggleChapter('ch-app-trig')">
+          <div class="ch-num" style="background:rgba(56,189,248,.12);color:#7dd3fc">Ch.9</div>
+          <div class="ch-info"><div class="ch-name">Some Applications of Trigonometry</div><div class="ch-tags"><span class="ch-tag">Heights</span><span class="ch-tag">Distances</span><span class="ch-tag">Angle of Elevation</span><span class="ch-tag">Angle of Depression</span></div></div>
+          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <a class="mat-link" href="maths/ch09_applications_trigonometry/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
+          <a class="mat-link" href="maths/ch09_applications_trigonometry/animated_diagram.html"><div class="mat-icon">&#128202;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive · 5 tabs</div></a>
+          <a class="mat-link" href="maths/ch09_applications_trigonometry/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">11 panels · quick ref</div></a>
+          <a class="mat-link" href="maths/ch09_applications_trigonometry/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards · flip deck</div></a>
+          <a class="mat-link" href="maths/ch09_applications_trigonometry/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions · CBSE</div></a>
         </div></div>
       </div>
       <div class="coming-soon"><strong>More Maths chapters coming soon!</strong>AP &amp; GP, Triangles, Statistics and more.</div>
@@ -733,6 +761,20 @@
           <a class="mat-link" href="social_science/geo_ch01_resources/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">44 cards</div></a>
           <a class="mat-link" href="social_science/geo_ch01_resources/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 questions</div></a>
           <a class="mat-link" href="social_science/geo_ch01_resources/map_work.html" style="border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.04)"><div class="mat-icon">&#128506;</div><div class="mat-name">Map Work</div><div class="mat-type" style="color:var(--blue)">&#10024; Bonus &middot; Interactive</div></a>
+        </div></div>
+      </div>
+      <div class="chapter" id="ch-forest">
+        <div class="ch-header" onclick="toggleChapter('ch-forest')">
+          <div class="ch-num" style="background:rgba(34,197,94,.12);color:#4ade80">Ch.2</div>
+          <div class="ch-info"><div class="ch-name">Forest and Wildlife Resources</div><div class="ch-tags"><span class="ch-tag">Geography</span><span class="ch-tag">Biodiversity</span><span class="ch-tag">Conservation</span><span class="ch-tag">Deforestation</span><span class="ch-tag">IUCN</span></div></div>
+          <span class="ch-status status-done">&#10003; Complete</span><span class="ch-arrow">&#9654;</span>
+        </div>
+        <div class="ch-body"><div class="material-grid">
+          <a class="mat-link" href="social_science/geo_ch02_forest_wildlife/mindmap.html"><div class="mat-icon">&#129504;</div><div class="mat-name">Mind Map</div><div class="mat-type">Visual web</div></a>
+          <a class="mat-link" href="social_science/geo_ch02_forest_wildlife/animated_diagram.html"><div class="mat-icon">&#127916;</div><div class="mat-name">Animated Diagram</div><div class="mat-type">Interactive &middot; 6 tabs</div></a>
+          <a class="mat-link" href="social_science/geo_ch02_forest_wildlife/cheatsheet.html"><div class="mat-icon">&#128203;</div><div class="mat-name">Cheat Sheet</div><div class="mat-type">9 panels</div></a>
+          <a class="mat-link" href="social_science/geo_ch02_forest_wildlife/flashcards.html"><div class="mat-icon">&#127183;</div><div class="mat-name">Flashcards</div><div class="mat-type">40 cards</div></a>
+          <a class="mat-link" href="social_science/geo_ch02_forest_wildlife/question_bank.html"><div class="mat-icon">&#128221;</div><div class="mat-name">Question Bank</div><div class="mat-type">30 MCQs</div></a>
         </div></div>
       </div>
       <!-- CIVICS -->

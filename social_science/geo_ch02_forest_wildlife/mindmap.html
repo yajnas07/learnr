@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Forest and Wildlife Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#04100a; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:42px; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(4,16,10,.9) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#4ade80; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#2a5a3a; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #1a3a2a; background:rgba(4,16,10,.85);
+  color:#4a8a5a; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#4ade80; color:#4ade80; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#071410; border:1px solid #1a3a2a;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:280px; font-size:.8rem; color:#a7d4b8;
+  line-height:1.6; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.7);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#4ade80; font-size:.9rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%;
+  background:rgba(4,16,10,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,58,42,.75);
+  position:absolute; top:0; left:0; right:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#4a8a5a; text-decoration:none;
+  border:1px solid rgba(26,58,42,.9); border-radius:99px;
+  padding:.2rem .65rem;
+}
+.site-nav-back:hover { color:#4ade80; border-color:#2a6040; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<div id="ui">
+  <div>
+    <h1>Forest and Wildlife Resources</h1>
+    <p>Class X · Geography Ch.2 — drag to pan · scroll to zoom · hover nodes</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2+20; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Forest &\nWildlife\nResources',
+  x:0, y:0, r:70, color:'#062010', stroke:'#4ade80', textColor:'#4ade80', fontSize:13
+};
+
+const BRANCHES = [
+  // Biodiversity in India
+  {
+    id:'bio', label:'Biodiversity\nin India', x:-320, y:-200, r:48,
+    color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+    info:'India is one of the world\'s richest countries in biological diversity.\n• 8% of total species in the world found in India.\n• ~47,000 plant species (10th in world, 4th in Asia).\n• ~89,000 animal species.\n• 1,200+ bird species, 2,500+ fish species.\nIndia is one of 12 mega-biodiversity countries.',
+    children:[
+      { id:'b1', label:'Flora', x:-510, y:-310, r:36, color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+        info:'India has ~47,000 plant species.\n• 15,000 flowering plants (6% of world total).\n• Many endemic species (found only in India).\n• Medicinal plants: Neem, Tulsi, Arjuna.\n• Forest cover: ~21.67% of total land area.\n• 6,000 species found in the Western Ghats alone.\n• Many species still undiscovered!' },
+      { id:'b2', label:'Fauna', x:-505, y:-160, r:36, color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+        info:'~89,000 animal species in India.\n• 1,200+ bird species\n• 2,500+ fish species\n• 5–8% of world\'s amphibians, reptiles, mammals.\n• 50,000+ known insect species (many more undiscovered).\n• India has the world\'s largest population of tigers and Asian elephants.' },
+      { id:'b3', label:'Threats to\nBiodiversity', x:-460, y:-50, r:36, color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+        info:'Major threats:\n• Habitat loss due to deforestation\n• Hunting and poaching\n• Environmental pollution\n• Over-exploitation (over-fishing, over-grazing)\n• Forest fires\n• Introduction of alien species\n• Climate change\n• Toxic chemicals in water bodies\n• Mining and dam construction' },
+    ]
+  },
+
+  // IUCN Classification
+  {
+    id:'iucn', label:'IUCN\nClassification', x:320, y:-200, r:48,
+    color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+    info:'International Union for Conservation of Nature (IUCN) classifies species based on threat level:\n1. Normal Species\n2. Endangered Species\n3. Vulnerable Species\n4. Rare Species\n5. Endemic Species\n6. Extinct Species',
+    children:[
+      { id:'i1', label:'Endangered\nSpecies', x:520, y:-320, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Species in danger of extinction.\nSurvival unlikely if negative factors continue.\nExamples:\n• Black buck\n• Crocodile\n• Indian wild ass\n• Indian rhino\n• Lion-tailed macaque\n• Sangai (brow-antlered deer)\nOnly a few hundred or thousand left.' },
+      { id:'i2', label:'Vulnerable\nSpecies', x:540, y:-180, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Species likely to move into endangered category if conditions worsen.\nPopulations declining.\nExamples:\n• Blue sheep\n• Asiatic elephant\n• Gangetic dolphin\n• Nilgiri langur\nNeed active conservation to prevent decline.' },
+      { id:'i3', label:'Rare &\nEndemic', x:510, y:-60, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Rare Species: small populations, may become vulnerable/endangered.\nExamples: Himalayan brown bear, Wild Asiatic buffalo, Desert fox.\n\nEndemic Species: found only in certain areas, often isolated.\nExamples:\n• Andaman teal\n• Nicobar pigeon\n• Mithun (Arunachal Pradesh)\n• Many species in Western Ghats.' },
+      { id:'i4', label:'Extinct\nSpecies', x:350, y:-360, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Species no longer found after being searched in known habitats.\nExamples:\n• Asiatic cheetah (last seen 1952)\n• Pink-headed duck (1930s)\n• Forest spotted owlet (not seen since 1884, rediscovered 1997!)\n• Dodo (Mauritius)\nHuman activities are the main cause of extinction.' },
+    ]
+  },
+
+  // Causes of Depletion
+  {
+    id:'cause', label:'Causes of\nDepletion', x:-310, y:220, r:48,
+    color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+    info:'Major factors causing depletion of forests and wildlife:\n1. Agricultural expansion (major cause)\n2. Commercial logging\n3. Mining activities\n4. Large development projects (dams, roads)\n5. Shifting cultivation (Jhum)\n6. Grazing and fuel wood collection\n7. Habitat fragmentation\n8. Forest fires',
+    children:[
+      { id:'c1', label:'Colonial\nExploitation', x:-500, y:140, r:36, color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'British colonial period caused massive deforestation.\n• Railways needed timber for sleepers.\n• Ship-building consumed teak forests.\n• Expansion of commercial agriculture.\n• Forest area declined from ~40% to 19% during 1900-1947.\n• Forests seen as "revenue source" not ecosystem.\n• Forest Act of 1865 — first forest regulation by British.' },
+      { id:'c2', label:'Post-Independence\nPressure', x:-495, y:285, r:36, color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'After 1947, deforestation continued:\n• Growing population — need for farmland.\n• River valley projects flooded forests (Narmada, Tehri).\n• Mining in forest areas (Doon Valley limestone mining).\n• Industrial expansion.\n• 5,000+ sq km of forest cleared between 1951-1980 for river projects alone.\n• Tribal displacement from forests.' },
+      { id:'c3', label:'Shifting\nCultivation', x:-440, y:400, r:36, color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Also called Jhum/Slash-and-burn cultivation.\n• Trees cut and burned, ash used as fertiliser.\n• Land cultivated for 2-3 years, then abandoned.\n• Practised in NE India, Odisha, Chhattisgarh, Andhra.\n• Earlier cycle: 20-30 years (forests recovered).\n• Now: shortened to 3-5 years (no recovery time).\n• Major cause of forest loss in tribal areas.' },
+    ]
+  },
+
+  // Conservation Strategies
+  {
+    id:'strat', label:'Conservation\nStrategies', x:310, y:220, r:48,
+    color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+    info:'Conservation of forests and wildlife involves:\n1. Government initiatives (laws, protected areas)\n2. Community-based conservation\n3. International cooperation\nGoal: preserve biodiversity while allowing sustainable use.\nTwo approaches: In-situ (in natural habitat) and Ex-situ (zoos, gene banks).',
+    children:[
+      { id:'s1', label:'Protected\nAreas', x:510, y:140, r:36, color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'India has a network of protected areas:\n• 104 National Parks (strict protection, no human activity)\n• 566 Wildlife Sanctuaries (limited human activity allowed)\n• 18 Biosphere Reserves (conservation + development)\n• Tiger Reserves under Project Tiger (1973): 53 reserves.\n• Project Elephant (1992): protect elephant habitats.\nTotal protected area: ~5% of land area.' },
+      { id:'s2', label:'Laws &\nPolicies', x:530, y:270, r:36, color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Key legislation:\n• Indian Wildlife (Protection) Act, 1972 — banned hunting, protected habitats.\n• Forest Conservation Act, 1980 — restricted diversion of forest land.\n• Environment Protection Act, 1986.\n• Biological Diversity Act, 2002.\n• Forest Rights Act, 2006 — recognised tribal forest rights.\n• CITES — international trade ban on endangered species.' },
+      { id:'s3', label:'Community\nConservation', x:470, y:390, r:36, color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Communities play a vital role:\n• Bishnoi community (Rajasthan): protects trees and wildlife since 1700s.\n• Chipko Movement (1970s): Uttarakhand — hugging trees.\n• Joint Forest Management (JFM): community + government partnership.\n• Sacred Groves: patches of forests protected by communities for religious reasons (Meghalaya, Rajasthan, MP).\n• Bhairodev Dakav Sonchuri (Rajasthan): villagers protect wildlife.' },
+    ]
+  },
+
+  // Types of Forests
+  {
+    id:'types', label:'Types of\nForests', x:0, y:-310, r:48,
+    color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+    info:'India\'s forests classified by legal status:\n1. Reserved Forests (more than half) — most restricted.\n2. Protected Forests (~1/3) — limited activities allowed.\n3. Unclassed Forests — owned by individuals/communities.\nAlso classified by type: tropical evergreen, deciduous, thorn, montane, mangrove, etc.',
+    children:[
+      { id:'t1', label:'Reserved\nForests', x:-170, y:-430, r:36, color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Regarded as the most valuable forests.\nPermanent forest estate maintained for timber and other products.\nNo public activity allowed without permission.\nMore than 50% of total forest area.\nStates with large reserved forests: Madhya Pradesh, Jharkhand, Chhattisgarh, Odisha.\nManaged by the Forest Department.' },
+      { id:'t2', label:'Protected\nForests', x:0, y:-450, r:36, color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'About 1/3 of total forest area.\nProtected from further depletion.\nLocal communities may have some rights (grazing, collection of minor forest produce).\nLess strictly controlled than reserved forests.\nStates: Bihar, Andhra Pradesh, Punjab, Haryana, Maharashtra.\nCan be upgraded to reserved forest if needed.' },
+      { id:'t3', label:'Unclassed\nForests', x:170, y:-430, r:36, color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Forests and wastelands belonging to government, private individuals, or communities.\nNot classified under reserved or protected.\nMost in NE India and Gujarat.\nIn NE states: community ownership (Village Council forests).\nLeast protection — most vulnerable to encroachment.\nNeed better management and reclassification.' },
+    ]
+  },
+
+  // Community Movements
+  {
+    id:'move', label:'Movements &\nSuccess Stories', x:0, y:310, r:48,
+    color:'#0a0014', stroke:'#a78bfa', textColor:'#ede9fe',
+    info:'Several grassroots movements have helped conserve forests and wildlife in India.\nCommunity participation is key to successful conservation.\nMany success stories show that local people are the best guardians of their environment.',
+    children:[
+      { id:'m1', label:'Chipko\nMovement', x:-180, y:430, r:36, color:'#0a0014', stroke:'#a78bfa', textColor:'#ede9fe',
+        info:'1970s, Garhwal Himalayas (Uttarakhand).\nVillagers (especially women) hugged trees to prevent felling.\nLeaders: Sunderlal Bahuguna, Gaura Devi, Chandi Prasad Bhatt.\nSlogan: "Ecology is permanent economy."\nResult: 15-year ban on commercial green felling in Himalayan forests.\nInspired similar movements worldwide.' },
+      { id:'m2', label:'Joint Forest\nManagement', x:0, y:460, r:36, color:'#0a0014', stroke:'#a78bfa', textColor:'#ede9fe',
+        info:'Started in 1988 (National Forest Policy).\nGovernment + local communities manage forests together.\n• Communities protect forests from fire, grazing, encroachment.\n• In return: access to non-timber products (fruits, herbs, honey).\n• 27 states have JFM programmes.\n• ~84,000 JFM committees across India.\nOdisha: 10,000+ communities formed to protect forest land.' },
+      { id:'m3', label:'Success\nStories', x:180, y:430, r:36, color:'#0a0014', stroke:'#a78bfa', textColor:'#ede9fe',
+        info:'• Sariska Tiger Reserve: local Rajput community stopped mining.\n• Alwar (Rajasthan): 5 villages declared 1,200 ha as Bhairodev Dakav "Sonchuri" — own wildlife sanctuary.\n• Bishnoi community: protect blackbuck and trees (since Amrita Devi sacrifice, 1731).\n• Periyar Tiger Reserve: reformed poachers became forest guards.\n• Sukhomajri (Haryana): village restored degraded forests.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){return allNodes.find(n=>n.id===id);}
+
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found&&found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10,window.innerHeight-240)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {tip.style.display='none';canvas.style.cursor='grab';}
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx,cy);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.22,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2+20;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(74,222,128,.025)'; ctx.lineWidth=1;
+  for(let x=-1400;x<1400;x+=70){ctx.beginPath();ctx.moveTo(x,-1400);ctx.lineTo(x,1400);ctx.stroke();}
+  for(let y=-1400;y<1400;y+=70){ctx.beginPath();ctx.moveTo(-1400,y);ctx.lineTo(1400,y);ctx.stroke();}
+
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    const cpx=(a.x+b.x)/2+(b.y-a.y)*.15, cpy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cpx,cpy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?38:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-9,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

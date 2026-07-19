@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Forest and Wildlife Resources · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04100a;--card:#0a1e10;--card2:#0f2616;--border:#1a3a22;
+  --text:#d4f0dc;--muted:#3a6a48;--geo:#22c55e;
+  --green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+.top-nav{display:flex;align-items:center;gap:16px;padding:10px 22px;background:rgba(4,16,10,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:27px}
+.nav-bc{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.nav-bc a{color:var(--muted);text-decoration:none}.nav-bc a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-cur{color:var(--geo);font-weight:700}
+.nav-back{margin-left:auto;padding:5px 13px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:18px;color:var(--geo);font-size:.78rem;text-decoration:none;transition:all .2s}
+.nav-back:hover{background:rgba(34,197,94,.2)}
+
+.page-hdr{padding:28px 20px 16px;text-align:center}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.85rem;color:#fff;margin-bottom:5px}
+.page-hdr p{color:var(--muted);font-size:.9rem}
+.ch-badge{display:inline-block;padding:3px 10px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);border-radius:12px;color:var(--geo);font-size:.73rem;font-weight:700;margin-bottom:8px}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 56px}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:7px 16px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.tab.active{border-color:var(--geo);background:rgba(34,197,94,.1);color:var(--green);font-weight:700}
+
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.panel-title{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;color:var(--text)}
+.panel-body{padding:18px}
+
+.rtable{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:4px}
+.rtable th{padding:8px 12px;background:rgba(34,197,94,.1);color:var(--green);font-weight:700;text-align:left;border-bottom:1px solid var(--border)}
+.rtable td{padding:8px 12px;border-bottom:1px solid rgba(26,58,34,.4);vertical-align:top}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(34,197,94,.04)}
+
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.72rem;font-weight:700;margin-right:4px}
+.tag-e{background:rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.3)}
+.tag-v{background:rgba(251,191,36,.15);color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
+.tag-r{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3)}
+.tag-n{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+
+.ibox{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:12px}
+.ibox strong{color:var(--text)}
+.ibox .kw{color:var(--green);font-weight:700}
+
+/* Cards Grid */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px}
+.info-card{border-radius:12px;padding:14px;border:1px solid var(--border);background:var(--card2);transition:all .25s}
+.info-card:hover{transform:translateY(-2px);border-color:rgba(74,222,128,.3)}
+.info-card h4{font-size:.88rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+.info-card p{font-size:.76rem;line-height:1.65;color:var(--muted)}
+.info-card .ic-icon{font-size:1.5rem;margin-bottom:8px;display:block}
+
+/* Timeline */
+.timeline{position:relative;padding-left:28px;margin-top:12px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--green),var(--purple))}
+.tl-item{position:relative;margin-bottom:18px;padding-bottom:4px}
+.tl-item::before{content:'';position:absolute;left:-24px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--green);background:var(--bg)}
+.tl-item h4{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.tl-item p{font-size:.76rem;line-height:1.6;color:var(--muted)}
+.tl-item .tl-year{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--green);margin-bottom:2px}
+
+/* Bar Chart */
+.bar-chart{margin-top:12px}
+.bar-row{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px}
+.bar-label span:first-child{color:var(--text)}
+.bar-label span:last-child{font-family:'DM Mono',monospace;color:var(--green)}
+.bar-track{height:12px;background:#0f2616;border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width 1.2s ease}
+
+/* Map Legend */
+.map-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.ml-item{display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--muted)}
+.ml-dot{width:10px;height:10px;border-radius:3px}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../../index.html" class="nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <div class="nav-bc">
+    <a href="../../index.html">Home</a><span class="nav-sep">/</span>
+    <a href="../../index.html">Geography</a><span class="nav-sep">/</span>
+    <span class="nav-cur">Forest &amp; Wildlife</span>
+  </div>
+  <a href="../../index.html" class="nav-back">← Back</a>
+</nav>
+
+<div class="page-hdr">
+  <div class="ch-badge">Geography · Ch.2</div>
+  <h1>Forest and Wildlife Resources</h1>
+  <p>Biodiversity, conservation, deforestation, community movements and Indian wildlife</p>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="show(0,this)">🌳 Biodiversity</button>
+    <button class="tab" onclick="show(1,this)">📊 Forest Status</button>
+    <button class="tab" onclick="show(2,this)">🐅 IUCN Classification</button>
+    <button class="tab" onclick="show(3,this)">⚠️ Causes of Depletion</button>
+    <button class="tab" onclick="show(4,this)">🛡️ Conservation</button>
+    <button class="tab" onclick="show(5,this)">✊ Community Movements</button>
+  </div>
+
+  <!-- TAB 0: Biodiversity -->
+  <div class="panel active" id="p0">
+    <div class="panel-card">
+      <div class="panel-title">🌍 India — A Mega-Biodiversity Country</div>
+      <div class="panel-body">
+        <div class="ibox">
+          India is one of the <span class="kw">12 mega-biodiversity countries</span> in the world. It has about <strong>8% of the total number of species</strong> in the world, estimated at 1.6 million. This is a huge diversity for a country with only 2.4% of the world's land area.
+        </div>
+        <div class="card-grid">
+          <div class="info-card"><div class="ic-icon">🌿</div><h4>47,000+ Plant Species</h4><p>15,000 flowering plants. 6th in world. Many endemic to Western Ghats, NE India and Himalayas.</p></div>
+          <div class="info-card"><div class="ic-icon">🐾</div><h4>89,000+ Animal Species</h4><p>5-8% of world's amphibians, reptiles, mammals. 50,000+ insect species (many undiscovered).</p></div>
+          <div class="info-card"><div class="ic-icon">🦅</div><h4>1,200+ Bird Species</h4><p>India is a birdwatcher's paradise. Includes endemic species like Great Indian Bustard.</p></div>
+          <div class="info-card"><div class="ic-icon">🐟</div><h4>2,500+ Fish Species</h4><p>Found in rivers, coasts, coral reefs. Freshwater fish diversity especially high in Western Ghats.</p></div>
+          <div class="info-card"><div class="ic-icon">🦎</div><h4>Reptiles & Amphibians</h4><p>King Cobra, gharial, saltwater croc, many endemic frogs in Western Ghats rain forests.</p></div>
+          <div class="info-card"><div class="ic-icon">🌺</div><h4>Endemic Hotspots</h4><p>Western Ghats, Eastern Himalayas, NE India, Andaman & Nicobar Islands — high endemism.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: Forest Status -->
+  <div class="panel" id="p1">
+    <div class="panel-card">
+      <div class="panel-title">📊 India's Forest Cover — Status & Types</div>
+      <div class="panel-body">
+        <div class="ibox">
+          India's forest cover is about <strong>21.67%</strong> of the total geographical area (2021 assessment). The National Forest Policy (1988) targets <span class="kw">33% for plains</span> and <span class="kw">67% for hilly/mountainous regions</span>. We are far from these targets.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--green)">Forest Cover by Category</h3>
+        <div class="bar-chart">
+          <div class="bar-row"><div class="bar-label"><span>Very Dense Forest</span><span>3.02%</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--green)" data-w="14%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Moderately Dense Forest</span><span>9.33%</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--teal)" data-w="43%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Open Forest</span><span>9.26%</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--amber)" data-w="43%"></div></div></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--green)">Legal Classification of Forests</h3>
+        <table class="rtable">
+          <tr><th>Type</th><th>Share</th><th>Description</th></tr>
+          <tr><td><strong>Reserved Forests</strong></td><td>~54%</td><td>Most restricted. No public activity without permission. Highest value for conservation. MP, Jharkhand, Chhattisgarh.</td></tr>
+          <tr><td><strong>Protected Forests</strong></td><td>~29%</td><td>Some rights for local people (grazing, minor produce). Bihar, AP, Maharashtra.</td></tr>
+          <tr><td><strong>Unclassed Forests</strong></td><td>~17%</td><td>Community/private owned. Least protection. Mostly NE states and Gujarat.</td></tr>
+        </table>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--green)">States with Highest Forest Cover</h3>
+        <div class="bar-chart">
+          <div class="bar-row"><div class="bar-label"><span>Madhya Pradesh</span><span>77,414 km²</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--green)" data-w="100%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Arunachal Pradesh</span><span>66,688 km²</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--green)" data-w="86%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Chhattisgarh</span><span>55,611 km²</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--teal)" data-w="72%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Odisha</span><span>51,345 km²</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--teal)" data-w="66%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Maharashtra</span><span>50,778 km²</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--amber)" data-w="65%"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: IUCN Classification -->
+  <div class="panel" id="p2">
+    <div class="panel-card">
+      <div class="panel-title">🐅 IUCN Classification of Species</div>
+      <div class="panel-body">
+        <div class="ibox">
+          The <span class="kw">International Union for Conservation of Nature (IUCN)</span> classifies species into categories based on the level of threat to their survival. India's wildlife includes species across all threat levels.
+        </div>
+        <table class="rtable" style="margin-top:14px">
+          <tr><th>Category</th><th>Definition</th><th>Indian Examples</th></tr>
+          <tr><td><span class="tag tag-n">Normal</span></td><td>Population is at a safe level for survival. No immediate threat.</td><td>Cattle, sal, pine, rodents, common birds</td></tr>
+          <tr><td><span class="tag tag-e">Endangered</span></td><td>In danger of extinction. Survival unlikely if threats continue.</td><td>Black buck, crocodile, Indian rhino, Indian wild ass, lion-tailed macaque, sangai</td></tr>
+          <tr><td><span class="tag tag-v">Vulnerable</span></td><td>Population declining. May become endangered if conditions worsen.</td><td>Blue sheep, Asiatic elephant, Gangetic dolphin, nilgiri langur</td></tr>
+          <tr><td><span class="tag tag-r">Rare</span></td><td>Small population. Could become vulnerable/endangered.</td><td>Himalayan brown bear, wild Asiatic buffalo, desert fox, hornbill</td></tr>
+          <tr><td><span class="tag" style="background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.3)">Endemic</span></td><td>Found only in specific isolated areas. Naturally rare.</td><td>Andaman teal, Nicobar pigeon, Mithun, Manipur bush quail</td></tr>
+          <tr><td><span class="tag" style="background:rgba(100,116,139,.15);color:#94a3b8;border:1px solid rgba(100,116,139,.3)">Extinct</span></td><td>Not found after extensive searches. No longer exists.</td><td>Asiatic cheetah (1952), pink-headed duck, Sumatran rhino (India)</td></tr>
+        </table>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--red)">
+          <strong style="color:var(--red)">⚠️ Key Fact:</strong> According to IUCN Red Data Book, India has <strong>44 critically endangered</strong>, <strong>113 endangered</strong>, and <strong>157 vulnerable</strong> species of plants and animals. The Asiatic cheetah was the last big cat to go extinct in India (1952).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Causes of Depletion -->
+  <div class="panel" id="p3">
+    <div class="panel-card">
+      <div class="panel-title">⚠️ Causes of Forest & Wildlife Depletion</div>
+      <div class="panel-body">
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">🌾</div><h4>Agricultural Expansion</h4><p>Largest single cause. After independence, vast forest areas converted to agricultural land to feed growing population. ~26,200 sq km lost (1951-80).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--red)"><div class="ic-icon">🪵</div><h4>Commercial Logging</h4><p>British era: massive felling for railways, shipbuilding. Post-1947: timber for construction, paper, furniture. Large-scale and often illegal.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--orange)"><div class="ic-icon">⛏️</div><h4>Mining</h4><p>Open-cast mining destroys entire habitats. Doon Valley (Uttarakhand): limestone quarrying devastated forests. Sariska (Rajasthan): mining threatened tiger habitat.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">🏗️</div><h4>Large Dams & Projects</h4><p>River valley projects submerged ~5,000 sq km of forest (1951-80). Narmada, Tehri dams displaced communities and wildlife.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🔥</div><h4>Shifting Cultivation</h4><p>Jhum (slash-and-burn) in NE India. Cycle shortened from 20-30 years to 3-5 years — no time for regeneration. ~1/3 of tribal area affected.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🐄</div><h4>Overgrazing & Fuel Wood</h4><p>India has ~500 million livestock. Grazing pressure on forests is enormous. 270 million tonnes of fuelwood collected annually — exceeds sustainable limit.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--amber)">Historical Timeline of Deforestation</h3>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-year">Pre-colonial</div><h4>~40% Forest Cover</h4><p>India had extensive forest cover. Tribal communities practised sustainable use.</p></div>
+          <div class="tl-item"><div class="tl-year">1860s–1947</div><h4>Colonial Exploitation</h4><p>British exploited teak, sal for railways, ships. Forest cover fell to ~19%. Forest Act 1865 — government control.</p></div>
+          <div class="tl-item"><div class="tl-year">1951–1980</div><h4>Post-Independence Decline</h4><p>26,200 sq km cleared for agriculture. 5,000+ sq km submerged by dams. Industrial and urban expansion.</p></div>
+          <div class="tl-item"><div class="tl-year">1980–Present</div><h4>Slow Recovery</h4><p>Forest Conservation Act 1980 slowed diversion. Cover now ~21.67% but quality declining. Fragmentation is a major issue.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: Conservation -->
+  <div class="panel" id="p4">
+    <div class="panel-card">
+      <div class="panel-title">🛡️ Conservation of Forest & Wildlife</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Conservation means protecting biodiversity while allowing sustainable use. India uses both <span class="kw">in-situ</span> (national parks, sanctuaries) and <span class="kw">ex-situ</span> (zoos, gene banks) conservation strategies.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--green)">Protected Area Network</h3>
+        <div class="card-grid">
+          <div class="info-card"><div class="ic-icon">🏔️</div><h4>104 National Parks</h4><p>Strictest protection. No human activity (grazing, farming, forestry) allowed. E.g., Jim Corbett, Kaziranga, Ranthambore.</p></div>
+          <div class="info-card"><div class="ic-icon">🦌</div><h4>566 Wildlife Sanctuaries</h4><p>Limited human activity allowed. Grazing permitted in some. E.g., Bharatpur, Periyar, Chilika.</p></div>
+          <div class="info-card"><div class="ic-icon">🌐</div><h4>18 Biosphere Reserves</h4><p>Large areas for conservation + sustainable use + research. E.g., Nilgiri, Sundarbans, Nanda Devi, Gulf of Mannar.</p></div>
+          <div class="info-card"><div class="ic-icon">🐯</div><h4>53 Tiger Reserves</h4><p>Project Tiger (1973). Tiger population: 1,827 (2006) → 3,167 (2022). Major success story!</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--green)">Key Legislation</h3>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-year">1972</div><h4>Indian Wildlife (Protection) Act</h4><p>Banned hunting and poaching. Established protected areas. Created Wildlife Advisory Board. Comprehensive protection framework.</p></div>
+          <div class="tl-item"><div class="tl-year">1980</div><h4>Forest Conservation Act</h4><p>Restricted diversion of forest land for non-forest purposes. Central government approval needed. Slowed forest loss significantly.</p></div>
+          <div class="tl-item"><div class="tl-year">1986</div><h4>Environment Protection Act</h4><p>Umbrella legislation. Created the Ministry of Environment. EIA (Environmental Impact Assessment) made mandatory for large projects.</p></div>
+          <div class="tl-item"><div class="tl-year">2006</div><h4>Forest Rights Act</h4><p>Recognised rights of tribal and forest-dwelling communities. Right to collect minor forest produce, habitat rights. Historic for tribal welfare.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: Community Movements -->
+  <div class="panel" id="p5">
+    <div class="panel-card">
+      <div class="panel-title">✊ Community-Based Conservation</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Some of India's most effective conservation has come from <span class="kw">local communities</span> — not just the government. People who depend on forests are often their best protectors.
+        </div>
+
+        <div class="card-grid" style="margin-top:14px">
+          <div class="info-card" style="border-left:3px solid var(--green)">
+            <div class="ic-icon">🌲</div>
+            <h4>Chipko Movement</h4>
+            <p><strong>1970s, Uttarakhand.</strong> Women hugged trees to prevent felling. Led by Sunderlal Bahuguna & Gaura Devi. Result: 15-year ban on green felling in Himalayas. "Ecology is permanent economy."</p>
+          </div>
+          <div class="info-card" style="border-left:3px solid var(--amber)">
+            <div class="ic-icon">🦌</div>
+            <h4>Bishnoi Community</h4>
+            <p><strong>Rajasthan, since 1700s.</strong> Protect blackbuck, chinkara, and khejri trees. 363 Bishnois sacrificed lives in 1731 (Amrita Devi). Still active today — filed cases against poachers.</p>
+          </div>
+          <div class="info-card" style="border-left:3px solid var(--blue)">
+            <div class="ic-icon">🤝</div>
+            <h4>Joint Forest Management</h4>
+            <p><strong>Since 1988.</strong> Government + community partnership. 84,000+ committees across 27 states. Communities protect forests; get access to non-timber products (fruits, herbs).</p>
+          </div>
+          <div class="info-card" style="border-left:3px solid var(--purple)">
+            <div class="ic-icon">⛰️</div>
+            <h4>Bhairodev Dakav Sonchuri</h4>
+            <p><strong>Alwar, Rajasthan.</strong> 5 villages declared 1,200 hectares as their own wildlife sanctuary. Self-imposed rules to protect wildlife. No government intervention needed!</p>
+          </div>
+          <div class="info-card" style="border-left:3px solid var(--teal)">
+            <div class="ic-icon">🙏</div>
+            <h4>Sacred Groves</h4>
+            <p><strong>Across India.</strong> Forest patches protected for religious beliefs. Preserve rare species. Found in Meghalaya, Rajasthan, MP, Maharashtra, Kerala. Ancient conservation wisdom.</p>
+          </div>
+          <div class="info-card" style="border-left:3px solid var(--orange)">
+            <div class="ic-icon">🐯</div>
+            <h4>Periyar Tiger Reserve</h4>
+            <p><strong>Kerala.</strong> Former poachers reformed into forest protectors and tourist guides. "Poacher turned gamekeeper" — community participation in anti-poaching operations.</p>
+          </div>
+        </div>
+
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--green)">
+          <strong>Key Takeaway:</strong> Conservation succeeds best when local communities are <span class="kw">active stakeholders</span>, not just passive beneficiaries. The chapter emphasises that government laws alone cannot protect forests — community participation is essential.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  btn.classList.add('active');
+  animateBars();
+}
+
+function animateBars(){
+  setTimeout(()=>{
+    document.querySelectorAll('.panel.active .bar-fill').forEach(b=>{
+      b.style.width=b.dataset.w||'0%';
+    });
+  },100);
+}
+animateBars();
+</script>
+</body>
+</html>
