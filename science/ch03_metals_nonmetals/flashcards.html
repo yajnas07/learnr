@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Metals and Non-Metals</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--card2:#263148;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;--orange:#f97316;--amber:#f59e0b;--lime:#84cc16;--cyan:#22d3ee;--purple:#a855f7;--red:#ef4444;--blue:#3b82f6;--green:#22c55e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:800;background:linear-gradient(135deg,#f97316,#facc15,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1.2rem}
+.filters button{font-family:'Syne',sans-serif;font-weight:700;font-size:.74rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,.1)}
+
+.progress{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.progress .count{color:var(--orange);font-weight:700}
+.progress .known{color:var(--green)}
+.prog-bar{width:140px;height:5px;background:var(--card);border-radius:9px;overflow:hidden}
+.prog-fill{height:100%;background:var(--orange);border-radius:9px;transition:width .3s}
+
+.deck{display:flex;justify-content:center;align-items:center;padding:1rem;min-height:380px;perspective:1200px}
+.flip-card{width:100%;max-width:520px;height:320px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-card .front,.flip-card .back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;border:1px solid var(--border)}
+.flip-card .front{background:var(--card)}
+.flip-card .back{background:var(--card2);transform:rotateY(180deg)}
+.flip-card .front h2{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;line-height:1.55;color:var(--text)}
+.flip-card .back p{font-size:.9rem;line-height:1.75;color:var(--text)}
+.flip-card .back p strong{color:var(--orange)}
+.flip-card .back p em{color:var(--cyan);font-style:normal}
+.cat-badge{font-family:'DM Mono',monospace;font-size:.62rem;padding:.15rem .55rem;border-radius:99px;margin-bottom:.8rem}
+.hint{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:1rem}
+
+.controls{display:flex;justify-content:center;gap:.6rem;padding:.8rem 1rem;flex-wrap:wrap}
+.ctrl{font-family:'Syne',sans-serif;font-weight:700;font-size:.76rem;padding:.4rem 1.1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.ctrl:hover{color:var(--text);border-color:#64748b}
+.ctrl.know{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.06)}
+
+.keys{text-align:center;padding:.5rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(7,16,31,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.8);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:#dde6f5}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Flashcards</h1>
+  <p>Metals &amp; Non-Metals · Science Ch.3 · 40 Cards</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress"><span class="count" id="pos">1 / 40</span><div class="prog-bar"><div class="prog-fill" id="prog"></div></div><span class="known" id="knownCount">0 known</span></div>
+<div class="deck" id="deck"></div>
+<div class="controls">
+  <button class="ctrl" onclick="prev()">← Prev</button>
+  <button class="ctrl" onclick="flipCard()">⟳ Flip</button>
+  <button class="ctrl know" onclick="markKnown()">✓ Know it</button>
+  <button class="ctrl" onclick="next()">Next →</button>
+  <button class="ctrl" onclick="shuffle()">⤮ Shuffle</button>
+  <button class="ctrl" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="keys">Keyboard: ← → (navigate) · Space (flip) · K (know it) · S (shuffle)</div>
+
+<script>
+const CARDS=[
+// phys (8)
+{cat:'phys',q:'Name two physical properties of metals that make them useful for making cooking utensils.',a:'<strong>Malleability</strong> (can be shaped into vessels) and <strong>good thermal conductivity</strong> (heat transfers quickly to food). Aluminium and steel are most common.'},
+{cat:'phys',q:'Which metal is the best conductor of electricity?',a:'<strong>Silver (Ag)</strong> is the best conductor. Conductivity order: Ag > Cu > Au > Al. Copper is used in wires as it\'s cheaper than silver.'},
+{cat:'phys',q:'Why is sodium stored under kerosene?',a:'Sodium is <strong>highly reactive</strong> — it reacts vigorously with moisture and oxygen in air. Kerosene prevents contact with air/water. It can even catch fire on water!'},
+{cat:'phys',q:'Name a non-metal that is lustrous and one that is liquid at room temperature.',a:'<strong>Iodine</strong> is a lustrous non-metal (shiny crystals).\n<strong>Bromine (Br₂)</strong> is the only non-metal that is liquid at room temperature.'},
+{cat:'phys',q:'Why can metals be drawn into thin wires?',a:'Metals are <strong>ductile</strong> because metallic bonds allow layers of atoms to slide past each other without breaking. The "sea of electrons" holds atoms together while allowing movement.'},
+{cat:'phys',q:'Why are metals sonorous?',a:'When struck, metal atoms vibrate and transmit the vibration through the metallic lattice as sound waves. The <strong>sea of delocalised electrons</strong> helps transmit these vibrations efficiently.'},
+{cat:'phys',q:'Why is mercury used in thermometers?',a:'Mercury is a <strong>liquid metal</strong> at room temperature, expands uniformly with heat, doesn\'t stick to glass, and has a <strong>high boiling point</strong> (357°C) — ideal for measuring temperatures.'},
+{cat:'phys',q:'Name a non-metal that conducts electricity.',a:'<strong>Graphite</strong> (a form of carbon) conducts electricity because each carbon atom uses only 3 of its 4 electrons for bonding — the 4th electron is free to move and carry current.'},
+
+// chem (8)
+{cat:'chem',q:'What happens when metals react with oxygen? Give the general equation.',a:'<strong>Metal + O₂ → Metal oxide</strong> (basic in nature)\n\nExamples: 2Mg + O₂ → 2MgO, 4Al + 3O₂ → 2Al₂O₃\n\nMetal oxides are <strong>basic</strong> — they turn red litmus blue.'},
+{cat:'chem',q:'Why does aluminium not corrode even though it\'s reactive?',a:'Aluminium forms a thin layer of <strong>Al₂O₃ (aluminium oxide)</strong> on its surface that is <strong>protective and non-porous</strong>. This layer prevents further reaction, unlike iron rust which is flaky.'},
+{cat:'chem',q:'Write the equation for sodium reacting with water.',a:'<strong>2Na + 2H₂O → 2NaOH + H₂↑</strong>\n\nReaction is so vigorous that hydrogen gas catches fire! Sodium dashes on water surface. This is why Na is stored under kerosene.'},
+{cat:'chem',q:'Why do copper and gold not react with dilute acids?',a:'Cu and Au are <strong>below hydrogen</strong> in the reactivity series. Only metals above hydrogen can displace H₂ from dilute acids. They are "noble metals" — very unreactive.'},
+{cat:'chem',q:'What happens when iron nails are placed in copper sulphate solution?',a:'<strong>Fe + CuSO₄ → FeSO₄ + Cu</strong>\n\nBlue CuSO₄ turns <strong>green</strong> (FeSO₄) and <strong>brown copper deposits</strong> on the nail. Fe displaces Cu because Fe is more reactive.'},
+{cat:'chem',q:'What type of oxides do non-metals form?',a:'Non-metals form <strong>acidic oxides</strong> (or neutral):\n• CO₂ + H₂O → H₂CO₃ (carbonic acid)\n• SO₂ + H₂O → H₂SO₃ (sulphurous acid)\n• Exception: CO, H₂O, N₂O are neutral.'},
+{cat:'chem',q:'What is aqua regia? What can it dissolve?',a:'<strong>Aqua regia</strong> = 3 parts conc. HCl + 1 part conc. HNO₃ (freshly prepared). It can dissolve <strong>gold and platinum</strong> — the only reagent that can! "Royal water" in Latin.'},
+{cat:'chem',q:'Why doesn\'t HNO₃ produce H₂ gas with metals?',a:'HNO₃ is a <strong>strong oxidising acid</strong>. It oxidises the H₂ produced to water (H₂O) and itself gets reduced to NO₂, NO, or N₂O depending on concentration.'},
+
+// react (8)
+{cat:'react',q:'What is the reactivity series of metals?',a:'Metals arranged in <strong>decreasing order of reactivity</strong>:\nK > Na > Ca > Mg > Al > Zn > Fe > Ni > Sn > Pb > [H] > Cu > Hg > Ag > Au > Pt'},
+{cat:'react',q:'A metal X displaces metal Y from its salt solution. Which is more reactive?',a:'<strong>Metal X is more reactive</strong> than metal Y. A more reactive metal always displaces a less reactive metal from its compound/solution.'},
+{cat:'react',q:'Why can\'t aluminium be extracted by reduction with carbon?',a:'Although Al is mid-series, it forms <strong>extremely stable Al₂O₃</strong> (very high bond energy). Carbon cannot reduce it at feasible temperatures. So <strong>electrolysis</strong> is used instead.'},
+{cat:'react',q:'What is the thermite reaction? Where is it used?',a:'<strong>Fe₂O₃ + 2Al → 2Fe + Al₂O₃ + Heat</strong>\n\nAl reduces iron oxide (Al is more reactive than Fe). Produces molten iron. Used to <strong>weld railway tracks</strong> and for incendiary devices.'},
+{cat:'react',q:'Can copper displace zinc from zinc sulphate solution? Why?',a:'<strong>No!</strong> Cu + ZnSO₄ → No reaction. Copper is LESS reactive than zinc (lower in series). Only a more reactive metal can displace a less reactive one.'},
+{cat:'react',q:'Why is hydrogen placed in the middle of the reactivity series?',a:'Hydrogen is placed as a reference point. Metals ABOVE H can <strong>displace H₂ from dilute acids</strong>. Metals BELOW H (Cu, Ag, Au) <strong>cannot</strong> react with dilute acids.'},
+{cat:'react',q:'Arrange these metals in decreasing reactivity: Fe, Na, Cu, Au, Mg',a:'<strong>Na > Mg > Fe > Cu > Au</strong>\n\nSodium reacts with cold water, Mg with hot water/steam, Fe with steam, Cu doesn\'t react with water/dilute acids, Au is noble.'},
+{cat:'react',q:'Why is gold found in free (native) state in nature?',a:'Gold is at the <strong>bottom of the reactivity series</strong> — it\'s extremely unreactive. It doesn\'t react with air, water, or most chemicals. So it remains uncombined in nature.'},
+
+// extract (8)
+{cat:'extract',q:'What is the difference between a mineral and an ore?',a:'<strong>Mineral:</strong> Any naturally occurring compound containing a metal.\n<strong>Ore:</strong> A mineral from which metal can be extracted <strong>profitably</strong>.\nAll ores are minerals, but not all minerals are ores.'},
+{cat:'extract',q:'Name the ore of aluminium and iron.',a:'<strong>Aluminium:</strong> Bauxite (Al₂O₃·2H₂O)\n<strong>Iron:</strong> Haematite (Fe₂O₃)\n\nOther important ores: Cinnabar (HgS), Zinc blende (ZnS), Copper pyrite (CuFeS₂).'},
+{cat:'extract',q:'What is froth flotation? For which type of ore is it used?',a:'Used for <strong>sulphide ores</strong>. Crushed ore + water + pine oil → air blown → sulphide ore particles attach to oil froth and float (they\'re hydrophobic). Gangue sinks. Froth is collected and dried.'},
+{cat:'extract',q:'What is the difference between roasting and calcination?',a:'<strong>Roasting:</strong> heating sulphide ore in air → oxide + SO₂\n(2ZnS + 3O₂ → 2ZnO + 2SO₂)\n\n<strong>Calcination:</strong> heating carbonate/hydrated ore without air → oxide + CO₂/H₂O\n(ZnCO₃ → ZnO + CO₂)'},
+{cat:'extract',q:'How is iron extracted in a blast furnace?',a:'<strong>Fe₂O₃ + 3CO → 2Fe + 3CO₂</strong>\n\nCoke (C) burns to give CO, which reduces iron oxide. Limestone removes impurities as slag (CaSiO₃). Molten iron collects at the bottom.'},
+{cat:'extract',q:'Describe electrolytic refining of copper.',a:'<strong>Anode:</strong> Impure copper block\n<strong>Cathode:</strong> Thin strip of pure copper\n<strong>Electrolyte:</strong> Acidified CuSO₄ solution\n\nCu²⁺ from anode dissolves → deposits at cathode as pure Cu. Impurities fall as "anode mud."'},
+{cat:'extract',q:'Why are highly reactive metals extracted by electrolysis?',a:'Metals like K, Na, Ca, Al form <strong>very stable compounds</strong> that cannot be reduced by carbon (C itself is less reactive). Only <strong>electrical energy</strong> can break these strong ionic bonds in their molten salts.'},
+{cat:'extract',q:'What is gangue?',a:'<strong>Gangue</strong> (also called matrix) = the <strong>unwanted impurities</strong> (sand, clay, rocky material) present in the ore. It must be removed before extraction. Methods: washing, magnetic separation, froth flotation.'},
+
+// corr (8)
+{cat:'corr',q:'What are the necessary conditions for rusting of iron?',a:'<strong>Both oxygen AND moisture (water)</strong> must be present.\n• Iron in dry air → No rust\n• Iron in oxygen-free water → No rust\n• Iron in moist air → Rusts\n\nSalt and acid speed up rusting.'},
+{cat:'corr',q:'What is galvanisation? Why is it effective?',a:'<strong>Galvanisation</strong> = coating iron with a layer of zinc.\nEffective because:\n1. Zinc layer acts as physical barrier\n2. Even if scratched, Zn is more reactive and oxidises preferentially (<strong>sacrificial protection</strong>)'},
+{cat:'corr',q:'Why does aluminium not corrode like iron?',a:'Al forms a <strong>thin, tough, non-porous layer of Al₂O₃</strong> on its surface. This layer is <strong>protective</strong> and prevents further oxidation. Iron\'s rust (Fe₂O₃·xH₂O) is porous and flaky, exposing fresh iron.'},
+{cat:'corr',q:'What is an alloy? Why are alloys made?',a:'<strong>Alloy</strong> = homogeneous mixture of a metal with other metals or non-metals (melted together).\nPurpose: improve properties — increase hardness, prevent corrosion, change colour/melting point.'},
+{cat:'corr',q:'What is stainless steel? Why doesn\'t it rust?',a:'<strong>Stainless steel = Fe + Cr (≈18%) + Ni (≈8%) + C</strong>\n\nChromium forms a <strong>protective Cr₂O₃ layer</strong> on the surface that prevents oxygen and moisture from reaching the iron. Self-healing if scratched!'},
+{cat:'corr',q:'What is solder? Why is it useful?',a:'<strong>Solder = Pb + Sn (lead + tin)</strong>\n\nIt has a <strong>low melting point</strong> (~183°C), making it perfect for joining electrical wires and electronic components without damaging them.'},
+{cat:'corr',q:'Why is pure gold (24K) not used for making jewellery?',a:'Pure gold is too <strong>soft</strong> — it would bend and scratch easily. It\'s alloyed with Cu or Ag to make it harder (22K = 22 parts Au + 2 parts Cu/Ag). This also makes it more durable.'},
+{cat:'corr',q:'How does painting prevent corrosion?',a:'Paint acts as a <strong>physical barrier</strong> between the metal surface and air/moisture. No contact with O₂ and H₂O = no rusting. But if paint chips off, that area will rust. (Unlike galvanising which still protects!)'},
+];
+
+const CATS={phys:{label:'Physical Properties',color:'var(--amber)',bg:'rgba(245,158,11,.12)'},chem:{label:'Chemical Properties',color:'var(--green)',bg:'rgba(34,197,94,.12)'},react:{label:'Reactivity Series',color:'var(--purple)',bg:'rgba(168,85,247,.12)'},extract:{label:'Extraction',color:'var(--cyan)',bg:'rgba(34,211,238,.12)'},corr:{label:'Corrosion & Alloys',color:'var(--red)',bg:'rgba(239,68,68,.12)'}};
+
+let filtered=[...CARDS],idx=0,known=new Set(),currentCat='all';
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="setFilter('all',this)">All (${CARDS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=CARDS.filter(c=>c.cat===k).length;h+=`<button onclick="setFilter('${k}',this)">${v.label} (${n})</button>`;}f.innerHTML=h;}
+function setFilter(cat,btn){currentCat=cat;document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===cat);idx=0;render();}
+function render(){if(!filtered.length)return;if(idx>=filtered.length)idx=0;if(idx<0)idx=filtered.length-1;const c=filtered[idx],cat=CATS[c.cat];document.getElementById('deck').innerHTML=`<div class="flip-card" id="fc" onclick="flipCard()"><div class="front"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><h2>${c.q}</h2><span class="hint">tap to flip</span></div><div class="back"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><p>${c.a.replace(/\n/g,'<br>')}</p></div></div>`;document.getElementById('pos').textContent=`${idx+1} / ${filtered.length}`;document.getElementById('prog').style.width=((idx+1)/filtered.length*100)+'%';document.getElementById('knownCount').textContent=known.size+' known';}
+function flipCard(){document.getElementById('fc')?.classList.toggle('flipped')}
+function next(){idx++;render()} function prev(){idx--;render()}
+function markKnown(){known.add(filtered[idx].q);next();}
+function shuffle(){filtered.sort(()=>Math.random()-.5);idx=0;render();}
+function resetAll(){known.clear();filtered=currentCat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===currentCat);idx=0;render();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();else if(e.key===' '){e.preventDefault();flipCard();}else if(e.key==='k'||e.key==='K')markKnown();else if(e.key==='s'||e.key==='S')shuffle();});
+buildFilters();render();
+</script>
+</body>
+</html>

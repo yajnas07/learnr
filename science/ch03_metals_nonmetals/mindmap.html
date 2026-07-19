@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Metals and Non-Metals</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #080f1e; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(8,15,30,.92) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#f97316,#facc15,#22d3ee);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 280px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(7,16,31,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,45,69,.75);
+  position:sticky; top:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a9ab8; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(26,45,69,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<div id="ui">
+  <div>
+    <h1>Metals and Non-Metals</h1>
+    <p>Class X · Science Ch.3 — drag &amp; hover to explore</p>
+  </div>
+</div>
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Metals &\nNon-Metals',
+  x:0, y:0, r:64, color:'#0a1628', stroke:'#f97316', textColor:'#f97316', fontSize:13
+};
+
+const BRANCHES = [
+  // ── Physical Properties ──
+  {
+    id:'phys', label:'Physical\nProperties', x:-340, y:-180, r:46,
+    color:'#1a1000', stroke:'#facc15', textColor:'#fef08a',
+    info:"Physical properties that distinguish metals from non-metals:\nMetals: lustrous, malleable, ductile, good conductors, high melting/boiling points, sonorous.\nNon-metals: dull, brittle, poor conductors, low melting points.\nExceptions exist! (e.g., Mercury is liquid, Diamond is hard, Graphite conducts)",
+    children:[
+      { id:'ph1', label:'Metals:\nLustre &\nMalleability', x:-560, y:-300, r:35, color:'#1a1000', stroke:'#facc15', textColor:'#fef08a',
+        info:'Metals have a shiny appearance (metallic lustre).\nMalleable: can be beaten into thin sheets (Gold, Silver, Aluminium).\nDuctile: can be drawn into thin wires (Gold is most ductile).\nGold can be beaten into sheets 0.00001 cm thin!\nAluminium foil is an everyday example of malleability.' },
+      { id:'ph2', label:'Conductivity\n& Sonority', x:-580, y:-150, r:35, color:'#1a1000', stroke:'#facc15', textColor:'#fef08a',
+        info:'Metals are good conductors of heat and electricity.\nBest conductors: Silver > Copper > Gold > Aluminium\nSonorous: metals produce a ringing sound when struck.\nUsed in bells, cymbals, utensils.\n\nExceptions: Mercury & Lead are poor conductors.' },
+      { id:'ph3', label:'Non-Metal\nProperties', x:-500, y:-30, r:35, color:'#1a1000', stroke:'#facc15', textColor:'#fef08a',
+        info:'Non-metals are generally:\n• Dull (no lustre) — Exception: Iodine has lustre\n• Brittle (break easily)\n• Poor conductors — Exception: Graphite conducts electricity\n• Low melting/boiling points\n• Exist as solids, liquids, or gases\n\nCarbon (diamond) is the hardest known natural substance!' },
+      { id:'ph4', label:'Exceptions\n& Oddities', x:-360, y:-350, r:35, color:'#1a1000', stroke:'#facc15', textColor:'#fef08a',
+        info:'Interesting exceptions:\n• Mercury — liquid metal at room temp\n• Gallium & Caesium — melt in your hand (low MP)\n• Diamond — hardest substance (non-metal!)\n• Graphite — conducts electricity (non-metal!)\n• Iodine — lustrous non-metal\n• Sodium & Potassium — soft metals (cut with knife)\n\nThese exceptions are CBSE favourites!' },
+    ]
+  },
+  // ── Chemical Properties ──
+  {
+    id:'chem', label:'Chemical\nProperties', x:340, y:-180, r:46,
+    color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+    info:"Chemical properties of metals:\n1. Reaction with oxygen → Metal oxides (basic)\n2. Reaction with water → Metal hydroxide + H₂\n3. Reaction with acids → Salt + H₂\n4. Reaction with other metal salts (displacement)\n\nNon-metals form acidic or neutral oxides.",
+    children:[
+      { id:'ch1', label:'Reaction\nwith O₂', x:560, y:-300, r:35, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Metal + O₂ → Metal Oxide (basic)\n\n2Cu + O₂ → 2CuO (black)\n4Al + 3O₂ → 2Al₂O₃\n2Mg + O₂ → 2MgO (dazzling white)\n\nReactivity: K > Na > Ca > Mg > Al > Zn > Fe > Cu\n\nNon-metals form acidic/neutral oxides:\nC + O₂ → CO₂ (acidic)\nS + O₂ → SO₂ (acidic)\nH₂ + O₂ → H₂O (neutral)' },
+      { id:'ch2', label:'Reaction\nwith H₂O', x:580, y:-150, r:35, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Metals react with water at different rates:\n\nVigorous: Na, K → Metal hydroxide + H₂\n2Na + 2H₂O → 2NaOH + H₂↑ (catches fire!)\n\nModerate: Ca → Ca(OH)₂ + H₂↑ (bubbles)\n\nSlow: Mg, Al, Zn, Fe\nFe + steam → Fe₃O₄ + H₂\n\nNo reaction: Cu, Ag, Au, Pt\n(These are "noble metals")' },
+      { id:'ch3', label:'Reaction\nwith Acids', x:510, y:-20, r:35, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'Metal + Dilute Acid → Salt + H₂↑\n\nZn + H₂SO₄ → ZnSO₄ + H₂↑\nFe + 2HCl → FeCl₂ + H₂↑\nMg + 2HCl → MgCl₂ + H₂↑\n\nCopper, Silver, Gold do NOT react with dilute acids.\n(They are below hydrogen in reactivity series)\n\nTest for H₂: Burns with a "pop" sound.' },
+      { id:'ch4', label:'Displacement\nReactions', x:360, y:-350, r:35, color:'#001a08', stroke:'#22c55e', textColor:'#bbf7d0',
+        info:'A more reactive metal displaces a less reactive metal from its salt solution.\n\nFe + CuSO₄ → FeSO₄ + Cu\n(Iron nail in blue CuSO₄ turns green + brown Cu deposits)\n\nCu + 2AgNO₃ → Cu(NO₃)₂ + 2Ag\n(Silver tree experiment)\n\nZn + CuSO₄ → ZnSO₄ + Cu ✓\nCu + ZnSO₄ → No reaction ✗\n\nThis is how reactivity series was established!' },
+    ]
+  },
+  // ── Reactivity Series ──
+  {
+    id:'react', label:'Reactivity\nSeries', x:0, y:-310, r:46,
+    color:'#0a0018', stroke:'#a855f7', textColor:'#e9d5ff',
+    info:"The reactivity series ranks metals by their chemical activity:\nK > Na > Ca > Mg > Al > Zn > Fe > Ni > Sn > Pb > [H] > Cu > Hg > Ag > Au > Pt\n\nMnemonic: 'Please Stop Calling Me A Cute Zebra, I Like Hyenas Since Copper and Gold Are Pretty'\n\nMore reactive metals are harder to extract from ores.",
+    children:[
+      { id:'re1', label:'Highly\nReactive\n(K, Na, Ca)', x:-170, y:-440, r:34, color:'#0a0018', stroke:'#a855f7', textColor:'#e9d5ff',
+        info:'K, Na, Ca (top of series):\n• React vigorously with cold water\n• Stored under kerosene (Na, K) or kept away from moisture\n• Cannot be extracted by reduction with carbon\n• Extracted by ELECTROLYSIS of molten salts\n• Form ionic compounds with strong bonds\n\nK is so reactive it catches fire on water!' },
+      { id:'re2', label:'Moderately\nReactive\n(Mg–Zn)', x:0, y:-460, r:34, color:'#0a0018', stroke:'#a855f7', textColor:'#e9d5ff',
+        info:'Mg, Al, Zn, Fe (middle of series):\n• React with steam (not cold water)\n• React with dilute acids to give H₂\n• Extracted by REDUCTION with carbon (coke)\n\nMgO + C → Mg + CO (at very high temp)\nZnO + C → Zn + CO\nFe₂O₃ + 3C → 2Fe + 3CO (blast furnace)\n\nAluminium is special — extracted by electrolysis despite being mid-series (forms very stable oxide).' },
+      { id:'re3', label:'Less Reactive\n(Cu, Ag, Au)', x:170, y:-440, r:34, color:'#0a0018', stroke:'#a855f7', textColor:'#e9d5ff',
+        info:'Cu, Hg, Ag, Au, Pt (bottom of series):\n• Do not react with water or dilute acids\n• Found in FREE STATE in nature (native metals)\n• Extracted by simple ROASTING or self-reduction\n\n2HgS + 3O₂ → 2HgO + 2SO₂\nthen 2HgO → 2Hg + O₂\n\nGold panning works because Au is unreactive!\nCopper was the first metal used by humans (along with gold).' },
+    ]
+  },
+  // ── Extraction of Metals ──
+  {
+    id:'extract', label:'Extraction\nof Metals', x:-320, y:210, r:46,
+    color:'#001a1a', stroke:'#22d3ee', textColor:'#a5f3fc',
+    info:"Metals are extracted from minerals/ores depending on their reactivity:\n\nHigh reactivity → Electrolysis (Na, K, Ca, Al)\nMedium reactivity → Reduction with carbon (Zn, Fe, Pb)\nLow reactivity → Roasting/Self-reduction (Cu, Hg)\n\nSteps: Mining → Concentration → Reduction → Refining",
+    children:[
+      { id:'ex1', label:'Ores &\nMinerals', x:-550, y:130, r:34, color:'#001a1a', stroke:'#22d3ee', textColor:'#a5f3fc',
+        info:'Mineral: Natural compound containing metal\nOre: Mineral from which metal can be extracted profitably\n\nImportant ores:\n• Bauxite: Al₂O₃·2H₂O (Aluminium)\n• Haematite: Fe₂O₃ (Iron)\n• Cinnabar: HgS (Mercury)\n• Copper pyrite: CuFeS₂ (Copper)\n• Zinc blende: ZnS (Zinc)\n\nNot all minerals are ores, but all ores are minerals.' },
+      { id:'ex2', label:'Concentration\n(Enrichment)', x:-560, y:280, r:34, color:'#001a1a', stroke:'#22d3ee', textColor:'#a5f3fc',
+        info:'Removing impurities (gangue) from ore:\n\n1. Hydraulic washing — lighter gangue washed away\n2. Magnetic separation — magnetic ores separated\n3. Froth flotation — for sulphide ores\n   (ore sticks to oil froth, gangue sinks)\n\nThe concentrated ore then undergoes:\n• Roasting (sulphide ores → oxide)\n  2ZnS + 3O₂ → 2ZnO + 2SO₂\n• Calcination (carbonate ores → oxide)\n  ZnCO₃ → ZnO + CO₂' },
+      { id:'ex3', label:'Reduction &\nRefining', x:-450, y:390, r:34, color:'#001a1a', stroke:'#22d3ee', textColor:'#a5f3fc',
+        info:'Reduction (oxide → metal):\n• With carbon: ZnO + C → Zn + CO (medium reactive)\n• Electrolysis: for Al, Na, K (highly reactive)\n• Self-reduction: 2Cu₂S + 3O₂ → 2Cu₂O + 2SO₂\n  then Cu₂O + Cu₂S → 6Cu + SO₂\n\nRefining (purification):\nElectrolytic refining:\n• Anode = impure metal\n• Cathode = pure metal strip\n• Electrolyte = metal salt solution\nPure metal deposits at cathode!' },
+    ]
+  },
+  // ── Corrosion & Alloys ──
+  {
+    id:'corr', label:'Corrosion\n& Alloys', x:320, y:210, r:46,
+    color:'#1a0005', stroke:'#ef4444', textColor:'#fecaca',
+    info:"Corrosion: surface of metals is attacked by moisture, air, acids, etc.\nRusting: iron corrosion → Fe₂O₃·xH₂O (brown, flaky)\nRequires: both oxygen AND moisture\n\nPrevention: painting, oiling, galvanizing, electroplating, alloying\n\nAlloys: homogeneous mixtures of metals (or metal + non-metal)",
+    children:[
+      { id:'co1', label:'Rusting\nof Iron', x:540, y:130, r:34, color:'#1a0005', stroke:'#ef4444', textColor:'#fecaca',
+        info:'Iron + O₂ + H₂O → Fe₂O₃·xH₂O (rust)\n\nConditions needed: BOTH oxygen and water\n• Iron in dry air: no rust ✗\n• Iron in boiled water (no O₂): no rust ✗\n• Iron in moist air: rusts ✓\n\nRust is brown, flaky, and does NOT protect the surface.\n(Unlike Al₂O₃ which forms a protective layer!)\n\nCost of corrosion: billions of dollars lost annually worldwide.' },
+      { id:'co2', label:'Prevention\nMethods', x:560, y:280, r:34, color:'#1a0005', stroke:'#ef4444', textColor:'#fecaca',
+        info:'Methods to prevent corrosion:\n1. Painting/Oiling/Greasing — barrier\n2. Galvanizing — coating with zinc layer\n   (Even if scratched, Zn protects Fe by sacrificial protection)\n3. Electroplating — coating with Cr, Ni, etc.\n4. Alloying — making alloys (stainless steel)\n5. Sacrificial protection — attach more reactive metal\n\nBridges and ships use galvanizing + painting together.' },
+      { id:'co3', label:'Important\nAlloys', x:450, y:390, r:34, color:'#1a0005', stroke:'#ef4444', textColor:'#fecaca',
+        info:'Alloy: Homogeneous mixture of metals (or metal + non-metal)\n\nSteel: Fe + C (0.05-1.5%) — harder than iron\nStainless Steel: Fe + Cr + Ni — rust-proof\nBrass: Cu + Zn — used in utensils, decorations\nBronze: Cu + Sn — statues, medals\nSolder: Pb + Sn — joining wires (low MP)\nAmalgam: Metal + Mercury — dental fillings\n24K = pure gold; 22K = Au + Cu/Ag (harder)\n\nAlloying changes properties: hardness↑, MP changes, conductivity↓' },
+    ]
+  },
+  // ── Ionic Compounds ──
+  {
+    id:'ionic', label:'Ionic\nCompounds', x:0, y:310, r:46,
+    color:'#00091a', stroke:'#3b82f6', textColor:'#bfdbfe',
+    info:"Metals form ionic (electrovalent) bonds with non-metals.\nMetal atoms LOSE electrons → cations (positive)\nNon-metal atoms GAIN electrons → anions (negative)\n\nElectrostatic attraction between cations and anions = ionic bond\nExample: Na⁺Cl⁻ (NaCl, common salt)",
+    children:[
+      { id:'io1', label:'Formation\nof Ions', x:-170, y:440, r:34, color:'#00091a', stroke:'#3b82f6', textColor:'#bfdbfe',
+        info:'Electron transfer:\nNa (2,8,1) → Na⁺ (2,8) + e⁻ [loses 1e]\nCl (2,8,7) + e⁻ → Cl⁻ (2,8,8) [gains 1e]\n\nMg (2,8,2) → Mg²⁺ + 2e⁻\nO (2,6) + 2e⁻ → O²⁻ (2,8)\n\nMetals lose electrons = electropositive\nNon-metals gain electrons = electronegative\n\nOctet rule: atoms want 8 electrons in outer shell (noble gas config).' },
+      { id:'io2', label:'Properties\nof Ionic\nCompounds', x:0, y:468, r:34, color:'#00091a', stroke:'#3b82f6', textColor:'#bfdbfe',
+        info:'Properties of ionic compounds:\n1. Hard & brittle (strong but rigid lattice)\n2. High melting & boiling points (strong forces)\n   NaCl: MP = 801°C\n3. Soluble in water (polar solvent)\n4. Insoluble in organic solvents (kerosene, petrol)\n5. Conduct electricity in molten/aqueous state\n   (free ions can move)\n6. Do NOT conduct in solid state (ions are fixed)' },
+      { id:'io3', label:'Electron\nDot\nStructures', x:170, y:440, r:34, color:'#00091a', stroke:'#3b82f6', textColor:'#bfdbfe',
+        info:'Lewis dot structures show valence electrons:\n\nNa: [one dot] → Na⁺ + e⁻\nCl: [seven dots] + e⁻ → Cl⁻ [eight dots]\n\nNaCl formation:\nNa· + ·Cl: → [Na]⁺[Cl:]⁻\n\nMgO formation:\n·Mg· + :O: → [Mg]²⁺[:O:]²⁻\n\nCaCl₂: Ca donates 2e⁻, one to each Cl\nCa·· + 2·Cl: → [Ca]²⁺ 2[Cl:]⁻' },
+    ]
+  },
+];
+
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+function getNode(id){ return allNodes.find(n => n.id===id); }
+
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; canvas.style.cursor='grabbing'; });
+canvas.addEventListener('mousemove', e => {
+  if(dragging){ ox=dragOrigin.x+(e.clientX-dragStart.x); oy=dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x, dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10, window.innerHeight-230)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', () => { dragging=false; canvas.style.cursor='grab'; });
+canvas.addEventListener('mouseleave', () => { dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY); }, {passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart', e => { if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; } });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2, cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d;
+  }
+}, {passive:false});
+canvas.addEventListener('touchend', () => { dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.2,Math.min(3,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2; draw(); }
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save(); ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(56,189,248,.03)'; ctx.lineWidth=1;
+  for(let x=-1500;x<1500;x+=70){ ctx.beginPath(); ctx.moveTo(x,-1500); ctx.lineTo(x,1500); ctx.stroke(); }
+  for(let y=-1500;y<1500;y+=70){ ctx.beginPath(); ctx.moveTo(-1500,y); ctx.lineTo(1500,y); ctx.stroke(); }
+  ctx.restore();
+
+  ctx.save(); ctx.translate(ox,oy); ctx.scale(scale,scale);
+  allEdges.forEach(e => {
+    const a=getNode(e.from), b=getNode(e.to); if(!a||!b) return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0, a.stroke+'55'); grd.addColorStop(1, b.stroke+'22');
+    const cx2=(a.x+b.x)/2+(b.y-a.y)*.15, cy2=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.quadraticCurveTo(cx2,cy2,b.x,b.y);
+    ctx.strokeStyle=grd; ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]); ctx.stroke(); ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n => {
+    ctx.save(); ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?40:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fillStyle=n.color; ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+    if(n.id==='c'){ ctx.beginPath(); ctx.arc(n.x,n.y,n.r-8,0,Math.PI*2); ctx.strokeStyle=n.stroke+'33'; ctx.lineWidth=1; ctx.stroke(); }
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Nunito,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=n.id==='c'?14:12;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+  ctx.restore();
+}
+resize();
+</script>
+</body>
+</html>

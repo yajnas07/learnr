@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Metals and Non-Metals</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--card2:#263148;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;--orange:#f97316;--amber:#f59e0b;--lime:#84cc16;--cyan:#22d3ee;--purple:#a855f7;--red:#ef4444;--blue:#3b82f6;--green:#22c55e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:800;background:linear-gradient(135deg,#f97316,#facc15,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1rem}
+.filters button{font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;padding:.32rem .85rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,.08)}
+
+.score-bar{display:flex;justify-content:center;gap:1.5rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.score-bar span.right{color:var(--green)} .score-bar span.wrong{color:var(--red)}
+
+.questions{max-width:820px;margin:auto;padding:0 1rem 3rem;display:flex;flex-direction:column;gap:1rem}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.4rem;transition:border-color .2s}
+.q-card:hover{border-color:#64748b}
+.q-num{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--orange);margin-bottom:.4rem}
+.q-text{font-size:.88rem;font-weight:600;line-height:1.7;margin-bottom:.9rem}
+.opts{display:grid;gap:.4rem}
+.opt{display:flex;align-items:flex-start;gap:.5rem;padding:.5rem .8rem;border-radius:9px;border:1px solid var(--border);cursor:pointer;font-size:.82rem;line-height:1.5;transition:all .15s;background:transparent}
+.opt:hover{border-color:#64748b;background:var(--card2)}
+.opt.correct{border-color:var(--green);background:rgba(34,197,94,.1);color:var(--green)}
+.opt.wrong{border-color:var(--red);background:rgba(239,68,68,.08);color:var(--red)}
+.opt .circle{min-width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;margin-top:1px}
+.opt.correct .circle{border-color:var(--green);background:var(--green);color:#000}
+.opt.wrong .circle{border-color:var(--red);background:var(--red);color:#fff}
+.explain{display:none;margin-top:.7rem;font-size:.78rem;line-height:1.7;color:var(--muted);background:var(--card2);border-radius:8px;padding:.7rem 1rem;border-left:3px solid var(--green)}
+.explain.show{display:block}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(7,16,31,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.8);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:#dde6f5}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Metals &amp; Non-Metals · Science Ch.3 · 30 MCQs</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="score-bar"><span>Score: <span class="right" id="sc-r">0</span> ✓ / <span class="wrong" id="sc-w">0</span> ✗</span><span id="sc-tot">0 / 30 attempted</span></div>
+<div class="questions" id="qlist"></div>
+
+<script>
+const QS=[
+// Physical Properties
+{cat:'phys',q:'Which of the following metals is liquid at room temperature?',ops:['Sodium','Mercury','Gallium at 25°C','Bromine'],ans:1,exp:'Mercury (Hg) is the only metal that is liquid at room temperature (m.p. −39°C). Gallium melts at 29.8°C so it could be liquid on a hot day. Bromine is a non-metal liquid.'},
+{cat:'phys',q:'Which property of metals is utilised in making bells?',ops:['Ductility','Malleability','Sonority','Conductivity'],ans:2,exp:'Metals are sonorous — they produce a ringing sound when struck. This property is used in making bells and cymbals.'},
+{cat:'phys',q:'Which non-metal is a good conductor of electricity?',ops:['Sulphur','Phosphorus','Graphite','Silicon'],ans:2,exp:'Graphite (a form of carbon) has free electrons (one per C atom) that allow electrical conduction. It is used in electrodes.'},
+{cat:'phys',q:'Gold can be beaten into very thin sheets. This property is called:',ops:['Ductility','Malleability','Sonority','Elasticity'],ans:1,exp:'Malleability = ability to be beaten into thin sheets. Gold is the most malleable metal — it can be beaten into sheets just 0.00001 cm thick (gold leaf).'},
+{cat:'phys',q:'Which of these metals has the highest melting point?',ops:['Mercury','Sodium','Tungsten','Gallium'],ans:2,exp:'Tungsten (W) has the highest melting point of all metals — 3422°C. It is used in light bulb filaments for this reason.'},
+
+// Chemical Properties
+{cat:'chem',q:'When sodium reacts with water, the products are:',ops:['Na₂O + H₂','NaOH + H₂','NaH + O₂','Na₂O₂ + H₂'],ans:1,exp:'2Na + 2H₂O → 2NaOH + H₂↑. Sodium reacts vigorously with cold water forming sodium hydroxide and hydrogen gas which may catch fire.'},
+{cat:'chem',q:'Which gas is produced when a metal reacts with dilute hydrochloric acid?',ops:['Oxygen','Chlorine','Hydrogen','Nitrogen'],ans:2,exp:'Metal + dilute HCl → Metal chloride + H₂↑. The hydrogen gas can be tested with a burning splint — it burns with a "pop" sound.'},
+{cat:'chem',q:'Iron does not react with:',ops:['Steam','Cold water','Dilute H₂SO₄','Oxygen at high temperature'],ans:1,exp:'Iron does not react with cold water. It reacts with steam: 3Fe + 4H₂O(steam) → Fe₃O₄ + 4H₂. Only very reactive metals (Na, K, Ca) react with cold water.'},
+{cat:'chem',q:'Copper does not react with dilute HCl because:',ops:['It is not a metal','It is less reactive than hydrogen','It is more reactive than hydrogen','HCl is weak acid'],ans:1,exp:'Copper lies below hydrogen in the reactivity series. Only metals above hydrogen can displace H₂ from dilute acids. Cu, Hg, Ag, Au, Pt cannot react with dilute acids.'},
+{cat:'chem',q:'The metal oxide that is amphoteric is:',ops:['Na₂O','CaO','Al₂O₃','MgO'],ans:2,exp:'Al₂O₃ is amphoteric — it reacts with both acids and bases. Al₂O₃ + 6HCl → 2AlCl₃ + 3H₂O; Al₂O₃ + 2NaOH → 2NaAlO₂ + H₂O.'},
+
+// Reactivity Series
+{cat:'react',q:'Which of the following reactions will NOT take place?',ops:['Zn + CuSO₄','Fe + CuSO₄','Cu + FeSO₄','Mg + ZnSO₄'],ans:2,exp:'Cu + FeSO₄ → No reaction. Copper is LESS reactive than iron, so it cannot displace iron from its salt solution.'},
+{cat:'react',q:'In the thermite reaction, aluminium reduces:',ops:['Copper oxide','Iron(III) oxide','Zinc oxide','Sodium oxide'],ans:1,exp:'Thermite reaction: 2Al + Fe₂O₃ → Al₂O₃ + 2Fe + Heat. Al is more reactive than Fe, so it reduces iron oxide. Used for welding railway tracks.'},
+{cat:'react',q:'A student placed iron nails in CuSO₄ solution. The colour change observed is:',ops:['Blue to colourless','Blue to green','Green to blue','No change'],ans:1,exp:'Fe + CuSO₄ → FeSO₄ + Cu. Blue CuSO₄ turns green (FeSO₄ is green). Brown copper deposits on the iron nail. Fe displaces Cu.'},
+{cat:'react',q:'Which metal is found in free state in nature?',ops:['Sodium','Iron','Aluminium','Gold'],ans:3,exp:'Gold (Au) is found in free/native state because it is at the bottom of the reactivity series — extremely unreactive. Na, Fe, Al are too reactive and exist as compounds.'},
+{cat:'react',q:'The correct order of decreasing reactivity is:',ops:['Na > Fe > Cu > Zn','Na > Zn > Fe > Cu','Fe > Zn > Na > Cu','Cu > Fe > Zn > Na'],ans:1,exp:'Correct series: Na > Zn > Fe > Cu. Sodium reacts with cold water (most reactive here), zinc reacts with steam, iron with steam slowly, copper doesn\'t react with water.'},
+
+// Extraction
+{cat:'extract',q:'Froth flotation process is used for concentration of:',ops:['Oxide ores','Carbonate ores','Sulphide ores','Native ores'],ans:2,exp:'Froth flotation is specifically designed for sulphide ores. Sulphide particles are hydrophobic (water-repelling) and attach to oil froth, floating to the surface while gangue sinks.'},
+{cat:'extract',q:'Roasting is used to convert:',ops:['Carbonate ore to oxide','Sulphide ore to oxide','Oxide ore to metal','Hydroxide ore to oxide'],ans:1,exp:'Roasting = heating sulphide ore strongly in excess air to convert it to oxide. Example: 2ZnS + 3O₂ → 2ZnO + 2SO₂. Then ZnO is reduced by carbon.'},
+{cat:'extract',q:'In electrolytic refining, pure metal is deposited at the:',ops:['Anode','Cathode','Electrolyte','Both electrodes'],ans:1,exp:'In electrolytic refining: Anode = impure metal (dissolves), Cathode = thin pure metal strip (pure metal deposits here). Impurities collect as anode mud.'},
+{cat:'extract',q:'Which metal is extracted by electrolysis of its molten chloride?',ops:['Iron','Copper','Sodium','Mercury'],ans:2,exp:'Sodium is highly reactive (top of reactivity series) — cannot be reduced by carbon. Extracted by electrolysis of molten NaCl (Down\'s process): 2NaCl → 2Na + Cl₂.'},
+{cat:'extract',q:'Cinnabar is an ore of:',ops:['Tin','Copper','Mercury','Iron'],ans:2,exp:'Cinnabar (HgS) is the ore of mercury. When roasted: 2HgS + 3O₂ → 2HgO + 2SO₂, then 2HgO → 2Hg + O₂ (self-reduction as Hg is low in series).'},
+
+// Corrosion & Alloys
+{cat:'corr',q:'Rusting of iron requires:',ops:['Only oxygen','Only water','Both oxygen and water','Carbon dioxide'],ans:2,exp:'Rusting needs BOTH O₂ AND H₂O. In dry air (no water) → no rust. In boiled water (no O₂) → no rust. Experiments with test tubes prove this.'},
+{cat:'corr',q:'Galvanisation is coating of iron with:',ops:['Aluminium','Tin','Copper','Zinc'],ans:3,exp:'Galvanisation = coating iron/steel with zinc. Zinc provides both physical barrier AND sacrificial protection (Zn is more reactive, oxidises preferentially even if coating is scratched).'},
+{cat:'corr',q:'Stainless steel does not rust because it contains:',ops:['Nickel','Chromium','Both Ni and Cr','Carbon'],ans:2,exp:'Stainless steel contains Fe + Cr (≈18%) + Ni (≈8%) + C. Chromium forms a thin, self-healing Cr₂O₃ layer that prevents O₂ and H₂O from reaching iron.'},
+{cat:'corr',q:'An alloy of copper and zinc is called:',ops:['Bronze','Solder','Brass','Amalgam'],ans:2,exp:'Brass = Cu + Zn (about 30% Zn). Bronze = Cu + Sn. Solder = Pb + Sn. Amalgam = Hg + other metal.'},
+{cat:'corr',q:'Solder is used for welding electric wires because:',ops:['It is hard','It has low melting point','It is a good conductor','It does not rust'],ans:1,exp:'Solder (Pb + Sn) has a low melting point (≈183°C), so it melts easily to join wires without damaging electronic components, then solidifies to hold the joint.'},
+
+// Ionic Compounds
+{cat:'ionic',q:'In the formation of NaCl, sodium atom:',ops:['Gains one electron','Loses one electron','Shares electrons','Gains two electrons'],ans:1,exp:'Na (2,8,1) loses 1 electron → Na⁺ (2,8). Cl (2,8,7) gains that electron → Cl⁻ (2,8,8). Transfer of electrons = ionic bonding.'},
+{cat:'ionic',q:'Ionic compounds have high melting points because:',ops:['They have weak bonds','They have strong electrostatic forces between ions','They are covalent','They are soft'],ans:1,exp:'Ionic compounds have very strong electrostatic forces of attraction between oppositely charged ions. Large amount of energy needed to overcome these forces → high m.p./b.p.'},
+{cat:'ionic',q:'Ionic compounds conduct electricity when:',ops:['In solid state','Dissolved in kerosene','In molten state or aqueous solution','Heated below melting point'],ans:2,exp:'In solid state, ions are fixed in lattice positions — cannot move. When melted or dissolved in water, ions become free to move and carry charge → conduct electricity.'},
+{cat:'ionic',q:'Which of the following is NOT a property of ionic compounds?',ops:['High melting point','Soluble in water','Conduct electricity in solid state','Hard but brittle'],ans:2,exp:'Ionic compounds do NOT conduct electricity in solid state because ions are fixed in the lattice. They conduct only in molten state or aqueous solution when ions are free.'},
+{cat:'ionic',q:'MgCl₂ is formed by transfer of:',ops:['1 electron from Mg to Cl','2 electrons from Mg to 2 Cl atoms','2 electrons from Cl to Mg','1 electron from Cl to Mg'],ans:1,exp:'Mg (2,8,2) loses 2 electrons → Mg²⁺. Each Cl (2,8,7) gains 1 electron → Cl⁻. So 2 electrons transfer from one Mg to two Cl atoms: Mg²⁺ + 2Cl⁻ → MgCl₂.'},
+];
+
+const CATS={phys:{l:'Physical Properties',c:'var(--amber)'},chem:{l:'Chemical Properties',c:'var(--green)'},react:{l:'Reactivity Series',c:'var(--purple)'},extract:{l:'Extraction',c:'var(--cyan)'},corr:{l:'Corrosion & Alloys',c:'var(--red)'},ionic:{l:'Ionic Compounds',c:'var(--blue)'}};
+
+let filtered=[...QS],scoreR=0,scoreW=0,attempted=0,answered=new Set();
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="filter('all',this)">All (${QS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=QS.filter(q=>q.cat===k).length;h+=`<button onclick="filter('${k}',this)">${v.l} (${n})</button>`;}f.innerHTML=h;}
+function filter(cat,btn){document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...QS]:QS.filter(q=>q.cat===cat);render();}
+function render(){const c=document.getElementById('qlist');c.innerHTML=filtered.map((q,i)=>{const gi=QS.indexOf(q);const letters='ABCD';return`<div class="q-card" id="q${gi}"><div class="q-num">Q${gi+1} · ${CATS[q.cat].l}</div><div class="q-text">${q.q}</div><div class="opts">${q.ops.map((o,j)=>`<div class="opt" data-qi="${gi}" data-oi="${j}" onclick="answer(${gi},${j},this)"><span class="circle">${letters[j]}</span><span>${o}</span></div>`).join('')}</div><div class="explain" id="exp${gi}">${q.exp}</div></div>`;}).join('');}
+function answer(qi,oi,el){if(answered.has(qi))return;answered.add(qi);attempted++;const q=QS[qi];const opts=document.querySelectorAll(`[data-qi="${qi}"]`);opts.forEach(o=>{const idx=+o.dataset.oi;if(idx===q.ans)o.classList.add('correct');else if(idx===oi)o.classList.add('wrong');});if(oi===q.ans)scoreR++;else scoreW++;document.getElementById('sc-r').textContent=scoreR;document.getElementById('sc-w').textContent=scoreW;document.getElementById('sc-tot').textContent=`${attempted} / ${QS.length} attempted`;document.getElementById(`exp${qi}`).classList.add('show');}
+buildFilters();render();
+</script>
+</body>
+</html>

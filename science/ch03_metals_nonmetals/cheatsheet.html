@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheatsheet — Metals and Non-Metals</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--card2:#263148;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;--orange:#f97316;--amber:#f59e0b;--lime:#84cc16;--cyan:#22d3ee;--purple:#a855f7;--red:#ef4444;--blue:#3b82f6;--green:#22c55e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1.2rem}
+header h1{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:800;background:linear-gradient(135deg,#f97316,#facc15,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.grid{max-width:1100px;margin:auto;padding:0 1rem 3rem;display:grid;gap:1.2rem;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:border-color .2s}
+.panel:hover{border-color:#64748b}
+.panel h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem}
+.panel h2 .dot{width:10px;height:10px;border-radius:50%}
+.panel ul{list-style:none;padding:0}
+.panel li{font-size:.82rem;line-height:1.7;padding:.18rem 0;padding-left:.8rem;position:relative;color:var(--text)}
+.panel li::before{content:'▸';position:absolute;left:0;color:var(--orange)}
+.panel table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:.5rem}
+.panel th,.panel td{padding:.4rem .55rem;border:1px solid var(--border);text-align:left}
+.panel th{background:var(--card2);color:var(--amber);font-family:'DM Mono',monospace;font-size:.7rem}
+.panel td{color:var(--text)}
+.panel .eq{font-family:'DM Mono',monospace;font-size:.75rem;background:var(--card2);border:1px solid var(--border);padding:.55rem .8rem;border-radius:8px;margin:.3rem 0;color:var(--cyan)}
+.panel .note{font-size:.73rem;color:var(--muted);background:rgba(249,115,22,.06);border-left:3px solid var(--orange);padding:.5rem .8rem;border-radius:0 8px 8px 0;margin-top:.6rem}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(7,16,31,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.8);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:#dde6f5}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Cheatsheet</h1>
+  <p>Metals &amp; Non-Metals · Science Ch.3 · Quick Reference</p>
+</header>
+
+<div class="grid">
+
+<!-- 1 -->
+<div class="panel">
+  <h2><span class="dot" style="background:var(--amber)"></span>Physical Properties — Metals</h2>
+  <ul>
+    <li><strong>Lustrous</strong> — shiny surface when freshly cut</li>
+    <li><strong>Malleable</strong> — can be beaten into thin sheets (Au, Ag most malleable)</li>
+    <li><strong>Ductile</strong> — can be drawn into wires (Au most ductile — 2 km wire from 1 g)</li>
+    <li><strong>Good conductors</strong> of heat &amp; electricity (Ag > Cu > Au > Al)</li>
+    <li><strong>Sonorous</strong> — produce ringing sound when struck</li>
+    <li><strong>Generally hard</strong>, high melting/boiling points</li>
+    <li><strong>Exceptions:</strong> Na, K — soft (cut with knife); Hg — liquid; Pb, Na — poor conductors</li>
+  </ul>
+</div>
+
+<!-- 2 -->
+<div class="panel">
+  <h2><span class="dot" style="background:var(--cyan)"></span>Physical Properties — Non-Metals</h2>
+  <ul>
+    <li><strong>Non-lustrous</strong> (exception: iodine, diamond)</li>
+    <li><strong>Brittle</strong> — break when hammered</li>
+    <li><strong>Non-ductile</strong>, cannot be drawn into wires</li>
+    <li><strong>Poor conductors</strong> (exception: graphite conducts electricity)</li>
+    <li><strong>Generally soft</strong>, low melting/boiling points</li>
+    <li><strong>Exist as solids, liquids, or gases</strong> at room temp (Br₂ = liquid)</li>
+    <li><strong>Low density</strong> compared to metals</li>
+  </ul>
+</div>
+
+<!-- 3 -->
+<div class="panel" style="grid-column:1/-1">
+  <h2><span class="dot" style="background:var(--green)"></span>Chemical Properties of Metals</h2>
+  <div class="eq">1. Metal + O₂ → Metal Oxide (basic)&emsp;| 4Na + O₂ → 2Na₂O | 2Mg + O₂ → 2MgO</div>
+  <div class="eq">2. Metal + H₂O → Metal hydroxide/oxide + H₂&emsp;| 2Na + 2H₂O → 2NaOH + H₂↑</div>
+  <div class="eq">3. Metal + Dilute Acid → Salt + H₂↑&emsp;| Zn + H₂SO₄ → ZnSO₄ + H₂↑</div>
+  <div class="eq">4. Metal A + Salt of B → Salt of A + Metal B&emsp;(if A > B in reactivity)</div>
+  <div class="note">HNO₃ doesn't give H₂ — it's an oxidising acid (oxidises H₂ → H₂O). Aqua regia (3HCl + HNO₃) dissolves Au &amp; Pt.</div>
+</div>
+
+<!-- 4 -->
+<div class="panel">
+  <h2><span class="dot" style="background:var(--purple)"></span>Reactivity Series</h2>
+  <table>
+    <tr><th>Metal</th><th>Reactivity</th><th>Extraction</th></tr>
+    <tr><td>K, Na, Ca</td><td>Most reactive</td><td>Electrolysis</td></tr>
+    <tr><td>Mg, Al</td><td>High</td><td>Electrolysis</td></tr>
+    <tr><td>Zn, Fe, Ni, Sn, Pb</td><td>Medium</td><td>Reduction by C/CO</td></tr>
+    <tr><td>Cu, Hg, Ag, Au, Pt</td><td>Low / Least</td><td>Self-reduction / Found free</td></tr>
+  </table>
+  <div class="note">Mnemonic: "King Solomon Came Making All Zebras In Lovely Sunny Park Having Clean Skin Giving Precious Metals"</div>
+</div>
+
+<!-- 5 -->
+<div class="panel">
+  <h2><span class="dot" style="background:var(--orange)"></span>Ionic Bonding</h2>
+  <ul>
+    <li>Metals <strong>lose electrons</strong> → form cations (Na → Na⁺ + e⁻)</li>
+    <li>Non-metals <strong>gain electrons</strong> → form anions (Cl + e⁻ → Cl⁻)</li>
+    <li>Electrostatic attraction between ions = <strong>ionic bond</strong></li>
+    <li>Example: Na⁺Cl⁻ — transfer of 1e⁻ from Na to Cl</li>
+  </ul>
+  <div class="eq">Na (2,8,1) → Na⁺ (2,8) + e⁻ &emsp;|&emsp; Cl (2,8,7) + e⁻ → Cl⁻ (2,8,8)</div>
+</div>
+
+<!-- 6 -->
+<div class="panel">
+  <h2><span class="dot" style="background:var(--lime)"></span>Properties of Ionic Compounds</h2>
+  <ul>
+    <li><strong>High melting &amp; boiling points</strong> — strong electrostatic forces</li>
+    <li><strong>Hard but brittle</strong> — rigid lattice, layers crack on shifting</li>
+    <li><strong>Solid state:</strong> don't conduct electricity (ions fixed)</li>
+    <li><strong>Molten/Aqueous:</strong> conduct electricity (ions free to move)</li>
+    <li><strong>Soluble</strong> in water, insoluble in organic solvents (kerosene, petrol)</li>
+  </ul>
+</div>
+
+<!-- 7 -->
+<div class="panel">
+  <h2><span class="dot" style="background:var(--red)"></span>Extraction of Metals — Steps</h2>
+  <ul>
+    <li><strong>Step 1: Concentration</strong> — Remove gangue (hydraulic washing, magnetic separation, froth flotation)</li>
+    <li><strong>Step 2: Conversion to oxide</strong> — Roasting (sulphide ores in air) or Calcination (carbonate ores without air)</li>
+    <li><strong>Step 3: Reduction</strong> — Using carbon/CO for mid-reactive metals; Electrolysis for highly reactive metals</li>
+    <li><strong>Step 4: Refining</strong> — Electrolytic refining (anode = impure, cathode = pure, electrolyte = metal salt solution)</li>
+  </ul>
+</div>
+
+<!-- 8 -->
+<div class="panel">
+  <h2><span class="dot" style="background:var(--blue)"></span>Roasting vs Calcination</h2>
+  <table>
+    <tr><th>Feature</th><th>Roasting</th><th>Calcination</th></tr>
+    <tr><td>Ore type</td><td>Sulphide ores</td><td>Carbonate/Hydrated ores</td></tr>
+    <tr><td>Air supply</td><td>Excess air</td><td>Limited/No air</td></tr>
+    <tr><td>By-product</td><td>SO₂ gas</td><td>CO₂ / H₂O</td></tr>
+    <tr><td>Example</td><td>2ZnS + 3O₂ → 2ZnO + 2SO₂</td><td>ZnCO₃ → ZnO + CO₂</td></tr>
+  </table>
+</div>
+
+<!-- 9 -->
+<div class="panel">
+  <h2><span class="dot" style="background:var(--amber)"></span>Corrosion</h2>
+  <ul>
+    <li><strong>Corrosion</strong> = surface of metal attacked by air, moisture, acids, etc.</li>
+    <li><strong>Rusting of iron:</strong> Fe + O₂ + H₂O → Fe₂O₃·xH₂O (hydrated iron oxide)</li>
+    <li>Needs BOTH O₂ and moisture; salt/acid accelerates it</li>
+    <li><strong>Silver tarnishing:</strong> reacts with H₂S in air → Ag₂S (black)</li>
+    <li><strong>Copper turning green:</strong> reacts with CO₂ + H₂O → CuCO₃·Cu(OH)₂</li>
+  </ul>
+</div>
+
+<!-- 10 -->
+<div class="panel">
+  <h2><span class="dot" style="background:var(--green)"></span>Prevention of Corrosion</h2>
+  <ul>
+    <li><strong>Painting / Oiling / Greasing</strong> — physical barrier</li>
+    <li><strong>Galvanisation</strong> — zinc coating (sacrificial protection)</li>
+    <li><strong>Electroplating</strong> — layer of Cr, Ni, Sn on surface</li>
+    <li><strong>Alloying</strong> — stainless steel (Fe + Cr + Ni + C)</li>
+    <li><strong>Anodising</strong> — thickening Al₂O₃ layer on aluminium</li>
+  </ul>
+</div>
+
+<!-- 11 -->
+<div class="panel" style="grid-column:1/-1">
+  <h2><span class="dot" style="background:var(--cyan)"></span>Important Alloys</h2>
+  <table>
+    <tr><th>Alloy</th><th>Composition</th><th>Properties / Use</th></tr>
+    <tr><td>Stainless Steel</td><td>Fe + Cr (18%) + Ni (8%) + C</td><td>Rust-proof; utensils, surgical instruments</td></tr>
+    <tr><td>Brass</td><td>Cu + Zn (30%)</td><td>Harder than Cu; taps, decorations</td></tr>
+    <tr><td>Bronze</td><td>Cu + Sn (10%)</td><td>Hard, corrosion-resistant; medals, statues</td></tr>
+    <tr><td>Solder</td><td>Pb + Sn</td><td>Low melting point (183°C); electrical joints</td></tr>
+    <tr><td>Amalgam</td><td>Hg + other metal</td><td>Soft, mouldable; dental fillings</td></tr>
+    <tr><td>22-Carat Gold</td><td>Au (22 parts) + Cu/Ag (2 parts)</td><td>Harder than pure gold; jewellery</td></tr>
+    <tr><td>Duralumin</td><td>Al + Cu + Mg + Mn</td><td>Light, strong; aircraft bodies</td></tr>
+  </table>
+</div>
+
+</div><!-- grid -->
+</body>
+</html>

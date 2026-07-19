@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Lab — Metals and Non-Metals</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--card2:#263148;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;--orange:#f97316;--amber:#f59e0b;--lime:#84cc16;--cyan:#22d3ee;--purple:#a855f7;--red:#ef4444;--blue:#3b82f6;--green:#22c55e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.6rem 1rem .8rem}
+header h1{font-family:'Syne',sans-serif;font-size:clamp(1.3rem,4vw,1.9rem);font-weight:800;background:linear-gradient(135deg,#f97316,#facc15,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+nav.tabs{display:flex;justify-content:center;flex-wrap:wrap;gap:.35rem;padding:.5rem 1rem 1.2rem}
+nav.tabs button{font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+nav.tabs button:hover{color:var(--text)}
+nav.tabs button.active{border-color:var(--orange);color:#fff;background:var(--orange)}
+
+.lab-container{max-width:900px;margin:auto;padding:0 1rem 3rem}
+.lab-panel{display:none}
+.lab-panel.active{display:block}
+
+/* Shared lab styles */
+.lab-bench{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem}
+.lab-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.3rem}
+.lab-desc{font-size:.78rem;color:var(--muted);margin-bottom:1rem;line-height:1.6}
+.lab-controls{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.lab-btn{font-family:'Nunito',sans-serif;font-weight:600;font-size:.76rem;padding:.4rem .9rem;border-radius:9px;border:1.5px solid var(--border);background:var(--card2);color:var(--text);cursor:pointer;transition:all .15s}
+.lab-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.lab-btn.selected{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,.1)}
+.lab-btn.go{border-color:var(--green);color:#000;background:var(--green);font-weight:700}
+.lab-btn.go:hover{background:var(--lime)}
+.lab-btn.reset{border-color:var(--red);color:var(--red)}
+
+.beaker{width:160px;height:200px;border:3px solid var(--muted);border-top:none;border-radius:0 0 20px 20px;position:relative;margin:1rem auto;overflow:hidden;transition:all .5s}
+.beaker::before{content:'';position:absolute;top:-3px;left:-15px;right:-15px;height:6px;background:var(--muted);border-radius:3px}
+.liquid{position:absolute;bottom:0;left:0;right:0;height:60%;border-radius:0 0 17px 17px;transition:all .8s ease}
+.bubble{position:absolute;width:8px;height:8px;background:rgba(255,255,255,.3);border-radius:50%;animation:rise 1.5s infinite}
+@keyframes rise{0%{transform:translateY(0) scale(1);opacity:.8}100%{transform:translateY(-120px) scale(.3);opacity:0}}
+.metal-piece{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);width:30px;height:20px;border-radius:4px;transition:all .8s;z-index:2}
+
+.observation-box{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-top:1rem}
+.observation-box h3{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--orange);margin-bottom:.5rem}
+.observation-box p{font-size:.8rem;line-height:1.7;color:var(--text)}
+.observation-box .equation{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--cyan);background:var(--card);padding:.4rem .7rem;border-radius:6px;margin-top:.5rem;display:inline-block}
+
+/* Experiment 1: Displacement */
+.test-tubes{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;padding:1rem 0}
+.tube-setup{text-align:center}
+.tube{width:50px;height:140px;border:2.5px solid var(--muted);border-top:none;border-radius:0 0 25px 25px;position:relative;overflow:hidden;margin:0 auto .5rem}
+.tube::before{content:'';position:absolute;top:-3px;left:-8px;right:-8px;height:5px;background:var(--muted);border-radius:3px}
+.tube .t-liquid{position:absolute;bottom:0;left:0;right:0;height:70%;border-radius:0 0 22px 22px;transition:all 1s}
+.tube .t-metal{position:absolute;bottom:8%;left:50%;transform:translateX(-50%);width:14px;height:10px;border-radius:2px;transition:all 1s;z-index:2}
+.tube-label{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted)}
+
+/* Experiment 2: Acid Reactions */
+.reaction-area{display:flex;justify-content:center;align-items:flex-end;gap:2rem;padding:1rem 0;flex-wrap:wrap}
+
+/* Experiment 3: Water Reactions */
+.water-trough{width:200px;height:100px;border:3px solid var(--muted);border-radius:0 0 15px 15px;position:relative;margin:1rem auto;overflow:hidden}
+.water-trough .w-water{position:absolute;bottom:0;left:0;right:0;height:70%;background:rgba(56,189,248,.2);border-radius:0 0 12px 12px;transition:all .5s}
+.water-trough .w-metal{position:absolute;width:20px;height:20px;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);transition:all .3s;z-index:2}
+
+/* Experiment 4: Flame Test */
+.flame-area{display:flex;justify-content:center;align-items:flex-end;gap:2rem;padding:1rem 0}
+.bunsen{width:30px;height:80px;background:linear-gradient(to top,#64748b,#94a3b8);border-radius:4px 4px 15px 15px;position:relative}
+.flame{width:20px;height:50px;position:absolute;top:-45px;left:50%;transform:translateX(-50%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;transition:all .5s;opacity:0}
+.flame.lit{opacity:1;animation:flicker .3s infinite alternate}
+@keyframes flicker{0%{transform:translateX(-50%) scale(1) rotate(-1deg)}100%{transform:translateX(-50%) scale(1.05) rotate(1deg)}}
+.wire-loop{width:2px;height:60px;background:#94a3b8;position:absolute;top:-55px;left:50%;transform:translateX(-50%)}
+.wire-loop::after{content:'';position:absolute;top:0;width:10px;height:10px;border:2px solid #94a3b8;border-radius:50%;left:-4px}
+
+.flame-color-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:.5rem;margin-top:1rem}
+.flame-card{text-align:center;padding:.6rem;border-radius:9px;border:1px solid var(--border);background:var(--card2);cursor:pointer;transition:all .2s}
+.flame-card:hover{border-color:var(--amber)}
+.flame-card.active{border-color:var(--orange);background:rgba(249,115,22,.08)}
+.flame-card .swatch{width:30px;height:30px;border-radius:50%;margin:0 auto .3rem;border:2px solid var(--border)}
+.flame-card .f-name{font-size:.7rem;font-weight:600}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(7,16,31,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.8);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:#dde6f5}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>🧪 Virtual Lab</h1>
+  <p>Metals &amp; Non-Metals · Perform Experiments Virtually</p>
+</header>
+
+<nav class="tabs">
+  <button class="active" onclick="showLab(0,this)">⚗️ Displacement</button>
+  <button onclick="showLab(1,this)">🧫 Acid Reactions</button>
+  <button onclick="showLab(2,this)">💧 Water Reactions</button>
+  <button onclick="showLab(3,this)">🔥 Flame Test</button>
+</nav>
+
+<div class="lab-container">
+
+<!-- LAB 1: Displacement Reactions -->
+<div class="lab-panel active" id="lab0">
+  <div class="lab-bench">
+    <div class="lab-title">Experiment: Displacement Reactions</div>
+    <div class="lab-desc">Drop a metal into a salt solution and observe if displacement occurs. A more reactive metal displaces a less reactive one from its compound.</div>
+    
+    <div class="lab-controls">
+      <span style="font-size:.72rem;color:var(--muted);margin-right:.3rem">Metal:</span>
+      <button class="lab-btn selected" onclick="selectDisp('metal',this,'Fe')">Iron (Fe)</button>
+      <button class="lab-btn" onclick="selectDisp('metal',this,'Cu')">Copper (Cu)</button>
+      <button class="lab-btn" onclick="selectDisp('metal',this,'Zn')">Zinc (Zn)</button>
+      <button class="lab-btn" onclick="selectDisp('metal',this,'Ag')">Silver (Ag)</button>
+    </div>
+    <div class="lab-controls">
+      <span style="font-size:.72rem;color:var(--muted);margin-right:.3rem">Solution:</span>
+      <button class="lab-btn selected" onclick="selectDisp('sol',this,'CuSO4')">CuSO₄ (blue)</button>
+      <button class="lab-btn" onclick="selectDisp('sol',this,'ZnSO4')">ZnSO₄ (colourless)</button>
+      <button class="lab-btn" onclick="selectDisp('sol',this,'FeSO4')">FeSO₄ (green)</button>
+      <button class="lab-btn" onclick="selectDisp('sol',this,'AgNO3')">AgNO₃ (colourless)</button>
+    </div>
+    <div class="lab-controls">
+      <button class="lab-btn go" onclick="runDisplacement()">▶ Drop Metal In</button>
+      <button class="lab-btn reset" onclick="resetDisp()">↺ Reset</button>
+    </div>
+
+    <div class="beaker" id="disp-beaker">
+      <div class="liquid" id="disp-liquid" style="background:rgba(56,130,246,.35)"></div>
+      <div class="metal-piece" id="disp-metal" style="background:#94a3b8;display:none"></div>
+    </div>
+
+    <div class="observation-box" id="disp-obs">
+      <h3>📝 Observation</h3>
+      <p id="disp-obs-text">Select a metal and solution, then click "Drop Metal In" to observe the reaction.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LAB 2: Acid Reactions -->
+<div class="lab-panel" id="lab1">
+  <div class="lab-bench">
+    <div class="lab-title">Experiment: Metal + Dilute Acid</div>
+    <div class="lab-desc">Add different metals to dilute hydrochloric acid and observe which ones produce hydrogen gas (bubbles). Metals above hydrogen in the reactivity series will react.</div>
+
+    <div class="lab-controls">
+      <span style="font-size:.72rem;color:var(--muted);margin-right:.3rem">Select metal:</span>
+      <button class="lab-btn selected" onclick="selectAcid(this,'Mg')">Magnesium</button>
+      <button class="lab-btn" onclick="selectAcid(this,'Zn')">Zinc</button>
+      <button class="lab-btn" onclick="selectAcid(this,'Fe')">Iron</button>
+      <button class="lab-btn" onclick="selectAcid(this,'Cu')">Copper</button>
+      <button class="lab-btn" onclick="selectAcid(this,'Au')">Gold</button>
+    </div>
+    <div class="lab-controls">
+      <button class="lab-btn go" onclick="runAcid()">▶ Add to Dilute HCl</button>
+      <button class="lab-btn reset" onclick="resetAcid()">↺ Reset</button>
+    </div>
+
+    <div class="beaker" id="acid-beaker">
+      <div class="liquid" id="acid-liquid" style="background:rgba(250,204,21,.15);height:55%"></div>
+      <div class="metal-piece" id="acid-metal" style="background:#94a3b8;display:none"></div>
+    </div>
+
+    <div class="observation-box" id="acid-obs">
+      <h3>📝 Observation</h3>
+      <p id="acid-obs-text">Select a metal and click "Add to Dilute HCl" to observe the reaction.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LAB 3: Water Reactions -->
+<div class="lab-panel" id="lab2">
+  <div class="lab-bench">
+    <div class="lab-title">Experiment: Metal + Water</div>
+    <div class="lab-desc">Observe how different metals react with water. Very reactive metals react with cold water, some with hot water/steam, and some don't react at all.</div>
+
+    <div class="lab-controls">
+      <span style="font-size:.72rem;color:var(--muted);margin-right:.3rem">Select metal:</span>
+      <button class="lab-btn selected" onclick="selectWater(this,'Na')">Sodium</button>
+      <button class="lab-btn" onclick="selectWater(this,'Ca')">Calcium</button>
+      <button class="lab-btn" onclick="selectWater(this,'Mg')">Magnesium</button>
+      <button class="lab-btn" onclick="selectWater(this,'Fe')">Iron</button>
+      <button class="lab-btn" onclick="selectWater(this,'Cu')">Copper</button>
+    </div>
+    <div class="lab-controls">
+      <span style="font-size:.72rem;color:var(--muted);margin-right:.3rem">Condition:</span>
+      <button class="lab-btn selected" onclick="selectWCond(this,'cold')">Cold Water</button>
+      <button class="lab-btn" onclick="selectWCond(this,'hot')">Hot Water</button>
+      <button class="lab-btn" onclick="selectWCond(this,'steam')">Steam</button>
+    </div>
+    <div class="lab-controls">
+      <button class="lab-btn go" onclick="runWater()">▶ Add Metal</button>
+      <button class="lab-btn reset" onclick="resetWater()">↺ Reset</button>
+    </div>
+
+    <div class="water-trough" id="water-trough">
+      <div class="w-water" id="w-water"></div>
+      <div class="w-metal" id="w-metal" style="background:#94a3b8;display:none"></div>
+    </div>
+
+    <div class="observation-box" id="water-obs">
+      <h3>📝 Observation</h3>
+      <p id="water-obs-text">Select a metal and water condition, then click "Add Metal" to see the reaction.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LAB 4: Flame Test -->
+<div class="lab-panel" id="lab3">
+  <div class="lab-bench">
+    <div class="lab-title">Experiment: Flame Test for Metal Ions</div>
+    <div class="lab-desc">Different metal ions produce characteristic flame colours when heated. This helps identify unknown metal compounds. Click a metal salt to see its flame colour.</div>
+
+    <div class="flame-area">
+      <div style="position:relative">
+        <div class="bunsen">
+          <div class="flame" id="flame"></div>
+          <div class="wire-loop"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flame-color-grid" id="flame-grid"></div>
+
+    <div class="observation-box" id="flame-obs">
+      <h3>📝 Observation</h3>
+      <p id="flame-obs-text">Click on a metal salt below to dip the wire loop and observe the flame colour.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- lab-container -->
+
+<script>
+// Tab switching
+function showLab(i,btn){
+  document.querySelectorAll('.lab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('lab'+i).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ========== LAB 1: DISPLACEMENT ==========
+const REACTIVITY={K:1,Na:2,Ca:3,Mg:4,Al:5,Zn:6,Fe:7,Ni:8,Sn:9,Pb:10,H:11,Cu:12,Hg:13,Ag:14,Au:15,Pt:16};
+const SOL_COLORS={CuSO4:'rgba(56,130,246,.35)',ZnSO4:'rgba(200,200,220,.1)',FeSO4:'rgba(34,197,94,.2)',AgNO3:'rgba(200,200,220,.1)'};
+const SOL_METAL={CuSO4:'Cu',ZnSO4:'Zn',FeSO4:'Fe',AgNO3:'Ag'};
+const METAL_COLORS={Fe:'#78716c',Cu:'#d97706',Zn:'#a1a1aa',Ag:'#d4d4d8',Mg:'#e2e8f0',Au:'#fbbf24',Na:'#e2e8f0',Ca:'#e2e8f0'};
+const PRODUCT_COLORS={FeSO4:'rgba(34,197,94,.2)',ZnSO4:'rgba(200,200,220,.1)',CuSO4:'rgba(56,130,246,.35)',MgSO4:'rgba(200,200,220,.1)',AgNO3:'rgba(200,200,220,.1)','Fe(NO3)2':'rgba(34,197,94,.15)','Zn(NO3)2':'rgba(200,200,220,.1)','Cu(NO3)2':'rgba(56,130,246,.25)'};
+
+let dispMetal='Fe',dispSol='CuSO4';
+
+function selectDisp(type,btn,val){
+  const row=btn.parentElement;
+  row.querySelectorAll('.lab-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  if(type==='metal')dispMetal=val;else dispSol=val;
+}
+
+function runDisplacement(){
+  const solMetal=SOL_METAL[dispSol];
+  const reacts=REACTIVITY[dispMetal]<REACTIVITY[solMetal];
+  const liquid=document.getElementById('disp-liquid');
+  const metal=document.getElementById('disp-metal');
+  const obs=document.getElementById('disp-obs-text');
+
+  metal.style.display='block';
+  metal.style.background=METAL_COLORS[dispMetal]||'#94a3b8';
+  metal.style.opacity='1';
+
+  if(reacts){
+    setTimeout(()=>{
+      // Change solution color
+      const newSol=dispMetal+'SO4';
+      liquid.style.background=PRODUCT_COLORS[newSol]||'rgba(200,200,220,.1)';
+      // Show deposited metal
+      metal.style.background=METAL_COLORS[solMetal];
+      // Add bubbles effect
+      for(let i=0;i<5;i++){
+        const b=document.createElement('div');
+        b.className='bubble';
+        b.style.left=(20+Math.random()*60)+'%';
+        b.style.bottom='30%';
+        b.style.animationDelay=(Math.random()*1)+'s';
+        document.getElementById('disp-beaker').appendChild(b);
+      }
+    },500);
+    const eq=getDispEquation(dispMetal,dispSol,solMetal);
+    obs.innerHTML=`<strong style="color:var(--green)">✓ Reaction occurs!</strong> ${dispMetal} is more reactive than ${solMetal}, so it displaces ${solMetal} from solution.<br><br>
+    <strong>Colour change:</strong> Solution colour changes as ${dispMetal} goes into solution and ${solMetal} deposits on the metal piece.<br>
+    <span class="equation">${eq}</span>`;
+  } else {
+    obs.innerHTML=`<strong style="color:var(--red)">✗ No reaction!</strong> ${dispMetal} is LESS reactive than ${solMetal}. It cannot displace ${solMetal} from its salt solution.<br><br>
+    <strong>No change observed</strong> — the solution colour and metal remain the same.<br>
+    <em style="color:var(--muted);font-size:.75rem">Remember: A metal can only displace another metal that is BELOW it in the reactivity series.</em>`;
+  }
+}
+
+function getDispEquation(m,sol,sm){
+  const eqs={
+    'Fe+CuSO4':'Fe + CuSO₄ → FeSO₄ + Cu',
+    'Zn+CuSO4':'Zn + CuSO₄ → ZnSO₄ + Cu',
+    'Zn+FeSO4':'Zn + FeSO₄ → ZnSO₄ + Fe',
+    'Fe+AgNO3':'Fe + 2AgNO₃ → Fe(NO₃)₂ + 2Ag',
+    'Cu+AgNO3':'Cu + 2AgNO₃ → Cu(NO₃)₂ + 2Ag',
+    'Zn+AgNO3':'Zn + 2AgNO₃ → Zn(NO₃)₂ + 2Ag',
+  };
+  return eqs[m+'+'+sol]||`${m} + ${sol} → ${m} salt + ${sm}`;
+}
+
+function resetDisp(){
+  document.getElementById('disp-liquid').style.background=SOL_COLORS[dispSol];
+  document.getElementById('disp-metal').style.display='none';
+  document.getElementById('disp-obs-text').textContent='Select a metal and solution, then click "Drop Metal In" to observe the reaction.';
+  document.querySelectorAll('#disp-beaker .bubble').forEach(b=>b.remove());
+}
+
+// ========== LAB 2: ACID REACTIONS ==========
+let acidMetal='Mg';
+const ACID_DATA={
+  Mg:{reacts:true,vigor:'vigorous',eq:'Mg + 2HCl → MgCl₂ + H₂↑',obs:'Magnesium reacts VIGOROUSLY with dilute HCl. Rapid effervescence (bubbling) is seen. The metal dissolves quickly. H₂ gas produced burns with a "pop" sound.'},
+  Zn:{reacts:true,vigor:'moderate',eq:'Zn + 2HCl → ZnCl₂ + H₂↑',obs:'Zinc reacts moderately with dilute HCl. Steady bubbles of H₂ gas are produced. The metal slowly dissolves. Reaction speeds up when heated.'},
+  Fe:{reacts:true,vigor:'slow',eq:'Fe + 2HCl → FeCl₂ + H₂↑',obs:'Iron reacts SLOWLY with dilute HCl. Few bubbles seen initially. The solution turns greenish (FeCl₂). Reaction is slow at room temperature.'},
+  Cu:{reacts:false,vigor:'none',eq:'Cu + HCl → No reaction',obs:'Copper does NOT react with dilute HCl. No bubbles, no colour change. Cu is BELOW hydrogen in the reactivity series — it cannot displace H₂.'},
+  Au:{reacts:false,vigor:'none',eq:'Au + HCl → No reaction',obs:'Gold does NOT react with dilute HCl (or any single acid). Gold is the least reactive metal. Only aqua regia (3HCl + HNO₃) can dissolve it.'}
+};
+
+function selectAcid(btn,m){
+  btn.parentElement.querySelectorAll('.lab-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  acidMetal=m;
+}
+
+function runAcid(){
+  const d=ACID_DATA[acidMetal];
+  const metal=document.getElementById('acid-metal');
+  const beaker=document.getElementById('acid-beaker');
+  metal.style.display='block';
+  metal.style.background=METAL_COLORS[acidMetal]||'#94a3b8';
+
+  if(d.reacts){
+    const count=d.vigor==='vigorous'?12:d.vigor==='moderate'?6:3;
+    const interval=d.vigor==='vigorous'?200:d.vigor==='moderate'?400:800;
+    let i=0;
+    const timer=setInterval(()=>{
+      if(i>=count*3){clearInterval(timer);return;}
+      const b=document.createElement('div');
+      b.className='bubble';
+      b.style.left=(20+Math.random()*60)+'%';
+      b.style.bottom='25%';
+      b.style.animationDuration=(1+Math.random())+'s';
+      beaker.appendChild(b);
+      i++;
+    },interval);
+    if(d.vigor==='vigorous'){
+      setTimeout(()=>{metal.style.opacity='.3';},1500);
+    }
+  }
+
+  document.getElementById('acid-obs-text').innerHTML=`${d.reacts?'<strong style="color:var(--green)">✓ Reaction occurs!</strong>':'<strong style="color:var(--red)">✗ No reaction!</strong>'} ${d.obs}<br><span class="equation">${d.eq}</span>`;
+}
+
+function resetAcid(){
+  document.getElementById('acid-metal').style.display='none';
+  document.getElementById('acid-metal').style.opacity='1';
+  document.getElementById('acid-obs-text').textContent='Select a metal and click "Add to Dilute HCl" to observe the reaction.';
+  document.querySelectorAll('#acid-beaker .bubble').forEach(b=>b.remove());
+}
+
+// ========== LAB 3: WATER REACTIONS ==========
+let waterMetal='Na',waterCond='cold';
+const WATER_DATA={
+  'Na+cold':{reacts:true,obs:'Sodium reacts VIGOROUSLY with cold water! It dashes around the surface, melts into a ball (exothermic), and H₂ may catch fire. Solution becomes alkaline (NaOH).',eq:'2Na + 2H₂O → 2NaOH + H₂↑',anim:'dash'},
+  'Na+hot':{reacts:true,obs:'Sodium reacts EXPLOSIVELY with hot water! Even more vigorous than cold water — can be dangerous. H₂ immediately catches fire.',eq:'2Na + 2H₂O → 2NaOH + H₂↑',anim:'explode'},
+  'Na+steam':{reacts:true,obs:'Sodium reacts explosively with steam.',eq:'2Na + 2H₂O → 2NaOH + H₂↑',anim:'explode'},
+  'Ca+cold':{reacts:true,obs:'Calcium reacts with cold water but less vigorously than Na. Bubbles of H₂ rise. Ca sinks (unlike Na). Milky Ca(OH)₂ forms.',eq:'Ca + 2H₂O → Ca(OH)₂ + H₂↑',anim:'bubble'},
+  'Ca+hot':{reacts:true,obs:'Calcium reacts more vigorously with hot water. Faster bubbling observed.',eq:'Ca + 2H₂O → Ca(OH)₂ + H₂↑',anim:'bubble'},
+  'Ca+steam':{reacts:true,obs:'Calcium reacts with steam vigorously.',eq:'Ca + 2H₂O → Ca(OH)₂ + H₂↑',anim:'bubble'},
+  'Mg+cold':{reacts:false,obs:'Magnesium reacts VERY SLOWLY with cold water. Almost no visible reaction. Only reacts noticeably with hot water or steam.',eq:'Mg + 2H₂O → Mg(OH)₂ + H₂↑ (very slow)',anim:'none'},
+  'Mg+hot':{reacts:true,obs:'Magnesium reacts with hot water, producing bubbles of hydrogen. Mg(OH)₂ makes the water slightly milky.',eq:'Mg + 2H₂O → Mg(OH)₂ + H₂↑',anim:'bubble'},
+  'Mg+steam':{reacts:true,obs:'Magnesium burns brightly in steam! Forms white MgO powder and H₂ gas.',eq:'Mg + H₂O(steam) → MgO + H₂↑',anim:'bubble'},
+  'Fe+cold':{reacts:false,obs:'Iron does NOT react with cold water at all. No change observed — iron sits in water unchanged.',eq:'No reaction',anim:'none'},
+  'Fe+hot':{reacts:false,obs:'Iron does NOT react with hot water either. Still no visible change.',eq:'No reaction',anim:'none'},
+  'Fe+steam':{reacts:true,obs:'Iron reacts with STEAM (not liquid water). Forms Fe₃O₄ (black) and H₂ gas. This is a slow reaction.',eq:'3Fe + 4H₂O(steam) → Fe₃O₄ + 4H₂↑',anim:'slow-bubble'},
+  'Cu+cold':{reacts:false,obs:'Copper does NOT react with water under any conditions. Cu is too low in the reactivity series.',eq:'No reaction',anim:'none'},
+  'Cu+hot':{reacts:false,obs:'Copper does NOT react with hot water. No change at all.',eq:'No reaction',anim:'none'},
+  'Cu+steam':{reacts:false,obs:'Copper does NOT react even with steam. It is below hydrogen in the reactivity series.',eq:'No reaction',anim:'none'},
+};
+
+function selectWater(btn,m){btn.parentElement.querySelectorAll('.lab-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');waterMetal=m;}
+function selectWCond(btn,c){btn.parentElement.querySelectorAll('.lab-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');waterCond=c;}
+
+function runWater(){
+  const key=waterMetal+'+'+waterCond;
+  const d=WATER_DATA[key];
+  const metal=document.getElementById('w-metal');
+  const trough=document.getElementById('water-trough');
+  const water=document.getElementById('w-water');
+  metal.style.display='block';
+  metal.style.background=METAL_COLORS[waterMetal]||'#94a3b8';
+
+  if(waterCond==='steam')water.style.background='rgba(148,163,184,.15)';
+  else if(waterCond==='hot')water.style.background='rgba(56,189,248,.25)';
+  else water.style.background='rgba(56,189,248,.2)';
+
+  if(d.anim==='dash'){
+    let pos=50,dir=1;
+    const t=setInterval(()=>{pos+=dir*8;if(pos>80||pos<20)dir*=-1;metal.style.left=pos+'%';},150);
+    setTimeout(()=>clearInterval(t),3000);
+    // Bubbles
+    for(let i=0;i<8;i++){const b=document.createElement('div');b.className='bubble';b.style.left=(15+Math.random()*70)+'%';b.style.bottom='30%';b.style.animationDelay=(Math.random())+'s';trough.appendChild(b);}
+  } else if(d.anim==='explode'){
+    metal.style.background='#fbbf24';
+    for(let i=0;i<15;i++){const b=document.createElement('div');b.className='bubble';b.style.left=(10+Math.random()*80)+'%';b.style.bottom='20%';b.style.animationDuration='.8s';trough.appendChild(b);}
+  } else if(d.anim==='bubble'||d.anim==='slow-bubble'){
+    const n=d.anim==='bubble'?6:3;
+    for(let i=0;i<n;i++){const b=document.createElement('div');b.className='bubble';b.style.left=(30+Math.random()*40)+'%';b.style.bottom='25%';b.style.animationDelay=(i*.3)+'s';trough.appendChild(b);}
+  }
+
+  document.getElementById('water-obs-text').innerHTML=`${d.reacts?'<strong style="color:var(--green)">✓ Reaction occurs!</strong>':'<strong style="color:var(--red)">✗ No reaction!</strong>'} ${d.obs}<br><span class="equation">${d.eq}</span>`;
+}
+
+function resetWater(){
+  document.getElementById('w-metal').style.display='none';
+  document.getElementById('w-metal').style.left='50%';
+  document.getElementById('w-water').style.background='rgba(56,189,248,.2)';
+  document.getElementById('water-obs-text').textContent='Select a metal and water condition, then click "Add Metal" to see the reaction.';
+  document.querySelectorAll('#water-trough .bubble').forEach(b=>b.remove());
+}
+
+// ========== LAB 4: FLAME TEST ==========
+const FLAMES=[
+  {metal:'Lithium (Li)',color:'#dc2626',name:'Crimson Red'},
+  {metal:'Sodium (Na)',color:'#fbbf24',name:'Golden Yellow'},
+  {metal:'Potassium (K)',color:'#c084fc',name:'Lilac/Violet'},
+  {metal:'Calcium (Ca)',color:'#f97316',name:'Brick Red'},
+  {metal:'Barium (Ba)',color:'#4ade80',name:'Apple Green'},
+  {metal:'Copper (Cu)',color:'#22d3ee',name:'Blue-Green'},
+  {metal:'Strontium (Sr)',color:'#ef4444',name:'Crimson'},
+];
+
+function buildFlameGrid(){
+  const g=document.getElementById('flame-grid');
+  g.innerHTML=FLAMES.map((f,i)=>`<div class="flame-card" onclick="showFlame(${i})"><div class="swatch" style="background:${f.color}"></div><div class="f-name">${f.metal}</div></div>`).join('');
+}
+
+function showFlame(i){
+  const f=FLAMES[i];
+  document.querySelectorAll('.flame-card').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.flame-card')[i].classList.add('active');
+  const flame=document.getElementById('flame');
+  flame.classList.add('lit');
+  flame.style.background=`radial-gradient(ellipse at bottom, ${f.color}, ${f.color}88, transparent)`;
+  document.getElementById('flame-obs-text').innerHTML=`<strong style="color:${f.color}">${f.metal}</strong> produces a <strong style="color:${f.color}">${f.name}</strong> flame colour.<br><br>
+  <em style="color:var(--muted)">This happens because when heated, electrons in the metal ion get excited to higher energy levels. When they fall back, they emit light of a specific wavelength (colour) unique to that element.</em>`;
+}
+
+buildFlameGrid();
+</script>
+</body>
+</html>
