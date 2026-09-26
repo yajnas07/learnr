@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagram — Triangles</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040810;--card:#0a1422;--card2:#0f1c30;
+  --border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;
+  --green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(217,70,239,.05) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.2rem 1rem .6rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--purple);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.tabs{display:flex;gap:.3rem;flex-wrap:wrap;justify-content:center;padding:.3rem 1rem .8rem;}
+.tab-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.72rem;padding:.35rem .85rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.on{color:#040810;border-color:transparent;}
+
+.stage{max-width:900px;margin:0 auto;padding:0 1rem 2rem;}
+.panel{display:none;animation:fadeIn .3s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.canvas-box{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1rem;}
+canvas{display:block;width:100%;height:360px;}
+.controls{display:flex;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border-top:1px solid var(--border);align-items:center;}
+.ctrl-group{display:flex;flex-direction:column;gap:.2rem;}
+.ctrl-group label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+.ctrl-group input[type=range]{width:120px;accent-color:var(--purple);}
+.ctrl-value{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);min-width:30px;text-align:center;}
+.info-box{background:var(--card2);border-radius:8px;padding:.5rem .8rem;font-family:'DM Mono',monospace;font-size:.75rem;line-height:1.7;color:var(--text);margin:.5rem 0;}
+.info-box strong{color:var(--amber);}
+.info-box em{color:var(--teal);font-style:normal;}
+
+.stepper{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
+.step-title{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;color:var(--purple);margin-bottom:.8rem;}
+.step-box{display:flex;flex-direction:column;gap:.5rem;}
+.step-item{background:var(--card2);border-radius:8px;padding:.6rem .9rem;border-left:3px solid var(--border);
+  opacity:.35;transform:translateX(-8px);transition:all .4s ease;}
+.step-item.active{opacity:1;transform:translateX(0);border-left-color:var(--teal);}
+.step-item.done{opacity:.7;transform:translateX(0);border-left-color:var(--green);}
+.step-num{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-bottom:.15rem;}
+.step-content{font-size:.84rem;line-height:1.5;}
+.step-content strong{color:var(--amber);}
+.step-content em{color:var(--teal);font-style:normal;}
+.step-nav{display:flex;gap:.6rem;margin-top:.8rem;justify-content:center;}
+.step-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.35rem 1rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.step-btn:hover:not(:disabled){border-color:#2a4a6a;color:var(--text);}
+.step-btn:disabled{opacity:.3;cursor:default;}
+
+.calc-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
+.calc-inputs{display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.8rem;}
+.calc-field{display:flex;flex-direction:column;gap:.2rem;}
+.calc-field label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+.calc-field input{width:80px;padding:.35rem .5rem;border-radius:6px;border:1px solid var(--border);
+  background:var(--card2);color:var(--teal);font-family:'DM Mono',monospace;font-size:.9rem;text-align:center;}
+.calc-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.45rem 1.2rem;
+  border-radius:6px;border:none;background:var(--purple);color:#040810;cursor:pointer;transition:all .2s;align-self:flex-end;}
+.calc-btn:hover{background:var(--blue);}
+.calc-result{background:var(--card2);border-radius:10px;padding:.8rem 1rem;font-family:'DM Mono',monospace;font-size:.82rem;line-height:1.8;margin-top:.5rem;}
+.calc-result strong{color:var(--amber);}
+.calc-result em{color:var(--teal);font-style:normal;}
+
+.crit-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-top:.6rem;}
+.crit-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;cursor:pointer;transition:all .3s;}
+.crit-card:hover,.crit-card.active{transform:translateY(-3px);border-color:var(--purple);}
+.crit-icon{font-size:2rem;margin-bottom:.3rem;}
+.crit-label{font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;margin-bottom:.3rem;}
+.crit-cond{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);margin-bottom:.3rem;}
+.crit-desc{font-size:.78rem;color:var(--muted);line-height:1.4;}
+
+.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.7rem;}
+.app-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;cursor:pointer;transition:all .3s;}
+.app-card:hover{border-color:#2a4a6a;transform:translateY(-2px);}
+.app-card.open .app-detail{display:block;}
+.app-head{display:flex;align-items:center;gap:.5rem;}
+.app-emoji{font-size:1.3rem;}
+.app-title{font-family:'Playfair Display',serif;font-size:.82rem;font-weight:700;}
+.app-detail{display:none;margin-top:.6rem;padding-top:.5rem;border-top:1px solid var(--border);font-size:.8rem;line-height:1.6;}
+.app-detail strong{color:var(--amber);}
+.app-detail em{color:var(--teal);font-style:normal;}
+.app-detail .formula{font-family:'DM Mono',monospace;font-size:.78rem;background:var(--card2);border-radius:6px;padding:.35rem .6rem;margin:.3rem 0;display:block;color:var(--teal);}
+
+@media(max-width:500px){canvas{height:280px;}.controls{flex-direction:column;gap:.5rem;}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Triangles</h1>
+  <p>Class X · Mathematics Ch.6 · Interactive Explorations · 6 Modules</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn on" onclick="showTab(0,this,'var(--purple)')" style="background:var(--purple);color:#040810">🔺 Similarity</button>
+  <button class="tab-btn" onclick="showTab(1,this,'var(--blue)')">📏 BPT / Thales</button>
+  <button class="tab-btn" onclick="showTab(2,this,'var(--amber)')">✅ Criteria</button>
+  <button class="tab-btn" onclick="showTab(3,this,'var(--green)')">📐 Area Ratio</button>
+  <button class="tab-btn" onclick="showTab(4,this,'var(--indigo)')">📊 Pythagoras</button>
+  <button class="tab-btn" onclick="showTab(5,this,'var(--red)')">🌍 Applications</button>
+</div>
+
+<div class="stage">
+<!-- ═══════════════ TAB 0: SIMILARITY EXPLORER ═══════════════ -->
+<div class="panel active" id="p0">
+  <div class="canvas-box">
+    <canvas id="simCanvas"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Scale factor k = <span class="ctrl-value" id="vk">1.5</span></label>
+        <input type="range" id="sk" min="0.5" max="2.5" step="0.1" value="1.5" oninput="updateSim()">
+      </div>
+    </div>
+  </div>
+  <div class="info-box" id="sim-info"></div>
+  <div class="info-box" style="opacity:.7;">
+    💡 The two triangles are <strong>similar</strong> — same shape, different size. Drag the slider to change the scale factor <em>k</em>. Corresponding angles stay equal; corresponding sides multiply by k. When k = 1 the triangles are congruent.
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 1: BPT / THALES ═══════════════ -->
+<div class="panel" id="p1">
+  <div class="canvas-box">
+    <canvas id="bptCanvas" style="height:340px;"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Position of DE = <span class="ctrl-value" id="vt">0.5</span></label>
+        <input type="range" id="st" min="0.2" max="0.8" step="0.05" value="0.5" oninput="updateBPT()">
+      </div>
+    </div>
+  </div>
+  <div class="info-box" id="bpt-info"></div>
+  <div class="info-box" style="opacity:.7;">
+    💡 DE is drawn <strong>parallel to BC</strong>. As you slide DE up and down, notice that <em>AD/DB always equals AE/EC</em> — that is the Basic Proportionality Theorem.
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 2: SIMILARITY CRITERIA ═══════════════ -->
+<div class="panel" id="p2">
+  <div class="info-box" style="text-align:center;font-size:.95rem;">
+    <strong>Three ways to prove two triangles are similar</strong>
+  </div>
+  <div class="crit-cases">
+    <div class="crit-card active" onclick="showCrit(0)">
+      <div class="crit-icon">📐</div>
+      <div class="crit-label" style="color:var(--amber)">AA (or AAA)</div>
+      <div class="crit-cond">∠A=∠P, ∠B=∠Q</div>
+      <div class="crit-desc">Two pairs of equal angles → similar (third angle follows).</div>
+    </div>
+    <div class="crit-card" onclick="showCrit(1)">
+      <div class="crit-icon">📏</div>
+      <div class="crit-label" style="color:var(--amber)">SSS</div>
+      <div class="crit-cond">AB/PQ = BC/QR = CA/RP</div>
+      <div class="crit-desc">All three side-pairs in the same ratio → similar.</div>
+    </div>
+    <div class="crit-card" onclick="showCrit(2)">
+      <div class="crit-icon">🔗</div>
+      <div class="crit-label" style="color:var(--amber)">SAS</div>
+      <div class="crit-cond">∠A=∠P &amp; AB/PQ=AC/PR</div>
+      <div class="crit-desc">Equal angle with proportional including sides → similar.</div>
+    </div>
+  </div>
+  <div class="calc-result" id="crit-info" style="margin-top:.8rem;"></div>
+</div>
+
+<!-- ═══════════════ TAB 3: AREA RATIO ═══════════════ -->
+<div class="panel" id="p3">
+  <div class="info-box" style="text-align:center;font-size:1rem;padding:.8rem;">
+    <strong style="font-size:1.1rem;">ar(ABC) / ar(PQR) = (AB/PQ)²</strong><br>
+    <span style="font-size:.72rem;color:var(--muted)">Ratio of areas = square of ratio of corresponding sides</span>
+  </div>
+  <div class="calc-wrap">
+    <div class="step-title">Area / Side Ratio Converter</div>
+    <div class="calc-inputs">
+      <div class="calc-field"><label>side 1</label><input type="number" id="as1" value="3"></div>
+      <div class="calc-field"><label>side 2</label><input type="number" id="as2" value="5"></div>
+      <button class="calc-btn" onclick="calcArea()">Find Area Ratio</button>
+    </div>
+    <div class="calc-result" id="area-result">
+      Enter the ratio of corresponding sides to get the ratio of areas (and vice-versa).
+    </div>
+  </div>
+  <div class="calc-wrap" style="margin-top:.8rem;">
+    <div class="step-title">Reverse: Areas → Side Ratio</div>
+    <div class="calc-inputs">
+      <div class="calc-field"><label>area 1</label><input type="number" id="ar1" value="16"></div>
+      <div class="calc-field"><label>area 2</label><input type="number" id="ar2" value="25"></div>
+      <button class="calc-btn" onclick="calcSide()">Find Side Ratio</button>
+    </div>
+    <div class="calc-result" id="side-result">
+      Enter two areas of similar triangles to get the ratio of their sides.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 4: PYTHAGORAS ═══════════════ -->
+<div class="panel" id="p4">
+  <div class="info-box" style="text-align:center;font-size:1rem;padding:.8rem;">
+    <strong style="font-size:1.1rem;">c² = a² + b²</strong><br>
+    <span style="font-size:.72rem;color:var(--muted)">In a right triangle, hypotenuse² = sum of squares of the legs</span>
+  </div>
+  <div class="canvas-box">
+    <canvas id="pythCanvas" style="height:340px;"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>side a = <span class="ctrl-value" id="vpa">3</span></label>
+        <input type="range" id="spa" min="2" max="8" step="1" value="3" oninput="updatePyth()">
+      </div>
+      <div class="ctrl-group">
+        <label>side b = <span class="ctrl-value" id="vpb">4</span></label>
+        <input type="range" id="spb" min="2" max="8" step="1" value="4" oninput="updatePyth()">
+      </div>
+    </div>
+  </div>
+  <div class="info-box" id="pyth-info"></div>
+</div>
+
+<!-- ═══════════════ TAB 5: APPLICATIONS ═══════════════ -->
+<div class="panel" id="p5">
+  <div class="info-box">💡 Click any real-life situation to see how triangles solve it.</div>
+  <div class="app-grid">
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🌳</span><span class="app-title">Heights &amp; Shadows</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> A short object and a tall object cast shadows at the same time → similar triangles.<br>
+        <span class="formula">height / shadow = constant</span>
+        <strong>Example:</strong> 6 m pole → 4 m shadow. Tower → 28 m shadow.<br>
+        6/4 = h/28 → <em>h = 42 m</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🪜</span><span class="app-title">Ladder against a Wall</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Ladder, wall and ground form a right triangle.<br>
+        <span class="formula">ladder² = height² + base²</span>
+        <strong>Example:</strong> 10 m ladder reaches 8 m high.<br>
+        base = √(10²−8²) = <em>6 m</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🌉</span><span class="app-title">Width of a River</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Construct a triangle on the bank similar to one spanning the river.<br>
+        <span class="formula">unknown width = known side × ratio</span>
+        <strong>Example:</strong> Similar triangles with ratio 1:3 and near side 15 m → width = <em>45 m</em>.
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🗼</span><span class="app-title">Distance Between Pole Tops</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Height difference &amp; horizontal gap form a right triangle.<br>
+        <span class="formula">d = √(gap² + (h₂−h₁)²)</span>
+        <strong>Example:</strong> Poles 6 m &amp; 11 m, 12 m apart.<br>
+        d = √(12² + 5²) = <em>13 m</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🗺️</span><span class="app-title">Maps &amp; Scale Drawings</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> A map is similar to the real region.<br>
+        <span class="formula">actual = map distance × scale factor</span>
+        <strong>Example:</strong> 1 cm on map = 50 km. 6.5 cm → <em>325 km</em>.
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">📐</span><span class="app-title">Diagonal of a Rectangle</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> The diagonal splits a rectangle into two right triangles.<br>
+        <span class="formula">diagonal² = length² + breadth²</span>
+        <strong>Example:</strong> 12 cm × 5 cm rectangle.<br>
+        diagonal = √(144+25) = <em>13 cm</em>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /stage -->
+
+<script>
+function showTab(i, btn, clr){
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';});
+  btn.classList.add('on');btn.style.background=clr;btn.style.color='#040810';
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  if(i===0) updateSim();
+  if(i===1) updateBPT();
+  if(i===2) showCrit(currentCrit);
+  if(i===4) updatePyth();
+}
+
+// ── TAB 0: Similarity Explorer ──
+const simCanvas=document.getElementById('simCanvas');
+const simCtx=simCanvas.getContext('2d');
+function updateSim(){
+  const k=parseFloat(document.getElementById('sk').value);
+  document.getElementById('vk').textContent=k.toFixed(1);
+  drawSim(k);
+  const base={a:3,b:4,c:5};
+  document.getElementById('sim-info').innerHTML=
+    `<strong>ΔABC ~ ΔPQR</strong> &nbsp;|&nbsp; scale factor <em>k = ${k.toFixed(1)}</em><br>`+
+    `Sides ${base.a}, ${base.b}, ${base.c} → ${(base.a*k).toFixed(1)}, ${(base.b*k).toFixed(1)}, ${(base.c*k).toFixed(1)} &nbsp;|&nbsp; `+
+    `Area ratio = k² = <em>${(k*k).toFixed(2)}</em> ${k===1?'(congruent!)':''}`;
+}
+function drawSim(k){
+  const W=simCanvas.width=simCanvas.offsetWidth*2;
+  const H=simCanvas.height=simCanvas.offsetHeight*2;
+  simCtx.clearRect(0,0,W,H);
+  const baseY=H*0.72, s=26;
+  // Triangle 1 (fixed): right triangle 3-4-5
+  const t1={x:W*0.24, y:baseY};
+  drawTri(simCtx,t1.x,t1.y,3*s,4*s,'#d946ef',['A','B','C']);
+  // Triangle 2 (scaled)
+  const t2={x:W*0.66, y:baseY};
+  drawTri(simCtx,t2.x,t2.y,3*s*k,4*s*k,'#38bdf8',['P','Q','R']);
+}
+function drawTri(ctx,bx,by,base,height,color,labels){
+  // right angle at B (bottom-left)
+  const A={x:bx,y:by-height}, B={x:bx,y:by}, C={x:bx+base,y:by};
+  ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(C.x,C.y);ctx.closePath();
+  ctx.fillStyle=color+'22';ctx.fill();
+  ctx.strokeStyle=color;ctx.lineWidth=3;ctx.stroke();
+  // right-angle mark
+  ctx.strokeStyle=color;ctx.lineWidth=2;
+  ctx.strokeRect(B.x,B.y-16,16,16);
+  // labels
+  ctx.fillStyle=color;ctx.font='bold 22px DM Mono';ctx.textAlign='center';
+  ctx.fillText(labels[0],A.x-16,A.y-6);
+  ctx.fillText(labels[1],B.x-16,B.y+24);
+  ctx.fillText(labels[2],C.x+16,C.y+24);
+  ctx.textAlign='left';
+}
+
+// ── TAB 1: BPT ──
+const bptCanvas=document.getElementById('bptCanvas');
+const bptCtx=bptCanvas.getContext('2d');
+function updateBPT(){
+  const t=parseFloat(document.getElementById('st').value);
+  document.getElementById('vt').textContent=t.toFixed(2);
+  drawBPT(t);
+  // AD/DB = t/(1-t)
+  const ratio=(t/(1-t));
+  document.getElementById('bpt-info').innerHTML=
+    `<strong>DE ∥ BC</strong> &nbsp;|&nbsp; AD/DB = <em>${ratio.toFixed(2)}</em> &nbsp;=&nbsp; AE/EC = <em>${ratio.toFixed(2)}</em> ✓<br>`+
+    `The parallel line divides both sides in the same ratio (Basic Proportionality Theorem).`;
+}
+function drawBPT(t){
+  const W=bptCanvas.width=bptCanvas.offsetWidth*2;
+  const H=bptCanvas.height=bptCanvas.offsetHeight*2;
+  bptCtx.clearRect(0,0,W,H);
+  // Triangle ABC: A top, B bottom-left, C bottom-right
+  const A={x:W*0.5,y:H*0.12}, B={x:W*0.18,y:H*0.85}, C={x:W*0.82,y:H*0.85};
+  bptCtx.beginPath();bptCtx.moveTo(A.x,A.y);bptCtx.lineTo(B.x,B.y);bptCtx.lineTo(C.x,C.y);bptCtx.closePath();
+  bptCtx.fillStyle='rgba(56,189,248,.08)';bptCtx.fill();
+  bptCtx.strokeStyle='#38bdf8';bptCtx.lineWidth=3;bptCtx.stroke();
+  // D on AB, E on AC at fraction t from A
+  const D={x:A.x+(B.x-A.x)*t, y:A.y+(B.y-A.y)*t};
+  const E={x:A.x+(C.x-A.x)*t, y:A.y+(C.y-A.y)*t};
+  bptCtx.beginPath();bptCtx.moveTo(D.x,D.y);bptCtx.lineTo(E.x,E.y);
+  bptCtx.strokeStyle='#f59e0b';bptCtx.lineWidth=3;bptCtx.stroke();
+  // points and labels
+  const pts=[[A,'A',-10,-12],[B,'B',-24,18],[C,'C',18,18],[D,'D',-24,4],[E,'E',18,4]];
+  bptCtx.font='bold 22px DM Mono';
+  pts.forEach(([p,l,dx,dy])=>{
+    bptCtx.fillStyle=(l==='D'||l==='E')?'#f59e0b':'#7dd3fc';
+    bptCtx.beginPath();bptCtx.arc(p.x,p.y,6,0,Math.PI*2);bptCtx.fill();
+    bptCtx.fillText(l,p.x+dx,p.y+dy);
+  });
+}
+
+// ── TAB 2: Criteria ──
+let currentCrit=0;
+const critData=[
+  {title:'AA (Angle-Angle) Similarity',setup:'If two angles of one triangle equal two angles of another, the triangles are similar.',
+   ex:'<strong>Example:</strong> In ΔABC, ∠A=50°, ∠B=60°. In ΔPQR, ∠P=50°, ∠Q=60°.<br>Two angles match → third is 70° in both → <em>ΔABC ~ ΔPQR by AA.</em>'},
+  {title:'SSS (Side-Side-Side) Similarity',setup:'If corresponding sides are in the same ratio, the triangles are similar.',
+   ex:'<strong>Example:</strong> ΔABC sides 4, 6, 8; ΔPQR sides 6, 9, 12.<br>4/6 = 6/9 = 8/12 = 2/3 → <em>ΔABC ~ ΔPQR by SSS.</em>'},
+  {title:'SAS (Side-Angle-Side) Similarity',setup:'If one angle equals one angle AND the including sides are proportional, the triangles are similar.',
+   ex:'<strong>Example:</strong> ∠A = ∠P = 40°, AB/PQ = 3/6, AC/PR = 4/8.<br>Angle equal &amp; including sides 1/2 each → <em>ΔABC ~ ΔPQR by SAS.</em>'},
+];
+function showCrit(idx){
+  currentCrit=idx;
+  document.querySelectorAll('.crit-card').forEach((c,i)=>c.classList.toggle('active',i===idx));
+  const s=critData[idx];
+  document.getElementById('crit-info').innerHTML=`<strong>${s.title}</strong><br><em>${s.setup}</em><br><br>${s.ex}`;
+}
+
+// ── TAB 3: Area Ratio ──
+function calcArea(){
+  const a=parseFloat(document.getElementById('as1').value)||0;
+  const b=parseFloat(document.getElementById('as2').value)||0;
+  const res=document.getElementById('area-result');
+  if(b===0){res.innerHTML='<strong style="color:var(--red)">side 2 cannot be 0.</strong>';return;}
+  const ratio=a/b;
+  let html=`<strong>Side ratio:</strong> ${a} : ${b} = ${ratio.toFixed(3)}<br>`;
+  html+=`<strong>Area ratio = (side ratio)²</strong><br>`;
+  html+=`= (${a}/${b})² = ${a*a} : ${b*b}<br>`;
+  html+=`<strong>ar₁ : ar₂ = ${a*a} : ${b*b}</strong> (= ${(ratio*ratio).toFixed(3)})`;
+  res.innerHTML=html;
+}
+function calcSide(){
+  const a=parseFloat(document.getElementById('ar1').value)||0;
+  const b=parseFloat(document.getElementById('ar2').value)||0;
+  const res=document.getElementById('side-result');
+  if(a<0||b<=0){res.innerHTML='<strong style="color:var(--red)">Enter positive areas.</strong>';return;}
+  const sr=Math.sqrt(a/b);
+  let html=`<strong>Area ratio:</strong> ${a} : ${b}<br>`;
+  html+=`<strong>Side ratio = √(area ratio)</strong><br>`;
+  html+=`= √(${a}/${b}) = √${(a/b).toFixed(3)}<br>`;
+  html+=`<strong>side₁ : side₂ = ${sr.toFixed(3)}</strong> (i.e. √${a} : √${b})`;
+  res.innerHTML=html;
+}
+
+// ── TAB 4: Pythagoras ──
+const pythCanvas=document.getElementById('pythCanvas');
+const pythCtx=pythCanvas.getContext('2d');
+function updatePyth(){
+  const a=parseInt(document.getElementById('spa').value);
+  const b=parseInt(document.getElementById('spb').value);
+  document.getElementById('vpa').textContent=a;
+  document.getElementById('vpb').textContent=b;
+  const c=Math.sqrt(a*a+b*b);
+  drawPyth(a,b,c);
+  document.getElementById('pyth-info').innerHTML=
+    `<strong>a = ${a}, b = ${b}</strong> &nbsp;|&nbsp; c² = ${a}² + ${b}² = ${a*a} + ${b*b} = <em>${a*a+b*b}</em><br>`+
+    `Hypotenuse c = √${a*a+b*b} = <strong>${c.toFixed(2)}</strong> ${Number.isInteger(c)?'(a Pythagorean triplet!)':''}`;
+}
+function drawPyth(a,b,c){
+  const W=pythCanvas.width=pythCanvas.offsetWidth*2;
+  const H=pythCanvas.height=pythCanvas.offsetHeight*2;
+  pythCtx.clearRect(0,0,W,H);
+  const s=Math.min(W*0.5/Math.max(a,b), H*0.5/Math.max(a,b), 34);
+  const bx=W*0.32, by=H*0.72;
+  const B={x:bx,y:by}, C={x:bx+b*s,y:by}, A={x:bx,y:by-a*s};
+  // triangle
+  pythCtx.beginPath();pythCtx.moveTo(A.x,A.y);pythCtx.lineTo(B.x,B.y);pythCtx.lineTo(C.x,C.y);pythCtx.closePath();
+  pythCtx.fillStyle='rgba(129,140,248,.1)';pythCtx.fill();
+  pythCtx.strokeStyle='#818cf8';pythCtx.lineWidth=3;pythCtx.stroke();
+  // right angle mark at B
+  pythCtx.strokeStyle='#818cf8';pythCtx.lineWidth=2;pythCtx.strokeRect(B.x,B.y-16,16,16);
+  // side labels
+  pythCtx.font='bold 22px DM Mono';pythCtx.textAlign='center';
+  pythCtx.fillStyle='#22c55e';pythCtx.fillText('a='+a,B.x-30,(A.y+B.y)/2);
+  pythCtx.fillStyle='#f59e0b';pythCtx.fillText('b='+b,(B.x+C.x)/2,B.y+28);
+  pythCtx.fillStyle='#38bdf8';
+  pythCtx.save();
+  pythCtx.translate((A.x+C.x)/2,(A.y+C.y)/2);
+  pythCtx.rotate(Math.atan2(C.y-A.y,C.x-A.x));
+  pythCtx.fillText('c='+c.toFixed(1),0,-10);
+  pythCtx.restore();
+  pythCtx.textAlign='left';
+}
+
+// ── TAB 5: Applications ──
+function toggleApp(el){el.classList.toggle('open');}
+
+updateSim();
+showCrit(0);
+window.addEventListener('resize',()=>{
+  updateSim();
+  if(document.getElementById('p1').classList.contains('active'))updateBPT();
+  if(document.getElementById('p4').classList.contains('active'))updatePyth();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Triangles</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(217,70,239,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--purple);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:1rem;padding:1rem 1.2rem 2rem;max-width:1100px;margin:0 auto;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.panel-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;}
+.panel-head .icon{font-size:1rem;}
+.panel-body{padding:.8rem 1rem 1rem;display:flex;flex-direction:column;gap:.6rem;}
+
+.ph-sim .panel-head{background:rgba(217,70,239,.12);color:var(--purple);}
+.ph-bpt .panel-head{background:rgba(56,189,248,.12);color:var(--blue);}
+.ph-crit .panel-head{background:rgba(245,158,11,.12);color:var(--amber);}
+.ph-area .panel-head{background:rgba(34,197,94,.12);color:var(--green);}
+.ph-pyth .panel-head{background:rgba(129,140,248,.12);color:var(--indigo);}
+.ph-app .panel-head{background:rgba(244,63,94,.12);color:var(--red);}
+.ph-vit .panel-head{background:rgba(45,212,191,.12);color:var(--teal);}
+.ph-mem .panel-head{background:rgba(74,104,144,.18);color:#9ab8d8;}
+
+.formula-block{background:var(--card2);border-radius:8px;padding:.6rem .8rem;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--teal);line-height:1.7;}
+.formula-block strong{color:var(--amber);}
+.sub-label{font-family:'Playfair Display',serif;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem;}
+
+table{width:100%;border-collapse:collapse;font-size:.76rem;}
+th{padding:.4rem .5rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+td{padding:.38rem .5rem;border-bottom:1px solid rgba(26,45,69,.5);line-height:1.4;}
+tr:last-child td{border-bottom:none;}
+td.mono{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--teal);}
+td.amber{color:var(--amber);}td.green{color:var(--green);}td.red{color:var(--red);}
+
+.hbox{display:flex;gap:.5rem;flex-wrap:wrap;}
+.fact{background:var(--card2);border-radius:6px;padding:.4rem .65rem;font-size:.76rem;color:var(--text);flex:1;min-width:100px;}
+.fact strong{display:block;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:.15rem;}
+.trick{background:rgba(245,158,11,.07);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.trick strong{color:var(--amber);}
+.tip{background:rgba(45,212,191,.07);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.tip strong{color:var(--teal);}
+.warn{background:rgba(244,63,94,.07);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.warn strong{color:var(--red);}
+
+.step-list{counter-reset:step;display:flex;flex-direction:column;gap:.3rem;}
+.step-list li{display:flex;align-items:flex-start;gap:.5rem;font-size:.78rem;list-style:none;counter-increment:step;line-height:1.5;}
+.step-list li::before{content:counter(step);background:var(--card2);color:var(--muted);font-family:'DM Mono',monospace;font-size:.65rem;
+  min-width:1.4rem;height:1.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:.1rem;flex-shrink:0;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Triangles — Cheat Sheet</h1>
+  <p>Class X · Mathematics Ch.6 · 8 Panels · Quick Reference</p>
+</header>
+
+<div class="panel-grid">
+
+<!-- 1. SIMILAR FIGURES -->
+<div class="panel ph-sim">
+  <div class="panel-head"><span class="icon">🔺</span> Similar Figures &amp; Triangles</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      <strong>ΔABC ~ ΔPQR</strong> means<br>
+      ∠A=∠P, ∠B=∠Q, ∠C=∠R &nbsp;AND<br>
+      AB/PQ = BC/QR = CA/RP
+    </div>
+    <div class="hbox">
+      <div class="fact"><strong>Similar (~)</strong>Same shape, sizes may differ. Corresponding angles equal &amp; sides proportional</div>
+      <div class="fact"><strong>Congruent (≅)</strong>Same shape AND size. A special case of similar with scale factor k = 1</div>
+    </div>
+    <div class="tip"><strong>Always similar:</strong> any two circles, any two squares, any two equilateral triangles.</div>
+    <div class="warn"><strong>Order matters!</strong> ΔABC ~ ΔPQR ≠ ΔABC ~ ΔQRP. Vertices must correspond in the written order.</div>
+  </div>
+</div>
+
+<!-- 2. BASIC PROPORTIONALITY (THALES) -->
+<div class="panel ph-bpt">
+  <div class="panel-head"><span class="icon">📏</span> Basic Proportionality (Thales)</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      <strong>BPT:</strong> If DE ∥ BC in ΔABC, then<br>
+      AD/DB = AE/EC
+    </div>
+    <div class="sub-label">Converse of BPT</div>
+    <div class="formula-block">
+      If AD/DB = AE/EC, then <strong>DE ∥ BC</strong>.
+    </div>
+    <div class="tip"><strong>Midpoint theorem</strong> is a special case: line joining midpoints of two sides is parallel to and half the third side.</div>
+    <div class="trick"><strong>Proof idea:</strong> triangles between the same parallels have equal areas → the ratio of segments follows.</div>
+  </div>
+</div>
+
+<!-- 3. SIMILARITY CRITERIA -->
+<div class="panel ph-crit">
+  <div class="panel-head"><span class="icon">✅</span> Criteria for Similarity</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Rule</th><th>Condition</th></tr>
+      <tr><td class="amber">AAA / AA</td><td>All (or two) pairs of corresponding angles equal</td></tr>
+      <tr><td class="amber">SSS</td><td>All 3 pairs of corresponding sides in same ratio</td></tr>
+      <tr><td class="amber">SAS</td><td>One pair of equal angles &amp; the two including sides proportional</td></tr>
+    </table>
+    <div class="tip"><strong>AA is enough:</strong> since angles sum to 180°, if two angles match the third automatically does.</div>
+    <div class="warn"><strong>No SSA / ASS!</strong> Unlike congruence there is no separate RHS/ASA — these three cover all cases.</div>
+  </div>
+</div>
+
+<!-- 4. AREAS OF SIMILAR TRIANGLES -->
+<div class="panel ph-area">
+  <div class="panel-head"><span class="icon">📐</span> Areas of Similar Triangles</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      If ΔABC ~ ΔPQR:<br>
+      <strong>ar(ABC)/ar(PQR) = (AB/PQ)²</strong><br>
+      = (BC/QR)² = (CA/RP)²
+    </div>
+    <div class="sub-label">Ratio of areas also equals</div>
+    <div class="formula-block">
+      (ratio of medians)² = (ratio of altitudes)²<br>
+      = (ratio of angle bisectors)² = (ratio of perimeters)²
+    </div>
+    <div class="warn"><strong>Careful:</strong> areas use the SQUARE of the side ratio, but perimeters use the side ratio itself (k, not k²).</div>
+  </div>
+</div>
+
+<!-- 5. PYTHAGORAS -->
+<div class="panel ph-pyth">
+  <div class="panel-head"><span class="icon">📊</span> Pythagoras Theorem</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      In right ΔABC with ∠B = 90°:<br>
+      <strong>AC² = AB² + BC²</strong><br>
+      (hypotenuse)² = sum of squares of legs
+    </div>
+    <div class="sub-label">Converse</div>
+    <div class="formula-block">
+      If AC² = AB² + BC², then <strong>∠B = 90°</strong>.
+    </div>
+    <div class="tip"><strong>Common triplets:</strong> (3,4,5), (5,12,13), (8,15,17), (7,24,25) — and all their multiples.</div>
+  </div>
+</div>
+
+<!-- 6. KEY RESULTS -->
+<div class="panel ph-vit">
+  <div class="panel-head"><span class="icon">⭐</span> Key Results &amp; Corollaries</div>
+  <div class="panel-body">
+    <div class="tip"><strong>Perpendicular from right angle:</strong> in a right triangle, the altitude to the hypotenuse creates two triangles each similar to the whole and to each other.</div>
+    <div class="tip"><strong>Ratio of perimeters</strong> of similar triangles = ratio of corresponding sides = k.</div>
+    <div class="trick"><strong>Diagonals of a trapezium</strong> ABCD (AB∥DC) divide each other proportionally: AO/OC = BO/OD.</div>
+    <div class="trick"><strong>Bisector of an angle</strong> of a triangle divides the opposite side in the ratio of the other two sides.</div>
+  </div>
+</div>
+
+<!-- 7. APPLICATIONS -->
+<div class="panel ph-app">
+  <div class="panel-head"><span class="icon">🌍</span> Common Applications</div>
+  <div class="panel-body">
+    <div class="hbox">
+      <div class="fact"><strong>Heights &amp; Shadows</strong>Object height / shadow length is constant at a given time → find tall object heights</div>
+      <div class="fact"><strong>River Width</strong>Similar triangles find distances that cannot be measured directly</div>
+    </div>
+    <div class="hbox">
+      <div class="fact"><strong>Ladder Problems</strong>Ladder² = wall height² + base distance² (Pythagoras)</div>
+      <div class="fact"><strong>Map Scaling</strong>Actual = map distance × scale factor</div>
+    </div>
+    <div class="tip"><strong>Approach:</strong> identify the similar triangles or right angle, write the proportion/Pythagoras equation, then solve.</div>
+  </div>
+</div>
+
+<!-- 8. EXAM QUICK RECALL -->
+<div class="panel ph-mem">
+  <div class="panel-head"><span class="icon">🧠</span> Exam Quick Recall</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Statement</th><th>Key Result</th></tr>
+      <tr><td>BPT</td><td class="mono">DE∥BC ⇒ AD/DB=AE/EC</td></tr>
+      <tr><td>Area ratio</td><td class="mono">= (side ratio)²</td></tr>
+      <tr><td>Perimeter ratio</td><td class="mono">= side ratio (k)</td></tr>
+      <tr><td>Pythagoras</td><td class="mono">c² = a² + b²</td></tr>
+      <tr><td>Similarity rules</td><td class="mono">AA, SSS, SAS</td></tr>
+    </table>
+    <div class="warn"><strong>Common mistakes:</strong> forgetting to square the ratio for areas; writing wrong vertex correspondence; using SSA (invalid).</div>
+    <div class="tip"><strong>Always state the criterion</strong> (AA/SSS/SAS) when proving similarity to earn full marks.</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

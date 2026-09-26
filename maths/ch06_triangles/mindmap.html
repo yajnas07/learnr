@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Triangles</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #040810; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#d946ef,#38bdf8,#f59e0b);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 260px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(4,8,16,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,45,69,.75);
+  position:sticky; top:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a9ab8; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(26,45,69,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<div id="ui">
+  <div>
+    <h1>Triangles</h1>
+    <p>Class X · CBSE · Mind Map — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+
+let W, H, scale = 1, ox = 0, oy = 0;
+let dragging = false, dragStart = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2 + 20;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Triangles', x:0, y:0, r:60,
+  color:'#12041c', stroke:'#d946ef', textColor:'#f0abfc', fontSize:15
+};
+
+const BRANCHES = [
+  {
+    id:'sim', label:'Similar\nFigures', x:0, y:-290, r:44,
+    color:'#12041c', stroke:'#d946ef', textColor:'#f0abfc',
+    info:'Two figures are SIMILAR if they have the same shape but not necessarily the same size.\nCondition: corresponding angles equal AND corresponding sides in the same ratio.\nAll congruent figures are similar, but not vice-versa.',
+    children:[
+      { id:'sm1', label:'Same Shape\nDiff Size', x:-180, y:-410, r:34, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'Similar figures look alike but may differ in size.\nExamples:\n• All circles are similar\n• All squares are similar\n• All equilateral triangles are similar' },
+      { id:'sm2', label:'Equal\nAngles', x:0, y:-440, r:34, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'For similar polygons:\nCorresponding angles must be EQUAL.\nWritten using symbol ~ (tilde).\nΔABC ~ ΔPQR means the triangles are similar.' },
+      { id:'sm3', label:'Proportional\nSides', x:180, y:-410, r:34, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'Corresponding sides are in the same ratio:\nAB/PQ = BC/QR = CA/RP = k\nThis constant k is the scale factor.\nIf k=1, figures are congruent.' },
+    ]
+  },
+  {
+    id:'bpt', label:'Basic\nProportionality\n(Thales)', x:-300, y:-185, r:46,
+    color:'#001a25', stroke:'#38bdf8', textColor:'#7dd3fc',
+    info:'Basic Proportionality Theorem (BPT / Thales Theorem):\nIf a line is drawn parallel to one side of a triangle to intersect the other two sides, it divides those sides in the same ratio.',
+    children:[
+      { id:'b1', label:'AD/DB\n= AE/EC', x:-510, y:-300, r:34, color:'#001a25', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'In ΔABC, if DE ∥ BC:\nAD/DB = AE/EC\nThe line parallel to one side divides the other two sides proportionally.\nProved using areas of triangles.' },
+      { id:'b2', label:'Converse\nof BPT', x:-540, y:-170, r:34, color:'#001a25', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'Converse of BPT:\nIf a line divides any two sides of a triangle in the same ratio, then the line is parallel to the third side.\nIf AD/DB = AE/EC, then DE ∥ BC.' },
+      { id:'b3', label:'Proved\nvia Areas', x:-510, y:-55, r:34, color:'#001a25', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'Proof uses: triangles on the same base and between the same parallels have equal areas.\nar(ADE)/ar(BDE) = ar(ADE)/ar(CDE)\n⇒ AD/DB = AE/EC.' },
+      { id:'b4', label:'Midpoint\nTheorem', x:-330, y:-360, r:34, color:'#001a25', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'Midpoint theorem is a special case of BPT.\nIf D, E are midpoints of AB, AC:\nDE ∥ BC and DE = ½ BC.\nHere the ratio k = 1/2.' },
+    ]
+  },
+  {
+    id:'crit', label:'Similarity\nCriteria', x:-300, y:185, r:46,
+    color:'#1a1200', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'Rules to prove two triangles are similar without checking all conditions:\n• AAA / AA\n• SSS\n• SAS\nThese are the shortcuts for triangle similarity.',
+    children:[
+      { id:'cr1', label:'AAA / AA\nSimilarity', x:-510, y:80, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'AAA: If all 3 pairs of corresponding angles are equal, triangles are similar.\nAA: Since angle sum = 180°, if 2 angles match, the third does too.\nSo AA is enough to prove similarity.' },
+      { id:'cr2', label:'SSS\nSimilarity', x:-540, y:210, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'SSS Similarity:\nIf corresponding sides of two triangles are in the same ratio, the triangles are similar.\nAB/PQ = BC/QR = CA/RP ⇒ ΔABC ~ ΔPQR.' },
+      { id:'cr3', label:'SAS\nSimilarity', x:-500, y:340, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'SAS Similarity:\nIf one angle of a triangle equals one angle of another AND the sides including these angles are proportional, the triangles are similar.' },
+      { id:'cr4', label:'~ implies\n≅ only if k=1', x:-310, y:390, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Congruent triangles are always similar (with ratio 1).\nBut similar triangles are congruent ONLY when the scale factor k = 1.\nCPCT applies to congruence, not general similarity.' },
+    ]
+  },
+  {
+    id:'area', label:'Areas of\nSimilar Δ', x:300, y:-185, r:46,
+    color:'#001a08', stroke:'#22c55e', textColor:'#86efac',
+    info:'Theorem: The ratio of the areas of two similar triangles equals the SQUARE of the ratio of their corresponding sides.',
+    children:[
+      { id:'a1', label:'Ratio =\n(side ratio)²', x:510, y:-300, r:34, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'If ΔABC ~ ΔPQR:\nar(ABC)/ar(PQR) = (AB/PQ)²\n= (BC/QR)² = (CA/RP)².\nAreas scale as the square of the linear scale factor.' },
+      { id:'a2', label:'Also =\n(median)²', x:540, y:-170, r:34, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'The ratio of areas also equals the square of the ratio of:\n• corresponding medians\n• corresponding altitudes\n• corresponding angle bisectors\n• corresponding perimeters.' },
+      { id:'a3', label:'Perimeter\nRatio = k', x:510, y:-55, r:34, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'The ratio of perimeters of similar triangles equals the ratio of sides (k), NOT k².\nOnly AREAS use the square.\nPerimeter ratio = side ratio = k.' },
+    ]
+  },
+  {
+    id:'pyth', label:'Pythagoras\nTheorem', x:300, y:185, r:46,
+    color:'#0a0020', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'In a right-angled triangle, the square of the hypotenuse equals the sum of squares of the other two sides.\nProved using similar triangles in Class X.',
+    children:[
+      { id:'p1', label:'c² = a² + b²', x:510, y:80, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'If angle B = 90° in ΔABC:\nAC² = AB² + BC²\n(hypotenuse)² = sum of squares of other two sides.\nHypotenuse is the side opposite the right angle.' },
+      { id:'p2', label:'Converse of\nPythagoras', x:540, y:220, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Converse:\nIf in a triangle the square of the longest side equals the sum of squares of the other two, then the angle opposite the longest side is 90°.\nUsed to test right angles.' },
+      { id:'p3', label:'Pythagorean\nTriplets', x:500, y:360, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Sets of 3 integers satisfying a²+b²=c²:\n• 3, 4, 5\n• 5, 12, 13\n• 8, 15, 17\n• 7, 24, 25\nMultiples also work (6,8,10 etc.).' },
+      { id:'p4', label:'Proved by\nSimilarity', x:310, y:390, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Class X proof drops a perpendicular from the right angle to the hypotenuse, creating two smaller triangles similar to the original.\nThis gives BC²=... relations that add to Pythagoras.' },
+    ]
+  },
+  {
+    id:'app', label:'Applications', x:0, y:290, r:44,
+    color:'#1a0010', stroke:'#f43f5e', textColor:'#fda4af',
+    info:'Similar triangles and Pythagoras solve real-world problems: heights, distances, shadows and map scaling.',
+    children:[
+      { id:'ap1', label:'Heights &\nShadows', x:-170, y:420, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'A pole and its shadow form a triangle similar to a taller object and its shadow at the same time.\nHeight/Shadow is constant → find unknown heights of towers, trees.' },
+      { id:'ap2', label:'Distances\n& Maps', x:0, y:460, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'Scale drawings and maps use similarity.\nActual distance = map distance × scale factor.\nSimilar triangles find widths of rivers, distances across obstacles.' },
+      { id:'ap3', label:'Right-Angle\nProblems', x:170, y:420, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'Ladders against walls, diagonals of rectangles, distances between points use Pythagoras.\nExample: ladder length² = wall height² + base distance².' },
+    ]
+  }
+];
+
+// Build flat list
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+
+function getNode(id) { return allNodes.find(n=>n.id===id); }
+
+// Pan & zoom
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { ox = dragOrigin.x+(e.clientX-dragStart.x); oy = dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>dragging=false);
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:0.91; zoomAt(f,e.clientX,e.clientY); },{passive:false});
+
+// Touch
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }});
+canvas.addEventListener('touchmove',e=>{ e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d; }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.3,Math.min(2.5,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+20; draw(); }
+
+// Draw
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy);
+  ctx.scale(scale,scale);
+
+  // grid
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.025)';
+  ctx.lineWidth=1;
+  for(let x=-1000;x<1000;x+=60){ ctx.beginPath();ctx.moveTo(x,-1000);ctx.lineTo(x,1000);ctx.stroke(); }
+  for(let y=-1000;y<1000;y+=60){ ctx.beginPath();ctx.moveTo(-1000,y);ctx.lineTo(1000,y);ctx.stroke(); }
+  ctx.restore();
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'88');
+    grd.addColorStop(1,b.stroke+'44');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2-30;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[4,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?30:16;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||11}px Nunito,sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=14;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

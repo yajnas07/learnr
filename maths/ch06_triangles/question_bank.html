@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Triangles</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(217,70,239,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--purple);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.dash{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;padding:.5rem 1rem 1.2rem;}
+.dash-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.55rem 1.1rem;text-align:center;min-width:90px;}
+.dash-card .num{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;}
+.dash-card .lbl{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.1rem;}
+
+.section-label{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;padding:.4rem 1.2rem .2rem;color:var(--muted);letter-spacing:.04em;display:flex;align-items:center;gap:.5rem;max-width:800px;margin:0 auto;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.qwrap{max-width:800px;margin:0 auto;padding:0 1rem 2rem;display:flex;flex-direction:column;gap:1rem;}
+
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.q-card.strip-sim{border-left:3px solid var(--purple);}
+.q-card.strip-bpt{border-left:3px solid var(--blue);}
+.q-card.strip-crit{border-left:3px solid var(--amber);}
+.q-card.strip-area{border-left:3px solid var(--green);}
+.q-card.strip-pyth{border-left:3px solid var(--indigo);}
+.q-card.strip-app{border-left:3px solid var(--red);}
+
+.q-header{display:flex;align-items:flex-start;gap:.7rem;padding:.7rem 1rem .5rem;}
+.q-num{font-family:'DM Mono',monospace;font-size:.68rem;font-weight:500;color:#040810;padding:.18rem .5rem;border-radius:2px;margin-top:.08rem;flex-shrink:0;white-space:nowrap;}
+.badge-mcq{background:var(--blue);}
+.badge-ar{background:var(--purple);}
+.badge-sa{background:var(--teal);}
+.badge-la{background:var(--amber);}
+.q-text{font-size:.88rem;line-height:1.6;}
+.q-text strong{color:var(--amber);}
+.q-text em{color:var(--teal);font-style:normal;}
+.q-marks{font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);padding:0 1rem .2rem 3.2rem;}
+
+.mcq-opts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;padding:.2rem 1rem .6rem;}
+.opt-btn{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.4rem .65rem;font-size:.8rem;color:var(--text);cursor:pointer;text-align:left;transition:all .2s;}
+.opt-btn:hover{border-color:#2a4a6a;}
+.opt-btn.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+.opt-btn.wrong{background:rgba(244,63,94,.1);border-color:var(--red);color:var(--red);}
+
+.feedback{font-size:.78rem;line-height:1.5;padding:.45rem 1rem .6rem;display:none;}
+.feedback.correct{color:var(--green);}
+.feedback.wrong{color:var(--red);}
+.feedback.shown{display:block;}
+
+.ans-reveal{padding:.1rem 1rem .6rem;}
+.show-btn{font-family:'DM Mono',monospace;font-size:.7rem;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:.28rem .75rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+.show-btn:hover{color:var(--text);border-color:#2a4a6a;}
+.ans-body{background:var(--card2);border-radius:8px;margin-top:.5rem;padding:.7rem .9rem;font-size:.82rem;line-height:1.7;display:none;}
+.ans-body.shown{display:block;}
+.ans-body strong{color:var(--amber);}
+.ans-body em{color:var(--teal);font-style:normal;}
+
+.ar-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;padding:.3rem 1rem .5rem;}
+.ar-box{background:var(--card2);border-radius:6px;padding:.45rem .7rem;font-size:.8rem;line-height:1.5;}
+.ar-box span{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);display:block;margin-bottom:.15rem;}
+.ar-choices{display:flex;gap:.4rem;flex-wrap:wrap;padding:.1rem 1rem .3rem;}
+.ar-choices button{font-size:.74rem;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:.28rem .65rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+.ar-choices button:hover{color:var(--text);}
+.ar-choices button.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+.ar-choices button.wrong{background:rgba(244,63,94,.1);border-color:var(--red);color:var(--red);}
+
+@media(max-width:500px){.mcq-opts{grid-template-columns:1fr;}.ar-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Triangles — Question Bank</h1>
+  <p>Class X · Mathematics Ch.6 · CBSE Pattern · 30 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dash-card"><div class="num" style="color:var(--blue)">10</div><div class="lbl">MCQ (1 mark)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--purple)">3</div><div class="lbl">Assertion-Reason</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--teal)">12</div><div class="lbl">Short Answer (2-3 m)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--amber)">5</div><div class="lbl">Long Answer (5 m)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--green)">47</div><div class="lbl">Total Marks</div></div>
+</div>
+
+<!-- ═══════════ MCQ ═══════════ -->
+<div class="section-label">Section A — Multiple Choice Questions (1 Mark Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-sim">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 1</span><div class="q-text">Which of the following pairs of figures is always similar?</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) Two rectangles</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) Two isosceles triangles</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">C) Two equilateral triangles</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) Two rhombuses</button>
+  </div>
+  <div class="feedback">✓ C is correct. All equilateral triangles have equal angles (60° each) and proportional sides, so they are always similar. Rectangles/rhombuses/isosceles triangles need not be.</div>
+</div>
+
+<div class="q-card strip-bpt">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 2</span><div class="q-text">In ΔABC, DE ∥ BC. If AD = 2 cm, DB = 3 cm and AE = 4 cm, then EC =</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 5 cm</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) 6 cm</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 8 cm</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 2.67 cm</button>
+  </div>
+  <div class="feedback">✓ B is correct. By BPT: AD/DB = AE/EC → 2/3 = 4/EC → EC = 6 cm.</div>
+</div>
+
+<div class="q-card strip-area">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 3</span><div class="q-text">If ΔABC ~ ΔPQR and AB/PQ = 3/4, then ar(ABC)/ar(PQR) =</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 3/4</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) 9/16</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 16/9</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 4/3</button>
+  </div>
+  <div class="feedback">✓ B is correct. Ratio of areas = (ratio of sides)² = (3/4)² = 9/16.</div>
+</div>
+
+<div class="q-card strip-pyth">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 4</span><div class="q-text">Which set of numbers forms a Pythagorean triplet?</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 2, 3, 4</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) 8, 15, 17</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 4, 5, 6</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 5, 6, 7</button>
+  </div>
+  <div class="feedback">✓ B is correct. 8² + 15² = 64 + 225 = 289 = 17². The others fail a²+b²=c².</div>
+</div>
+
+<div class="q-card strip-crit">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 5</span><div class="q-text">Two triangles are similar if their corresponding:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) sides are equal</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) angles are equal</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) areas are equal</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) perimeters are equal</button>
+  </div>
+  <div class="feedback">✓ B is correct. Equal corresponding angles (AA/AAA) guarantee similarity. Equal sides would make them congruent.</div>
+</div>
+
+<div class="q-card strip-area">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 6</span><div class="q-text">The areas of two similar triangles are 25 cm² and 36 cm². The ratio of their corresponding sides is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'c')">A) 5 : 6</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) 25 : 36</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 6 : 5</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 625 : 1296</button>
+  </div>
+  <div class="feedback">✓ A is correct. Side ratio = √(25/36) = 5/6.</div>
+</div>
+
+<div class="q-card strip-pyth">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 7</span><div class="q-text">In a right triangle, the hypotenuse is 25 cm and one side is 7 cm. The other side is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 18 cm</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) 24 cm</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 20 cm</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 26 cm</button>
+  </div>
+  <div class="feedback">✓ B is correct. Other side = √(25² − 7²) = √(625 − 49) = √576 = 24 cm (a 7-24-25 triplet).</div>
+</div>
+
+<div class="q-card strip-sim">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 8</span><div class="q-text">If ΔABC ~ ΔDEF and their areas are equal, then the triangles are:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) not similar</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) congruent</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) right-angled</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) equilateral</button>
+  </div>
+  <div class="feedback">✓ B is correct. Equal areas → area ratio = 1 → side ratio = 1 → congruent.</div>
+</div>
+
+<div class="q-card strip-bpt">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 9</span><div class="q-text">A line joining the midpoints of two sides of a triangle is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) equal to the third side</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) parallel to and half the third side</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) perpendicular to the third side</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) twice the third side</button>
+  </div>
+  <div class="feedback">✓ B is correct. By the Midpoint Theorem (a special case of BPT), the segment is parallel to and half the length of the third side.</div>
+</div>
+
+<div class="q-card strip-crit">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 10</span><div class="q-text">Which is NOT a valid criterion for similarity of triangles?</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) AA</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) SSS</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) SAS</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">D) SSA</button>
+  </div>
+  <div class="feedback">✓ D is correct. SSA is not a valid similarity criterion. Only AA, SSS and SAS prove similarity.</div>
+</div>
+
+</div>
+
+<!-- ═══════════ ASSERTION-REASON ═══════════ -->
+<div class="section-label">Section B — Assertion &amp; Reason (1 Mark Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-area">
+  <div class="q-header"><span class="q-num badge-ar">A-R 1</span><div class="q-text">Choose the correct option about the statements below.</div></div>
+  <div class="ar-grid">
+    <div class="ar-box"><span>ASSERTION (A)</span>If two triangles are similar with side ratio 2:3, their area ratio is 4:9.</div>
+    <div class="ar-box"><span>REASON (R)</span>The ratio of areas of two similar triangles equals the square of the ratio of corresponding sides.</div>
+  </div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'c')">A: Both true, R explains A</button>
+    <button onclick="ar(this,'w')">B: Both true, R doesn't explain A</button>
+    <button onclick="ar(this,'w')">C: A true, R false</button>
+    <button onclick="ar(this,'w')">D: A false, R true</button>
+  </div>
+  <div class="feedback">✓ A is correct. (2:3)² = 4:9, so A is true, and R is exactly the theorem that explains it.</div>
+</div>
+
+<div class="q-card strip-crit">
+  <div class="q-header"><span class="q-num badge-ar">A-R 2</span><div class="q-text">Choose the correct option about the statements below.</div></div>
+  <div class="ar-grid">
+    <div class="ar-box"><span>ASSERTION (A)</span>All congruent triangles are similar.</div>
+    <div class="ar-box"><span>REASON (R)</span>All similar triangles are congruent.</div>
+  </div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'w')">A: Both true, R explains A</button>
+    <button onclick="ar(this,'w')">B: Both true, R doesn't explain A</button>
+    <button onclick="ar(this,'c')">C: A true, R false</button>
+    <button onclick="ar(this,'w')">D: A false, R true</button>
+  </div>
+  <div class="feedback">✓ C is correct. A is true (congruence is similarity with k=1). R is false — similar triangles are congruent only when k = 1.</div>
+</div>
+
+<div class="q-card strip-pyth">
+  <div class="q-header"><span class="q-num badge-ar">A-R 3</span><div class="q-text">Choose the correct option about the statements below.</div></div>
+  <div class="ar-grid">
+    <div class="ar-box"><span>ASSERTION (A)</span>A triangle with sides 9 cm, 12 cm and 15 cm is right-angled.</div>
+    <div class="ar-box"><span>REASON (R)</span>By the converse of Pythagoras, if the square of the longest side equals the sum of squares of the other two, the triangle is right-angled.</div>
+  </div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'c')">A: Both true, R explains A</button>
+    <button onclick="ar(this,'w')">B: Both true, R doesn't explain A</button>
+    <button onclick="ar(this,'w')">C: A true, R false</button>
+    <button onclick="ar(this,'w')">D: A false, R true</button>
+  </div>
+  <div class="feedback">✓ A is correct. 9²+12² = 81+144 = 225 = 15², so A is true, and R (converse of Pythagoras) explains exactly why.</div>
+</div>
+
+</div>
+
+<!-- ═══════════ SHORT ANSWER ═══════════ -->
+<div class="section-label">Section C — Short Answer Questions (2–3 Marks Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-bpt">
+  <div class="q-header"><span class="q-num badge-sa">SA 1</span><div class="q-text">In ΔABC, DE ∥ BC. If AD = 4 cm, DB = 6 cm and AE = 5 cm, find AC.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">By BPT: AD/DB = AE/EC.<br>
+    4/6 = 5/EC → EC = (5×6)/4 = 7.5 cm.<br>
+    AC = AE + EC = 5 + 7.5 = <strong>12.5 cm</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-area">
+  <div class="q-header"><span class="q-num badge-sa">SA 2</span><div class="q-text">The areas of two similar triangles are 81 cm² and 144 cm². If the smaller side of the first triangle is 9 cm, find the corresponding side of the other.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Ratio of areas = 81/144 → ratio of sides = √(81/144) = 9/12 = 3/4.<br>
+    So 9/x = 3/4 → x = (9×4)/3 = <strong>12 cm</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-pyth">
+  <div class="q-header"><span class="q-num badge-sa">SA 3</span><div class="q-text">A ladder 10 m long reaches a window 8 m above the ground. Find the distance of the foot of the ladder from the base of the wall.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">By Pythagoras: base² = 10² − 8² = 100 − 64 = 36.<br>
+    base = √36 = <strong>6 m</strong> (a 6-8-10 triplet).</div>
+  </div>
+</div>
+
+<div class="q-card strip-crit">
+  <div class="q-header"><span class="q-num badge-sa">SA 4</span><div class="q-text">In ΔABC and ΔPQR, ∠A = ∠P and AB/PQ = AC/PR. Which similarity criterion proves ΔABC ~ ΔPQR?</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">One pair of equal angles (∠A = ∠P) with the two <strong>including sides</strong> proportional (AB/PQ = AC/PR).<br>
+    This is the <strong>SAS similarity criterion</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-bpt">
+  <div class="q-header"><span class="q-num badge-sa">SA 5</span><div class="q-text">In ΔABC, D and E are points on AB and AC. AD = 2, DB = 3, AE = 3, EC = 4.5. Is DE ∥ BC?</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">AD/DB = 2/3. AE/EC = 3/4.5 = 2/3.<br>
+    Since AD/DB = AE/EC, by the <strong>converse of BPT, DE ∥ BC</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-pyth">
+  <div class="q-header"><span class="q-num badge-sa">SA 6</span><div class="q-text">The sides of a triangle are 7 cm, 24 cm and 25 cm. Show that it is a right triangle.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Longest side = 25 cm. Check: 7² + 24² = 49 + 576 = 625 = 25².<br>
+    Since a² + b² = c², by the converse of Pythagoras the triangle is <strong>right-angled</strong> (right angle opposite the 25 cm side).</div>
+  </div>
+</div>
+
+<div class="q-card strip-area">
+  <div class="q-header"><span class="q-num badge-sa">SA 7</span><div class="q-text">Two similar triangles have corresponding medians in the ratio 4:9. Find the ratio of their areas.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Medians of similar triangles are in the same ratio as the sides.<br>
+    Ratio of areas = (4/9)² = <strong>16/81</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-sim">
+  <div class="q-header"><span class="q-num badge-sa">SA 8</span><div class="q-text">State whether the following are always similar: (i) two circles (ii) two squares (iii) two right triangles.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">(i) Two circles — <strong>always similar</strong> ✓<br>
+    (ii) Two squares — <strong>always similar</strong> ✓ (all angles 90°, sides proportional)<br>
+    (iii) Two right triangles — <strong>NOT always similar</strong> ✗ (the other two angles may differ).</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-sa">SA 9</span><div class="q-text">A vertical pole 6 m high casts a shadow 4 m long. At the same time a tower casts a shadow 28 m long. Find the height of the tower.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">The pole and tower form similar triangles (same sun angle).<br>
+    height/shadow constant: 6/4 = h/28<br>
+    h = (6 × 28)/4 = <strong>42 m</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-bpt">
+  <div class="q-header"><span class="q-num badge-sa">SA 10</span><div class="q-text">In a trapezium ABCD, AB ∥ DC and the diagonals intersect at O. If AO = 3, OC = 6 and BO = 4, find OD.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Diagonals of a trapezium divide each other proportionally: AO/OC = BO/OD.<br>
+    3/6 = 4/OD → OD = (4×6)/3 = <strong>8 units</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-pyth">
+  <div class="q-header"><span class="q-num badge-sa">SA 11</span><div class="q-text">Find the length of the diagonal of a rectangle whose sides are 12 cm and 5 cm.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Diagonal² = 12² + 5² = 144 + 25 = 169.<br>
+    Diagonal = √169 = <strong>13 cm</strong> (a 5-12-13 triplet).</div>
+  </div>
+</div>
+
+<div class="q-card strip-crit">
+  <div class="q-header"><span class="q-num badge-sa">SA 12</span><div class="q-text">In ΔABC, the perpendicular from A meets BC at D. If AD² = BD·DC, prove ∠BAC = 90°.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">In right triangles ABD and ADC, AD² = BD·DC is given.<br>
+    This makes ΔABD ~ ΔCAD (SAS-type, with the shared perpendicular), so ∠BAD = ∠ACD and ∠DAC = ∠ABD.<br>
+    Then ∠BAC = ∠BAD + ∠DAC = ∠ACD + ∠ABD.<br>
+    Since angles of ΔABC sum to 180°: ∠BAC + (∠ABD + ∠ACD) = 180° → 2∠BAC = 180° → <strong>∠BAC = 90°</strong>.</div>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════ LONG ANSWER ═══════════ -->
+<div class="section-label">Section D — Long Answer Questions (5 Marks Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-bpt">
+  <div class="q-header"><span class="q-num badge-la">LA 1</span><div class="q-text">State and prove the Basic Proportionality Theorem (Thales Theorem).</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body"><strong>Statement:</strong> If a line is drawn parallel to one side of a triangle to intersect the other two sides in distinct points, the other two sides are divided in the same ratio.<br><br>
+    <strong>Given:</strong> ΔABC with DE ∥ BC meeting AB at D and AC at E.<br>
+    <strong>To prove:</strong> AD/DB = AE/EC.<br>
+    <strong>Construction:</strong> Join BE and CD; draw EM ⊥ AB and DN ⊥ AC.<br><br>
+    <strong>Proof:</strong> ar(ADE) = ½·AD·EM and ar(BDE) = ½·DB·EM.<br>
+    ∴ ar(ADE)/ar(BDE) = AD/DB … (i)<br>
+    Similarly ar(ADE)/ar(CDE) = AE/EC … (ii)<br>
+    ΔBDE and ΔCDE are on the same base DE and between the same parallels DE, BC → equal areas.<br>
+    So RHS of (i) and (ii) are equal → <strong>AD/DB = AE/EC.</strong> ∎</div>
+  </div>
+</div>
+
+<div class="q-card strip-pyth">
+  <div class="q-header"><span class="q-num badge-la">LA 2</span><div class="q-text">Prove that in a right triangle, the square of the hypotenuse equals the sum of the squares of the other two sides (Pythagoras Theorem).</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body"><strong>Given:</strong> Right ΔABC, right-angled at B.<br>
+    <strong>To prove:</strong> AC² = AB² + BC².<br>
+    <strong>Construction:</strong> Draw BD ⊥ AC.<br><br>
+    <strong>Proof:</strong> ΔADB ~ ΔABC (AA) ⇒ AB/AC = AD/AB ⇒ AB² = AC·AD … (i)<br>
+    ΔBDC ~ ΔABC (AA) ⇒ BC/AC = DC/BC ⇒ BC² = AC·DC … (ii)<br><br>
+    Adding (i) and (ii): AB² + BC² = AC·AD + AC·DC = AC(AD + DC) = AC·AC = <strong>AC².</strong> ∎</div>
+  </div>
+</div>
+
+<div class="q-card strip-area">
+  <div class="q-header"><span class="q-num badge-la">LA 3</span><div class="q-text">Prove that the ratio of the areas of two similar triangles is equal to the square of the ratio of their corresponding sides.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body"><strong>Given:</strong> ΔABC ~ ΔPQR.<br>
+    <strong>To prove:</strong> ar(ABC)/ar(PQR) = (AB/PQ)² = (BC/QR)² = (CA/RP)².<br>
+    <strong>Construction:</strong> Draw altitudes AM ⊥ BC and PN ⊥ QR.<br><br>
+    <strong>Proof:</strong> ar(ABC)/ar(PQR) = (½·BC·AM)/(½·QR·PN) = (BC/QR)(AM/PN).<br>
+    In ΔABM and ΔPQN: ∠B = ∠Q (similar Δ) and ∠M = ∠N = 90° → ΔABM ~ ΔPQN (AA).<br>
+    So AM/PN = AB/PQ. Also, since ΔABC ~ ΔPQR, BC/QR = AB/PQ.<br>
+    ∴ ar(ABC)/ar(PQR) = (AB/PQ)(AB/PQ) = <strong>(AB/PQ)².</strong> ∎</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-la">LA 4</span><div class="q-text">Two poles of heights 6 m and 11 m stand on level ground. If the distance between their feet is 12 m, find the distance between their tops.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let the poles be AB = 6 m and CD = 11 m, with feet B and D on the ground, BD = 12 m.<br>
+    Draw AE ∥ BD from the top of the shorter pole to meet CD at E.<br>
+    Then AE = BD = 12 m and CE = 11 − 6 = 5 m.<br><br>
+    In right ΔAEC: AC² = AE² + CE² = 12² + 5² = 144 + 25 = 169.<br>
+    AC = √169 = <strong>13 m</strong>. The distance between the tops is 13 m.</div>
+  </div>
+</div>
+
+<div class="q-card strip-bpt">
+  <div class="q-header"><span class="q-num badge-la">LA 5</span><div class="q-text">In ΔABC, D is a point on BC such that ∠ADC = ∠BAC. Prove that CA² = CB·CD.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">In ΔADC and ΔBAC:<br>
+    ∠ADC = ∠BAC (given)<br>
+    ∠C = ∠C (common angle)<br>
+    ∴ ΔADC ~ ΔBAC (AA similarity).<br><br>
+    From similarity, corresponding sides are proportional:<br>
+    CA/CB = CD/CA<br>
+    Cross-multiplying: <strong>CA² = CB·CD.</strong> ∎</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function mcq(btn,result){
+  const card=btn.closest('.q-card');
+  if(card.querySelector('.opt-btn.correct')||card.querySelector('.opt-btn.wrong'))return;
+  btn.classList.add(result==='c'?'correct':'wrong');
+  const fb=card.querySelector('.feedback');
+  fb.classList.add(result==='c'?'correct':'wrong','shown');
+}
+function ar(btn,result){
+  const card=btn.closest('.q-card');
+  if(card.querySelector('.ar-choices button.correct')||card.querySelector('.ar-choices button.wrong'))return;
+  btn.classList.add(result==='c'?'correct':'wrong');
+  const fb=card.querySelector('.feedback');
+  if(fb)fb.classList.add(result==='c'?'correct':'wrong','shown');
+}
+function reveal(btn){
+  const body=btn.nextElementSibling;
+  if(body.classList.contains('shown')){body.classList.remove('shown');btn.textContent='Show Solution';}
+  else{body.classList.add('shown');btn.textContent='Hide Solution';}
+}
+</script>
+</body>
+</html>
