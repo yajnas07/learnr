@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Statistics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:1rem;padding:1rem 1.2rem 2rem;max-width:1100px;margin:0 auto;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.panel-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;}
+.panel-head .icon{font-size:1rem;}
+.panel-body{padding:.8rem 1rem 1rem;display:flex;flex-direction:column;gap:.6rem;}
+
+.ph-data .panel-head{background:rgba(56,189,248,.12);color:var(--blue);}
+.ph-mean .panel-head{background:rgba(34,197,94,.12);color:var(--green);}
+.ph-med .panel-head{background:rgba(129,140,248,.12);color:var(--indigo);}
+.ph-mode .panel-head{background:rgba(244,63,94,.12);color:var(--red);}
+.ph-ogive .panel-head{background:rgba(217,70,239,.12);color:var(--purple);}
+.ph-rel .panel-head{background:rgba(45,212,191,.12);color:var(--teal);}
+.ph-vit .panel-head{background:rgba(245,158,11,.12);color:var(--amber);}
+.ph-mem .panel-head{background:rgba(74,104,144,.18);color:#9ab8d8;}
+
+.formula-block{background:var(--card2);border-radius:8px;padding:.6rem .8rem;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--teal);line-height:1.7;}
+.formula-block strong{color:var(--blue);}
+.sub-label{font-family:'Playfair Display',serif;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem;}
+
+table{width:100%;border-collapse:collapse;font-size:.76rem;}
+th{padding:.4rem .5rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+td{padding:.38rem .5rem;border-bottom:1px solid rgba(26,45,69,.5);line-height:1.4;}
+tr:last-child td{border-bottom:none;}
+td.mono{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--teal);}
+td.blue{color:var(--blue);}td.green{color:var(--green);}td.red{color:var(--red);}
+
+.hbox{display:flex;gap:.5rem;flex-wrap:wrap;}
+.fact{background:var(--card2);border-radius:6px;padding:.4rem .65rem;font-size:.76rem;color:var(--text);flex:1;min-width:100px;}
+.fact strong{display:block;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:.15rem;}
+.trick{background:rgba(56,189,248,.07);border-left:3px solid var(--blue);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.trick strong{color:var(--blue);}
+.tip{background:rgba(45,212,191,.07);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.tip strong{color:var(--teal);}
+.warn{background:rgba(244,63,94,.07);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.warn strong{color:var(--red);}
+
+.step-list{counter-reset:step;display:flex;flex-direction:column;gap:.3rem;}
+.step-list li{display:flex;align-items:flex-start;gap:.5rem;font-size:.78rem;list-style:none;counter-increment:step;line-height:1.5;}
+.step-list li::before{content:counter(step);background:var(--card2);color:var(--muted);font-family:'DM Mono',monospace;font-size:.65rem;
+  min-width:1.4rem;height:1.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:.1rem;flex-shrink:0;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Statistics — Cheat Sheet</h1>
+  <p>Class X · Mathematics Ch.13 · 8 Panels · Quick Reference</p>
+</header>
+
+<div class="panel-grid">
+
+<!-- 1. DATA BASICS -->
+<div class="panel ph-data">
+  <div class="panel-head"><span class="icon">📊</span> Data &amp; Frequency Basics</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      Class mark <strong>xᵢ = (lower + upper) ÷ 2</strong><br>
+      Class size <strong>h = upper − lower limit</strong>
+    </div>
+    <div class="sub-label">Key terms</div>
+    <table>
+      <tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td class="mono">fᵢ</td><td>frequency of a class</td></tr>
+      <tr><td class="mono">cf</td><td>cumulative (running) total</td></tr>
+      <tr><td class="mono">n = Σfᵢ</td><td>total frequency</td></tr>
+    </table>
+    <div class="tip"><strong>Continuous classes:</strong> if there are gaps (e.g. 10–19, 20–29), adjust to 9.5–19.5… before finding median/mode.</div>
+  </div>
+</div>
+
+<!-- 2. MEAN -->
+<div class="panel ph-mean">
+  <div class="panel-head"><span class="icon">➗</span> Mean of Grouped Data</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      Direct: <strong>x̄ = Σfᵢxᵢ ÷ Σfᵢ</strong><br>
+      Assumed mean: <strong>x̄ = a + (Σfᵢdᵢ ÷ Σfᵢ)</strong>, dᵢ = xᵢ − a<br>
+      Step-deviation: <strong>x̄ = a + h·(Σfᵢuᵢ ÷ Σfᵢ)</strong>, uᵢ = (xᵢ−a)/h
+    </div>
+    <div class="tip"><strong>All three methods give the same mean.</strong> Choose step-deviation when class widths are equal.</div>
+    <div class="trick"><strong>Pick a</strong> as the class mark near the middle (often the one with the highest frequency) to keep dᵢ small.</div>
+  </div>
+</div>
+
+<!-- 3. MEDIAN -->
+<div class="panel ph-med">
+  <div class="panel-head"><span class="icon">🎯</span> Median of Grouped Data</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      Median = <strong>l + [(n/2 − cf)/f] × h</strong>
+    </div>
+    <div class="sub-label">What each letter means</div>
+    <table>
+      <tr><td class="mono">l</td><td>lower limit of median class</td></tr>
+      <tr><td class="mono">n/2</td><td>half the total frequency</td></tr>
+      <tr><td class="mono">cf</td><td>cf of class BEFORE median class</td></tr>
+      <tr><td class="mono">f</td><td>frequency of median class</td></tr>
+      <tr><td class="mono">h</td><td>class size</td></tr>
+    </table>
+    <div class="warn"><strong>Median class</strong> = first class whose cf ≥ n/2.</div>
+  </div>
+</div>
+
+<!-- 4. MODE -->
+<div class="panel ph-mode">
+  <div class="panel-head"><span class="icon">🔝</span> Mode of Grouped Data</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      Mode = <strong>l + [(f₁ − f₀)/(2f₁ − f₀ − f₂)] × h</strong>
+    </div>
+    <table>
+      <tr><td class="mono">l</td><td>lower limit of modal class</td></tr>
+      <tr><td class="mono">f₁</td><td>frequency of modal class</td></tr>
+      <tr><td class="mono">f₀</td><td>frequency of class before</td></tr>
+      <tr><td class="mono">f₂</td><td>frequency of class after</td></tr>
+      <tr><td class="mono">h</td><td>class size</td></tr>
+    </table>
+    <div class="tip"><strong>Modal class</strong> = the class with the highest frequency.</div>
+  </div>
+</div>
+
+<!-- 5. OGIVE -->
+<div class="panel ph-ogive">
+  <div class="panel-head"><span class="icon">📈</span> Ogive (CF Curve)</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      <strong>Less than</strong> ogive → plot (upper limit, cf)<br>
+      <strong>More than</strong> ogive → plot (lower limit, cf)
+    </div>
+    <div class="sub-label">Median from a graph</div>
+    <ol class="step-list">
+      <li>Draw both ogives on the same axes</li>
+      <li>Their point of intersection gives the median</li>
+      <li>Or draw a line at y = n/2 to the less-than curve, then drop to the x-axis</li>
+    </ol>
+    <div class="trick"><strong>Ogive is always smooth &amp; free-hand</strong> — never join points with straight lines in the exam.</div>
+  </div>
+</div>
+
+<!-- 6. KEY FORMULAS -->
+<div class="panel ph-vit">
+  <div class="panel-head"><span class="icon">⭐</span> All Formulas at a Glance</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Measure</th><th>Formula</th></tr>
+      <tr><td>Mean (direct)</td><td class="mono">Σfx / Σf</td></tr>
+      <tr><td>Mean (assumed)</td><td class="mono">a + Σfd/Σf</td></tr>
+      <tr><td>Mean (step-dev)</td><td class="mono">a + h·Σfu/Σf</td></tr>
+      <tr><td>Median</td><td class="mono">l + [(n/2−cf)/f]·h</td></tr>
+      <tr><td>Mode</td><td class="mono">l + [(f₁−f₀)/(2f₁−f₀−f₂)]·h</td></tr>
+      <tr><td>Empirical</td><td class="mono">3Md = Mo + 2x̄</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 7. EMPIRICAL RELATION -->
+<div class="panel ph-rel">
+  <div class="panel-head"><span class="icon">🔗</span> Empirical Relationship</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      <strong>3 Median = Mode + 2 Mean</strong><br>
+      Mode = 3 Median − 2 Mean<br>
+      Mean = (3 Median − Mode) ÷ 2
+    </div>
+    <div class="tip"><strong>Use it</strong> to estimate the third measure when the other two are known.</div>
+    <div class="trick"><strong>Order on the number line:</strong> for a moderately skewed distribution, Mean, Median and Mode differ but stay close.</div>
+  </div>
+</div>
+
+<!-- 8. EXAM QUICK RECALL -->
+<div class="panel ph-mem">
+  <div class="panel-head"><span class="icon">🧠</span> Exam Quick Recall</div>
+  <div class="panel-body">
+    <div class="warn"><strong>Median:</strong> build the cf column first, then find n/2.</div>
+    <div class="tip"><strong>Mode:</strong> spot the tallest frequency = modal class before plugging in.</div>
+    <div class="warn"><strong>Common mistakes:</strong> using (n+1)/2 instead of n/2 for grouped data; forgetting to make classes continuous; taking cf of the median class instead of the class before it.</div>
+    <div class="tip"><strong>Step-deviation check:</strong> u = (x − a)/h should be small whole numbers (…−2,−1,0,1,2…).</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

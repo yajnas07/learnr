@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Areas Related to Circles</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #040810; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#f59e0b,#f43f5e,#d946ef);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 260px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(4,8,16,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,45,69,.75);
+  position:sticky; top:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a9ab8; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(26,45,69,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<div id="ui">
+  <div>
+    <h1>Areas Related to Circles</h1>
+    <p>Class X · CBSE · Mind Map — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+
+let W, H, scale = 1, ox = 0, oy = 0;
+let dragging = false, dragStart = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2 + 20;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Areas Related\nto Circles', x:0, y:0, r:62,
+  color:'#1a1200', stroke:'#f59e0b', textColor:'#fde68a', fontSize:14
+};
+
+const BRANCHES = [
+  {
+    id:'basics', label:'Circle\nBasics', x:0, y:-290, r:44,
+    color:'#1a1200', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'A circle has a centre and radius r. Diameter d = 2r.\nπ (pi) ≈ 22/7 ≈ 3.14159 is the ratio of circumference to diameter.',
+    children:[
+      { id:'ba1', label:'Radius &\nDiameter', x:-180, y:-410, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Radius r = distance from centre to the circle.\nDiameter d = 2r (longest chord).\nAll radii of a circle are equal.' },
+      { id:'ba2', label:'Value of\nπ', x:0, y:-440, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'π = circumference ÷ diameter.\nUse π = 22/7 when the radius is a multiple of 7; otherwise π ≈ 3.14.\nπ is an irrational number.' },
+      { id:'ba3', label:'Concentric\nCircles', x:180, y:-410, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Circles sharing the same centre but different radii are concentric.\nThe region between them is a circular ring (annulus).' },
+    ]
+  },
+  {
+    id:'circ', label:'Circumference\n/ Perimeter', x:-300, y:-185, r:44,
+    color:'#001a12', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:'Circumference = distance around a circle:\nC = 2πr = πd\nPerimeter of a semicircle = πr + 2r.',
+    children:[
+      { id:'c1', label:'C = 2πr\n= πd', x:-510, y:-300, r:36, color:'#001a12', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Circumference C = 2πr = πd.\nIt is the total length of the boundary of the circle.' },
+      { id:'c2', label:'Arc\nLength', x:-540, y:-170, r:34, color:'#001a12', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Length of an arc of angle θ:\nℓ = (θ/360) × 2πr\nA fraction of the full circumference.' },
+      { id:'c3', label:'Semicircle\nPerimeter', x:-510, y:-55, r:34, color:'#001a12', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Perimeter of a semicircle = half the circumference + the diameter:\nP = πr + 2r = r(π + 2).' },
+      { id:'c4', label:'Rotations\nof a Wheel', x:-330, y:-360, r:34, color:'#001a12', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'Distance covered in n rotations = n × circumference.\nNumber of rotations = total distance ÷ (2πr).' },
+    ]
+  },
+  {
+    id:'area', label:'Area of\na Circle', x:-300, y:185, r:44,
+    color:'#12041c', stroke:'#d946ef', textColor:'#f0abfc',
+    info:'Area of a circle:\nA = πr²\nArea of a semicircle = ½πr². Area of a quadrant = ¼πr².',
+    children:[
+      { id:'a1', label:'A = πr²', x:-510, y:80, r:36, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'Area of a circle A = πr².\nIf the diameter is given, r = d/2 first.' },
+      { id:'a2', label:'Semicircle\n½πr²', x:-540, y:210, r:34, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'Area of a semicircle = ½πr².\nHalf of the full circle area.' },
+      { id:'a3', label:'Ring\n(Annulus)', x:-500, y:340, r:34, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'Area of a ring between radii R (outer) and r (inner):\nA = π(R² − r²) = π(R+r)(R−r).' },
+      { id:'a4', label:'Quadrant\n¼πr²', x:-310, y:390, r:34, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'A quadrant is one-fourth of a circle (90° sector).\nArea = ¼πr².' },
+    ]
+  },
+  {
+    id:'sec', label:'Sector of\na Circle', x:300, y:-185, r:44,
+    color:'#001a08', stroke:'#22c55e', textColor:'#86efac',
+    info:'A sector is the region bounded by two radii and the arc between them.\nArea = (θ/360) × πr².',
+    children:[
+      { id:'s1', label:'Area\n(θ/360)πr²', x:510, y:-300, r:36, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'Area of a sector of angle θ:\nA = (θ/360) × πr²\nA fraction of the whole circle area.' },
+      { id:'s2', label:'Arc\nLength', x:540, y:-170, r:34, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'Arc length ℓ = (θ/360) × 2πr.\nAlso, sector area = ½ × ℓ × r.' },
+      { id:'s3', label:'Minor &\nMajor', x:510, y:-55, r:34, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'The smaller sector is the minor sector; the larger is the major sector.\nMajor sector area = πr² − minor sector area.' },
+    ]
+  },
+  {
+    id:'seg', label:'Segment of\na Circle', x:300, y:185, r:44,
+    color:'#0a0020', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'A segment is the region between a chord and its arc.\nArea of minor segment = area of sector − area of triangle.',
+    children:[
+      { id:'g1', label:'Sector −\nTriangle', x:510, y:80, r:36, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Area of minor segment = (area of sector) − (area of triangle OAB):\n= (θ/360)πr² − ½r²sinθ.' },
+      { id:'g2', label:'Triangle\n½r²sinθ', x:540, y:220, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Area of the triangle formed by two radii and the chord:\n= ½ r² sinθ\n(θ = angle at the centre).' },
+      { id:'g3', label:'Major\nSegment', x:500, y:360, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Major segment area = area of circle − minor segment area = πr² − minor segment.' },
+      { id:'g4', label:'Special\nAngles', x:310, y:390, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'For θ = 60°, 90°, 120° use sin values.\nAt 90°: triangle = ½r²; at 60°: ½r²·(√3/2).' },
+    ]
+  },
+  {
+    id:'comb', label:'Combinations\nof Figures', x:0, y:290, r:44,
+    color:'#1a0010', stroke:'#f43f5e', textColor:'#fda4af',
+    info:'Real shapes combine circles with squares, triangles and rectangles.\nAdd or subtract areas to find shaded regions.',
+    children:[
+      { id:'cb1', label:'Add / Subtract\nAreas', x:-170, y:420, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'For a shaded region: add the areas that make it up, and subtract the areas that are cut out.\nBreak the figure into standard shapes.' },
+      { id:'cb2', label:'Circle in\nSquare', x:0, y:460, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'A circle inscribed in a square of side a has radius a/2.\nShaded corners = square − circle = a² − π(a/2)².' },
+      { id:'cb3', label:'Designs &\nFlower Beds', x:170, y:420, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'Tiles, flower beds and windows combine sectors and segments.\nIdentify each part, compute its area, then add.' },
+    ]
+  }
+];
+
+// Build flat list
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+
+function getNode(id) { return allNodes.find(n=>n.id===id); }
+
+// Pan & zoom
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { ox = dragOrigin.x+(e.clientX-dragStart.x); oy = dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>dragging=false);
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:0.91; zoomAt(f,e.clientX,e.clientY); },{passive:false});
+
+// Touch
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }});
+canvas.addEventListener('touchmove',e=>{ e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d; }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.3,Math.min(2.5,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+20; draw(); }
+
+// Draw
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy);
+  ctx.scale(scale,scale);
+
+  // grid
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.025)';
+  ctx.lineWidth=1;
+  for(let x=-1000;x<1000;x+=60){ ctx.beginPath();ctx.moveTo(x,-1000);ctx.lineTo(x,1000);ctx.stroke(); }
+  for(let y=-1000;y<1000;y+=60){ ctx.beginPath();ctx.moveTo(-1000,y);ctx.lineTo(1000,y);ctx.stroke(); }
+  ctx.restore();
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'88');
+    grd.addColorStop(1,b.stroke+'44');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2-30;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[4,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?30:16;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||11}px Nunito,sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=14;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

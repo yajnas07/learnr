@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive — Areas Related to Circles</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(245,158,11,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.4rem 1rem .4rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--amber);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.tabs{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;padding:.9rem 1rem;max-width:900px;margin:0 auto;}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.4rem .8rem;border-radius:99px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);cursor:pointer;transition:.15s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:#04121e;font-weight:700;}
+
+.panel{display:none;max-width:720px;margin:0 auto;padding:1rem 1.2rem 2.5rem;}
+.panel.active{display:block;}
+.stage{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem;}
+canvas{width:100%;background:var(--card2);border-radius:10px;display:block;touch-action:none;}
+.desc{font-size:.85rem;line-height:1.6;color:var(--text);margin-top:.9rem;}
+.desc b{color:var(--amber);}
+.readout{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--teal);background:var(--card2);border-radius:8px;padding:.6rem .8rem;margin-top:.8rem;line-height:1.7;}
+.readout b{color:var(--amber);}
+.ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;margin-top:.9rem;}
+.ctrl-row label{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.5rem;flex:1;min-width:180px;}
+input[type=range]{flex:1;accent-color:var(--amber);}
+.hint-txt{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);margin-top:.6rem;text-align:center;}
+
+.app-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.4rem;}
+@media(max-width:520px){.app-grid{grid-template-columns:1fr;}}
+.app-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:.9rem;}
+.app-card h4{font-family:'Playfair Display',serif;font-size:.9rem;color:var(--amber);margin-bottom:.4rem;}
+.app-card p{font-size:.8rem;line-height:1.5;color:var(--text);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Areas Related to Circles — Interactive</h1>
+  <p>Class X · Mathematics Ch.11 · 6 Interactive Modules</p>
+</header>
+
+<div class="tabs" id="tabs">
+  <button class="tab-btn active" onclick="showTab(0,this,'#f59e0b')">🟣 Area &amp; Circumference</button>
+  <button class="tab-btn" onclick="showTab(1,this,'#2dd4bf')">📏 Arc Length</button>
+  <button class="tab-btn" onclick="showTab(2,this,'#22c55e')">🍕 Sector</button>
+  <button class="tab-btn" onclick="showTab(3,this,'#818cf8')">🌙 Segment</button>
+  <button class="tab-btn" onclick="showTab(4,this,'#d946ef')">⭕ Ring</button>
+  <button class="tab-btn" onclick="showTab(5,this,'#f43f5e')">🌍 Applications</button>
+</div>
+
+<!-- 0: AREA & CIRCUMFERENCE -->
+<div class="panel active">
+  <div class="stage">
+    <canvas id="cvCirc" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Radius r: <span id="rVal">80</span><input type="range" id="rR" min="30" max="150" value="80" step="2"></label>
+    </div>
+    <div class="readout" id="circOut"></div>
+    <div class="desc">Change the radius and watch how the <b>circumference (2πr)</b> and <b>area (πr²)</b> grow. Area grows with the square of r — double r and area quadruples.</div>
+  </div>
+</div>
+
+<!-- 1: ARC LENGTH -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvArc" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Angle θ: <span id="arcVal">90</span>°<input type="range" id="arcA" min="10" max="350" value="90" step="5"></label>
+    </div>
+    <div class="readout" id="arcOut"></div>
+    <div class="desc">An <b>arc</b> is a fraction of the circumference: ℓ = (θ/360)·2πr. The highlighted arc grows as you increase the angle.</div>
+  </div>
+</div>
+
+<!-- 2: SECTOR -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvSec" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Angle θ: <span id="secVal">90</span>°<input type="range" id="secA" min="10" max="350" value="90" step="5"></label>
+    </div>
+    <div class="readout" id="secOut"></div>
+    <div class="desc">A <b>sector</b> is a "pizza slice" bounded by two radii and an arc. Area = (θ/360)·πr². Its perimeter = arc + 2r.</div>
+  </div>
+</div>
+
+<!-- 3: SEGMENT -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvSeg" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Angle θ: <span id="segVal">120</span>°<input type="range" id="segA" min="20" max="180" value="120" step="5"></label>
+    </div>
+    <div class="readout" id="segOut"></div>
+    <div class="desc">A <b>segment</b> is the region between a chord and its arc. Minor segment = sector − triangle = (θ/360)πr² − ½r²sinθ.</div>
+  </div>
+</div>
+
+<!-- 4: RING -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvRing" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Outer R: <span id="RVal">130</span><input type="range" id="RR" min="70" max="160" value="130" step="2"></label>
+      <label>Inner r: <span id="rrVal">80</span><input type="range" id="rrR" min="20" max="150" value="80" step="2"></label>
+    </div>
+    <div class="readout" id="ringOut"></div>
+    <div class="desc">A <b>ring (annulus)</b> is the region between two concentric circles. Area = π(R² − r²) = π(R+r)(R−r).</div>
+  </div>
+</div>
+
+<!-- 5: APPLICATIONS -->
+<div class="panel">
+  <div class="app-grid">
+    <div class="app-card"><h4>🕐 Clock Hands</h4><p>The minute hand sweeps a sector each minute — 360° per hour, 6° per minute.</p></div>
+    <div class="app-card"><h4>🌾 Grazing Animals</h4><p>An animal tied to a post grazes a circular sector; the rope length is the radius.</p></div>
+    <div class="app-card"><h4>🚗 Wheels &amp; Tyres</h4><p>Distance travelled = number of turns × circumference (2πr).</p></div>
+    <div class="app-card"><h4>🪟 Windows &amp; Arches</h4><p>Semicircular windows combine a rectangle with a half-circle area.</p></div>
+    <div class="app-card"><h4>🌸 Flower Beds</h4><p>Circular and sector-shaped beds in gardens use these area formulas for turf and fencing.</p></div>
+    <div class="app-card"><h4>🍕 Food Portions</h4><p>A pizza slice is literally a sector; its crust length is the arc.</p></div>
+  </div>
+  <div class="desc" style="text-align:center;">From clocks to gardens, circular areas describe the round parts of the world around us.</div>
+</div>
+
+<script>
+// ---------- 0: AREA & CIRCUMFERENCE ----------
+(function(){
+  const cv=document.getElementById('cvCirc'),ctx=cv.getContext('2d');
+  const cx=cv.width/2,cy=cv.height/2;
+  const s=document.getElementById('rR');
+  function draw(){
+    const r=+s.value;document.getElementById('rVal').textContent=r;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.fillStyle='rgba(245,158,11,.15)';ctx.strokeStyle='#f59e0b';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();ctx.stroke();
+    // radius line
+    ctx.strokeStyle='#fbbf24';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r,cy);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill();
+    ctx.fillStyle='#fde68a';ctx.font='12px "DM Mono"';ctx.fillText('r',cx+r/2,cy-8);
+    const C=2*Math.PI*r/40, A=Math.PI*r*r/1600;
+    document.getElementById('circOut').innerHTML=
+      `r = <b>${(r/40).toFixed(1)}</b> units → Circumference 2πr = <b>${C.toFixed(2)}</b>, Area πr² = <b>${A.toFixed(2)}</b>`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 1: ARC LENGTH ----------
+(function(){
+  const cv=document.getElementById('cvArc'),ctx=cv.getContext('2d');
+  const cx=cv.width/2,cy=cv.height/2,r=140;
+  const s=document.getElementById('arcA');
+  function draw(){
+    const deg=+s.value,rad=deg*Math.PI/180;document.getElementById('arcVal').textContent=deg;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle='#334155';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();
+    // highlight arc
+    ctx.strokeStyle='#2dd4bf';ctx.lineWidth=5;ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+rad);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill();
+    const ru=r/40, len=(deg/360)*2*Math.PI*ru;
+    document.getElementById('arcOut').innerHTML=
+      `ℓ = (${deg}/360) × 2π × ${ru.toFixed(1)} = <b>${len.toFixed(2)}</b> units &nbsp;(fraction ${(deg/360).toFixed(2)} of circumference)`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 2: SECTOR ----------
+(function(){
+  const cv=document.getElementById('cvSec'),ctx=cv.getContext('2d');
+  const cx=cv.width/2,cy=cv.height/2,r=140;
+  const s=document.getElementById('secA');
+  function draw(){
+    const deg=+s.value,rad=deg*Math.PI/180;document.getElementById('secVal').textContent=deg;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle='#334155';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();
+    ctx.fillStyle='rgba(34,197,94,.2)';ctx.strokeStyle='#22c55e';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+rad);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill();
+    const ru=r/40, area=(deg/360)*Math.PI*ru*ru, arc=(deg/360)*2*Math.PI*ru;
+    document.getElementById('secOut').innerHTML=
+      `Sector area = (${deg}/360)·πr² = <b>${area.toFixed(2)}</b> &nbsp;|&nbsp; Perimeter = arc + 2r = ${arc.toFixed(2)} + ${(2*ru).toFixed(1)} = <b>${(arc+2*ru).toFixed(2)}</b>`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 3: SEGMENT ----------
+(function(){
+  const cv=document.getElementById('cvSeg'),ctx=cv.getContext('2d');
+  const cx=cv.width/2,cy=cv.height/2,r=140;
+  const s=document.getElementById('segA');
+  function draw(){
+    const deg=+s.value,rad=deg*Math.PI/180;document.getElementById('segVal').textContent=deg;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle='#334155';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();
+    const a0=-Math.PI/2-rad/2, a1=-Math.PI/2+rad/2;
+    // segment fill (arc + chord)
+    ctx.fillStyle='rgba(129,140,248,.25)';ctx.strokeStyle='#818cf8';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.arc(cx,cy,r,a0,a1);ctx.closePath();ctx.fill();
+    // chord line
+    const p0={x:cx+r*Math.cos(a0),y:cy+r*Math.sin(a0)},p1={x:cx+r*Math.cos(a1),y:cy+r*Math.sin(a1)};
+    ctx.beginPath();ctx.moveTo(p0.x,p0.y);ctx.lineTo(p1.x,p1.y);ctx.stroke();
+    // radii (faint)
+    ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p0.x,p0.y);ctx.moveTo(cx,cy);ctx.lineTo(p1.x,p1.y);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill();
+    const ru=r/40, sector=(deg/360)*Math.PI*ru*ru, tri=0.5*ru*ru*Math.sin(rad), seg=sector-tri;
+    document.getElementById('segOut').innerHTML=
+      `Segment = sector − triangle = ${sector.toFixed(2)} − ${tri.toFixed(2)} = <b>${seg.toFixed(2)}</b> sq. units`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 4: RING ----------
+(function(){
+  const cv=document.getElementById('cvRing'),ctx=cv.getContext('2d');
+  const cx=cv.width/2,cy=cv.height/2;
+  const RR=document.getElementById('RR'),rrR=document.getElementById('rrR');
+  function draw(){
+    let R=+RR.value,r=+rrR.value;if(r>=R)r=R-10;
+    document.getElementById('RVal').textContent=R;document.getElementById('rrVal').textContent=r;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    // outer filled
+    ctx.fillStyle='rgba(217,70,239,.22)';ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.fill();
+    // punch inner hole
+    ctx.save();ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();ctx.restore();
+    ctx.strokeStyle='#d946ef';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.beginPath();ctx.arc(cx,cy,3,0,7);ctx.fill();
+    const Ru=R/40,ru=r/40,area=Math.PI*(Ru*Ru-ru*ru);
+    document.getElementById('ringOut').innerHTML=
+      `Area = π(R² − r²) = π(${Ru.toFixed(1)}² − ${ru.toFixed(1)}²) = <b>${area.toFixed(2)}</b> sq. units`;
+  }
+  RR.oninput=rrR.oninput=draw;draw();
+})();
+
+// ---------- tabs ----------
+function showTab(i,btn,color){
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',j===i));
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.style.background='';});
+  btn.classList.add('active');btn.style.background=color;
+}
+document.querySelector('.tab-btn').style.background='#f59e0b';
+</script>
+</body>
+</html>

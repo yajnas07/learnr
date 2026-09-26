@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Statistics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .6rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.wrap{max-width:820px;margin:0 auto;padding:1rem 1.2rem 3rem;}
+.section-head{display:flex;align-items:center;gap:.6rem;margin:1.6rem 0 .8rem;font-family:'Playfair Display',serif;font-weight:900;font-size:1.05rem;color:var(--blue);}
+.section-head .marks{margin-left:auto;font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);font-weight:400;}
+
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin-bottom:.9rem;border-left:3px solid var(--border);}
+.strip-data{border-left-color:var(--blue);}
+.strip-mean{border-left-color:var(--green);}
+.strip-med{border-left-color:var(--indigo);}
+.strip-mode{border-left-color:var(--red);}
+.strip-ogive{border-left-color:var(--purple);}
+.strip-rel{border-left-color:var(--teal);}
+.q-num{font-family:'DM Mono',monospace;font-size:.64rem;color:var(--muted);}
+.q-text{font-size:.92rem;line-height:1.55;margin:.3rem 0 .7rem;}
+.q-text b{color:var(--blue);}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+@media(max-width:520px){.opts{grid-template-columns:1fr;}}
+.opt{font-family:'DM Mono',monospace;font-size:.8rem;padding:.5rem .7rem;border:1px solid var(--border);border-radius:8px;
+  background:var(--card2);cursor:pointer;transition:.15s;text-align:left;color:var(--text);}
+.opt:hover{border-color:var(--blue);}
+.opt.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+.opt.wrong{background:rgba(244,63,94,.15);border-color:var(--red);color:var(--red);}
+
+.reveal-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.4rem .8rem;border-radius:7px;border:1px solid var(--border);
+  background:var(--card2);color:var(--teal);cursor:pointer;margin-top:.3rem;}
+.reveal-btn:hover{border-color:var(--teal);}
+.answer{display:none;margin-top:.7rem;padding:.7rem .9rem;background:rgba(45,212,191,.06);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;font-size:.85rem;line-height:1.6;}
+.answer.show{display:block;}
+.answer b{color:var(--teal);}
+.answer .mono{font-family:'DM Mono',monospace;color:var(--blue);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Statistics — Question Bank</h1>
+  <p>Class X · Mathematics Ch.13 · CBSE Pattern · 30 Questions</p>
+</header>
+
+<div class="wrap">
+
+<!-- SECTION A: MCQ -->
+<div class="section-head">🔵 Section A — Multiple Choice <span class="marks">10 × 1 = 10 marks</span></div>
+
+<div class="q strip-data">
+  <div class="q-num">Q1 · MCQ</div>
+  <div class="q-text">The class mark of the class interval 25–35 is:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'w')">25</button>
+    <button class="opt" onclick="mcq(this,'c')">30</button>
+    <button class="opt" onclick="mcq(this,'w')">35</button>
+    <button class="opt" onclick="mcq(this,'w')">10</button>
+  </div>
+</div>
+
+<div class="q strip-med">
+  <div class="q-num">Q2 · MCQ</div>
+  <div class="q-text">For grouped data, the median is found using the position:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'w')">(n+1)/2</button>
+    <button class="opt" onclick="mcq(this,'c')">n/2</button>
+    <button class="opt" onclick="mcq(this,'w')">n</button>
+    <button class="opt" onclick="mcq(this,'w')">2n</button>
+  </div>
+</div>
+
+<div class="q strip-mode">
+  <div class="q-num">Q3 · MCQ</div>
+  <div class="q-text">The modal class of a frequency distribution is the class with the:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">highest frequency</button>
+    <button class="opt" onclick="mcq(this,'w')">lowest frequency</button>
+    <button class="opt" onclick="mcq(this,'w')">highest class mark</button>
+    <button class="opt" onclick="mcq(this,'w')">middle position</button>
+  </div>
+</div>
+
+<div class="q strip-rel">
+  <div class="q-num">Q4 · MCQ</div>
+  <div class="q-text">The empirical relationship between the three averages is:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">3 Median = Mode + 2 Mean</button>
+    <button class="opt" onclick="mcq(this,'w')">2 Median = Mode + 3 Mean</button>
+    <button class="opt" onclick="mcq(this,'w')">Mode = 2 Median − 3 Mean</button>
+    <button class="opt" onclick="mcq(this,'w')">Mean = Median = Mode</button>
+  </div>
+</div>
+
+<div class="q strip-mean">
+  <div class="q-num">Q5 · MCQ</div>
+  <div class="q-text">In the step-deviation method, uᵢ equals:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'w')">xᵢ − a</button>
+    <button class="opt" onclick="mcq(this,'c')">(xᵢ − a)/h</button>
+    <button class="opt" onclick="mcq(this,'w')">a − xᵢ</button>
+    <button class="opt" onclick="mcq(this,'w')">xᵢ·h</button>
+  </div>
+</div>
+
+<div class="q strip-ogive">
+  <div class="q-num">Q6 · MCQ</div>
+  <div class="q-text">A "less than" ogive is drawn by plotting:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">upper limits vs cf</button>
+    <button class="opt" onclick="mcq(this,'w')">lower limits vs cf</button>
+    <button class="opt" onclick="mcq(this,'w')">class marks vs f</button>
+    <button class="opt" onclick="mcq(this,'w')">limits vs frequency</button>
+  </div>
+</div>
+
+<div class="q strip-mode">
+  <div class="q-num">Q7 · MCQ</div>
+  <div class="q-text">If Mean = 30 and Median = 28, then using the empirical relation the Mode is:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">24</button>
+    <button class="opt" onclick="mcq(this,'w')">26</button>
+    <button class="opt" onclick="mcq(this,'w')">28</button>
+    <button class="opt" onclick="mcq(this,'w')">32</button>
+  </div>
+</div>
+
+<div class="q strip-data">
+  <div class="q-num">Q8 · MCQ</div>
+  <div class="q-text">The cumulative frequency of the last class of a distribution is always equal to:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">n (total frequency)</button>
+    <button class="opt" onclick="mcq(this,'w')">n/2</button>
+    <button class="opt" onclick="mcq(this,'w')">the largest frequency</button>
+    <button class="opt" onclick="mcq(this,'w')">zero</button>
+  </div>
+</div>
+
+<div class="q strip-med">
+  <div class="q-num">Q9 · MCQ</div>
+  <div class="q-text">In the median formula, "cf" refers to the cumulative frequency of the:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">class before the median class</button>
+    <button class="opt" onclick="mcq(this,'w')">median class</button>
+    <button class="opt" onclick="mcq(this,'w')">class after the median class</button>
+    <button class="opt" onclick="mcq(this,'w')">last class</button>
+  </div>
+</div>
+
+<div class="q strip-mean">
+  <div class="q-num">Q10 · MCQ</div>
+  <div class="q-text">Which measure of central tendency is most affected by extreme values?</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">Mean</button>
+    <button class="opt" onclick="mcq(this,'w')">Median</button>
+    <button class="opt" onclick="mcq(this,'w')">Mode</button>
+    <button class="opt" onclick="mcq(this,'w')">None</button>
+  </div>
+</div>
+
+<!-- SECTION B: ASSERTION-REASON -->
+<div class="section-head">🧩 Section B — Assertion &amp; Reason <span class="marks">3 × 1 = 3 marks</span></div>
+
+<div class="q strip-med">
+  <div class="q-num">Q11 · A-R</div>
+  <div class="q-text"><b>Assertion:</b> For grouped data the median is found using n/2, not (n+1)/2.<br><b>Reason:</b> Grouped data is treated as continuous, so the median corresponds to the n/2-th observation.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer"><b>Both true, Reason explains Assertion.</b> Because grouped data is continuous, the middle is at the n/2 position, so we locate the class whose cf first reaches n/2.</div>
+</div>
+
+<div class="q strip-rel">
+  <div class="q-num">Q12 · A-R</div>
+  <div class="q-text"><b>Assertion:</b> The three mean methods (direct, assumed, step-deviation) may give different answers.<br><b>Reason:</b> They use different reference points a and scaling h.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer"><b>Assertion false, Reason true.</b> Although the methods use different a and h, all three give the <span class="mono">same mean</span> — only the arithmetic differs.</div>
+</div>
+
+<div class="q strip-ogive">
+  <div class="q-num">Q13 · A-R</div>
+  <div class="q-text"><b>Assertion:</b> The median can be read off the point where the two ogives intersect.<br><b>Reason:</b> At that point the "less than" and "more than" cumulative frequencies are equal (= n/2).</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer"><b>Both true, Reason explains Assertion.</b> The intersection occurs at cf = n/2, and its x-coordinate is the median.</div>
+</div>
+
+<!-- SECTION C: SHORT ANSWER -->
+<div class="section-head">✍️ Section C — Short Answer <span class="marks">12 × 2 = 24 marks</span></div>
+
+<div class="q strip-data">
+  <div class="q-num">Q14 · Short</div>
+  <div class="q-text">Find the class mark and class size of the interval 40–55.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Class mark = (40 + 55)/2 = <span class="mono">47.5</span>; class size h = 55 − 40 = <span class="mono">15</span>.</div>
+</div>
+
+<div class="q strip-mean">
+  <div class="q-num">Q15 · Short</div>
+  <div class="q-text">The mean of Σfᵢxᵢ = 1860 and Σfᵢ = 60. Find the mean.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">x̄ = Σfx/Σf = 1860/60 = <span class="mono">31</span>.</div>
+</div>
+
+<div class="q strip-rel">
+  <div class="q-num">Q16 · Short</div>
+  <div class="q-text">If the mode is 25 and the mean is 28, estimate the median.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">3 Median = Mode + 2 Mean = 25 + 56 = 81 → Median = <span class="mono">27</span>.</div>
+</div>
+
+<div class="q strip-mode">
+  <div class="q-num">Q17 · Short</div>
+  <div class="q-text">A modal class 30–40 has f₁ = 20, f₀ = 12, f₂ = 8, h = 10. Find the mode.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Mode = 30 + [(20−12)/(40−12−8)]×10 = 30 + (8/20)×10 = 30 + 4 = <span class="mono">34</span>.</div>
+</div>
+
+<div class="q strip-med">
+  <div class="q-num">Q18 · Short</div>
+  <div class="q-text">A median class 50–60 has l = 50, n/2 = 25, cf = 18, f = 14, h = 10. Find the median.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Median = 50 + [(25−18)/14]×10 = 50 + (7/14)×10 = 50 + 5 = <span class="mono">55</span>.</div>
+</div>
+
+<div class="q strip-mean">
+  <div class="q-num">Q19 · Short</div>
+  <div class="q-text">Using assumed mean a = 25, Σfᵢdᵢ = 120 and Σfᵢ = 40. Find the mean.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">x̄ = a + Σfd/Σf = 25 + 120/40 = 25 + 3 = <span class="mono">28</span>.</div>
+</div>
+
+<div class="q strip-data">
+  <div class="q-num">Q20 · Short</div>
+  <div class="q-text">Build the cumulative frequency for classes 0–10, 10–20, 20–30 with f = 5, 8, 7.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">cf: 5, 5+8 = 13, 13+7 = <span class="mono">20</span>. So cf column = 5, 13, 20 (and n = 20).</div>
+</div>
+
+<div class="q strip-mean">
+  <div class="q-num">Q21 · Short</div>
+  <div class="q-text">Using step-deviation with a = 45, h = 10, Σfᵢuᵢ = −6, Σfᵢ = 30. Find the mean.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">x̄ = a + h·(Σfu/Σf) = 45 + 10×(−6/30) = 45 − 2 = <span class="mono">43</span>.</div>
+</div>
+
+<div class="q strip-mode">
+  <div class="q-num">Q22 · Short</div>
+  <div class="q-text">Why must class intervals be continuous before finding the mode or median?</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">The mode and median formulas assume no gaps between classes. Discontinuous classes (e.g. 10–19, 20–29) are converted to continuous ones (9.5–19.5, 19.5–29.5) so the boundaries meet.</div>
+</div>
+
+<div class="q strip-ogive">
+  <div class="q-num">Q23 · Short</div>
+  <div class="q-text">Explain how to read the median from a single "less than" ogive.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Locate y = n/2 on the cf-axis, draw a horizontal line to the curve, then drop a vertical line to the x-axis. That x-value is the <span class="mono">median</span>.</div>
+</div>
+
+<div class="q strip-rel">
+  <div class="q-num">Q24 · Short</div>
+  <div class="q-text">The mean and median of a distribution are 35.4 and 34.8. Estimate the mode.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Mode = 3 Median − 2 Mean = 3(34.8) − 2(35.4) = 104.4 − 70.8 = <span class="mono">33.6</span>.</div>
+</div>
+
+<div class="q strip-med">
+  <div class="q-num">Q25 · Short</div>
+  <div class="q-text">The total frequency n = 50. Which n/2 value locates the median class, and what does it mean?</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">n/2 = 25. The median class is the first class whose cumulative frequency ≥ <span class="mono">25</span>.</div>
+</div>
+
+<!-- SECTION D: LONG ANSWER -->
+<div class="section-head">📐 Section D — Long Answer <span class="marks">5 × 3 = 15 marks</span></div>
+
+<div class="q strip-mean">
+  <div class="q-num">Q26 · Long</div>
+  <div class="q-text">Find the mean of: classes 0–10, 10–20, 20–30, 30–40 with frequencies 7, 10, 15, 8 (direct method).</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Class marks: 5, 15, 25, 35. Σf = 40. Σfx = 35 + 150 + 375 + 280 = 840. Mean = 840/40 = <span class="mono">21</span>.</div>
+</div>
+
+<div class="q strip-med">
+  <div class="q-num">Q27 · Long</div>
+  <div class="q-text">Find the median of: classes 0–10, 10–20, 20–30, 30–40, 40–50 with f = 5, 8, 12, 10, 5.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">n = 40, n/2 = 20. cf: 5, 13, 25, 35, 40 → median class 20–30 (cf first ≥ 20). l = 20, cf = 13, f = 12, h = 10. Median = 20 + [(20−13)/12]×10 = 20 + 5.83 = <span class="mono">25.83</span>.</div>
+</div>
+
+<div class="q strip-mode">
+  <div class="q-num">Q28 · Long</div>
+  <div class="q-text">Find the mode of: classes 10–20, 20–30, 30–40, 40–50 with f = 6, 14, 9, 5.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Modal class 20–30 (highest f = 14). l = 20, f₁ = 14, f₀ = 6, f₂ = 9, h = 10. Mode = 20 + [(14−6)/(28−6−9)]×10 = 20 + (8/13)×10 = 20 + 6.15 = <span class="mono">26.15</span>.</div>
+</div>
+
+<div class="q strip-mean">
+  <div class="q-num">Q29 · Long</div>
+  <div class="q-text">Find the mean of: classes 100–120, 120–140, 140–160, 160–180 with f = 12, 14, 8, 6 using the step-deviation method (a = 130, h = 20).</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Class marks: 110, 130, 150, 170 → u = −1, 0, 1, 2. Σf = 40. Σfu = −12 + 0 + 8 + 12 = 8. Mean = 130 + 20×(8/40) = 130 + 4 = <span class="mono">134</span>.</div>
+</div>
+
+<div class="q strip-rel">
+  <div class="q-num">Q30 · Long</div>
+  <div class="q-text">For a distribution, Mean = 45 and Mode = 42. Find the median and state which average resists outliers.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">3 Median = Mode + 2 Mean = 42 + 90 = 132 → Median = <span class="mono">44</span>. The <b>median</b> resists extreme values (outliers), whereas the mean is most affected by them.</div>
+</div>
+
+</div>
+
+<script>
+function mcq(btn,type){
+  const parent=btn.parentElement;
+  if(parent.dataset.done)return;
+  parent.dataset.done='1';
+  if(type==='c'){btn.classList.add('correct');}
+  else{btn.classList.add('wrong');
+    parent.querySelectorAll('.opt').forEach(o=>{if(o.getAttribute('onclick').includes("'c'"))o.classList.add('correct');});
+  }
+}
+function reveal(btn){
+  const ans=btn.nextElementSibling;
+  ans.classList.toggle('show');
+  btn.textContent=ans.classList.contains('show')?'Hide Answer':'Show Answer';
+}
+</script>
+</body>
+</html>

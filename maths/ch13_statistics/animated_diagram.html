@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive — Statistics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.4rem 1rem .4rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.tabs{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;padding:.9rem 1rem;max-width:900px;margin:0 auto;}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.4rem .8rem;border-radius:99px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);cursor:pointer;transition:.15s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:#04121e;font-weight:700;}
+
+.panel{display:none;max-width:720px;margin:0 auto;padding:1rem 1.2rem 2.5rem;}
+.panel.active{display:block;}
+.stage{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem;}
+canvas{width:100%;background:var(--card2);border-radius:10px;display:block;touch-action:none;}
+.desc{font-size:.85rem;line-height:1.6;color:var(--text);margin-top:.9rem;}
+.desc b{color:var(--blue);}
+.readout{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--teal);background:var(--card2);border-radius:8px;padding:.6rem .8rem;margin-top:.8rem;line-height:1.7;}
+.readout b{color:var(--blue);}
+.ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;margin-top:.9rem;}
+.ctrl-row label{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.5rem;flex:1;min-width:180px;}
+input[type=range]{flex:1;accent-color:var(--blue);}
+.hint-txt{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);margin-top:.6rem;text-align:center;}
+
+.app-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.4rem;}
+@media(max-width:520px){.app-grid{grid-template-columns:1fr;}}
+.app-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:.9rem;}
+.app-card h4{font-family:'Playfair Display',serif;font-size:.9rem;color:var(--blue);margin-bottom:.4rem;}
+.app-card p{font-size:.8rem;line-height:1.5;color:var(--text);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Statistics — Interactive</h1>
+  <p>Class X · Mathematics Ch.13 · 6 Interactive Modules</p>
+</header>
+
+<div class="tabs" id="tabs">
+  <button class="tab-btn active" onclick="showTab(0,this,'#38bdf8')">📊 Histogram &amp; Mean</button>
+  <button class="tab-btn" onclick="showTab(1,this,'#818cf8')">🎯 Median</button>
+  <button class="tab-btn" onclick="showTab(2,this,'#f43f5e')">🔝 Mode</button>
+  <button class="tab-btn" onclick="showTab(3,this,'#d946ef')">📈 Ogive</button>
+  <button class="tab-btn" onclick="showTab(4,this,'#2dd4bf')">🔗 Empirical</button>
+  <button class="tab-btn" onclick="showTab(5,this,'#22c55e')">🌍 Applications</button>
+</div>
+
+<!-- 0: HISTOGRAM & MEAN -->
+<div class="panel active">
+  <div class="stage">
+    <canvas id="cvMean" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Middle class (20–30) frequency: <span id="meanVal">15</span><input type="range" id="meanF" min="4" max="26" value="15" step="1"></label>
+    </div>
+    <div class="readout" id="meanOut"></div>
+    <div class="desc">Each bar is a class; its height is the frequency. The <b>mean</b> = Σfᵢxᵢ / Σfᵢ uses the class marks (5, 15, 25, 35, 45). Drag the slider and watch the mean shift toward the taller bar.</div>
+  </div>
+</div>
+
+<!-- 1: MEDIAN -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvMed" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Middle class (20–30) frequency: <span id="medVal">15</span><input type="range" id="medF" min="4" max="26" value="15" step="1"></label>
+    </div>
+    <div class="readout" id="medOut"></div>
+    <div class="desc">The dashed line is at <b>n/2</b>. The first class whose cumulative frequency crosses it is the <b>median class</b> (highlighted). Median = l + [(n/2 − cf)/f]·h.</div>
+  </div>
+</div>
+
+<!-- 2: MODE -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvMode" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Modal class (20–30) frequency: <span id="modeVal">15</span><input type="range" id="modeF" min="11" max="26" value="15" step="1"></label>
+    </div>
+    <div class="readout" id="modeOut"></div>
+    <div class="desc">The tallest bar is the <b>modal class</b>. The crossing diagonals inside it locate the mode: Mode = l + [(f₁ − f₀)/(2f₁ − f₀ − f₂)]·h.</div>
+  </div>
+</div>
+
+<!-- 3: OGIVE -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvOgive" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Middle class (20–30) frequency: <span id="ogVal">15</span><input type="range" id="ogF" min="4" max="26" value="15" step="1"></label>
+    </div>
+    <div class="readout" id="ogOut"></div>
+    <div class="desc">The <b>"less than" ogive</b> plots (upper limit, cumulative frequency). Drawing a line at y = n/2 across to the curve and down to the x-axis reads off the <b>median</b> graphically.</div>
+  </div>
+</div>
+
+<!-- 4: EMPIRICAL -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvRel" width="640" height="420"></canvas>
+    <div class="ctrl-row">
+      <label>Skewness: <span id="relVal">0</span><input type="range" id="relS" min="-10" max="10" value="0" step="1"></label>
+    </div>
+    <div class="readout" id="relOut"></div>
+    <div class="desc">For a skewed distribution the three averages separate on the number line, always obeying <b>3 Median = Mode + 2 Mean</b>. Slide to add skew and see them spread apart.</div>
+  </div>
+</div>
+
+<!-- 5: APPLICATIONS -->
+<div class="panel">
+  <div class="app-grid">
+    <div class="app-card"><h4>🏏 Cricket Scores</h4><p>A batsman's average is the mean of runs; a "typical" innings is described by the median.</p></div>
+    <div class="app-card"><h4>📚 Exam Marks</h4><p>Grouped mark distributions use mean, median and mode to summarise a class's performance.</p></div>
+    <div class="app-card"><h4>🏠 Household Income</h4><p>Median income is preferred over mean because a few very high incomes skew the average.</p></div>
+    <div class="app-card"><h4>👟 Shoe &amp; Dress Sizes</h4><p>Shops stock the modal size — the one that sells most often — to meet demand.</p></div>
+    <div class="app-card"><h4>🌡️ Weather Data</h4><p>Average rainfall and temperature over class intervals are reported using the mean.</p></div>
+    <div class="app-card"><h4>📊 Surveys &amp; Polls</h4><p>Opinion polls group responses into intervals and report central tendency and spread.</p></div>
+  </div>
+  <div class="desc" style="text-align:center;">From sports to surveys, statistics turns raw data into a single meaningful summary.</div>
+</div>
+
+<script>
+// Shared dataset: 5 classes, width 10, marks 5..45
+const LOWER=[0,10,20,30,40], H=10, MARKS=[5,15,25,35,45];
+const BASE=[7,10,15,8,5]; // middle (index 2) is adjustable
+
+function freqs(mid){ const f=BASE.slice(); f[2]=mid; return f; }
+
+// axis helpers for bar charts
+function barGeom(cv){ return {x0:60,y0:cv.height-46,w:cv.width-90,h:cv.height-90}; }
+
+function drawAxes(ctx,cv,maxF){
+  const g=barGeom(cv);
+  ctx.strokeStyle='#334155';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(g.x0,g.y0-g.h);ctx.lineTo(g.x0,g.y0);ctx.lineTo(g.x0+g.w,g.y0);ctx.stroke();
+  ctx.fillStyle='#4a6890';ctx.font='10px "DM Mono"';ctx.textAlign='right';
+  for(let v=0;v<=maxF;v+=Math.ceil(maxF/5)){
+    const y=g.y0-(v/maxF)*g.h;
+    ctx.fillText(v,g.x0-6,y+3);
+    ctx.strokeStyle='rgba(255,255,255,.05)';ctx.beginPath();ctx.moveTo(g.x0,y);ctx.lineTo(g.x0+g.w,y);ctx.stroke();
+  }
+  ctx.textAlign='center';
+}
+
+function drawBars(ctx,cv,f,maxF,highlight,color){
+  const g=barGeom(cv), bw=g.w/f.length;
+  f.forEach((fi,i)=>{
+    const bh=(fi/maxF)*g.h, x=g.x0+i*bw+bw*0.12, y=g.y0-bh, w=bw*0.76;
+    ctx.fillStyle = i===highlight ? color+'55' : 'rgba(56,189,248,.18)';
+    ctx.strokeStyle = i===highlight ? color : '#38bdf8';
+    ctx.lineWidth=2;
+    ctx.fillRect(x,y,w,bh);ctx.strokeRect(x,y,w,bh);
+    ctx.fillStyle='#cce4ff';ctx.font='11px "DM Mono"';
+    ctx.fillText(fi,x+w/2,y-6);
+    ctx.fillStyle='#4a6890';ctx.font='9px "DM Mono"';
+    ctx.fillText(LOWER[i]+'–'+(LOWER[i]+H),x+w/2,g.y0+14);
+  });
+  return {g,bw};
+}
+
+// ---------- 0: MEAN ----------
+(function(){
+  const cv=document.getElementById('cvMean'),ctx=cv.getContext('2d');
+  const s=document.getElementById('meanF');
+  function draw(){
+    const mid=+s.value;document.getElementById('meanVal').textContent=mid;
+    const f=freqs(mid), n=f.reduce((a,b)=>a+b,0);
+    const sfx=f.reduce((a,fi,i)=>a+fi*MARKS[i],0), mean=sfx/n;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    const maxF=26;
+    drawAxes(ctx,cv,maxF);
+    const {g,bw}=drawBars(ctx,cv,f,maxF,-1,'#38bdf8');
+    // mean marker (map mean 0..50 across the 5 classes)
+    const mx=g.x0+(mean/50)*g.w;
+    ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(mx,g.y0-g.h);ctx.lineTo(mx,g.y0);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#f59e0b';ctx.font='11px "DM Mono"';ctx.fillText('mean',mx,g.y0-g.h-4);
+    document.getElementById('meanOut').innerHTML=
+      `Σfᵢxᵢ = ${sfx}, Σfᵢ = ${n} → Mean x̄ = ${sfx}/${n} = <b>${mean.toFixed(2)}</b>`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 1: MEDIAN ----------
+(function(){
+  const cv=document.getElementById('cvMed'),ctx=cv.getContext('2d');
+  const s=document.getElementById('medF');
+  function draw(){
+    const mid=+s.value;document.getElementById('medVal').textContent=mid;
+    const f=freqs(mid), n=f.reduce((a,b)=>a+b,0);
+    // cumulative frequencies
+    const cf=[];let run=0;f.forEach(fi=>{run+=fi;cf.push(run);});
+    // median class
+    let mc=0;for(let i=0;i<cf.length;i++){if(cf[i]>=n/2){mc=i;break;}}
+    const l=LOWER[mc], cfb=mc>0?cf[mc-1]:0, fm=f[mc];
+    const median=l+((n/2-cfb)/fm)*H;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    const maxF=26;
+    drawAxes(ctx,cv,maxF);
+    drawBars(ctx,cv,f,maxF,mc,'#818cf8');
+    // n/2 line (in frequency terms it's cumulative, so draw at proportion using a second scale on right)
+    const g=barGeom(cv);
+    const yhalf=g.y0-((n/2)/n)*g.h; // relative position
+    ctx.strokeStyle='#818cf8';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.moveTo(g.x0,yhalf);ctx.lineTo(g.x0+g.w,yhalf);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#818cf8';ctx.font='10px "DM Mono"';ctx.textAlign='left';
+    ctx.fillText('n/2 = '+(n/2),g.x0+g.w-70,yhalf-5);ctx.textAlign='center';
+    document.getElementById('medOut').innerHTML=
+      `n = ${n}, n/2 = ${n/2}. Median class = <b>${l}–${l+H}</b> (cf before = ${cfb}, f = ${fm}). Median = ${l} + [(${n/2}−${cfb})/${fm}]·${H} = <b>${median.toFixed(2)}</b>`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 2: MODE ----------
+(function(){
+  const cv=document.getElementById('cvMode'),ctx=cv.getContext('2d');
+  const s=document.getElementById('modeF');
+  function draw(){
+    const mid=+s.value;document.getElementById('modeVal').textContent=mid;
+    const f=freqs(mid);
+    // modal class = index of max
+    let mc=0;f.forEach((fi,i)=>{if(fi>f[mc])mc=i;});
+    const l=LOWER[mc],f1=f[mc],f0=mc>0?f[mc-1]:0,f2=mc<f.length-1?f[mc+1]:0;
+    const denom=(2*f1-f0-f2);
+    const mode=denom!==0? l+((f1-f0)/denom)*H : l+H/2;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    const maxF=26;
+    drawAxes(ctx,cv,maxF);
+    const g=barGeom(cv), bw=g.w/f.length;
+    drawBars(ctx,cv,f,maxF,mc,'#f43f5e');
+    // interpolation diagonals inside modal bar
+    const bx=g.x0+mc*bw+bw*0.12, bwid=bw*0.76;
+    const topL={x:bx,y:g.y0-(f1/maxF)*g.h}, topR={x:bx+bwid,y:g.y0-(f1/maxF)*g.h};
+    const prevTop={x:bx,y:g.y0-(f0/maxF)*g.h}, nextTop={x:bx+bwid,y:g.y0-(f2/maxF)*g.h};
+    ctx.strokeStyle='#fbbf24';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(topL.x,topL.y);ctx.lineTo(nextTop.x,nextTop.y);
+    ctx.moveTo(topR.x,topR.y);ctx.lineTo(prevTop.x,prevTop.y);ctx.stroke();
+    // mode vertical
+    const mx=bx+((f1-f0)/denom)*bwid;
+    ctx.strokeStyle='#f43f5e';ctx.lineWidth=2;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(mx,g.y0);ctx.lineTo(mx,topL.y);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#f43f5e';ctx.font='11px "DM Mono"';ctx.fillText('mode',mx,g.y0+28);
+    document.getElementById('modeOut').innerHTML=
+      `Modal class = <b>${l}–${l+H}</b>. f₁=${f1}, f₀=${f0}, f₂=${f2}. Mode = ${l} + [(${f1}−${f0})/(${2*f1}−${f0}−${f2})]·${H} = <b>${mode.toFixed(2)}</b>`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 3: OGIVE ----------
+(function(){
+  const cv=document.getElementById('cvOgive'),ctx=cv.getContext('2d');
+  const s=document.getElementById('ogF');
+  function draw(){
+    const mid=+s.value;document.getElementById('ogVal').textContent=mid;
+    const f=freqs(mid), n=f.reduce((a,b)=>a+b,0);
+    const cf=[];let run=0;f.forEach(fi=>{run+=fi;cf.push(run);});
+    // median (exact) for reference
+    let mc=0;for(let i=0;i<cf.length;i++){if(cf[i]>=n/2){mc=i;break;}}
+    const median=LOWER[mc]+((n/2-(mc>0?cf[mc-1]:0))/f[mc])*H;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    const pad=54, x0=pad, y0=cv.height-40, w=cv.width-pad-30, h=cv.height-70;
+    const xMax=50, yMax=n;
+    const px=v=>x0+(v/xMax)*w, py=v=>y0-(v/yMax)*h;
+    // axes
+    ctx.strokeStyle='#334155';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x0,y0-h);ctx.lineTo(x0,y0);ctx.lineTo(x0+w,y0);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.font='9px "DM Mono"';ctx.textAlign='center';
+    for(let v=0;v<=xMax;v+=10)ctx.fillText(v,px(v),y0+14);
+    ctx.textAlign='right';
+    for(let v=0;v<=yMax;v+=Math.ceil(yMax/5))ctx.fillText(v,x0-5,py(v)+3);
+    ctx.textAlign='center';
+    // ogive points: (upper limit, cf), starting (0,0)
+    const pts=[{x:0,y:0}];
+    cf.forEach((c,i)=>pts.push({x:LOWER[i]+H,y:c}));
+    ctx.strokeStyle='#d946ef';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(px(pts[0].x),py(pts[0].y));
+    for(let i=1;i<pts.length;i++)ctx.lineTo(px(pts[i].x),py(pts[i].y));
+    ctx.stroke();
+    pts.forEach(p=>{ctx.fillStyle='#e879f9';ctx.beginPath();ctx.arc(px(p.x),py(p.y),3.5,0,7);ctx.fill();});
+    // n/2 guide → median
+    ctx.strokeStyle='#38bdf8';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(x0,py(n/2));ctx.lineTo(px(median),py(n/2));ctx.lineTo(px(median),y0);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#38bdf8';ctx.font='10px "DM Mono"';
+    ctx.fillText('median ≈ '+median.toFixed(1),px(median),py(n/2)-8);
+    document.getElementById('ogOut').innerHTML=
+      `cf = [${cf.join(', ')}], n = ${n}. Line at y = n/2 = ${n/2} meets the curve at x = <b>${median.toFixed(2)}</b> (the median).`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 4: EMPIRICAL ----------
+(function(){
+  const cv=document.getElementById('cvRel'),ctx=cv.getContext('2d');
+  const s=document.getElementById('relS');
+  function draw(){
+    const k=+s.value;document.getElementById('relVal').textContent=k;
+    // build mean & median from skew, then mode via empirical relation
+    const mean=30+k*0.6, median=30+k*0.2;
+    const mode=3*median-2*mean; // empirical relation
+    ctx.clearRect(0,0,cv.width,cv.height);
+    const x0=50,x1=cv.width-40,y=cv.height/2+40, vMin=15,vMax=45;
+    const px=v=>x0+((v-vMin)/(vMax-vMin))*(x1-x0);
+    // bell curve (skewed) above the line
+    ctx.strokeStyle='#2dd4bf';ctx.lineWidth=2.5;ctx.beginPath();
+    for(let i=0;i<=200;i++){
+      const v=vMin+(vMax-vMin)*i/200;
+      const g=Math.exp(-Math.pow((v-median-k*0.15)/6,2)/2);
+      const yy=y-g*150;
+      if(i===0)ctx.moveTo(px(v),yy);else ctx.lineTo(px(v),yy);
+    }
+    ctx.stroke();
+    // number line
+    ctx.strokeStyle='#334155';ctx.lineWidth=1.5;ctx.beginPath();
+    ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();
+    // markers
+    function mark(v,color,label,dy){
+      ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px(v),y-8);ctx.lineTo(px(v),y+8);ctx.stroke();
+      ctx.fillStyle=color;ctx.font='11px "DM Mono"';ctx.textAlign='center';
+      ctx.fillText(label,px(v),y+22+dy);
+      ctx.fillText(v.toFixed(1),px(v),y+36+dy);
+    }
+    mark(mean,'#38bdf8','Mean',0);
+    mark(median,'#818cf8','Median',(Math.abs(median-mean)<2?26:0));
+    mark(mode,'#f43f5e','Mode',(Math.abs(mode-mean)<2?26:0));
+    document.getElementById('relOut').innerHTML=
+      `Mean = ${mean.toFixed(1)}, Median = ${median.toFixed(1)} → Mode = 3(${median.toFixed(1)}) − 2(${mean.toFixed(1)}) = <b>${mode.toFixed(1)}</b> &nbsp;(3 Median = Mode + 2 Mean)`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- tabs ----------
+function showTab(i,btn,color){
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',j===i));
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.style.background='';});
+  btn.classList.add('active');btn.style.background=color;
+}
+document.querySelector('.tab-btn').style.background='#38bdf8';
+</script>
+</body>
+</html>

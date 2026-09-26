@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Probability</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(217,70,239,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--purple);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:1rem;padding:1rem 1.2rem 2rem;max-width:1100px;margin:0 auto;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.panel-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;}
+.panel-head .icon{font-size:1rem;}
+.panel-body{padding:.8rem 1rem 1rem;display:flex;flex-direction:column;gap:.6rem;}
+
+.ph-bas .panel-head{background:rgba(217,70,239,.12);color:var(--purple);}
+.ph-theo .panel-head{background:rgba(34,197,94,.12);color:var(--green);}
+.ph-samp .panel-head{background:rgba(56,189,248,.12);color:var(--blue);}
+.ph-comp .panel-head{background:rgba(244,63,94,.12);color:var(--red);}
+.ph-obj .panel-head{background:rgba(129,140,248,.12);color:var(--indigo);}
+.ph-vit .panel-head{background:rgba(245,158,11,.12);color:var(--amber);}
+.ph-app .panel-head{background:rgba(45,212,191,.12);color:var(--teal);}
+.ph-mem .panel-head{background:rgba(74,104,144,.18);color:#9ab8d8;}
+
+.formula-block{background:var(--card2);border-radius:8px;padding:.6rem .8rem;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--teal);line-height:1.7;}
+.formula-block strong{color:var(--purple);}
+.sub-label{font-family:'Playfair Display',serif;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem;}
+
+table{width:100%;border-collapse:collapse;font-size:.76rem;}
+th{padding:.4rem .5rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+td{padding:.38rem .5rem;border-bottom:1px solid rgba(26,45,69,.5);line-height:1.4;}
+tr:last-child td{border-bottom:none;}
+td.mono{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--teal);}
+td.purple{color:var(--purple);}td.green{color:var(--green);}td.red{color:var(--red);}
+
+.hbox{display:flex;gap:.5rem;flex-wrap:wrap;}
+.fact{background:var(--card2);border-radius:6px;padding:.4rem .65rem;font-size:.76rem;color:var(--text);flex:1;min-width:100px;}
+.fact strong{display:block;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:.15rem;}
+.trick{background:rgba(217,70,239,.07);border-left:3px solid var(--purple);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.trick strong{color:var(--purple);}
+.tip{background:rgba(45,212,191,.07);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.tip strong{color:var(--teal);}
+.warn{background:rgba(244,63,94,.07);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.warn strong{color:var(--red);}
+
+.step-list{counter-reset:step;display:flex;flex-direction:column;gap:.3rem;}
+.step-list li{display:flex;align-items:flex-start;gap:.5rem;font-size:.78rem;list-style:none;counter-increment:step;line-height:1.5;}
+.step-list li::before{content:counter(step);background:var(--card2);color:var(--muted);font-family:'DM Mono',monospace;font-size:.65rem;
+  min-width:1.4rem;height:1.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:.1rem;flex-shrink:0;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Probability — Cheat Sheet</h1>
+  <p>Class X · Mathematics Ch.14 · 8 Panels · Quick Reference</p>
+</header>
+
+<div class="panel-grid">
+
+<!-- 1. BASICS -->
+<div class="panel ph-bas">
+  <div class="panel-head"><span class="icon">🎲</span> Basic Terms</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      Probability = <strong>a measure of chance</strong><br>
+      Always <strong>0 ≤ P(E) ≤ 1</strong>
+    </div>
+    <div class="sub-label">Vocabulary</div>
+    <table>
+      <tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td class="mono">Experiment</td><td>action with uncertain result</td></tr>
+      <tr><td class="mono">Outcome</td><td>one possible result</td></tr>
+      <tr><td class="mono">Event</td><td>set of favourable outcomes</td></tr>
+      <tr><td class="mono">Trial</td><td>one performance of the experiment</td></tr>
+    </table>
+    <div class="tip"><strong>Elementary event:</strong> an event with exactly one outcome.</div>
+  </div>
+</div>
+
+<!-- 2. THEORETICAL PROBABILITY -->
+<div class="panel ph-theo">
+  <div class="panel-head"><span class="icon">➗</span> Theoretical Probability</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      <strong>P(E) = (favourable outcomes) ÷ (total outcomes)</strong>
+    </div>
+    <div class="tip"><strong>Condition:</strong> all outcomes must be equally likely (fair coin / unbiased die).</div>
+    <div class="trick"><strong>Sum rule:</strong> the probabilities of all elementary events add up to <b>1</b>.</div>
+    <div class="warn"><strong>Never</strong> give a probability greater than 1 or less than 0 — recheck your counting.</div>
+  </div>
+</div>
+
+<!-- 3. SAMPLE SPACE -->
+<div class="panel ph-samp">
+  <div class="panel-head"><span class="icon">🗂️</span> Sample Space (Total Outcomes)</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Experiment</th><th>Total outcomes</th></tr>
+      <tr><td>1 coin</td><td class="mono">2</td></tr>
+      <tr><td>2 coins</td><td class="mono">4</td></tr>
+      <tr><td>3 coins</td><td class="mono">8 (2ⁿ)</td></tr>
+      <tr><td>1 die</td><td class="mono">6</td></tr>
+      <tr><td>2 dice</td><td class="mono">36 (6×6)</td></tr>
+      <tr><td>1 card from 52</td><td class="mono">52</td></tr>
+    </table>
+    <div class="tip"><strong>Counting rule:</strong> m outcomes then n outcomes = m × n total.</div>
+  </div>
+</div>
+
+<!-- 4. COMPLEMENT -->
+<div class="panel ph-comp">
+  <div class="panel-head"><span class="icon">🔄</span> Complementary Events</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      <strong>P(not E) = 1 − P(E)</strong><br>
+      P(E) + P(Ē) = 1
+    </div>
+    <div class="hbox">
+      <div class="fact"><strong>Sure event</strong>P = 1</div>
+      <div class="fact"><strong>Impossible event</strong>P = 0</div>
+    </div>
+    <div class="trick"><strong>Shortcut:</strong> "at least one" problems are often easier as 1 − P(none).</div>
+  </div>
+</div>
+
+<!-- 5. CARDS -->
+<div class="panel ph-obj">
+  <div class="panel-head"><span class="icon">🃏</span> Deck of 52 Cards</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Category</th><th>Count</th></tr>
+      <tr><td>Suits (♠♥♦♣)</td><td class="mono">4 × 13 = 52</td></tr>
+      <tr><td>Red / Black</td><td class="mono">26 / 26</td></tr>
+      <tr><td>Face cards (J,Q,K)</td><td class="mono">12</td></tr>
+      <tr><td>Aces</td><td class="mono">4</td></tr>
+      <tr><td>Cards per suit</td><td class="mono">13</td></tr>
+    </table>
+    <div class="tip"><strong>Hearts &amp; Diamonds</strong> are red; <strong>Spades &amp; Clubs</strong> are black.</div>
+  </div>
+</div>
+
+<!-- 6. KEY FORMULAS -->
+<div class="panel ph-vit">
+  <div class="panel-head"><span class="icon">⭐</span> All Formulas at a Glance</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Idea</th><th>Formula</th></tr>
+      <tr><td>Probability</td><td class="mono">P(E) = fav / total</td></tr>
+      <tr><td>Range</td><td class="mono">0 ≤ P(E) ≤ 1</td></tr>
+      <tr><td>Complement</td><td class="mono">P(Ē) = 1 − P(E)</td></tr>
+      <tr><td>Sure event</td><td class="mono">P = 1</td></tr>
+      <tr><td>Impossible event</td><td class="mono">P = 0</td></tr>
+      <tr><td>Sum of all</td><td class="mono">ΣP = 1</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 7. DICE GRID -->
+<div class="panel ph-app">
+  <div class="panel-head"><span class="icon">🎯</span> Two-Dice Sums</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Sum</th><th>Ways</th><th>Probability</th></tr>
+      <tr><td class="mono">2 or 12</td><td class="mono">1</td><td class="mono">1/36</td></tr>
+      <tr><td class="mono">3 or 11</td><td class="mono">2</td><td class="mono">2/36</td></tr>
+      <tr><td class="mono">7</td><td class="mono">6</td><td class="mono">6/36 = 1/6</td></tr>
+    </table>
+    <div class="warn"><strong>Sums are NOT equally likely!</strong> 7 is the most probable sum; 2 and 12 the least.</div>
+    <div class="tip">Always count the <b>36 ordered pairs</b>, e.g. (2,5) and (5,2) are different.</div>
+  </div>
+</div>
+
+<!-- 8. EXAM QUICK RECALL -->
+<div class="panel ph-mem">
+  <div class="panel-head"><span class="icon">🧠</span> Exam Quick Recall</div>
+  <div class="panel-body">
+    <div class="trick"><strong>Method:</strong> (1) count total outcomes, (2) count favourable, (3) divide, (4) simplify the fraction.</div>
+    <div class="warn"><strong>Common mistakes:</strong> forgetting a card is removed (without replacement); assuming dice sums are equally likely; miscounting face cards (12, not 16).</div>
+    <div class="tip"><strong>Always simplify:</strong> 26/52 = 1/2. Leave the answer as a reduced fraction unless told otherwise.</div>
+    <div class="tip"><strong>Sanity check:</strong> a probability must land between 0 and 1.</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

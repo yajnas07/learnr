@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Statistics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.4rem 1rem .4rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.filters{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;padding:.8rem 1rem;max-width:800px;margin:0 auto;}
+.filt{font-family:'DM Mono',monospace;font-size:.68rem;padding:.3rem .7rem;border-radius:99px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);cursor:pointer;transition:.15s;}
+.filt:hover{color:var(--text);}
+.filt.active{background:var(--blue);color:#04121e;border-color:var(--blue);font-weight:700;}
+
+.progress{text-align:center;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:.3rem 0;}
+
+.stage{max-width:560px;margin:0 auto;padding:1rem 1.2rem 2rem;}
+.card{perspective:1600px;height:340px;cursor:pointer;}
+.card-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.card.flipped .card-inner{transform:rotateY(180deg);}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;border:1px solid var(--border);
+  background:var(--card);padding:1.6rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.face-back{transform:rotateY(180deg);background:var(--card2);}
+.cat-tag{position:absolute;top:1rem;left:1rem;font-family:'DM Mono',monospace;font-size:.62rem;padding:.2rem .55rem;border-radius:99px;}
+.face .side{position:absolute;top:1rem;right:1rem;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);}
+.q-text{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;line-height:1.45;}
+.a-text{font-size:.95rem;line-height:1.6;color:var(--text);}
+.hint{margin-top:1rem;font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);font-style:italic;}
+.flip-hint{position:absolute;bottom:1rem;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);}
+
+.controls{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:1.2rem;}
+.btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.5rem .9rem;border-radius:8px;border:1px solid var(--border);
+  background:var(--card);color:var(--text);cursor:pointer;transition:.15s;}
+.btn:hover{border-color:var(--blue);color:var(--blue);}
+.btn-known{border-color:rgba(34,197,94,.4);color:var(--green);}
+.btn-review{border-color:rgba(245,158,11,.4);color:var(--amber);}
+.mark-row{display:flex;justify-content:center;gap:.6rem;margin-top:.7rem;}
+.counter{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);min-width:64px;text-align:center;}
+.util-row{display:flex;justify-content:center;gap:.6rem;margin-top:1rem;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Statistics</h1>
+  <p>Class X · Mathematics Ch.13 · 36 Flashcards · 6 Categories</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress" id="progress"></div>
+
+<div class="stage">
+  <div class="card" id="card" onclick="flip()">
+    <div class="card-inner">
+      <div class="face face-front">
+        <span class="cat-tag" id="catFront"></span>
+        <span class="side" id="sideFront"></span>
+        <div class="q-text" id="qText"></div>
+        <div class="hint" id="hintText"></div>
+        <div class="flip-hint">click / space to flip →</div>
+      </div>
+      <div class="face face-back">
+        <span class="cat-tag" id="catBack"></span>
+        <span class="side">answer</span>
+        <div class="a-text" id="aText"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="nav(-1)">← Prev</button>
+    <span class="counter" id="counter"></span>
+    <button class="btn" onclick="nav(1)">Next →</button>
+  </div>
+  <div class="mark-row">
+    <button class="btn btn-known" onclick="markKnown()">✓ Known</button>
+    <button class="btn btn-review" onclick="markReview()">↻ Review</button>
+  </div>
+  <div class="util-row">
+    <button class="btn" onclick="shuffle()">🔀 Shuffle</button>
+    <button class="btn" onclick="resetAll()">♻ Reset</button>
+  </div>
+</div>
+
+<script>
+const catColors={data:'#38bdf8',mean:'#22c55e',med:'#818cf8',mode:'#f43f5e',ogive:'#d946ef',rel:'#2dd4bf'};
+const catNames={data:'Data Basics',mean:'Mean',med:'Median',mode:'Mode',ogive:'Ogive',rel:'Relation'};
+
+const ALL_CARDS=[
+// DATA BASICS
+{cat:'data',q:'What is the class mark of a class interval?',a:'Class mark = (lower limit + upper limit) ÷ 2. It represents the whole class.',hint:'midpoint'},
+{cat:'data',q:'What is the class size (h)?',a:'The difference between the upper and lower class limits, e.g. class 10–20 has h = 10.',hint:'upper − lower'},
+{cat:'data',q:'What is cumulative frequency (cf)?',a:'A running total of frequencies up to and including a class. Used to find the median.',hint:'running total'},
+{cat:'data',q:'What does n represent in grouped data?',a:'n = Σfᵢ, the total of all frequencies (total number of observations).',hint:'Σfᵢ'},
+{cat:'data',q:'What is a "less than" cumulative frequency?',a:'It adds frequencies from the top down and is paired with the upper class limits.',hint:'upper limits'},
+{cat:'data',q:'Why make class intervals continuous?',a:'For median and mode we need no gaps. Adjust boundaries (e.g. 10–19 → 9.5–19.5) before applying formulas.',hint:'no gaps'},
+// MEAN
+{cat:'mean',q:'State the direct method for the mean.',a:'x̄ = Σfᵢxᵢ ÷ Σfᵢ, where xᵢ is the class mark.',hint:'Σfx/Σf'},
+{cat:'mean',q:'State the assumed-mean method.',a:'x̄ = a + (Σfᵢdᵢ ÷ Σfᵢ), where dᵢ = xᵢ − a and a is the assumed mean.',hint:'a + Σfd/Σf'},
+{cat:'mean',q:'State the step-deviation method.',a:'x̄ = a + h·(Σfᵢuᵢ ÷ Σfᵢ), where uᵢ = (xᵢ − a)/h.',hint:'a + h·Σfu/Σf'},
+{cat:'mean',q:'When is the step-deviation method best?',a:'When all class sizes are equal — the uᵢ values become small whole numbers, simplifying arithmetic.',hint:'equal widths'},
+{cat:'mean',q:'How do you choose the assumed mean a?',a:'Pick a convenient class mark near the middle (often the class with highest frequency) so deviations stay small.',hint:'middle class mark'},
+{cat:'mean',q:'Do the three mean methods give different answers?',a:'No — direct, assumed-mean and step-deviation all give exactly the same mean.',hint:'same result'},
+// MEDIAN
+{cat:'med',q:'State the median formula for grouped data.',a:'Median = l + [(n/2 − cf)/f] × h.',hint:'l + [(n/2−cf)/f]h'},
+{cat:'med',q:'What is the median class?',a:'The first class whose cumulative frequency is greater than or equal to n/2.',hint:'cf ≥ n/2'},
+{cat:'med',q:'In the median formula, what is cf?',a:'The cumulative frequency of the class just BEFORE the median class.',hint:'class before'},
+{cat:'med',q:'Do we use n/2 or (n+1)/2 for grouped data?',a:'We use n/2 for grouped (continuous) data.',hint:'n/2'},
+{cat:'med',q:'What does the median measure?',a:'The middle value — it divides the data into two equal halves and is unaffected by extreme values.',hint:'middle value'},
+{cat:'med',q:'In the median formula, what is f?',a:'The frequency of the median class itself.',hint:'median-class freq'},
+// MODE
+{cat:'mode',q:'State the mode formula for grouped data.',a:'Mode = l + [(f₁ − f₀)/(2f₁ − f₀ − f₂)] × h.',hint:'l + [(f₁−f₀)/(2f₁−f₀−f₂)]h'},
+{cat:'mode',q:'What is the modal class?',a:'The class interval with the highest frequency. The mode lies inside it.',hint:'highest frequency'},
+{cat:'mode',q:'In the mode formula, what are f₀, f₁ and f₂?',a:'f₁ = frequency of the modal class, f₀ = frequency of the class before it, f₂ = frequency of the class after it.',hint:'before, modal, after'},
+{cat:'mode',q:'What does the mode represent?',a:'The most frequently occurring value in the data.',hint:'most frequent'},
+{cat:'mode',q:'Can a data set have more than one mode?',a:'Yes — it can be unimodal, bimodal, or have no mode at all.',hint:'one / many / none'},
+{cat:'mode',q:'What is l in the mode formula?',a:'The lower limit of the modal class.',hint:'lower limit'},
+// OGIVE
+{cat:'ogive',q:'What is an ogive?',a:'A cumulative frequency curve, drawn free-hand and smooth.',hint:'cf curve'},
+{cat:'ogive',q:'How do you draw a "less than" ogive?',a:'Plot points (upper class limit, cumulative frequency) and join with a smooth rising curve.',hint:'upper limit vs cf'},
+{cat:'ogive',q:'How do you draw a "more than" ogive?',a:'Plot points (lower class limit, cumulative frequency from the top) and join with a smooth falling curve.',hint:'lower limit vs cf'},
+{cat:'ogive',q:'How do you find the median from two ogives?',a:'The x-coordinate of the point where the "less than" and "more than" ogives intersect is the median.',hint:'intersection'},
+{cat:'ogive',q:'How do you find the median from one ogive?',a:'Draw a horizontal line at y = n/2 to the less-than curve, then drop to the x-axis; that value is the median.',hint:'y = n/2'},
+{cat:'ogive',q:'Should an ogive be a straight-line graph?',a:'No — it must be a smooth free-hand curve, not straight line segments.',hint:'smooth curve'},
+// RELATION
+{cat:'rel',q:'State the empirical relationship between the three averages.',a:'3 Median = Mode + 2 Mean.',hint:'3Md = Mo + 2x̄'},
+{cat:'rel',q:'How do you estimate the mode from mean and median?',a:'Mode = 3 Median − 2 Mean.',hint:'3Md − 2x̄'},
+{cat:'rel',q:'How do you estimate the mean from mode and median?',a:'Mean = (3 Median − Mode) ÷ 2.',hint:'(3Md − Mo)/2'},
+{cat:'rel',q:'What are the three measures of central tendency?',a:'Mean, median and mode — each describes the "centre" of the data in a different way.',hint:'mean, median, mode'},
+{cat:'rel',q:'When is the empirical relation useful?',a:'When two of the three measures are known, it estimates the third.',hint:'find the third'},
+{cat:'rel',q:'Is the median affected by extreme values?',a:'No — unlike the mean, the median resists outliers, so it is a robust average.',hint:'robust'},
+];
+
+let cards=[...ALL_CARDS];
+let idx=0, filter='all';
+const known=new Set(), review=new Set();
+
+function buildFilters(){
+  const f=document.getElementById('filters');
+  const cats=['all',...Object.keys(catNames)];
+  f.innerHTML=cats.map(c=>{
+    const label=c==='all'?'All':catNames[c];
+    return `<button class="filt${c===filter?' active':''}" onclick="setFilter('${c}')">${label}</button>`;
+  }).join('');
+}
+function setFilter(c){
+  filter=c;
+  cards = c==='all' ? [...ALL_CARDS] : ALL_CARDS.filter(x=>x.cat===c);
+  idx=0; buildFilters(); render();
+}
+function render(){
+  if(!cards.length)return;
+  const card=cards[idx];
+  document.getElementById('card').classList.remove('flipped');
+  const col=catColors[card.cat];
+  document.getElementById('catFront').outerHTML=`<span class="cat-tag" id="catFront" style="background:${col}22;color:${col}">${catNames[card.cat]}</span>`;
+  document.getElementById('catBack').outerHTML=`<span class="cat-tag" id="catBack" style="background:${col}22;color:${col}">${catNames[card.cat]}</span>`;
+  document.getElementById('qText').textContent=card.q;
+  document.getElementById('aText').textContent=card.a;
+  document.getElementById('hintText').textContent='💡 '+card.hint;
+  document.getElementById('sideFront').textContent='question';
+  document.getElementById('counter').textContent=`${idx+1} / ${cards.length}`;
+  updateProgress();
+}
+function updateProgress(){
+  document.getElementById('progress').textContent=
+    `Known: ${known.size}  ·  To review: ${review.size}  ·  Total: ${ALL_CARDS.length}`;
+}
+function flip(){document.getElementById('card').classList.toggle('flipped');}
+function nav(d){idx=(idx+d+cards.length)%cards.length;render();}
+function markKnown(){const c=cards[idx];known.add(c.q);review.delete(c.q);updateProgress();nav(1);}
+function markReview(){const c=cards[idx];review.add(c.q);known.delete(c.q);updateProgress();nav(1);}
+function shuffle(){for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}idx=0;render();}
+function resetAll(){known.clear();review.clear();setFilter('all');}
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();flip();}
+  else if(e.code==='ArrowRight')nav(1);
+  else if(e.code==='ArrowLeft')nav(-1);
+});
+buildFilters();render();
+</script>
+</body>
+</html>
