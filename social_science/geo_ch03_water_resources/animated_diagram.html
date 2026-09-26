@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Water Resources · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04100a;--card:#0a1e10;--card2:#0f2616;--border:#1a3a22;
+  --text:#d4f0dc;--muted:#3a6a48;--geo:#22c55e;
+  --green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+.top-nav{display:flex;align-items:center;gap:16px;padding:10px 22px;background:rgba(4,16,10,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:27px}
+.nav-bc{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.nav-bc a{color:var(--muted);text-decoration:none}.nav-bc a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-cur{color:var(--geo);font-weight:700}
+.nav-back{margin-left:auto;padding:5px 13px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:18px;color:var(--geo);font-size:.78rem;text-decoration:none;transition:all .2s}
+.nav-back:hover{background:rgba(34,197,94,.2)}
+
+.page-hdr{padding:28px 20px 16px;text-align:center}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.85rem;color:#fff;margin-bottom:5px}
+.page-hdr p{color:var(--muted);font-size:.9rem}
+.ch-badge{display:inline-block;padding:3px 10px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);border-radius:12px;color:var(--geo);font-size:.73rem;font-weight:700;margin-bottom:8px}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 56px}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:7px 16px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.tab.active{border-color:var(--geo);background:rgba(34,197,94,.1);color:var(--green);font-weight:700}
+
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.panel-title{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;color:var(--text)}
+.panel-body{padding:18px}
+
+.rtable{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:4px}
+.rtable th{padding:8px 12px;background:rgba(34,197,94,.1);color:var(--green);font-weight:700;text-align:left;border-bottom:1px solid var(--border)}
+.rtable td{padding:8px 12px;border-bottom:1px solid rgba(26,58,34,.4);vertical-align:top}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(34,197,94,.04)}
+
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.72rem;font-weight:700;margin-right:4px}
+.tag-e{background:rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.3)}
+.tag-v{background:rgba(251,191,36,.15);color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
+.tag-r{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3)}
+.tag-n{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+
+.ibox{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:12px}
+.ibox strong{color:var(--text)}
+.ibox .kw{color:var(--green);font-weight:700}
+
+/* Cards Grid */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px}
+.info-card{border-radius:12px;padding:14px;border:1px solid var(--border);background:var(--card2);transition:all .25s}
+.info-card:hover{transform:translateY(-2px);border-color:rgba(74,222,128,.3)}
+.info-card h4{font-size:.88rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+.info-card p{font-size:.76rem;line-height:1.65;color:var(--muted)}
+.info-card .ic-icon{font-size:1.5rem;margin-bottom:8px;display:block}
+
+/* Timeline */
+.timeline{position:relative;padding-left:28px;margin-top:12px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--green),var(--purple))}
+.tl-item{position:relative;margin-bottom:18px;padding-bottom:4px}
+.tl-item::before{content:'';position:absolute;left:-24px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--green);background:var(--bg)}
+.tl-item h4{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.tl-item p{font-size:.76rem;line-height:1.6;color:var(--muted)}
+.tl-item .tl-year{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--green);margin-bottom:2px}
+
+/* Bar Chart */
+.bar-chart{margin-top:12px}
+.bar-row{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px}
+.bar-label span:first-child{color:var(--text)}
+.bar-label span:last-child{font-family:'DM Mono',monospace;color:var(--green)}
+.bar-track{height:12px;background:#0f2616;border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width 1.2s ease}
+
+/* Map Legend */
+.map-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.ml-item{display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--muted)}
+.ml-dot{width:10px;height:10px;border-radius:3px}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../../index.html" class="nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <div class="nav-bc">
+    <a href="../../index.html">Home</a><span class="nav-sep">/</span>
+    <a href="../../index.html">Geography</a><span class="nav-sep">/</span>
+    <span class="nav-cur">Water Resources</span>
+  </div>
+  <a href="../../index.html" class="nav-back">← Back</a>
+</nav>
+
+<div class="page-hdr">
+  <div class="ch-badge">Geography · Ch.3</div>
+  <h1>Water Resources</h1>
+  <p>Water scarcity, multi-purpose dams, rainwater harvesting and sustainable water management</p>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="show(0,this)">💧 Water Facts</button>
+    <button class="tab" onclick="show(1,this)">🚱 Water Scarcity</button>
+    <button class="tab" onclick="show(2,this)">🏞️ Dams & Projects</button>
+    <button class="tab" onclick="show(3,this)">⚠️ Dam Concerns</button>
+    <button class="tab" onclick="show(4,this)">🌧️ Rainwater Harvesting</button>
+    <button class="tab" onclick="show(5,this)">🛡️ Conservation</button>
+  </div>
+
+  <!-- TAB 0: Water Facts -->
+  <div class="panel active" id="p0">
+    <div class="panel-card">
+      <div class="panel-title">🌍 Water — A Renewable but Scarce Resource</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Water is a <span class="kw">renewable resource</span> that keeps circulating through the <strong>hydrological cycle</strong>. Yet <strong>freshwater</strong> is scarce. About <strong>96.5%</strong> of the world's water is in oceans (saline). Only about <span class="kw">2.5% is freshwater</span> — most of it frozen in ice-caps and glaciers.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--green)">Distribution of Water on Earth</h3>
+        <div class="bar-chart">
+          <div class="bar-row"><div class="bar-label"><span>Oceans (saline)</span><span>96.5%</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--blue)" data-w="100%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Frozen ice-caps & glaciers</span><span>1.75%</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--teal)" data-w="18%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Groundwater</span><span>0.68%</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--green)" data-w="8%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Rivers, lakes & atmosphere</span><span>0.07%</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--amber)" data-w="3%"></div></div></div>
+        </div>
+
+        <div class="card-grid" style="margin-top:16px">
+          <div class="info-card"><div class="ic-icon">🔄</div><h4>Hydrological Cycle</h4><p>Water constantly renews through evaporation, condensation and precipitation. This makes it a renewable resource.</p></div>
+          <div class="info-card"><div class="ic-icon">🇮🇳</div><h4>India's Share</h4><p>India receives ~4% of the world's annual precipitation, holds ~2.5% of world's water — yet supports ~18% of world population.</p></div>
+          <div class="info-card"><div class="ic-icon">🌧️</div><h4>Uneven Rainfall</h4><p>India's rainfall is highly seasonal & uneven — most falls in a few monsoon months, causing floods and droughts.</p></div>
+          <div class="info-card"><div class="ic-icon">📉</div><h4>Falling Availability</h4><p>Per capita water availability is declining fast due to rising population, agriculture and industrialisation.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: Water Scarcity -->
+  <div class="panel" id="p1">
+    <div class="panel-card">
+      <div class="panel-title">🚱 Water Scarcity — Causes</div>
+      <div class="panel-body">
+        <div class="ibox">
+          <strong>Water scarcity</strong> is the shortage of water relative to demand. It may exist even in areas with plenty of water because of <span class="kw">over-exploitation, unequal access and pollution</span>. Scarcity is mostly <strong>human-made</strong>.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">👥</div><h4>Growing Population</h4><p>More people means more water for drinking, farming and industry. Also raises demand for food — needing more irrigation water.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--red)"><div class="ic-icon">🌾</div><h4>Over-Irrigation</h4><p>Agriculture uses the most water. Water-intensive crops and free/subsidised power lead to over-pumping of groundwater.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--orange)"><div class="ic-icon">🏭</div><h4>Industrialisation</h4><p>Industries need huge amounts of water and energy. Hydroelectric power and manufacturing put pressure on freshwater.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">🏙️</div><h4>Urbanisation</h4><p>Cities and dense housing colonies with their own pumping devices over-exploit groundwater resources.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🕳️</div><h4>Falling Water Table</h4><p>Excessive tube-wells and pumping lower the water table, making groundwater harder and costlier to access.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🧪</div><h4>Water Pollution</h4><p>Domestic sewage, industrial effluents and chemicals pollute rivers and groundwater — good water becomes unusable.</p></div>
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--red)">
+          <strong style="color:var(--red)">⚠️ Key Idea:</strong> Water scarcity may be an outcome of <strong>large and growing population</strong>, but it is also caused by <span class="kw">unequal access</span> — a resource-rich region can still face scarcity due to bad management and over-exploitation.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Dams & Projects -->
+  <div class="panel" id="p2">
+    <div class="panel-card">
+      <div class="panel-title">🏞️ Multi-Purpose River Projects</div>
+      <div class="panel-body">
+        <div class="ibox">
+          A <span class="kw">dam</span> is a barrier across flowing water that obstructs, directs or slows the flow, creating a reservoir. <strong>Multi-purpose projects</strong> serve several needs at once — irrigation, electricity, water supply, flood control, navigation and recreation. Nehru called them the <span class="kw">"temples of modern India."</span>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--green)">Purposes Served by Dams</h3>
+        <div class="card-grid">
+          <div class="info-card"><div class="ic-icon">🌾</div><h4>Irrigation</h4><p>Stored water is released through canals to farms, boosting agricultural output round the year.</p></div>
+          <div class="info-card"><div class="ic-icon">⚡</div><h4>Hydroelectricity</h4><p>Falling water spins turbines to generate clean electricity — a major renewable energy source.</p></div>
+          <div class="info-card"><div class="ic-icon">🚰</div><h4>Water Supply</h4><p>Provide drinking and industrial water to towns and cities located far from the source.</p></div>
+          <div class="info-card"><div class="ic-icon">🌊</div><h4>Flood Control</h4><p>Reservoirs hold excess monsoon water, reducing downstream flooding during heavy rains.</p></div>
+          <div class="info-card"><div class="ic-icon">⛵</div><h4>Navigation</h4><p>Regulated flow supports inland water transport and movement of goods along rivers.</p></div>
+          <div class="info-card"><div class="ic-icon">🐟</div><h4>Fishery & Recreation</h4><p>Reservoirs support fish breeding and become spots for tourism and water sports.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--green)">Major Dams & Rivers of India</h3>
+        <table class="rtable">
+          <tr><th>Dam / Project</th><th>River</th><th>State</th></tr>
+          <tr><td><strong>Bhakra–Nangal</strong></td><td>Sutlej</td><td>Punjab / Himachal Pradesh</td></tr>
+          <tr><td><strong>Hirakud</strong></td><td>Mahanadi</td><td>Odisha (world's longest dam)</td></tr>
+          <tr><td><strong>Sardar Sarovar</strong></td><td>Narmada</td><td>Gujarat</td></tr>
+          <tr><td><strong>Nagarjuna Sagar</strong></td><td>Krishna</td><td>Telangana / Andhra Pradesh</td></tr>
+          <tr><td><strong>Tehri</strong></td><td>Bhagirathi</td><td>Uttarakhand</td></tr>
+          <tr><td><strong>Rana Pratap Sagar</strong></td><td>Chambal</td><td>Rajasthan</td></tr>
+        </table>
+        <div class="ibox" style="margin-top:14px">
+          <strong>Bhakra–Nangal & Hirakud</strong> projects were built to conserve water for irrigation and hydel power, but they also serve to <span class="kw">control floods</span> — showing the "multi-purpose" nature.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Dam Concerns -->
+  <div class="panel" id="p3">
+    <div class="panel-card">
+      <div class="panel-title">⚠️ Problems & Opposition to Dams</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Multi-purpose projects have benefits, but they also raise serious <span class="kw">ecological, social and economic</span> concerns. Recent movements have questioned whether these projects truly help everyone equally.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--red)"><div class="ic-icon">🏞️</div><h4>Regulate Natural Flow</h4><p>Dams fragment rivers, making it harder for aquatic fauna to migrate and breed. Sediment gets trapped, causing poorer riverbeds downstream.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--orange)"><div class="ic-icon">🪨</div><h4>Sedimentation</h4><p>Reservoirs collect silt and sediment, reducing storage capacity over time and creating rockier riverbeds downstream.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">🌊</div><h4>Induced Floods</h4><p>Ironically, dams meant to control floods have triggered them by releasing excess water. Sediment build-up worsens flooding during heavy rain.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">🏘️</div><h4>Displacement</h4><p>Large dams submerge land and forests, displacing local communities and tribal people who lose their homes and livelihoods.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">⚖️</div><h4>Social Inequality</h4><p>Benefits (water, power) often reach large farmers and industries, while costs fall on the poor and displaced — causing social conflicts.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🧂</div><h4>Land Degradation</h4><p>Over-irrigation from dams causes waterlogging and soil salinity, reducing land fertility in canal-irrigated areas.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--amber)">Movements Against Dams</h3>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-year">Narmada Valley</div><h4>Narmada Bachao Andolan</h4><p>Led by Medha Patkar. Opposed the Sardar Sarovar Dam over displacement of tribal communities and environmental damage.</p></div>
+          <div class="tl-item"><div class="tl-year">Gujarat</div><h4>Sabarmati-basin Farmers</h4><p>Agitations by farmers over inequitable distribution of water and benefits from irrigation projects.</p></div>
+          <div class="tl-item"><div class="tl-year">General</div><h4>Inter-State Disputes</h4><p>Objections raised over sharing of river water and benefits — e.g., Krishna–Godavari and Cauvery water disputes between states.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: Rainwater Harvesting -->
+  <div class="panel" id="p4">
+    <div class="panel-card">
+      <div class="panel-title">🌧️ Rainwater Harvesting</div>
+      <div class="panel-body">
+        <div class="ibox">
+          <span class="kw">Rainwater harvesting</span> is the technique of collecting and storing rainwater for future use, or recharging groundwater. It is a low-cost, eco-friendly way to conserve water and reduce dependence on dams and canals.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--green)">Traditional Harvesting across India</h3>
+        <table class="rtable">
+          <tr><th>Method / Structure</th><th>Region</th><th>Description</th></tr>
+          <tr><td><strong>Guls / Kuls</strong></td><td>Western Himalayas</td><td>Diversion channels that carry water from streams for agriculture.</td></tr>
+          <tr><td><strong>Rooftop harvesting</strong></td><td>Rajasthan (Bikaner, Phalodi, Barmer)</td><td>Rooftop rainwater stored in underground tanks called <em>tankas</em> for drinking water.</td></tr>
+          <tr><td><strong>Khadins & Johads</strong></td><td>Rajasthan</td><td>Inundation channels and small check-dams to harvest rainwater and recharge wells.</td></tr>
+          <tr><td><strong>Bamboo drip irrigation</strong></td><td>Meghalaya</td><td>200-year-old system channelling stream water through bamboo pipes to plants.</td></tr>
+          <tr><td><strong>Recharge through tanks</strong></td><td>West Bengal (flood plains)</td><td>Inundation channels used to irrigate fields during floods.</td></tr>
+        </table>
+
+        <div class="card-grid" style="margin-top:16px">
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">🏜️</div><h4>Tankas of Rajasthan</h4><p>Underground tanks in almost all houses of Bikaner, Phalodi and Barmer. Connected to sloping rooftops that channel rainwater. Kept water cool in summer.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🌾</div><h4>Gendathur, Karnataka</h4><p>A village where households built rooftop rainwater harvesting structures to meet their water needs — a modern success story.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🎋</div><h4>Bamboo Drip Irrigation</h4><p>In Meghalaya, tribal farmers use bamboo pipes to drip-irrigate betel and black pepper plants efficiently.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">🏠</div><h4>Mandatory in Cities</h4><p>Many states (e.g., Tamil Nadu) have made rooftop rainwater harvesting compulsory for all buildings by law.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: Conservation -->
+  <div class="panel" id="p5">
+    <div class="panel-card">
+      <div class="panel-title">🛡️ Conservation & Management of Water</div>
+      <div class="panel-body">
+        <div class="ibox">
+          To secure water for the future, we must <span class="kw">conserve and manage</span> it wisely — reducing waste, preventing pollution, recycling and reviving traditional systems. Water conservation is everyone's responsibility.
+        </div>
+        <div class="card-grid" style="margin-top:14px">
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">🌧️</div><h4>Rainwater Harvesting</h4><p>Capture rainwater from rooftops and open spaces to recharge groundwater and store for reuse.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">♻️</div><h4>Recycle & Reuse</h4><p>Treat and reuse wastewater for gardening, industry and flushing — reduces demand on freshwater.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">💧</div><h4>Efficient Irrigation</h4><p>Use drip and sprinkler irrigation instead of flooding fields — saves large amounts of water.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">🚿</div><h4>Prevent Wastage</h4><p>Fix leaks, avoid over-use in homes, and adopt water-saving habits in daily life.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">🧫</div><h4>Prevent Pollution</h4><p>Treat sewage and industrial effluents before releasing them into rivers and groundwater.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--orange)"><div class="ic-icon">🏞️</div><h4>Revive Tradition</h4><p>Restore tanks, johads and step-wells; encourage watershed development and afforestation.</p></div>
+        </div>
+
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--green)">
+          <strong>Key Takeaway:</strong> The chapter urges a shift from large centralised projects towards <span class="kw">decentralised, community-based water harvesting</span>. Conserving every drop today ensures water security for future generations.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  btn.classList.add('active');
+  animateBars();
+}
+
+function animateBars(){
+  setTimeout(()=>{
+    document.querySelectorAll('.panel.active .bar-fill').forEach(b=>{
+      b.style.width=b.dataset.w||'0%';
+    });
+  },100);
+}
+animateBars();
+</script>
+</body>
+</html>

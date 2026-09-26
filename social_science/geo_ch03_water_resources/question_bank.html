@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Water Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04100a;--card:#0a1e10;--card2:#0f2616;--border:#1a3a22;--text:#d4f0dc;--muted:#3a6a48;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:#4ade80}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.72rem;padding:.32rem .85rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--green);color:var(--green);background:rgba(74,222,128,.08)}
+
+.score-bar{display:flex;justify-content:center;gap:1.5rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.score-bar span.right{color:var(--green)} .score-bar span.wrong{color:var(--red)}
+
+.questions{max-width:820px;margin:auto;padding:0 1rem 3rem;display:flex;flex-direction:column;gap:1rem}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.4rem;transition:border-color .2s}
+.q-card:hover{border-color:#2a5a3a}
+.q-num{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--green);margin-bottom:.4rem}
+.q-text{font-size:.88rem;font-weight:600;line-height:1.7;margin-bottom:.9rem}
+.opts{display:grid;gap:.4rem}
+.opt{display:flex;align-items:flex-start;gap:.5rem;padding:.5rem .8rem;border-radius:9px;border:1px solid var(--border);cursor:pointer;font-size:.82rem;line-height:1.5;transition:all .15s;background:transparent}
+.opt:hover{border-color:#2a5a3a;background:var(--card2)}
+.opt.correct{border-color:var(--green);background:rgba(74,222,128,.1);color:var(--green)}
+.opt.wrong{border-color:var(--red);background:rgba(248,113,113,.08);color:var(--red)}
+.opt .circle{min-width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;margin-top:1px}
+.opt.correct .circle{border-color:var(--green);background:var(--green);color:#000}
+.opt.wrong .circle{border-color:var(--red);background:var(--red);color:#fff}
+.explain{display:none;margin-top:.7rem;font-size:.78rem;line-height:1.7;color:var(--muted);background:var(--card2);border-radius:8px;padding:.7rem 1rem;border-left:3px solid var(--green)}
+.explain.show{display:block}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(4,16,10,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,58,42,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#4a8a5a;text-decoration:none;border:1px solid rgba(26,58,42,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:#4ade80}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Water Resources · Geography Ch.3 · 30 MCQs</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="score-bar"><span>Score: <span class="right" id="sc-r">0</span> ✓ / <span class="wrong" id="sc-w">0</span> ✗</span><span id="sc-tot">0 / 30 attempted</span></div>
+<div class="questions" id="qlist"></div>
+
+<script>
+const QS=[
+// Water Facts
+{cat:'facts',q:'What percentage of the world\'s water is found in oceans?',ops:['71%','86.5%','96.5%','99%'],ans:2,exp:'About 96.5% of the world\'s water is in oceans and is saline (salty). Only 2.5% is freshwater, and most of that is frozen in ice-caps and glaciers.'},
+{cat:'facts',q:'Water is considered a renewable resource because it:',ops:['Never gets used up','Circulates through the hydrological cycle','Is found everywhere','Can be manufactured'],ans:1,exp:'Water is renewable because it keeps circulating through the hydrological (water) cycle — evaporation, condensation and precipitation continuously renew the supply.'},
+{cat:'facts',q:'India receives about what share of the world\'s annual precipitation?',ops:['2%','4%','8%','18%'],ans:1,exp:'India receives about 4% of the world\'s annual precipitation, holds about 2.5% of the world\'s water resources, but supports nearly 18% of the world\'s population.'},
+{cat:'facts',q:'What percentage of the world\'s water is usable freshwater?',ops:['2.5%','10%','25%','50%'],ans:0,exp:'Only about 2.5% of the world\'s water is freshwater, and most of it is frozen in glaciers and ice-caps. Usable freshwater in rivers, lakes and groundwater is a tiny fraction.'},
+{cat:'facts',q:'India\'s rainfall is difficult to manage because it is:',ops:['Evenly spread all year','Highly seasonal and uneven','Always in winter','Very low everywhere'],ans:1,exp:'India\'s rainfall is highly seasonal and uneven — most falls in a few monsoon months. This causes floods in the rainy season and droughts at other times, making water management difficult.'},
+
+// Water Scarcity
+{cat:'scarcity',q:'Water scarcity is mainly caused by:',ops:['Only natural factors','Only lack of rain','Human activities and over-exploitation','Too many rivers'],ans:2,exp:'Water scarcity is largely human-made — caused by over-exploitation, excessive use, unequal access and pollution. It can exist even in areas with plenty of water.'},
+{cat:'scarcity',q:'The largest consumer of water in India is:',ops:['Industry','Agriculture','Domestic use','Recreation'],ans:1,exp:'Agriculture is the largest user of water. Water-intensive crops and subsidised/free power encourage over-pumping of groundwater, which lowers the water table.'},
+{cat:'scarcity',q:'Over-exploitation of groundwater leads to:',ops:['Rising water table','Falling water table','More rainfall','Cleaner water'],ans:1,exp:'Excessive pumping through tube-wells withdraws groundwater faster than it recharges, causing the water table to fall and making water harder and costlier to access.'},
+{cat:'scarcity',q:'A water-rich region can still face water scarcity because of:',ops:['Too much rain','Unequal access and bad management','Having many rivers','Low population'],ans:1,exp:'Scarcity is often about unequal access, pollution and poor management — not just the quantity of water. Even resource-rich regions can face scarcity of usable water.'},
+{cat:'scarcity',q:'Which of these does NOT directly cause water scarcity?',ops:['Growing population','Industrialisation','Water pollution','Afforestation'],ans:3,exp:'Afforestation (planting trees) actually helps conserve water by improving groundwater recharge. Population growth, industrialisation and pollution all worsen scarcity.'},
+
+// Dams
+{cat:'dams',q:'Who described multi-purpose river projects as the "temples of modern India"?',ops:['Mahatma Gandhi','Jawaharlal Nehru','Medha Patkar','Sunderlal Bahuguna'],ans:1,exp:'Jawaharlal Nehru called multi-purpose dams the "temples of modern India" because he saw them as symbols of progress providing irrigation, power and flood control together.'},
+{cat:'dams',q:'The Bhakra-Nangal project is built on which river?',ops:['Narmada','Sutlej','Mahanadi','Krishna'],ans:1,exp:'The Bhakra-Nangal project is built on the Sutlej river (Punjab/Himachal Pradesh). It provides irrigation and hydroelectric power and also helps control floods.'},
+{cat:'dams',q:'Which dam is built on the Mahanadi river?',ops:['Tehri','Sardar Sarovar','Hirakud','Nagarjuna Sagar'],ans:2,exp:'The Hirakud dam is built on the Mahanadi river in Odisha. It is the world\'s longest dam and serves irrigation, hydel power and flood control.'},
+{cat:'dams',q:'A "multi-purpose" river project is one that:',ops:['Serves only irrigation','Serves several purposes at once','Only generates electricity','Only controls floods'],ans:1,exp:'A multi-purpose project serves many needs simultaneously — irrigation, hydroelectricity, water supply, flood control, navigation, fishery and recreation.'},
+{cat:'dams',q:'The Sardar Sarovar Dam is built on the:',ops:['Krishna river','Narmada river','Bhagirathi river','Chambal river'],ans:1,exp:'The Sardar Sarovar Dam is built on the Narmada river in Gujarat. It became the focus of the Narmada Bachao Andolan led by Medha Patkar.'},
+
+// Dam Concerns
+{cat:'concern',q:'The Narmada Bachao Andolan was led by:',ops:['Sunderlal Bahuguna','Medha Patkar','Gaura Devi','Chandi Prasad Bhatt'],ans:1,exp:'The Narmada Bachao Andolan was led by Medha Patkar. It opposed the Sardar Sarovar Dam, highlighting displacement of tribal communities and environmental damage.'},
+{cat:'concern',q:'How can dams built for flood control sometimes cause floods?',ops:['They increase rainfall','Sudden release of excess water and sedimentation','They dry up rivers','They cause earthquakes'],ans:1,exp:'When reservoirs fill during heavy rain, sudden release of excess water can flood downstream areas. Sediment build-up also reduces reservoir capacity, worsening floods over time.'},
+{cat:'concern',q:'A major social problem caused by large dams is:',ops:['More jobs','Displacement of local communities','Better roads','Increased tourism'],ans:1,exp:'Large dams submerge land and forests, displacing local and tribal communities who lose their homes and livelihoods — a major social cost of big projects.'},
+{cat:'concern',q:'Sedimentation in reservoirs causes:',ops:['Increased storage capacity','Reduced storage capacity','Cleaner water','Higher electricity'],ans:1,exp:'Silt and sediment carried by rivers settle in the reservoir, gradually reducing its water-storage capacity and leaving rockier riverbeds downstream.'},
+{cat:'concern',q:'Over-irrigation from dams often leads to:',ops:['Waterlogging and soil salinity','Higher soil fertility','More forests','Cleaner rivers'],ans:0,exp:'Excess canal irrigation causes waterlogging and increased soil salinity, which reduce land fertility in canal-irrigated areas over time.'},
+
+// Rainwater Harvesting
+{cat:'harvest',q:'"Tankas" for storing rooftop rainwater are traditionally found in:',ops:['Kerala','Rajasthan','Assam','Punjab'],ans:1,exp:'Tankas are underground tanks that store rooftop rainwater, found in almost every house in Bikaner, Phalodi and Barmer in arid Rajasthan. They provide drinking water and stay cool in summer.'},
+{cat:'harvest',q:'Bamboo drip irrigation is a traditional practice of:',ops:['Rajasthan','Meghalaya','Tamil Nadu','Gujarat'],ans:1,exp:'Bamboo drip irrigation is a 200-year-old system in Meghalaya where stream water is channelled through bamboo pipes to drip-irrigate betel and black pepper plants.'},
+{cat:'harvest',q:'"Guls" and "kuls" are diversion channels used in the:',ops:['Western Himalayas','Thar Desert','Coastal plains','Deccan Plateau'],ans:0,exp:'Guls and kuls are traditional diversion channels of the Western Himalayas that carry water from streams to fields for agriculture.'},
+{cat:'harvest',q:'Gendathur, a village famous for rooftop rainwater harvesting, is in:',ops:['Karnataka','Rajasthan','Meghalaya','Odisha'],ans:0,exp:'Gendathur is a village in Karnataka where households built rooftop rainwater harvesting structures to meet their water needs — a modern success story.'},
+{cat:'harvest',q:'Khadins and johads are used to:',ops:['Generate electricity','Harvest rainwater and recharge groundwater','Transport goods','Farm fish'],ans:1,exp:'Khadins (inundation channels) and johads (check-dams) are traditional Rajasthani structures used to harvest rainwater and recharge groundwater and wells.'},
+
+// Mixed / Conservation
+{cat:'harvest',q:'Which state was among the first to make rooftop rainwater harvesting compulsory?',ops:['Kerala','Tamil Nadu','Bihar','Haryana'],ans:1,exp:'Tamil Nadu was among the first states to make rooftop rainwater harvesting compulsory by law for all buildings, to combat urban water scarcity.'},
+{cat:'facts',q:'Groundwater makes up about what share of the world\'s total water?',ops:['0.07%','0.68%','2.5%','10%'],ans:1,exp:'Groundwater is about 0.68% of the world\'s total water. Oceans hold 96.5%, glaciers ~1.75%, and rivers/lakes/atmosphere only ~0.07%.'},
+{cat:'concern',q:'Movements against large dams have mainly arisen because:',ops:['Dams are too small','Benefits and costs are unequally shared','Dams produce no power','There is too much water'],ans:1,exp:'Opposition arises because benefits (water, power) often reach large farmers and industries, while costs (displacement, loss of land) fall on the poor and tribal communities.'},
+{cat:'scarcity',q:'Which of the following best conserves water in farming?',ops:['Flood irrigation','Drip and sprinkler irrigation','Growing more water-intensive crops','Free electricity for pumps'],ans:1,exp:'Drip and sprinkler irrigation deliver water directly to plants efficiently, saving large amounts of water compared to flooding fields.'},
+{cat:'dams',q:'Which dam is built on the Krishna river?',ops:['Tehri','Nagarjuna Sagar','Hirakud','Rana Pratap Sagar'],ans:1,exp:'The Nagarjuna Sagar dam is built on the Krishna river (Telangana/Andhra Pradesh). Tehri is on the Bhagirathi, Hirakud on the Mahanadi, and Rana Pratap Sagar on the Chambal.'},
+];
+
+const CATS={facts:{l:'Water Facts',c:'var(--blue)'},scarcity:{l:'Water Scarcity',c:'var(--amber)'},dams:{l:'Dams & Projects',c:'var(--purple)'},concern:{l:'Dam Concerns',c:'var(--red)'},harvest:{l:'Rainwater Harvesting',c:'var(--teal)'}};
+
+let filtered=[...QS],scoreR=0,scoreW=0,attempted=0,answered=new Set();
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="filter('all',this)">All (${QS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=QS.filter(q=>q.cat===k).length;h+=`<button onclick="filter('${k}',this)">${v.l} (${n})</button>`;}f.innerHTML=h;}
+function filter(cat,btn){document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...QS]:QS.filter(q=>q.cat===cat);render();}
+function render(){const c=document.getElementById('qlist');c.innerHTML=filtered.map((q,i)=>{const gi=QS.indexOf(q);const letters='ABCD';return`<div class="q-card" id="q${gi}"><div class="q-num">Q${gi+1} · ${CATS[q.cat].l}</div><div class="q-text">${q.q}</div><div class="opts">${q.ops.map((o,j)=>`<div class="opt" data-qi="${gi}" data-oi="${j}" onclick="answer(${gi},${j},this)"><span class="circle">${letters[j]}</span><span>${o}</span></div>`).join('')}</div><div class="explain" id="exp${gi}">${q.exp}</div></div>`;}).join('');}
+function answer(qi,oi,el){if(answered.has(qi))return;answered.add(qi);attempted++;const q=QS[qi];const opts=document.querySelectorAll(`[data-qi="${qi}"]`);opts.forEach(o=>{const idx=+o.dataset.oi;if(idx===q.ans)o.classList.add('correct');else if(idx===oi)o.classList.add('wrong');});if(oi===q.ans)scoreR++;else scoreW++;document.getElementById('sc-r').textContent=scoreR;document.getElementById('sc-w').textContent=scoreW;document.getElementById('sc-tot').textContent=`${attempted} / ${QS.length} attempted`;document.getElementById(`exp${qi}`).classList.add('show');}
+buildFilters();render();
+</script>
+</body>
+</html>

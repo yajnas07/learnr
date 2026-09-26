@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Water Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#04100a; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:42px; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(4,16,10,.9) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#4ade80; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#2a5a3a; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #1a3a2a; background:rgba(4,16,10,.85);
+  color:#4a8a5a; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#4ade80; color:#4ade80; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#071410; border:1px solid #1a3a2a;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:280px; font-size:.8rem; color:#a7d4b8;
+  line-height:1.6; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.7);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#4ade80; font-size:.9rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%;
+  background:rgba(4,16,10,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,58,42,.75);
+  position:absolute; top:0; left:0; right:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#4a8a5a; text-decoration:none;
+  border:1px solid rgba(26,58,42,.9); border-radius:99px;
+  padding:.2rem .65rem;
+}
+.site-nav-back:hover { color:#4ade80; border-color:#2a6040; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<div id="ui">
+  <div>
+    <h1>Water Resources</h1>
+    <p>Class X · Geography Ch.3 — drag to pan · scroll to zoom · hover nodes</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2+20; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Water\nResources',
+  x:0, y:0, r:70, color:'#062010', stroke:'#4ade80', textColor:'#4ade80', fontSize:14
+};
+
+const BRANCHES = [
+  // Water Facts
+  {
+    id:'facts', label:'Water\nFacts', x:-320, y:-200, r:48,
+    color:'#000a14', stroke:'#60a5fa', textColor:'#dbeafe',
+    info:'Water is a renewable resource that circulates through the hydrological cycle.\n• 96.5% of world water is in oceans (saline).\n• Only 2.5% is freshwater — most frozen in glaciers.\n• India has ~2.5% of world water but ~18% of world population.\n• India gets ~4% of world\'s annual rainfall.',
+    children:[
+      { id:'f1', label:'Freshwater\nScarce', x:-510, y:-310, r:36, color:'#000a14', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Distribution of Earth\'s water:\n• Oceans (saline): 96.5%\n• Frozen ice-caps & glaciers: ~1.75%\n• Groundwater: ~0.68%\n• Rivers, lakes, atmosphere: ~0.07%\nUsable freshwater is a very small fraction, making conservation vital.' },
+      { id:'f2', label:'Hydrological\nCycle', x:-505, y:-160, r:36, color:'#000a14', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Water constantly renews through:\n• Evaporation from oceans & land\n• Condensation into clouds\n• Precipitation (rain/snow)\n• Runoff & infiltration back to sources\nThis cycle makes water a renewable resource — but freshwater supply is still limited.' },
+      { id:'f3', label:'India\'s\nWater Share', x:-460, y:-50, r:36, color:'#000a14', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'India\'s water situation:\n• Receives ~4% of global precipitation.\n• Holds ~2.5% of world\'s water.\n• Supports ~18% of world population.\n• Rainfall is highly seasonal & uneven — causing floods and droughts.\n• Per capita availability is falling rapidly.' },
+    ]
+  },
+
+  // Water Scarcity
+  {
+    id:'scar', label:'Water\nScarcity', x:320, y:-200, r:48,
+    color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+    info:'Water scarcity is shortage of water relative to demand.\nOften human-made — caused by over-exploitation, unequal access and pollution.\nCan exist even in water-rich regions due to bad management.',
+    children:[
+      { id:'sc1', label:'Rising\nDemand', x:520, y:-320, r:36, color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Causes of rising demand:\n• Growing population — more drinking & domestic water.\n• Expansion of irrigated agriculture (largest user).\n• Industrialisation & urbanisation.\n• Dense housing colonies with private pumps.\nMore demand, but limited supply.' },
+      { id:'sc2', label:'Over-\nExploitation', x:540, y:-180, r:36, color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Over-use of water resources:\n• Excessive pumping of groundwater by tube-wells.\n• Water-intensive crops encouraged by subsidised power.\n• Falling water table — water costlier & harder to access.\n• Ecological imbalance in river basins.' },
+      { id:'sc3', label:'Pollution &\nUnequal Access', x:510, y:-60, r:36, color:'#100a00', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'• Domestic sewage & industrial effluents pollute rivers & groundwater.\n• Chemicals make water unusable.\n• Unequal access: resource-rich regions can still face scarcity.\n• Some people over-consume while others lack access.\nScarcity is often about bad management, not just quantity.' },
+    ]
+  },
+
+  // Causes of Depletion / Concerns replaced with Dam Concerns
+  {
+    id:'concern', label:'Dam\nConcerns', x:-310, y:220, r:48,
+    color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+    info:'Multi-purpose projects raise ecological, social and economic concerns:\n1. Regulate natural river flow.\n2. Sedimentation & induced floods.\n3. Displacement of communities.\n4. Social inequality in benefits.\n5. Land degradation from over-irrigation.',
+    children:[
+      { id:'cn1', label:'Ecological\nImpact', x:-500, y:140, r:36, color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'• Dams fragment rivers, harming aquatic life migration & spawning.\n• Sediment trapped in reservoirs → rockier riverbeds downstream.\n• Reservoir submerges forests & land.\n• Reduced flow affects river ecosystems.\n• Excessive sedimentation reduces dam capacity over time.' },
+      { id:'cn2', label:'Induced\nFloods', x:-495, y:285, r:36, color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'• Dams built to control floods have sometimes caused them.\n• Sudden release of excess water floods downstream areas.\n• Sediment build-up worsens flooding during heavy rain.\n• Waterlogging & soil salinity from over-irrigation degrade land.' },
+      { id:'cn3', label:'Social\nProtests', x:-440, y:400, r:36, color:'#100008', stroke:'#f43f5e', textColor:'#fecdd3',
+        info:'Movements against large dams:\n• Narmada Bachao Andolan (Medha Patkar) — Sardar Sarovar Dam.\n• Opposed displacement of tribal communities.\n• Benefits reach big farmers/industry; costs fall on the poor.\n• Inter-state water disputes (Krishna, Cauvery).' },
+    ]
+  },
+
+  // Rainwater Harvesting
+  {
+    id:'harvest', label:'Rainwater\nHarvesting', x:310, y:220, r:48,
+    color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+    info:'Technique of collecting & storing rainwater for future use or recharging groundwater.\nLow-cost, eco-friendly and decentralised.\nIndia has rich traditions of water harvesting across regions.',
+    children:[
+      { id:'h1', label:'Guls, Kuls &\nKhadins', x:510, y:140, r:36, color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Traditional harvesting:\n• Guls/Kuls — diversion channels in Western Himalayas for farming.\n• Khadins & Johads — inundation channels & check-dams in Rajasthan.\n• Recharge wells & tanks in West Bengal flood plains.\nHarvest rainwater and recharge groundwater.' },
+      { id:'h2', label:'Tankas of\nRajasthan', x:530, y:270, r:36, color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Rooftop rainwater harvesting:\n• Underground tanks (tankas) in Bikaner, Phalodi, Barmer.\n• Connected to sloping rooftops that channel rain.\n• Stored drinking water kept cool in summer.\n• Often the only source of water in arid areas.' },
+      { id:'h3', label:'Modern\nExamples', x:470, y:390, r:36, color:'#000a14', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'• Gendathur, Karnataka — village with rooftop harvesting in every house.\n• Bamboo drip irrigation in Meghalaya — 200-year-old system.\n• Tamil Nadu made rooftop harvesting compulsory by law.\n• Decentralised harvesting reduces dependence on dams.' },
+    ]
+  },
+
+  // Multi-purpose Projects
+  {
+    id:'dams', label:'Multi-Purpose\nProjects', x:0, y:-310, r:48,
+    color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+    info:'Dams serve several purposes at once — irrigation, hydroelectricity, water supply, flood control, navigation, fishery & recreation.\nNehru called them the "temples of modern India."',
+    children:[
+      { id:'d1', label:'Purposes', x:-170, y:-430, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Multi-purpose dams provide:\n• Irrigation via canals.\n• Hydroelectric power.\n• Domestic & industrial water supply.\n• Flood control.\n• Inland navigation.\n• Fishery & recreation/tourism.\nOne project meets many needs.' },
+      { id:'d2', label:'Major\nDams', x:0, y:-450, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Important dams & rivers:\n• Bhakra-Nangal — Sutlej.\n• Hirakud — Mahanadi (world\'s longest dam).\n• Sardar Sarovar — Narmada.\n• Nagarjuna Sagar — Krishna.\n• Tehri — Bhagirathi.\n• Rana Pratap Sagar — Chambal.' },
+      { id:'d3', label:'Temples of\nModern India', x:170, y:-430, r:36, color:'#0a0a20', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'• Term coined by Jawaharlal Nehru.\n• Symbolised progress & development after independence.\n• Bhakra-Nangal & Hirakud conserve water for irrigation, power & flood control.\n• Integrated water-resource management.\n• Now questioned for social & ecological costs.' },
+    ]
+  },
+
+  // Conservation & Management
+  {
+    id:'conserv', label:'Conservation\n& Management', x:0, y:310, r:48,
+    color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+    info:'To secure future water, we must conserve & manage it wisely.\n• Reduce waste, prevent pollution.\n• Recycle & reuse water.\n• Revive traditional harvesting.\n• Use efficient irrigation.\nWater conservation is everyone\'s responsibility.',
+    children:[
+      { id:'cv1', label:'Efficient\nUse', x:-180, y:430, r:36, color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+        info:'• Drip & sprinkler irrigation save water in farming.\n• Fix leaks & avoid domestic wastage.\n• Recycle & reuse treated wastewater for gardening/industry.\n• Adopt water-saving habits daily.' },
+      { id:'cv2', label:'Prevent\nPollution', x:0, y:460, r:36, color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+        info:'• Treat sewage & industrial effluents before release.\n• Protect rivers & groundwater from chemicals.\n• Enforce pollution control laws.\n• Clean water bodies through community efforts.' },
+      { id:'cv3', label:'Revive\nTradition', x:180, y:430, r:36, color:'#0a1a08', stroke:'#86efac', textColor:'#dcfce7',
+        info:'• Restore tanks, johads & step-wells.\n• Encourage watershed development & afforestation.\n• Promote decentralised, community-based harvesting.\n• Shift from large dams to local water security.\nConserve every drop for future generations.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){return allNodes.find(n=>n.id===id);}
+
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found&&found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10,window.innerHeight-240)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {tip.style.display='none';canvas.style.cursor='grab';}
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx,cy);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.22,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2+20;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(74,222,128,.025)'; ctx.lineWidth=1;
+  for(let x=-1400;x<1400;x+=70){ctx.beginPath();ctx.moveTo(x,-1400);ctx.lineTo(x,1400);ctx.stroke();}
+  for(let y=-1400;y<1400;y+=70){ctx.beginPath();ctx.moveTo(-1400,y);ctx.lineTo(1400,y);ctx.stroke();}
+
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    const cpx=(a.x+b.x)/2+(b.y-a.y)*.15, cpy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cpx,cpy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?38:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-9,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

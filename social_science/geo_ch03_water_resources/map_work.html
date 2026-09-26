@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Work — Water Resources · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04100a;--card:#0a1a10;--card2:#102418;--border:#1a3a28;--text:#c8f5d8;--muted:#4a8a5a;
+  --geo:#22c55e;--green:#4ade80;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--purple:#a78bfa;--orange:#fb923c;--cyan:#38bdf8;--pink:#f472b6;--teal:#34d399}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.2rem;background:rgba(4,16,10,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem;transition:all .2s}
+.site-nav a.back:hover{color:var(--geo);border-color:var(--geo)}
+header{text-align:center;padding:1.4rem 1rem .8rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3.5vw,1.8rem);font-weight:900;color:var(--green)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+.wrap{max-width:960px;margin:0 auto;padding:0 1rem 3rem}
+.mode-bar{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem}
+.mode-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;padding:.45rem 1.2rem;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.mode-btn.active{border-color:var(--geo);color:var(--green);background:rgba(34,197,94,.08)}
+.tab-bar{display:flex;gap:.4rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.3rem .8rem;border-radius:99px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tab-btn.active{border-color:var(--geo);color:var(--green);background:rgba(34,197,94,.08)}
+.map-area{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;aspect-ratio:6/7;max-height:630px;margin:0 auto;max-width:540px}
+.map-area svg{width:100%;height:100%;display:block}
+.pin{cursor:pointer;transition:all .2s}
+.pin circle{transition:all .2s}
+.pin:hover circle{r:7;filter:drop-shadow(0 0 8px currentColor)}
+.pin text{font-family:'DM Mono',monospace;font-size:11px;pointer-events:none;opacity:0;transition:opacity .2s}
+.pin:hover text{opacity:1}
+.pin.highlight circle{animation:ping 1s ease infinite}
+@keyframes ping{0%,100%{r:5;opacity:1}50%{r:10;opacity:.5}}
+.info-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:1rem;min-height:80px}
+.info-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.info-desc{font-size:.84rem;color:var(--muted);line-height:1.65}
+.info-desc strong{color:var(--text)}
+.quiz-bar{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:1rem;flex-wrap:wrap}
+.quiz-q{flex:1;font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;min-width:200px}
+.quiz-score{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.quiz-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:4px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s}
+.quiz-btn:hover{border-color:var(--geo);color:var(--green)}
+.feedback-flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;pointer-events:none;opacity:0;transition:opacity .3s;z-index:10;text-shadow:0 0 20px #000}
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+#indiaBase{opacity:0.9;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-water">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Map Work — Water Resources</h1>
+  <p>Class X · Geography Ch.3 · CBSE Board Map Work · Interactive</p>
+</header>
+<div class="wrap">
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('learn')">📖 Learn Mode</button>
+    <button class="mode-btn" onclick="setMode('test')">✍️ Test Yourself</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="setTab('dams')">🏞️ Dams & Projects</button>
+    <button class="tab-btn" onclick="setTab('rivers')">🌊 Rivers</button>
+    <button class="tab-btn" onclick="setTab('harvest')">🌧️ Rainwater Harvesting</button>
+  </div>
+  <div class="map-area" id="mapArea">
+    <div class="feedback-flash" id="fbFlash"></div>
+    <svg viewBox="0 0 666.67 777.33" id="mapSvg">
+      <image id="indiaBase" href="../ch02_nationalism/India_outline.svg" x="0" y="0" width="666.67" height="777.33"/>
+    </svg>
+  </div>
+  <div class="legend" id="legendArea"></div>
+  <div class="info-panel" id="infoPanel">
+    <div class="info-title" id="infoTitle">Click any pin to learn about it</div>
+    <div class="info-desc" id="infoDesc">Explore major <strong>dams & multi-purpose projects</strong>, <strong>rivers</strong>, and regions famous for <strong>traditional rainwater harvesting</strong> across India. CBSE Board asks map questions on locating major dams and the rivers they are built on.</div>
+  </div>
+  <div class="quiz-bar" id="quizBar" style="display:none">
+    <div class="quiz-q" id="quizQ">Loading...</div>
+    <div class="quiz-score" id="quizScore">0/0</div>
+    <button class="quiz-btn" onclick="skipQ()">Skip →</button>
+  </div>
+</div>
+
+<script>
+const TABS = {
+  dams: {
+    legend: [
+      {color:'#60a5fa',name:'Multi-Purpose Dam'}
+    ],
+    places: [
+      { id:'bhakra', x:213, y:190, color:'#60a5fa', label:'Bhakra-Nangal',
+        info:'<strong>Bhakra-Nangal Dam</strong> — built on the <strong>Sutlej river</strong> (Punjab/Himachal Pradesh border). One of India\'s earliest and largest multi-purpose projects. Provides irrigation to Punjab, Haryana & Rajasthan, generates hydroelectricity, and controls floods. The reservoir is called <strong>Gobind Sagar</strong>. A classic "temple of modern India".' },
+      { id:'hirakud', x:390, y:437, color:'#60a5fa', label:'Hirakud',
+        info:'<strong>Hirakud Dam</strong> — built on the <strong>Mahanadi river</strong> in Odisha. It is the <strong>world\'s longest dam</strong> (about 26 km including dykes). Built for irrigation, hydel power and flood control of the Mahanadi delta. A key example of integrated water management in eastern India.' },
+      { id:'sardar_sarovar', x:143, y:437, color:'#60a5fa', label:'Sardar Sarovar',
+        info:'<strong>Sardar Sarovar Dam</strong> — built on the <strong>Narmada river</strong> in Gujarat. Supplies water and power to Gujarat, Maharashtra, MP and Rajasthan. Became the focus of the <strong>Narmada Bachao Andolan</strong> (led by Medha Patkar) over displacement of tribal communities and environmental damage.' },
+      { id:'nagarjuna', x:270, y:527, color:'#60a5fa', label:'Nagarjuna Sagar',
+        info:'<strong>Nagarjuna Sagar Dam</strong> — built on the <strong>Krishna river</strong> (Telangana/Andhra Pradesh). One of the largest masonry dams. Provides irrigation and hydroelectricity to the region. Its reservoir is one of the largest man-made lakes in India.' },
+      { id:'tehri', x:270, y:198, color:'#60a5fa', label:'Tehri',
+        info:'<strong>Tehri Dam</strong> — built on the <strong>Bhagirathi river</strong> (a headstream of the Ganga) in Uttarakhand. One of the tallest dams in India. Provides hydroelectricity, irrigation and drinking water. Located in a seismically sensitive Himalayan zone — raised environmental concerns.' },
+      { id:'rana_pratap', x:200, y:378, color:'#60a5fa', label:'Rana Pratap Sagar',
+        info:'<strong>Rana Pratap Sagar Dam</strong> — built on the <strong>Chambal river</strong> in Rajasthan. Part of the Chambal Valley multi-purpose project (along with Gandhi Sagar and Jawahar Sagar). Provides irrigation and hydroelectric power to Rajasthan and Madhya Pradesh.' },
+    ]
+  },
+  rivers: {
+    legend: [
+      {color:'#38bdf8',name:'Himalayan River'},{color:'#34d399',name:'Peninsular River'}
+    ],
+    places: [
+      { id:'sutlej', x:200, y:170, color:'#38bdf8', label:'Sutlej',
+        info:'<strong>Sutlej River</strong> — a Himalayan river; the Bhakra-Nangal project is built on it. Perennial (fed by snowmelt + rain), so it flows all year. Part of the Indus river system. Vital for irrigation in Punjab.' },
+      { id:'ganga', x:330, y:270, color:'#38bdf8', label:'Ganga',
+        info:'<strong>Ganga River</strong> — India\'s largest river system; the Bhagirathi (on which Tehri Dam is built) is its headstream. Perennial Himalayan river. Supports the fertile, densely populated Northern Plains. Faces serious pollution challenges.' },
+      { id:'narmada', x:180, y:430, color:'#34d399', label:'Narmada',
+        info:'<strong>Narmada River</strong> — flows westward into the Arabian Sea; the Sardar Sarovar Dam is built on it. Focus of the Narmada Bachao Andolan. One of the few major west-flowing rivers of peninsular India.' },
+      { id:'mahanadi', x:370, y:430, color:'#34d399', label:'Mahanadi',
+        info:'<strong>Mahanadi River</strong> — a peninsular river in Odisha/Chhattisgarh; the Hirakud Dam (world\'s longest) is built on it. Forms a fertile delta on the east coast. Rain-fed, so flow varies with the monsoon.' },
+      { id:'krishna', x:260, y:520, color:'#34d399', label:'Krishna',
+        info:'<strong>Krishna River</strong> — a major east-flowing peninsular river; the Nagarjuna Sagar Dam is built on it. Rises in the Western Ghats and flows into the Bay of Bengal. Involved in inter-state water disputes.' },
+      { id:'chambal', x:215, y:370, color:'#34d399', label:'Chambal',
+        info:'<strong>Chambal River</strong> — a tributary of the Yamuna; the Rana Pratap Sagar Dam is built on it. Famous for its deep ravines (badlands) formed by gully erosion in Rajasthan/MP.' },
+    ]
+  },
+  harvest: {
+    legend: [
+      {color:'#fbbf24',name:'Tankas / Rooftop'},{color:'#a78bfa',name:'Guls & Kuls'},
+      {color:'#fb923c',name:'Khadins / Johads'},{color:'#34d399',name:'Bamboo Drip'}
+    ],
+    places: [
+      { id:'rajasthan_tanka', x:140, y:330, color:'#fbbf24', label:'Rajasthan (Tankas)',
+        info:'<strong>Tankas — Bikaner, Phalodi, Barmer (Rajasthan)</strong>. Underground tanks in almost every house collect <strong>rooftop rainwater</strong> for drinking. Water stays cool in summer. Often the only source of drinking water in this arid region.' },
+      { id:'himalaya_gul', x:270, y:180, color:'#a78bfa', label:'W.Himalayas (Guls/Kuls)',
+        info:'<strong>Guls & Kuls — Western Himalayas</strong>. Traditional <strong>diversion channels</strong> that carry water from streams and springs to agricultural fields in the hilly terrain of Himachal Pradesh and nearby areas.' },
+      { id:'rajasthan_khadin', x:170, y:390, color:'#fb923c', label:'Rajasthan (Khadins)',
+        info:'<strong>Khadins & Johads — Rajasthan</strong>. Khadins are <strong>inundation channels</strong> and johads are small <strong>check-dams/earthen barriers</strong> that harvest rainwater and recharge groundwater and wells in dry areas.' },
+      { id:'meghalaya', x:530, y:300, color:'#34d399', label:'Meghalaya (Bamboo Drip)',
+        info:'<strong>Bamboo Drip Irrigation — Meghalaya</strong>. A 200-year-old system where stream water is channelled through <strong>bamboo pipes</strong> to drip-irrigate betel and black pepper plants — an efficient traditional method in the North East.' },
+      { id:'karnataka', x:190, y:560, color:'#fbbf24', label:'Gendathur (Karnataka)',
+        info:'<strong>Gendathur, Karnataka</strong>. A model village where households built <strong>rooftop rainwater harvesting</strong> structures to meet their water needs — a modern success story of water conservation.' },
+      { id:'bengal', x:420, y:390, color:'#fb923c', label:'W.Bengal (Inundation)',
+        info:'<strong>Flood-plain harvesting — West Bengal</strong>. People developed <strong>inundation channels</strong> to irrigate their fields during floods, using excess water productively while recharging the land.' },
+    ]
+  }
+};
+
+let mode='learn', tab='dams', quizIdx=0, quizOrder=[], score=0, total=0;
+const svg=document.getElementById('mapSvg');
+
+function setTab(t){
+  tab=t;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['dams','rivers','harvest'][i]===t));
+  buildPins();
+  buildLegend();
+  document.getElementById('infoTitle').textContent='Click any pin to learn about it';
+  document.getElementById('infoDesc').innerHTML=TABS[t].places[0].info;
+  if(mode==='test'){ score=0;total=0;quizOrder=[...Array(TABS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function buildLegend(){
+  const area=document.getElementById('legendArea');
+  area.innerHTML=TABS[tab].legend.map(l=>`<div class="leg-item"><div class="leg-dot" style="background:${l.color}"></div>${l.name}</div>`).join('');
+}
+
+function buildPins(){
+  document.querySelectorAll('.pin').forEach(p=>p.remove());
+  TABS[tab].places.forEach(p=>{
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('pin'); g.id='pin-'+p.id;
+    g.innerHTML=`<circle cx="${p.x}" cy="${p.y}" r="5" fill="${p.color}" stroke="#000" stroke-width="1"/>
+      <text x="${p.x}" y="${p.y-9}" text-anchor="middle" fill="${p.color}">${p.label}</text>`;
+    g.addEventListener('click',()=>handleClick(p));
+    svg.appendChild(g);
+  });
+}
+
+function handleClick(place){
+  if(mode==='learn'){
+    document.getElementById('infoTitle').innerHTML=`📍 ${place.label}`;
+    document.getElementById('infoDesc').innerHTML=place.info;
+    document.querySelectorAll('.pin circle').forEach(c=>c.setAttribute('stroke-width','1'));
+    document.querySelector('#pin-'+place.id+' circle').setAttribute('stroke-width','3');
+  } else { checkAnswer(place); }
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.mode-btn:${m==='learn'?'first':'last'}-child`).classList.add('active');
+  document.getElementById('infoPanel').style.display=m==='learn'?'block':'none';
+  document.getElementById('quizBar').style.display=m==='test'?'flex':'none';
+  document.querySelectorAll('.pin text').forEach(t=>t.style.opacity=m==='learn'?'':'0');
+  if(m==='test'){ score=0;total=0;quizOrder=[...Array(TABS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function showQuestion(){
+  const places=TABS[tab].places;
+  if(quizIdx>=quizOrder.length){ quizIdx=0;quizOrder.sort(()=>Math.random()-.5); }
+  const p=places[quizOrder[quizIdx]];
+  document.getElementById('quizQ').innerHTML=`📍 Click on: <strong>${p.label}</strong>`;
+  document.getElementById('quizScore').textContent=`${score}/${total}`;
+  document.querySelectorAll('.pin').forEach(g=>g.classList.remove('highlight'));
+  document.querySelectorAll('.pin text').forEach(t=>{t.style.opacity='0';});
+}
+
+function checkAnswer(place){
+  const places=TABS[tab].places;
+  const expected=places[quizOrder[quizIdx]]; total++;
+  const flash=document.getElementById('fbFlash');
+  if(place.id===expected.id){ score++;flash.textContent='✓';flash.style.color='#4ade80'; }
+  else{ flash.textContent='✗';flash.style.color='#f87171';
+    document.querySelector('#pin-'+expected.id)?.classList.add('highlight');
+    setTimeout(()=>document.querySelector('#pin-'+expected.id)?.classList.remove('highlight'),1500);
+  }
+  flash.style.opacity='1'; setTimeout(()=>{flash.style.opacity='0';},800);
+  quizIdx++; setTimeout(showQuestion,1000);
+}
+
+function skipQ(){ quizIdx++; showQuestion(); }
+
+buildPins(); buildLegend();
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Water Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04100a;--card:#0a1e10;--card2:#0f2616;--border:#1a3a22;--text:#d4f0dc;--muted:#3a6a48;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:#4ade80}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1.2rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.74rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--green);color:var(--green);background:rgba(74,222,128,.1)}
+
+.progress{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.progress .count{color:var(--green);font-weight:700}
+.progress .known{color:var(--teal)}
+.prog-bar{width:140px;height:5px;background:var(--card);border-radius:9px;overflow:hidden}
+.prog-fill{height:100%;background:var(--green);border-radius:9px;transition:width .3s}
+
+.deck{display:flex;justify-content:center;align-items:center;padding:1rem;min-height:380px;perspective:1200px}
+.flip-card{width:100%;max-width:520px;height:320px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-card .front,.flip-card .back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;border:1px solid var(--border)}
+.flip-card .front{background:var(--card)}
+.flip-card .back{background:var(--card2);transform:rotateY(180deg)}
+.flip-card .front h2{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;line-height:1.55;color:var(--text)}
+.flip-card .back p{font-size:.88rem;line-height:1.75;color:var(--text)}
+.flip-card .back p strong{color:var(--green)}
+.flip-card .back p em{color:var(--teal);font-style:normal}
+.cat-badge{font-family:'DM Mono',monospace;font-size:.62rem;padding:.15rem .55rem;border-radius:99px;margin-bottom:.8rem}
+.hint{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:1rem}
+
+.controls{display:flex;justify-content:center;gap:.6rem;padding:.8rem 1rem;flex-wrap:wrap}
+.ctrl{font-family:'Lato',sans-serif;font-weight:700;font-size:.76rem;padding:.4rem 1.1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.ctrl:hover{color:var(--text);border-color:#2a5a3a}
+.ctrl.know{border-color:var(--teal);color:var(--teal);background:rgba(52,211,153,.06)}
+
+.keys{text-align:center;padding:.5rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(4,16,10,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,58,42,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#4a8a5a;text-decoration:none;border:1px solid rgba(26,58,42,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:#4ade80}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Flashcards</h1>
+  <p>Water Resources · Geography Ch.3 · 35 Cards</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress"><span class="count" id="pos">1 / 35</span><div class="prog-bar"><div class="prog-fill" id="prog"></div></div><span class="known" id="knownCount">0 known</span></div>
+<div class="deck" id="deck"></div>
+<div class="controls">
+  <button class="ctrl" onclick="prev()">← Prev</button>
+  <button class="ctrl" onclick="flipCard()">⟳ Flip</button>
+  <button class="ctrl know" onclick="markKnown()">✓ Know it</button>
+  <button class="ctrl" onclick="next()">Next →</button>
+  <button class="ctrl" onclick="shuffle()">⤮ Shuffle</button>
+  <button class="ctrl" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="keys">Keyboard: ← → (navigate) · Space (flip) · K (know it) · S (shuffle)</div>
+
+<script>
+const CARDS=[
+// facts (7)
+{cat:'facts',q:'Why is water considered a renewable resource?',a:'Water keeps circulating through the <strong>hydrological (water) cycle</strong> — evaporation, condensation and precipitation. It renews itself continuously, so it is a renewable resource. However, usable freshwater is still limited.'},
+{cat:'facts',q:'How is the world\'s water distributed?',a:'<strong>96.5%</strong> is in oceans (saline).\nOnly <strong>2.5% is freshwater</strong> — most locked in ice-caps and glaciers (~1.75%).\nGroundwater ~0.68%.\nRivers, lakes & atmosphere ~0.07%.'},
+{cat:'facts',q:'What share of world water and rainfall does India have?',a:'India receives about <strong>4% of the world\'s annual precipitation</strong> and holds about <strong>2.5% of the world\'s water resources</strong> — yet supports nearly <strong>18% of the world\'s population</strong>.'},
+{cat:'facts',q:'Why is India\'s water availability under stress despite plenty of rain?',a:'India\'s rainfall is highly <strong>seasonal and uneven</strong> — most of it falls in a few monsoon months, causing floods and droughts. Rising population, agriculture and industry keep lowering per-capita availability.'},
+{cat:'facts',q:'What is the hydrological cycle?',a:'The continuous movement of water: evaporation from oceans/land → condensation into clouds → precipitation (rain/snow) → runoff and infiltration back to water bodies. It makes water a renewable resource.'},
+{cat:'facts',q:'What fraction of Earth\'s water is usable freshwater in rivers and lakes?',a:'Only about <strong>0.07%</strong> of the Earth\'s total water is in rivers, lakes and the atmosphere — the most easily accessible freshwater. This tiny fraction makes conservation essential.'},
+{cat:'facts',q:'Why is freshwater considered scarce even though water is renewable?',a:'Because <strong>96.5% of water is saline</strong> (oceans) and most freshwater is frozen in glaciers. Usable freshwater is a very small share. Pollution and over-use further reduce available freshwater.'},
+
+// scarcity (7)
+{cat:'scarcity',q:'What is water scarcity?',a:'Water scarcity is a <strong>shortage of water relative to demand</strong>. It can exist even in water-rich regions due to over-exploitation, unequal access and pollution. It is largely <strong>human-made</strong>.'},
+{cat:'scarcity',q:'How does a growing population cause water scarcity?',a:'More people need more water for <strong>drinking, domestic use, farming and industry</strong>. Rising food demand needs more irrigation water. This increases total demand while supply stays limited.'},
+{cat:'scarcity',q:'How does agriculture contribute to water scarcity?',a:'Agriculture is the <strong>largest user of water</strong>. Water-intensive crops and free/subsidised electricity encourage farmers to over-pump groundwater, lowering the water table.'},
+{cat:'scarcity',q:'How does over-exploitation lower the water table?',a:'Excessive tube-wells and pumping withdraw groundwater faster than it recharges. The <strong>water table falls</strong>, making groundwater harder and costlier to access and causing ecological imbalance.'},
+{cat:'scarcity',q:'How does pollution cause water scarcity?',a:'Domestic sewage, industrial effluents and chemicals pollute rivers and groundwater. Even where water is available, <strong>polluted water becomes unfit for use</strong> — creating scarcity of usable water.'},
+{cat:'scarcity',q:'Can a water-rich region still face water scarcity? Explain.',a:'Yes. Scarcity is often about <strong>unequal access and bad management</strong>, not just quantity. A region with plenty of water can face scarcity if some over-consume, resources are polluted, or distribution is unfair.'},
+{cat:'scarcity',q:'How do industrialisation and urbanisation worsen scarcity?',a:'Industries need <strong>huge amounts of water and energy</strong> (including hydel power). Growing cities and housing colonies with private pumping devices over-exploit groundwater, increasing pressure on limited supplies.'},
+
+// dams (7)
+{cat:'dams',q:'What is a dam and what is a multi-purpose river project?',a:'A <strong>dam</strong> is a barrier across flowing water that creates a reservoir. A <strong>multi-purpose project</strong> serves many needs at once — irrigation, hydroelectricity, water supply, flood control, navigation, fishery and recreation.'},
+{cat:'dams',q:'Why did Nehru call dams the "temples of modern India"?',a:'Jawaharlal Nehru saw multi-purpose dams as <strong>symbols of progress and development</strong> after independence. They provided irrigation, power and flood control together — driving agricultural and industrial growth.'},
+{cat:'dams',q:'Name the major purposes served by multi-purpose dams.',a:'<strong>Irrigation, hydroelectric power, domestic & industrial water supply, flood control, inland navigation, fishery and recreation/tourism.</strong> One project meets several needs simultaneously.'},
+{cat:'dams',q:'On which river is the Bhakra-Nangal project built?',a:'The <strong>Bhakra-Nangal project</strong> is built on the <strong>Sutlej river</strong> (Punjab/Himachal Pradesh). It provides irrigation and hydel power and helps control floods.'},
+{cat:'dams',q:'Which is the world\'s longest dam and on which river?',a:'The <strong>Hirakud dam</strong> is the world\'s longest dam. It is built on the <strong>Mahanadi river</strong> in Odisha and serves irrigation, power and flood control.'},
+{cat:'dams',q:'Match major dams to their rivers.',a:'<strong>Sardar Sarovar → Narmada</strong>\n<strong>Nagarjuna Sagar → Krishna</strong>\n<strong>Tehri → Bhagirathi</strong>\n<strong>Rana Pratap Sagar → Chambal</strong>\n<strong>Bhakra-Nangal → Sutlej</strong>'},
+{cat:'dams',q:'How does a dam generate hydroelectricity?',a:'Water stored at a height in the reservoir is released with force. The <strong>falling water spins turbines</strong> connected to generators, producing clean, renewable electricity.'},
+
+// concern (7)
+{cat:'concern',q:'How do dams affect the natural flow of rivers?',a:'Dams <strong>regulate and fragment river flow</strong>. This makes it harder for aquatic fauna to migrate and breed. Sediment gets trapped, leaving rockier, poorer riverbeds downstream.'},
+{cat:'concern',q:'What is sedimentation and why is it a problem for dams?',a:'Sediment (silt) carried by rivers <strong>settles in the reservoir</strong>, gradually reducing its water storage capacity. It also leaves rockier riverbeds downstream and worsens flooding over time.'},
+{cat:'concern',q:'How can dams meant to control floods actually cause them?',a:'When reservoirs fill during heavy rain, <strong>sudden release of excess water</strong> can flood downstream areas. Sediment build-up in the reservoir also reduces capacity, worsening floods.'},
+{cat:'concern',q:'How do large dams displace people?',a:'Reservoirs <strong>submerge land, forests and villages</strong>. Local and tribal communities lose their homes, farmland and livelihoods, and are forced to resettle — often without fair compensation.'},
+{cat:'concern',q:'What is the Narmada Bachao Andolan?',a:'A movement led by <strong>Medha Patkar</strong> opposing the <strong>Sardar Sarovar Dam</strong> on the Narmada. It highlighted the displacement of tribal communities and the environmental damage caused by large dams.'},
+{cat:'concern',q:'How do dams create social inequality?',a:'Benefits like irrigation water and electricity often reach <strong>large farmers and industries</strong>, while the costs (displacement, loss of land) fall on the <strong>poor and tribal communities</strong> — causing social conflict.'},
+{cat:'concern',q:'How does over-irrigation from dams degrade land?',a:'Excess canal irrigation causes <strong>waterlogging and increased soil salinity</strong>. This reduces the fertility of the land in canal-irrigated areas over time.'},
+
+// harvest (7)
+{cat:'harvest',q:'What is rainwater harvesting?',a:'The technique of <strong>collecting and storing rainwater</strong> for future use or to recharge groundwater. It is low-cost, eco-friendly and decentralised — reducing dependence on dams and canals.'},
+{cat:'harvest',q:'What are guls and kuls?',a:'<strong>Guls and kuls</strong> are diversion channels built in the <strong>Western Himalayas</strong> that carry water from streams to fields for agriculture — a traditional water-harvesting method.'},
+{cat:'harvest',q:'What are tankas and where are they used?',a:'<strong>Tankas</strong> are underground tanks for storing rooftop rainwater, found in almost every house in <strong>Bikaner, Phalodi and Barmer (Rajasthan)</strong>. They provide drinking water and keep it cool in summer.'},
+{cat:'harvest',q:'What are khadins and johads?',a:'Traditional rainwater-harvesting structures of <strong>Rajasthan</strong>. Khadins are inundation channels and johads are small check-dams/earthen barriers that harvest rainwater and recharge groundwater and wells.'},
+{cat:'harvest',q:'What is bamboo drip irrigation?',a:'A <strong>200-year-old system in Meghalaya</strong> where stream water is channelled through <strong>bamboo pipes</strong> to drip-irrigate plants like betel and black pepper — an efficient traditional method.'},
+{cat:'harvest',q:'What is special about Gendathur village?',a:'<strong>Gendathur, in Karnataka</strong>, is a village where households built <strong>rooftop rainwater harvesting</strong> structures to meet their water needs — a modern success story of water conservation.'},
+{cat:'harvest',q:'Which state made rooftop rainwater harvesting compulsory?',a:'<strong>Tamil Nadu</strong> was among the first states to make rooftop rainwater harvesting <strong>compulsory by law</strong> for all buildings, to combat water scarcity in cities.'},
+
+// conserve (bonus in mixed)
+{cat:'harvest',q:'Why does the chapter favour rainwater harvesting over large dams?',a:'Rainwater harvesting is <strong>decentralised, low-cost and community-based</strong>. It recharges local groundwater and avoids the displacement, ecological damage and inequality caused by large dams.'},
+];
+
+const CATS={facts:{label:'Water Facts',color:'var(--blue)',bg:'rgba(96,165,250,.12)'},scarcity:{label:'Water Scarcity',color:'var(--amber)',bg:'rgba(251,191,36,.12)'},dams:{label:'Dams & Projects',color:'var(--purple)',bg:'rgba(167,139,250,.12)'},concern:{label:'Dam Concerns',color:'var(--red)',bg:'rgba(248,113,113,.12)'},harvest:{label:'Rainwater Harvesting',color:'var(--teal)',bg:'rgba(52,211,153,.12)'}};
+
+let filtered=[...CARDS],idx=0,known=new Set(),currentCat='all';
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="setFilter('all',this)">All (${CARDS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=CARDS.filter(c=>c.cat===k).length;h+=`<button onclick="setFilter('${k}',this)">${v.label} (${n})</button>`;}f.innerHTML=h;}
+function setFilter(cat,btn){currentCat=cat;document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===cat);idx=0;render();}
+function render(){if(!filtered.length)return;if(idx>=filtered.length)idx=0;if(idx<0)idx=filtered.length-1;const c=filtered[idx],cat=CATS[c.cat];document.getElementById('deck').innerHTML=`<div class="flip-card" id="fc" onclick="flipCard()"><div class="front"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><h2>${c.q}</h2><span class="hint">tap to flip</span></div><div class="back"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><p>${c.a.replace(/\n/g,'<br>')}</p></div></div>`;document.getElementById('pos').textContent=`${idx+1} / ${filtered.length}`;document.getElementById('prog').style.width=((idx+1)/filtered.length*100)+'%';document.getElementById('knownCount').textContent=known.size+' known';}
+function flipCard(){document.getElementById('fc')?.classList.toggle('flipped')}
+function next(){idx++;render()} function prev(){idx--;render()}
+function markKnown(){known.add(filtered[idx].q);next();}
+function shuffle(){filtered.sort(()=>Math.random()-.5);idx=0;render();}
+function resetAll(){known.clear();filtered=currentCat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===currentCat);idx=0;render();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();else if(e.key===' '){e.preventDefault();flipCard();}else if(e.key==='k'||e.key==='K')markKnown();else if(e.key==='s'||e.key==='S')shuffle();});
+buildFilters();render();
+</script>
+</body>
+</html>
