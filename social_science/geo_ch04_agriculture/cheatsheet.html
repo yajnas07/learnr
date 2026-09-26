@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheatsheet — Agriculture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0a04;--card:#1a1208;--card2:#22180c;--border:#3a2a12;--text:#f0e4d0;--muted:#8a6a3a;--geo:#eab308;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1.2rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--geo)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.grid{max-width:1100px;margin:auto;padding:0 1rem 3rem;display:grid;gap:1.2rem;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:border-color .2s}
+.panel:hover{border-color:#5a4020}
+.panel h2{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem}
+.panel h2 .dot{width:10px;height:10px;border-radius:50%}
+.panel ul{list-style:none;padding:0}
+.panel li{font-size:.82rem;line-height:1.7;padding:.18rem 0;padding-left:.8rem;position:relative;color:var(--text)}
+.panel li::before{content:'▸';position:absolute;left:0;color:var(--geo)}
+.panel table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:.5rem}
+.panel th,.panel td{padding:.4rem .55rem;border:1px solid var(--border);text-align:left}
+.panel th{background:var(--card2);color:var(--geo);font-family:'DM Mono',monospace;font-size:.7rem}
+.panel td{color:var(--text)}
+.panel .note{font-size:.73rem;color:var(--muted);background:rgba(234,179,8,.06);border-left:3px solid var(--geo);padding:.5rem .8rem;border-radius:0 8px 8px 0;margin-top:.6rem}
+.panel .kw{color:var(--geo);font-weight:700}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(14,10,4,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,42,18,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid rgba(58,42,18,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:var(--geo)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Cheatsheet</h1>
+  <p>Agriculture · Geography Ch.4 · Quick Reference</p>
+</header>
+
+<div class="grid">
+
+<div class="panel">
+  <h2><span class="dot" style="background:var(--orange)"></span>Types of Farming</h2>
+  <ul>
+    <li><strong>Primitive Subsistence</strong> — slash & burn, primitive tools, monsoon-dependent</li>
+    <li><strong>Intensive Subsistence</strong> — labour-intensive, high inputs, small plots</li>
+    <li><strong>Commercial Farming</strong> — HYV seeds, fertilisers, crops for market</li>
+    <li><strong>Plantation</strong> — single crop on large area (tea, coffee, rubber)</li>
+  </ul>
+  <div class="note">Slash & burn names: <span class="kw">Jhumming</span> (NE India), <span class="kw">Milpa</span> (Mexico), <span class="kw">Roca</span> (Brazil), <span class="kw">Ladang</span> (Malaysia).</div>
+</div>
+
+<div class="panel">
+  <h2><span class="dot" style="background:var(--green)"></span>Cropping Seasons</h2>
+  <table>
+    <tr><th>Season</th><th>Time</th><th>Crops</th></tr>
+    <tr><td><strong>Rabi</strong></td><td>Sown Oct–Dec, harvest Apr–Jun</td><td>Wheat, gram, peas, mustard, barley</td></tr>
+    <tr><td><strong>Kharif</strong></td><td>Sown Jun–Jul, harvest Sep–Oct</td><td>Rice, maize, jowar, bajra, cotton, jute</td></tr>
+    <tr><td><strong>Zaid</strong></td><td>Summer (short)</td><td>Watermelon, cucumber, vegetables, fodder</td></tr>
+  </table>
+  <div class="note">Winter western disturbances help Rabi crops in NW India. Sugarcane takes almost a year.</div>
+</div>
+
+<div class="panel">
+  <h2><span class="dot" style="background:var(--geo)"></span>Major Food Crops</h2>
+  <ul>
+    <li><strong>Rice</strong> — kharif; needs >25°C, high humidity, >100 cm rain; staple food</li>
+    <li><strong>Wheat</strong> — rabi; cool growing season, 50–75 cm rain; NW plains</li>
+    <li><strong>Millets</strong> — jowar, bajra, ragi (coarse grains); ragi rich in iron & calcium</li>
+    <li><strong>Maize</strong> — both kharif & rabi; needs old alluvial soil</li>
+    <li><strong>Pulses</strong> — India = largest producer & consumer; fix nitrogen in soil</li>
+  </ul>
+</div>
+
+<div class="panel">
+  <h2><span class="dot" style="background:var(--amber)"></span>Cash & Fibre Crops</h2>
+  <table>
+    <tr><th>Crop</th><th>Soil / Condition</th><th>Areas</th></tr>
+    <tr><td><strong>Sugarcane</strong></td><td>Hot & humid, 21–27°C</td><td>UP, Maharashtra, TN</td></tr>
+    <tr><td><strong>Cotton</strong></td><td>Black soil, 210 frost-free days</td><td>Maharashtra, Gujarat</td></tr>
+    <tr><td><strong>Jute</strong></td><td>Fertile flood-plain soil</td><td>WB, Bihar, Assam</td></tr>
+    <tr><td><strong>Tea/Coffee</strong></td><td>Plantation crops</td><td>Assam, WB, Nilgiris</td></tr>
+  </table>
+  <div class="note">Jute = "golden fibre". India believed to be the original home of cotton.</div>
+</div>
+
+<div class="panel">
+  <h2><span class="dot" style="background:var(--blue)"></span>Reforms & Technology</h2>
+  <ul>
+    <li><strong>Green Revolution</strong> — HYV seeds, irrigation, fertilisers (1960s)</li>
+    <li><strong>White Revolution</strong> (Operation Flood) — boosted milk production</li>
+    <li><strong>Land reforms</strong> — abolition of zamindari, "land to the tiller"</li>
+    <li><strong>Collectivisation & consolidation</strong> of holdings</li>
+    <li><strong>KCC</strong> (Kissan Credit Card), <strong>PAIS</strong>, crop insurance, MSP</li>
+  </ul>
+</div>
+
+<div class="panel">
+  <h2><span class="dot" style="background:var(--purple)"></span>Globalisation</h2>
+  <ul>
+    <li>Indian spices, muslin & cotton textiles traded worldwide since ancient times</li>
+    <li>British exported cotton/indigo as raw material — ruined farmers</li>
+    <li><strong>Champaran (1917)</strong> — Gandhiji vs forced indigo cultivation</li>
+    <li>Today: competition from subsidised farm goods of developed nations</li>
+    <li>Shift to horticulture (fruits, vegetables, flowers), organic farming</li>
+  </ul>
+</div>
+
+<div class="panel">
+  <h2><span class="dot" style="background:var(--teal)"></span>Food Security & Future</h2>
+  <ul>
+    <li>Agriculture supports ~<strong>2/3 of India's population</strong></li>
+    <li>Share in GDP declining, but livelihood role remains huge</li>
+    <li><strong>Bhoodan–Gramdan</strong> — Vinoba Bhave's "blood-less revolution"</li>
+    <li><strong>Organic farming</strong> — reduces chemicals, protects soil & health</li>
+    <li>Need sustainable, profitable farming for the future</li>
+  </ul>
+</div>
+
+<div class="panel" style="grid-column:1/-1">
+  <h2><span class="dot" style="background:var(--geo)"></span>Important Exam Points — Quick Recall</h2>
+  <ul>
+    <li><span class="kw">Jhumming</span> — slash & burn farming in NE India</li>
+    <li><span class="kw">Rabi</span> — wheat, gram, mustard | <span class="kw">Kharif</span> — rice, cotton, jute | <span class="kw">Zaid</span> — summer crops</li>
+    <li><span class="kw">Rice</span> — staple; India 2nd largest producer after China</li>
+    <li><span class="kw">Cotton</span> — needs black soil & 210 frost-free days; kharif crop</li>
+    <li><span class="kw">Jute</span> — "golden fibre" of West Bengal</li>
+    <li><span class="kw">India</span> — largest producer & consumer of pulses</li>
+    <li><span class="kw">Green Revolution</span> — HYV seeds made India self-sufficient in food</li>
+    <li><span class="kw">Operation Flood</span> = White Revolution (milk)</li>
+    <li><span class="kw">Bhoodan–Gramdan</span> — led by Vinoba Bhave; began at Pochampalli</li>
+    <li><span class="kw">Champaran, 1917</span> — Gandhiji's movement against forced indigo cultivation</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>

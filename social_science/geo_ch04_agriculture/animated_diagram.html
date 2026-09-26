@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Agriculture · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0a04;--card:#1a1208;--card2:#22180c;--border:#3a2a12;
+  --text:#f0e4d0;--muted:#8a6a3a;--geo:#eab308;
+  --green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+.top-nav{display:flex;align-items:center;gap:16px;padding:10px 22px;background:rgba(14,10,4,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:27px}
+.nav-bc{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.nav-bc a{color:var(--muted);text-decoration:none}.nav-bc a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-cur{color:var(--geo);font-weight:700}
+.nav-back{margin-left:auto;padding:5px 13px;background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.3);border-radius:18px;color:var(--geo);font-size:.78rem;text-decoration:none;transition:all .2s}
+.nav-back:hover{background:rgba(234,179,8,.2)}
+
+.page-hdr{padding:28px 20px 16px;text-align:center}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.85rem;color:#fff;margin-bottom:5px}
+.page-hdr p{color:var(--muted);font-size:.9rem}
+.ch-badge{display:inline-block;padding:3px 10px;background:rgba(234,179,8,.12);border:1px solid rgba(234,179,8,.35);border-radius:12px;color:var(--geo);font-size:.73rem;font-weight:700;margin-bottom:8px}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 56px}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:7px 16px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.tab.active{border-color:var(--geo);background:rgba(234,179,8,.1);color:var(--geo);font-weight:700}
+
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.panel-title{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;color:var(--text)}
+.panel-body{padding:18px}
+
+.rtable{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:4px}
+.rtable th{padding:8px 12px;background:rgba(234,179,8,.1);color:var(--geo);font-weight:700;text-align:left;border-bottom:1px solid var(--border)}
+.rtable td{padding:8px 12px;border-bottom:1px solid rgba(58,42,18,.4);vertical-align:top}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(234,179,8,.04)}
+
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.72rem;font-weight:700;margin-right:4px}
+.tag-e{background:rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.3)}
+.tag-v{background:rgba(251,191,36,.15);color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
+.tag-r{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3)}
+.tag-n{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+
+.ibox{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:12px}
+.ibox strong{color:var(--text)}
+.ibox .kw{color:var(--geo);font-weight:700}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px}
+.info-card{border-radius:12px;padding:14px;border:1px solid var(--border);background:var(--card2);transition:all .25s}
+.info-card:hover{transform:translateY(-2px);border-color:rgba(234,179,8,.3)}
+.info-card h4{font-size:.88rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+.info-card p{font-size:.76rem;line-height:1.65;color:var(--muted)}
+.info-card .ic-icon{font-size:1.5rem;margin-bottom:8px;display:block}
+
+.timeline{position:relative;padding-left:28px;margin-top:12px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--geo),var(--green))}
+.tl-item{position:relative;margin-bottom:18px;padding-bottom:4px}
+.tl-item::before{content:'';position:absolute;left:-24px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--geo);background:var(--bg)}
+.tl-item h4{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.tl-item p{font-size:.76rem;line-height:1.6;color:var(--muted)}
+.tl-item .tl-year{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--geo);margin-bottom:2px}
+
+.bar-chart{margin-top:12px}
+.bar-row{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px}
+.bar-label span:first-child{color:var(--text)}
+.bar-label span:last-child{font-family:'DM Mono',monospace;color:var(--geo)}
+.bar-track{height:12px;background:#22180c;border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width 1.2s ease}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../../index.html" class="nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <div class="nav-bc">
+    <a href="../../index.html">Home</a><span class="nav-sep">/</span>
+    <a href="../../index.html">Geography</a><span class="nav-sep">/</span>
+    <span class="nav-cur">Agriculture</span>
+  </div>
+  <a href="../../index.html" class="nav-back">← Back</a>
+</nav>
+
+<div class="page-hdr">
+  <div class="ch-badge">Geography · Ch.4</div>
+  <h1>Agriculture</h1>
+  <p>Farming types, cropping seasons, major crops, reforms, globalisation and food security</p>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="show(0,this)">🚜 Farming Types</button>
+    <button class="tab" onclick="show(1,this)">🌦️ Cropping Seasons</button>
+    <button class="tab" onclick="show(2,this)">🌾 Major Crops</button>
+    <button class="tab" onclick="show(3,this)">🔬 Reforms & Tech</button>
+    <button class="tab" onclick="show(4,this)">🌍 Globalisation</button>
+    <button class="tab" onclick="show(5,this)">🍚 Food & Future</button>
+  </div>
+
+  <!-- TAB 0: Farming Types -->
+  <div class="panel active" id="p0">
+    <div class="panel-card">
+      <div class="panel-title">🚜 Types of Farming in India</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Farming in India varies with <span class="kw">physical environment, technology and socio-cultural practices</span>. It ranges from subsistence farming for the family's needs to modern commercial farming for the market.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--orange)"><div class="ic-icon">🔥</div><h4>Primitive Subsistence</h4><p>"Slash and burn" farming on small patches with primitive tools (hoe, dao) and family labour. Depends on monsoon & natural fertility. Known as <em>jhumming</em> in NE India.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">👩‍🌾</div><h4>Intensive Subsistence</h4><p>Practised in areas of high population pressure. Labour-intensive with high inputs and irrigation on small holdings. High output per unit area.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">💰</div><h4>Commercial Farming</h4><p>Uses modern inputs — HYV seeds, fertilisers, pesticides. Crops grown for sale in the market. Commercialisation varies by region.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">🌴</div><h4>Plantation</h4><p>A type of commercial farming — single crop grown on a large area (tea, coffee, rubber, sugarcane). Capital-intensive, needs migrant labour, linked to industry.</p></div>
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--geo)">
+          <strong>Slash & burn</strong> has different names worldwide: <span class="kw">Jhumming</span> (NE India), <span class="kw">Milpa</span> (Mexico), <span class="kw">Roca</span> (Brazil), <span class="kw">Ladang</span> (Malaysia).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: Cropping Seasons -->
+  <div class="panel" id="p1">
+    <div class="panel-card">
+      <div class="panel-title">🌦️ Three Cropping Seasons</div>
+      <div class="panel-body">
+        <div class="ibox">
+          India has three main cropping seasons — <span class="kw">Rabi, Kharif and Zaid</span> — determined by the monsoon and temperature cycle.
+        </div>
+        <table class="rtable">
+          <tr><th>Season</th><th>Sown / Harvested</th><th>Major Crops</th><th>Regions</th></tr>
+          <tr><td><strong>Rabi</strong> (winter)</td><td>Sown Oct–Dec, harvested Apr–Jun</td><td>Wheat, barley, peas, gram, mustard</td><td>Punjab, Haryana, HP, J&K, UP, Uttarakhand</td></tr>
+          <tr><td><strong>Kharif</strong> (monsoon)</td><td>Sown Jun–Jul, harvested Sep–Oct</td><td>Rice, maize, jowar, bajra, tur, cotton, jute, groundnut, soyabean</td><td>Assam, WB, coastal areas, UP, Bihar</td></tr>
+          <tr><td><strong>Zaid</strong> (summer)</td><td>Short season between Rabi & Kharif</td><td>Watermelon, muskmelon, cucumber, vegetables, fodder</td><td>Across northern plains</td></tr>
+        </table>
+        <div class="card-grid" style="margin-top:16px">
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">❄️</div><h4>Rabi Boost</h4><p>Winter western disturbances (temperate cyclones) bring precipitation that helps the success of rabi crops in north-west India.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">🌧️</div><h4>Kharif Timing</h4><p>Grown with the onset of the south-west monsoon. Rice-growing regions may raise three crops (Aus, Aman, Boro) in a year.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">☀️</div><h4>Zaid & Sugarcane</h4><p>Zaid is a short summer season. Sugarcane, however, takes almost a year to grow.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Major Crops -->
+  <div class="panel" id="p2">
+    <div class="panel-card">
+      <div class="panel-title">🌾 Major Crops of India</div>
+      <div class="panel-body">
+        <div class="ibox">
+          India grows a variety of crops due to its <span class="kw">diverse relief, climate and soils</span> — food grains, cash crops, plantation crops and fibre crops.
+        </div>
+        <table class="rtable">
+          <tr><th>Crop</th><th>Conditions</th><th>Leading Areas</th></tr>
+          <tr><td><strong>Rice</strong> (kharif)</td><td>High temp (>25°C), high humidity, rainfall >100 cm</td><td>N & NE plains, coastal & deltaic regions</td></tr>
+          <tr><td><strong>Wheat</strong> (rabi)</td><td>Cool growing season, bright sunshine at ripening, 50–75 cm rain</td><td>Ganga-Satluj plains (NW), Deccan black soil</td></tr>
+          <tr><td><strong>Millets</strong> (jowar, bajra, ragi)</td><td>Coarse grains, less water; ragi rich in iron & calcium</td><td>Maharashtra, Karnataka, Rajasthan, TN</td></tr>
+          <tr><td><strong>Sugarcane</strong></td><td>Hot & humid, 21–27°C, 75–100 cm rain</td><td>UP, Maharashtra, Karnataka, TN</td></tr>
+          <tr><td><strong>Cotton</strong> (kharif)</td><td>Black soil, high temp, light rain, 210 frost-free days</td><td>Maharashtra, Gujarat, MP, Punjab</td></tr>
+          <tr><td><strong>Jute</strong></td><td>Well-drained fertile flood-plain soil, high temp</td><td>West Bengal, Bihar, Assam, Odisha</td></tr>
+        </table>
+        <div class="card-grid" style="margin-top:16px">
+          <div class="info-card" style="border-left:3px solid var(--geo)"><div class="ic-icon">🍚</div><h4>Rice — Staple Food</h4><p>Staple food of a majority of Indians. India is the second-largest producer after China.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">🫘</div><h4>Pulses</h4><p>India is the largest producer & consumer of pulses. Being leguminous, they help restore soil fertility by fixing nitrogen.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">🍵</div><h4>Tea & Coffee</h4><p>Plantation crops. Tea grown in Assam, WB (Darjeeling), TN, Kerala. Arabica coffee first from Yemen, grown in Nilgiri hills.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--orange)"><div class="ic-icon">🧵</div><h4>Jute — Golden Fibre</h4><p>Used to make gunny bags, mats, ropes, carpets. Facing competition from synthetic substitutes.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Reforms & Tech -->
+  <div class="panel" id="p3">
+    <div class="panel-card">
+      <div class="panel-title">🔬 Technological & Institutional Reforms</div>
+      <div class="panel-body">
+        <div class="ibox">
+          After Independence, reforms were needed as agriculture had been neglected. <span class="kw">Land reforms, the Green Revolution and the White Revolution</span> transformed Indian farming.
+        </div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-year">1950s–60s</div><h4>Land Reforms</h4><p>Abolition of zamindari, collectivisation, consolidation of holdings and "land to the tiller" to bring institutional change.</p></div>
+          <div class="tl-item"><div class="tl-year">1960s–70s</div><h4>Green Revolution</h4><p>HYV seeds, irrigation, chemical fertilisers and machinery raised food-grain output — making India self-sufficient in food.</p></div>
+          <div class="tl-item"><div class="tl-year">1970s (Operation Flood)</div><h4>White Revolution</h4><p>Boosted milk production through cooperatives — made India the world's largest milk producer.</p></div>
+          <div class="tl-item"><div class="tl-year">Recent</div><h4>Financial & Insurance Support</h4><p>Kissan Credit Card (KCC), Personal Accident Insurance Scheme (PAIS), crop insurance, MSP, grameen banks and cooperatives.</p></div>
+        </div>
+        <div class="card-grid" style="margin-top:16px">
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">💳</div><h4>Kissan Credit Card</h4><p>Provides affordable credit to farmers so they can buy seeds, fertilisers and equipment without falling into debt traps.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">📻</div><h4>Awareness</h4><p>Weather bulletins and agricultural programmes on radio & TV help farmers plan and adopt better practices.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">💵</div><h4>Minimum Support Price</h4><p>Government announces MSP and procures crops to protect farmers from a sharp fall in prices.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: Globalisation -->
+  <div class="panel" id="p4">
+    <div class="panel-card">
+      <div class="panel-title">🌍 Agriculture & Globalisation</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Globalisation is <span class="kw">not new</span> to Indian agriculture — spices and cotton textiles were traded worldwide even in ancient times. But modern globalisation brings both <strong>competition</strong> and <strong>opportunity</strong>.
+        </div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-year">Ancient</div><h4>Global Trade Links</h4><p>Indian spices, muslin and fine cotton textiles were exported to many countries, earning worldwide fame.</p></div>
+          <div class="tl-item"><div class="tl-year">Colonial era</div><h4>Exploitation</h4><p>Under the British, cotton and indigo were exported as raw material, ruining Indian farmers and cottage industries.</p></div>
+          <div class="tl-item"><div class="tl-year">1917</div><h4>Champaran Movement</h4><p>Gandhiji led farmers of Champaran (Bihar) against forced indigo cultivation by British planters.</p></div>
+          <div class="tl-item"><div class="tl-year">Today</div><h4>Post-1990 Competition</h4><p>Indian farmers face competition from highly subsidised farm products of developed nations, squeezing profits.</p></div>
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--red)">
+          <strong style="color:var(--red)">⚠️ Challenge:</strong> Falling profits and rising costs push farmers to shift from cereals towards <span class="kw">fruits, vegetables and flowers (horticulture)</span> and to explore organic farming and genetic engineering.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: Food & Future -->
+  <div class="panel" id="p5">
+    <div class="panel-card">
+      <div class="panel-title">🍚 Food Security & Sustainable Future</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Agriculture provides a livelihood for about <span class="kw">two-thirds of India's population</span> and food for all. Its share in GDP is declining, but making farming <strong>sustainable and profitable</strong> remains vital.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--geo)"><div class="ic-icon">👨‍👩‍👧</div><h4>Livelihood</h4><p>Supports ~2/3 of the population, provides raw materials to industry and employment to millions.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">🤝</div><h4>Bhoodan–Gramdan</h4><p>Vinoba Bhave's "blood-less revolution" — landlords voluntarily donated land to the landless. Began at Pochampalli.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🌱</div><h4>Organic Farming</h4><p>Reduces chemical use, protects soil and health, and opens markets for chemical-free produce.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--red)"><div class="ic-icon">⚠️</div><h4>Sustainability Concerns</h4><p>Over-use of water and chemicals degrades land. Crop rotation, conservation and balanced inputs are needed.</p></div>
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--geo)">
+          <strong>Key Takeaway:</strong> Indian agriculture must become <span class="kw">productive, profitable and sustainable</span> — balancing food security for a growing population with the health of land, water and the farmers themselves.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  btn.classList.add('active');
+  animateBars();
+}
+
+function animateBars(){
+  setTimeout(()=>{
+    document.querySelectorAll('.panel.active .bar-fill').forEach(b=>{
+      b.style.width=b.dataset.w||'0%';
+    });
+  },100);
+}
+animateBars();
+</script>
+</body>
+</html>

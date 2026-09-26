@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Agriculture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#0e0a04; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:42px; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(14,10,4,.9) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#facc15; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#7a5a20; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #3a2a0a; background:rgba(14,10,4,.85);
+  color:#a08a4a; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#facc15; color:#facc15; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#141007; border:1px solid #3a2a0a;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:290px; font-size:.8rem; color:#d4c4a8;
+  line-height:1.6; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.7);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#facc15; font-size:.9rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%;
+  background:rgba(14,10,4,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(58,42,10,.75);
+  position:absolute; top:0; left:0; right:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#a08a4a; text-decoration:none;
+  border:1px solid rgba(58,42,10,.9); border-radius:99px;
+  padding:.2rem .65rem;
+}
+.site-nav-back:hover { color:#facc15; border-color:#6a5020; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<div id="ui">
+  <div>
+    <h1>Agriculture</h1>
+    <p>Class X · Geography Ch.4 — drag to pan · scroll to zoom · hover nodes</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2+20; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Agriculture',
+  x:0, y:0, r:70, color:'#201806', stroke:'#facc15', textColor:'#facc15', fontSize:14
+};
+
+const BRANCHES = [
+  // Farming Types
+  {
+    id:'types', label:'Farming\nTypes', x:-320, y:-200, r:48,
+    color:'#14100a', stroke:'#fb923c', textColor:'#ffedd5',
+    info:'Different farming systems are practised in India depending on soil, climate, technology and demand.\n• Primitive subsistence farming\n• Intensive subsistence farming\n• Commercial farming (incl. plantation)',
+    children:[
+      { id:'t1', label:'Primitive\nSubsistence', x:-510, y:-310, r:36, color:'#14100a', stroke:'#fb923c', textColor:'#ffedd5',
+        info:'Primitive subsistence farming:\n• Practised on small patches with primitive tools (hoe, dao, digging sticks).\n• Depends on monsoon, natural soil fertility.\n• "Slash and burn" agriculture.\n• Called jhumming (NE India), milpa (Mexico), roca (Brazil), ladang (Malaysia).' },
+      { id:'t2', label:'Intensive\nSubsistence', x:-505, y:-160, r:36, color:'#14100a', stroke:'#fb923c', textColor:'#ffedd5',
+        info:'Intensive subsistence farming:\n• Practised in areas of high population pressure on land.\n• Labour-intensive, high doses of biochemical inputs & irrigation.\n• Small land holdings due to inheritance dividing land.\n• Farmers work hard on the same land for higher output.' },
+      { id:'t3', label:'Commercial\nFarming', x:-460, y:-50, r:36, color:'#14100a', stroke:'#fb923c', textColor:'#ffedd5',
+        info:'Commercial farming:\n• Higher use of modern inputs — HYV seeds, fertilisers, pesticides.\n• Crops grown for sale in the market.\n• Degree of commercialisation varies by region (rice in Haryana is commercial, in Odisha subsistence).\n• Plantation is a type of commercial farming.' },
+    ]
+  },
+
+  // Cropping Seasons
+  {
+    id:'seasons', label:'Cropping\nSeasons', x:320, y:-200, r:48,
+    color:'#0a140a', stroke:'#4ade80', textColor:'#dcfce7',
+    info:'India has three cropping seasons — Rabi, Kharif and Zaid.',
+    children:[
+      { id:'s1', label:'Rabi', x:520, y:-320, r:36, color:'#0a140a', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'Rabi (winter) crops:\n• Sown Oct–Dec, harvested Apr–Jun.\n• Wheat, barley, peas, gram, mustard.\n• Important in Punjab, Haryana, HP, J&K, UP, Uttarakhand.\n• Precipitation from winter western disturbances helps.' },
+      { id:'s2', label:'Kharif', x:540, y:-180, r:36, color:'#0a140a', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'Kharif (monsoon) crops:\n• Sown with onset of monsoon (Jun–Jul), harvested Sep–Oct.\n• Rice, maize, jowar, bajra, tur, cotton, jute, groundnut, soyabean.\n• Grown in Assam, WB, coastal areas, UP, Bihar (rice).' },
+      { id:'s3', label:'Zaid', x:510, y:-60, r:36, color:'#0a140a', stroke:'#4ade80', textColor:'#dcfce7',
+        info:'Zaid (summer) season:\n• Short season between Rabi and Kharif (summer months).\n• Watermelon, muskmelon, cucumber, vegetables, fodder crops.\n• Sugarcane takes almost a year to grow.' },
+    ]
+  },
+
+  // Reforms
+  {
+    id:'reform', label:'Reforms &\nTechnology', x:-310, y:220, r:48,
+    color:'#0a0a18', stroke:'#818cf8', textColor:'#e0e7ff',
+    info:'Since Independence, technological and institutional reforms have modernised Indian agriculture.',
+    children:[
+      { id:'r1', label:'Green &\nWhite Revolution', x:-500, y:140, r:36, color:'#0a0a18', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'• Green Revolution — HYV seeds, irrigation, fertilisers raised food grain output (1960s).\n• White Revolution (Operation Flood) — boosted milk production.\n• Made India self-sufficient in food grains.' },
+      { id:'r2', label:'Institutional\nReforms', x:-495, y:285, r:36, color:'#0a0a18', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Institutional reforms:\n• Collectivisation, consolidation of holdings.\n• Abolition of zamindari.\n• Land reforms — "land to the tiller".\n• Kissan Credit Card (KCC), Personal Accident Insurance Scheme (PAIS).\n• Minimum Support Price (MSP), procurement.' },
+      { id:'r3', label:'Govt\nSupport', x:-440, y:400, r:36, color:'#0a0a18', stroke:'#818cf8', textColor:'#e0e7ff',
+        info:'Government initiatives:\n• MSP, subsidies on inputs.\n• Crop insurance against drought/flood/cyclone.\n• Grameen banks, cooperative societies for loans.\n• Weather bulletins & agricultural programmes on radio/TV.' },
+    ]
+  },
+
+  // Globalisation
+  {
+    id:'global', label:'Globalisation\n& Future', x:310, y:220, r:48,
+    color:'#0a1414', stroke:'#22d3ee', textColor:'#cffafe',
+    info:'Globalisation and competition affect Indian agriculture. Farmers face challenges but also new opportunities.',
+    children:[
+      { id:'g1', label:'Old Trade\nLinks', x:510, y:140, r:36, color:'#0a1414', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'• Indian spices, cotton textiles, muslin were exported worldwide even in ancient times.\n• Under British, cotton/indigo were exported as raw material — hurting Indian farmers.\n• Champaran indigo movement (1917) against forced cultivation.' },
+      { id:'g2', label:'Challenges\nToday', x:530, y:270, r:36, color:'#0a1414', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Challenges under globalisation:\n• Competition from highly subsidised farm products of developed nations.\n• Falling profits, rising input costs.\n• Farmers shifting from cereals to fruits, vegetables, flowers.\n• Need for genetic engineering, organic farming.' },
+      { id:'g3', label:'Way\nForward', x:470, y:390, r:36, color:'#0a1414', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'• Agriculture provides livelihood but its GDP share is declining.\n• Need to make farming sustainable & profitable.\n• Contract farming, agro-industries, organic farming.\n• "Gene Revolution" — biotechnology for better yields.' },
+    ]
+  },
+
+  // Major Crops
+  {
+    id:'crops', label:'Major\nCrops', x:0, y:-310, r:48,
+    color:'#180a0a', stroke:'#f87171', textColor:'#fecaca',
+    info:'India grows a wide variety of food and non-food crops due to varied climate & soils.',
+    children:[
+      { id:'cr1', label:'Food Grains', x:-170, y:-430, r:36, color:'#180a0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Food grains:\n• Rice — staple, needs high temp/humidity/rainfall >100cm. Grown in plains of N & NE, coasts, deltas.\n• Wheat — main rabi crop, needs cool growing & bright harvest; grown in N-W (Punjab, Haryana, UP).\n• Millets (jowar, bajra, ragi) — coarse grains, nutritious.\n• Maize, pulses (India is largest producer & consumer).' },
+      { id:'cr2', label:'Cash\nCrops', x:0, y:-450, r:36, color:'#180a0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Cash / commercial crops:\n• Sugarcane — tropical & subtropical, source of sugar, gur, khandsari.\n• Oilseeds — groundnut, mustard, soyabean, sunflower.\n• Tea & Coffee — plantation crops.\n• Horticulture — India is major producer of fruits & vegetables.' },
+      { id:'cr3', label:'Fibre\nCrops', x:170, y:-430, r:36, color:'#180a0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Fibre crops:\n• Cotton — needs black soil (Deccan), high temp, light rain, 210 frost-free days. India believed to be original home of cotton.\n• Jute — "golden fibre", grown in WB, Bihar, Assam on well-drained fertile flood plains.\n• Other fibres: silk, hemp, natural fibres.' },
+    ]
+  },
+
+  // Food Security
+  {
+    id:'food', label:'Food\nSecurity', x:0, y:310, r:48,
+    color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+    info:'Ensuring availability & access to food for all is a key concern linked with agriculture.',
+    children:[
+      { id:'fs1', label:'Importance\nof Agri', x:-180, y:430, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'• Agriculture supports ~2/3 of India\'s population.\n• Provides food, raw materials, employment.\n• Contributes to national income & exports.\n• Its share in GDP is declining but livelihood role remains huge.' },
+      { id:'fs2', label:'Bhoodan–\nGramdan', x:0, y:460, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'Bhoodan–Gramdan movement:\n• Led by Vinoba Bhave (Gandhi\'s spiritual heir).\n• Landlords voluntarily donated land to the landless.\n• Called the "Blood-less Revolution".\n• Ramchandra Reddy donated land at Pochampalli.' },
+      { id:'fs3', label:'Sustainability', x:180, y:430, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'• Over-use of chemicals & water degrades land.\n• Need organic farming, crop rotation, conservation.\n• Balance food production with ecological health.\n• Support farmers to keep agriculture viable & sustainable.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){return allNodes.find(n=>n.id===id);}
+
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found&&found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10,window.innerHeight-240)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {tip.style.display='none';canvas.style.cursor='grab';}
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx,cy);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.22,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2+20;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(250,204,21,.025)'; ctx.lineWidth=1;
+  for(let x=-1400;x<1400;x+=70){ctx.beginPath();ctx.moveTo(x,-1400);ctx.lineTo(x,1400);ctx.stroke();}
+  for(let y=-1400;y<1400;y+=70){ctx.beginPath();ctx.moveTo(-1400,y);ctx.lineTo(1400,y);ctx.stroke();}
+
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    const cpx=(a.x+b.x)/2+(b.y-a.y)*.15, cpy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cpx,cpy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?38:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-9,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

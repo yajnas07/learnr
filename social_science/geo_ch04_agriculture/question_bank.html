@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Agriculture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0a04;--card:#1a1208;--card2:#22180c;--border:#3a2a12;--text:#f0e4d0;--muted:#8a6a3a;--geo:#eab308;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--geo)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.72rem;padding:.32rem .85rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--geo);color:var(--geo);background:rgba(234,179,8,.08)}
+
+.score-bar{display:flex;justify-content:center;gap:1.5rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.score-bar span.right{color:var(--green)} .score-bar span.wrong{color:var(--red)}
+
+.questions{max-width:820px;margin:auto;padding:0 1rem 3rem;display:flex;flex-direction:column;gap:1rem}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.4rem;transition:border-color .2s}
+.q-card:hover{border-color:#5a4020}
+.q-num{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--geo);margin-bottom:.4rem}
+.q-text{font-size:.88rem;font-weight:600;line-height:1.7;margin-bottom:.9rem}
+.opts{display:grid;gap:.4rem}
+.opt{display:flex;align-items:flex-start;gap:.5rem;padding:.5rem .8rem;border-radius:9px;border:1px solid var(--border);cursor:pointer;font-size:.82rem;line-height:1.5;transition:all .15s;background:transparent}
+.opt:hover{border-color:#5a4020;background:var(--card2)}
+.opt.correct{border-color:var(--green);background:rgba(74,222,128,.1);color:var(--green)}
+.opt.wrong{border-color:var(--red);background:rgba(248,113,113,.08);color:var(--red)}
+.opt .circle{min-width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;margin-top:1px}
+.opt.correct .circle{border-color:var(--green);background:var(--green);color:#000}
+.opt.wrong .circle{border-color:var(--red);background:var(--red);color:#fff}
+.explain{display:none;margin-top:.7rem;font-size:.78rem;line-height:1.7;color:var(--muted);background:var(--card2);border-radius:8px;padding:.7rem 1rem;border-left:3px solid var(--geo)}
+.explain.show{display:block}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(14,10,4,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,42,18,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid rgba(58,42,18,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:var(--geo)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Agriculture · Geography Ch.4 · 30 MCQs</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="score-bar"><span>Score: <span class="right" id="sc-r">0</span> ✓ / <span class="wrong" id="sc-w">0</span> ✗</span><span id="sc-tot">0 / 30 attempted</span></div>
+<div class="questions" id="qlist"></div>
+
+<script>
+const QS=[
+// Farming Types
+{cat:'types',q:'"Slash and burn" agriculture is known as ______ in North-East India.',ops:['Milpa','Roca','Jhumming','Ladang'],ans:2,exp:'Slash and burn farming is called Jhumming in North-East India. It is known as Milpa in Mexico, Roca in Brazil and Ladang in Malaysia.'},
+{cat:'types',q:'Which type of farming uses HYV seeds and grows crops mainly for the market?',ops:['Primitive subsistence','Intensive subsistence','Commercial farming','Shifting cultivation'],ans:2,exp:'Commercial farming uses modern inputs like HYV seeds, fertilisers and pesticides to grow crops mainly for sale in the market.'},
+{cat:'types',q:'Plantation agriculture is characterised by:',ops:['Many crops on small plots','A single crop grown on a large area','No use of labour','Only rain-fed farming'],ans:1,exp:'In plantation agriculture a single crop (like tea, coffee or rubber) is grown on a large area. It is capital-intensive, uses migrant labour and is linked to industry.'},
+{cat:'types',q:'Intensive subsistence farming is practised in regions of:',ops:['Low population','High population pressure on land','No irrigation','Very large farms'],ans:1,exp:'Intensive subsistence farming is practised in areas of high population pressure on land, using labour, high inputs and irrigation on small holdings.'},
+{cat:'types',q:'Which crop is commercial in Punjab but subsistence in Odisha?',ops:['Wheat','Rice','Cotton','Tea'],ans:1,exp:'Rice is a commercial crop in Punjab and Haryana but a subsistence crop in Odisha — showing that the degree of commercialisation varies by region.'},
+
+// Cropping Seasons
+{cat:'seasons',q:'Wheat is a crop of which cropping season?',ops:['Kharif','Rabi','Zaid','All seasons'],ans:1,exp:'Wheat is a Rabi (winter) crop, sown between October and December and harvested in April–June. Other rabi crops include gram, peas and mustard.'},
+{cat:'seasons',q:'Which of these is a Kharif crop?',ops:['Wheat','Mustard','Rice','Barley'],ans:2,exp:'Rice is a Kharif (monsoon) crop, grown with the onset of the south-west monsoon. Wheat, mustard and barley are Rabi crops.'},
+{cat:'seasons',q:'Crops grown in the short summer season are called:',ops:['Rabi crops','Kharif crops','Zaid crops','Plantation crops'],ans:2,exp:'Zaid crops are grown in the short summer season between Rabi and Kharif — such as watermelon, muskmelon, cucumber and vegetables.'},
+{cat:'seasons',q:'The success of Rabi crops in north-west India is helped by:',ops:['South-west monsoon','Winter western disturbances','Cyclones from Bay of Bengal','Retreating monsoon'],ans:1,exp:'Precipitation from winter western disturbances (temperate cyclones) is important for the success of Rabi crops in north-western India.'},
+{cat:'seasons',q:'Kharif crops are generally harvested in:',ops:['April–June','September–October','December–January','February–March'],ans:1,exp:'Kharif crops are sown with the onset of the monsoon (June–July) and harvested in September–October.'},
+
+// Major Crops
+{cat:'crops',q:'Which conditions are ideal for growing rice?',ops:['Cool & dry','High temperature, high humidity, rainfall >100 cm','Frost & light rain','Black soil & dry climate'],ans:1,exp:'Rice needs high temperature (above 25°C), high humidity and annual rainfall above 100 cm. In lower rainfall areas it is grown with irrigation.'},
+{cat:'crops',q:'Cotton grows best in which type of soil?',ops:['Alluvial soil','Red soil','Black (regur) soil','Laterite soil'],ans:2,exp:'Cotton grows best in black (regur) soil, needing high temperature, light rainfall, bright sunshine and 210 frost-free days. India is believed to be the original home of cotton.'},
+{cat:'crops',q:'Jute is popularly known as the:',ops:['Golden fibre','White gold','Green fibre','King of crops'],ans:0,exp:'Jute is called the "golden fibre". It grows on well-drained fertile flood-plain soils and is used to make gunny bags, mats, ropes and carpets.'},
+{cat:'crops',q:'India is the largest producer and consumer of which of these?',ops:['Wheat','Rice','Pulses','Cotton'],ans:2,exp:'India is the largest producer and consumer of pulses. Being leguminous, pulses help restore soil fertility by fixing nitrogen from the air.'},
+{cat:'crops',q:'Which millet is especially rich in iron, calcium and roughage?',ops:['Jowar','Bajra','Ragi','Maize'],ans:2,exp:'Ragi is very rich in iron, calcium, other micronutrients and roughage, making it a highly nutritious coarse grain.'},
+{cat:'crops',q:'Sugarcane is the main source of:',ops:['Cotton and jute','Sugar, gur and molasses','Tea and coffee','Rice and wheat'],ans:1,exp:'Sugarcane is a tropical and subtropical crop and the main source of sugar, gur (jaggery), khandsari and molasses.'},
+{cat:'crops',q:'Which is a plantation crop grown in the Nilgiri hills?',ops:['Jute','Coffee','Wheat','Bajra'],ans:1,exp:'Coffee (the Arabica variety, originally from Yemen) is a plantation crop grown in the Nilgiri hills of Karnataka, Kerala and Tamil Nadu.'},
+
+// Reforms & Tech
+{cat:'reform',q:'The Green Revolution was mainly associated with:',ops:['Milk production','HYV seeds and food-grain output','Fisheries','Poultry farming'],ans:1,exp:'The Green Revolution introduced high-yielding variety (HYV) seeds, irrigation and fertilisers in the 1960s, sharply raising food-grain output and making India self-sufficient in food.'},
+{cat:'reform',q:'Operation Flood is another name for the:',ops:['Green Revolution','White Revolution','Blue Revolution','Yellow Revolution'],ans:1,exp:'Operation Flood is the White Revolution, which boosted milk production through cooperatives and made India the world\'s largest milk producer.'},
+{cat:'reform',q:'"Land to the tiller" was an aim of:',ops:['The Green Revolution','Land reforms','Globalisation','Plantation farming'],ans:1,exp:'"Land to the tiller" was a key aim of institutional land reforms, along with abolition of zamindari, collectivisation and consolidation of holdings.'},
+{cat:'reform',q:'The Kissan Credit Card (KCC) helps farmers by providing:',ops:['Free land','Affordable credit','Free seeds forever','Export licences'],ans:1,exp:'The Kissan Credit Card provides farmers with affordable, timely credit to buy inputs like seeds and fertilisers, protecting them from moneylenders.'},
+{cat:'reform',q:'MSP (Minimum Support Price) is meant to:',ops:['Raise input costs','Protect farmers from a fall in prices','Increase exports','Reduce food output'],ans:1,exp:'MSP is the price at which the government procures crops, protecting farmers from a sharp fall in market prices and ensuring a stable income.'},
+
+// Globalisation
+{cat:'global',q:'The Champaran movement of 1917 was against:',ops:['High taxes','Forced indigo cultivation','Dam construction','Land ceiling'],ans:1,exp:'The Champaran movement, led by Gandhiji in Bihar in 1917, was against the forced cultivation of indigo by British planters.'},
+{cat:'global',q:'A major challenge to Indian farmers under globalisation is:',ops:['Lack of land','Competition from subsidised foreign farm products','Too much rainfall','Excess of pulses'],ans:1,exp:'Indian farmers face competition from highly subsidised farm products of developed nations, which lowers their profits and threatens their livelihoods.'},
+{cat:'global',q:'Which Indian products were famous in world trade since ancient times?',ops:['Plastics and steel','Spices, muslin and cotton textiles','Cars and machines','Petroleum'],ans:1,exp:'Indian spices, muslin and fine cotton textiles were traded and exported worldwide even in ancient times — showing globalisation of Indian farm produce is very old.'},
+{cat:'global',q:'To increase incomes, many farmers are shifting from cereals to:',ops:['Only rice','Fruits, vegetables and flowers','Cotton only','Fewer crops'],ans:1,exp:'Facing falling profits from cereals, many farmers are shifting to horticulture — fruits, vegetables, oilseeds and flowers — and exploring organic farming.'},
+
+// Food & Future
+{cat:'future',q:'The Bhoodan–Gramdan movement was led by:',ops:['Mahatma Gandhi','Vinoba Bhave','Jawaharlal Nehru','Medha Patkar'],ans:1,exp:'The Bhoodan–Gramdan movement was led by Vinoba Bhave, Gandhi\'s spiritual heir. Landlords voluntarily donated land to the landless — a "blood-less revolution".'},
+{cat:'future',q:'Agriculture provides a livelihood for about what share of India\'s population?',ops:['One-tenth','One-third','Two-thirds','Nine-tenths'],ans:2,exp:'Agriculture supports about two-thirds of India\'s population, providing food, raw materials and employment, even though its share in GDP is declining.'},
+{cat:'future',q:'Which practice makes agriculture more sustainable?',ops:['More chemical use','Organic farming and crop rotation','Over-irrigation','Monocropping'],ans:1,exp:'Organic farming, crop rotation and conservation reduce dependence on chemicals and water, protecting soil health and making agriculture sustainable.'},
+{cat:'future',q:'The Bhoodan–Gramdan movement is said to have begun at:',ops:['Champaran','Pochampalli','Dandi','Wardha'],ans:1,exp:'The movement began when Shri Ram Chandra Reddy donated land at Pochampalli to landless villagers, inspiring Vinoba Bhave\'s Bhoodan–Gramdan movement.'},
+{cat:'crops',q:'Which of the following is an oilseed crop?',ops:['Groundnut','Jute','Ragi','Rice'],ans:0,exp:'Groundnut is an important oilseed crop. Other oilseeds include mustard, soyabean, sesamum, castor seeds and sunflower.'},
+];
+
+const CATS={types:{l:'Farming Types',c:'var(--orange)'},seasons:{l:'Cropping Seasons',c:'var(--green)'},crops:{l:'Major Crops',c:'var(--red)'},reform:{l:'Reforms & Tech',c:'var(--blue)'},global:{l:'Globalisation',c:'var(--purple)'},future:{l:'Food & Future',c:'var(--teal)'}};
+
+let filtered=[...QS],scoreR=0,scoreW=0,attempted=0,answered=new Set();
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="filter('all',this)">All (${QS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=QS.filter(q=>q.cat===k).length;h+=`<button onclick="filter('${k}',this)">${v.l} (${n})</button>`;}f.innerHTML=h;}
+function filter(cat,btn){document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...QS]:QS.filter(q=>q.cat===cat);render();}
+function render(){const c=document.getElementById('qlist');c.innerHTML=filtered.map((q,i)=>{const gi=QS.indexOf(q);const letters='ABCD';return`<div class="q-card" id="q${gi}"><div class="q-num">Q${gi+1} · ${CATS[q.cat].l}</div><div class="q-text">${q.q}</div><div class="opts">${q.ops.map((o,j)=>`<div class="opt" data-qi="${gi}" data-oi="${j}" onclick="answer(${gi},${j},this)"><span class="circle">${letters[j]}</span><span>${o}</span></div>`).join('')}</div><div class="explain" id="exp${gi}">${q.exp}</div></div>`;}).join('');}
+function answer(qi,oi,el){if(answered.has(qi))return;answered.add(qi);attempted++;const q=QS[qi];const opts=document.querySelectorAll(`[data-qi="${qi}"]`);opts.forEach(o=>{const idx=+o.dataset.oi;if(idx===q.ans)o.classList.add('correct');else if(idx===oi)o.classList.add('wrong');});if(oi===q.ans)scoreR++;else scoreW++;document.getElementById('sc-r').textContent=scoreR;document.getElementById('sc-w').textContent=scoreW;document.getElementById('sc-tot').textContent=`${attempted} / ${QS.length} attempted`;document.getElementById(`exp${qi}`).classList.add('show');}
+buildFilters();render();
+</script>
+</body>
+</html>

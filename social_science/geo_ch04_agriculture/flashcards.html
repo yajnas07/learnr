@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Agriculture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0a04;--card:#1a1208;--card2:#22180c;--border:#3a2a12;--text:#f0e4d0;--muted:#8a6a3a;--geo:#eab308;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--geo)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1.2rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.74rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--geo);color:var(--geo);background:rgba(234,179,8,.1)}
+
+.progress{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.progress .count{color:var(--geo);font-weight:700}
+.progress .known{color:var(--teal)}
+.prog-bar{width:140px;height:5px;background:var(--card);border-radius:9px;overflow:hidden}
+.prog-fill{height:100%;background:var(--geo);border-radius:9px;transition:width .3s}
+
+.deck{display:flex;justify-content:center;align-items:center;padding:1rem;min-height:380px;perspective:1200px}
+.flip-card{width:100%;max-width:520px;height:320px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-card .front,.flip-card .back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;border:1px solid var(--border)}
+.flip-card .front{background:var(--card)}
+.flip-card .back{background:var(--card2);transform:rotateY(180deg)}
+.flip-card .front h2{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;line-height:1.55;color:var(--text)}
+.flip-card .back p{font-size:.88rem;line-height:1.75;color:var(--text)}
+.flip-card .back p strong{color:var(--geo)}
+.flip-card .back p em{color:var(--teal);font-style:normal}
+.cat-badge{font-family:'DM Mono',monospace;font-size:.62rem;padding:.15rem .55rem;border-radius:99px;margin-bottom:.8rem}
+.hint{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:1rem}
+
+.controls{display:flex;justify-content:center;gap:.6rem;padding:.8rem 1rem;flex-wrap:wrap}
+.ctrl{font-family:'Lato',sans-serif;font-weight:700;font-size:.76rem;padding:.4rem 1.1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.ctrl:hover{color:var(--text);border-color:#5a4020}
+.ctrl.know{border-color:var(--teal);color:var(--teal);background:rgba(52,211,153,.06)}
+
+.keys{text-align:center;padding:.5rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(14,10,4,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,42,18,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid rgba(58,42,18,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:var(--geo)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Flashcards</h1>
+  <p>Agriculture · Geography Ch.4 · 35 Cards</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress"><span class="count" id="pos">1 / 35</span><div class="prog-bar"><div class="prog-fill" id="prog"></div></div><span class="known" id="knownCount">0 known</span></div>
+<div class="deck" id="deck"></div>
+<div class="controls">
+  <button class="ctrl" onclick="prev()">← Prev</button>
+  <button class="ctrl" onclick="flipCard()">⟳ Flip</button>
+  <button class="ctrl know" onclick="markKnown()">✓ Know it</button>
+  <button class="ctrl" onclick="next()">Next →</button>
+  <button class="ctrl" onclick="shuffle()">⤮ Shuffle</button>
+  <button class="ctrl" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="keys">Keyboard: ← → (navigate) · Space (flip) · K (know it) · S (shuffle)</div>
+
+<script>
+const CARDS=[
+// types (7)
+{cat:'types',q:'What is primitive subsistence farming?',a:'Farming on <strong>small patches of land</strong> using primitive tools (hoe, dao, digging sticks) and family labour. It is "slash and burn" agriculture that depends on the monsoon and natural soil fertility.'},
+{cat:'types',q:'What are the different names for slash-and-burn agriculture?',a:'<strong>Jhumming</strong> (NE India), <strong>Milpa</strong> (Mexico), <strong>Roca</strong> (Brazil), <strong>Ladang</strong> (Malaysia). Farmers clear land, burn vegetation and cultivate for a few years before moving on.'},
+{cat:'types',q:'What is intensive subsistence farming?',a:'Farming in areas of <strong>high population pressure on land</strong>. It is labour-intensive, using high doses of biochemical inputs and irrigation on small holdings to get maximum output per unit area.'},
+{cat:'types',q:'What is commercial farming?',a:'Farming that uses <strong>modern inputs</strong> — HYV seeds, chemical fertilisers, pesticides and insecticides — to grow crops mainly for <strong>sale in the market</strong>. Degree of commercialisation varies from region to region.'},
+{cat:'types',q:'What is plantation agriculture?',a:'A type of commercial farming where a <strong>single crop is grown on a large area</strong> (tea, coffee, rubber, sugarcane, banana). It is capital-intensive, uses migrant labour and is closely linked with industry.'},
+{cat:'types',q:'Why can the same crop be commercial in one region and subsistence in another?',a:'The degree of commercialisation varies. For example, <strong>rice is a commercial crop in Punjab and Haryana</strong> but a <strong>subsistence crop in Odisha</strong>, depending on the local farming system and market access.'},
+{cat:'types',q:'Why do intensive subsistence farmers have small landholdings?',a:'Because of the <strong>right of inheritance</strong>, land is divided among successive generations, leaving farmers with very small, fragmented plots on which they work very hard for higher output.'},
+
+// seasons (6)
+{cat:'seasons',q:'What are the three cropping seasons in India?',a:'<strong>Rabi</strong> (winter), <strong>Kharif</strong> (monsoon) and <strong>Zaid</strong> (summer). They are determined by the monsoon rhythm and the temperature cycle across the year.'},
+{cat:'seasons',q:'When are Rabi crops sown and harvested, and give examples.',a:'<strong>Rabi</strong> crops are sown in <strong>winter (Oct–Dec)</strong> and harvested in <strong>summer (Apr–Jun)</strong>. Examples: wheat, barley, peas, gram and mustard.'},
+{cat:'seasons',q:'When are Kharif crops grown, and give examples.',a:'<strong>Kharif</strong> crops are grown with the <strong>onset of the monsoon (Jun–Jul)</strong> and harvested in <strong>Sep–Oct</strong>. Examples: rice, maize, jowar, bajra, tur, cotton, jute, groundnut and soyabean.'},
+{cat:'seasons',q:'What is the Zaid season?',a:'A <strong>short summer season</strong> between the Rabi and Kharif seasons. Crops grown include watermelon, muskmelon, cucumber, vegetables and fodder crops.'},
+{cat:'seasons',q:'How do winter western disturbances help agriculture?',a:'The precipitation from <strong>winter western disturbances (temperate cyclones)</strong> is important for the success of <strong>Rabi crops</strong> in north-western India.'},
+{cat:'seasons',q:'Why does sugarcane not fit neatly into a cropping season?',a:'Because <strong>sugarcane takes almost a year to grow</strong>, unlike other seasonal crops which are sown and harvested within a few months.'},
+
+// crops (9)
+{cat:'crops',q:'What conditions does rice require?',a:'Rice needs <strong>high temperature (above 25°C), high humidity and annual rainfall above 100 cm</strong>. In low-rainfall areas it is grown with irrigation. It is a kharif crop and the staple food of most Indians.'},
+{cat:'crops',q:'What conditions does wheat require and where is it grown?',a:'Wheat needs a <strong>cool growing season and bright sunshine at ripening</strong>, with 50–75 cm rain. It is the main rabi crop, grown in the Ganga-Satluj plains of the north-west and the black soil of the Deccan.'},
+{cat:'crops',q:'Name the important millets and one nutritional fact.',a:'The main millets are <strong>jowar, bajra and ragi</strong>. They are coarse grains but highly nutritious — <strong>ragi is very rich in iron, calcium and roughage</strong>.'},
+{cat:'crops',q:'Why are pulses important, and India\'s position?',a:'India is the <strong>largest producer and consumer of pulses</strong>. Being leguminous crops, pulses help <strong>restore soil fertility by fixing nitrogen</strong> from the air, so they are grown in rotation with other crops.'},
+{cat:'crops',q:'What conditions does sugarcane need?',a:'Sugarcane is a <strong>tropical and subtropical crop</strong> needing hot and humid climate (21–27°C) and 75–100 cm rainfall. It is the source of sugar, gur (jaggery), khandsari and molasses.'},
+{cat:'crops',q:'What conditions does cotton require?',a:'Cotton needs <strong>black (regur) soil, high temperature, light rainfall, bright sunshine and 210 frost-free days</strong>. India is believed to be the original home of the cotton plant. It is a kharif crop.'},
+{cat:'crops',q:'Why is jute called the "golden fibre"?',a:'<strong>Jute</strong> is called the golden fibre for its colour and value. It grows on <strong>well-drained fertile flood-plain soils</strong> and is used to make gunny bags, mats, ropes and carpets. Grown mainly in West Bengal, Bihar and Assam.'},
+{cat:'crops',q:'Where are tea and coffee grown in India?',a:'<strong>Tea</strong> is a plantation crop grown in Assam, West Bengal (Darjeeling), Tamil Nadu and Kerala. <strong>Coffee</strong> (Arabica variety, originally from Yemen) is grown in the Nilgiri hills of Karnataka, Kerala and Tamil Nadu.'},
+{cat:'crops',q:'What are the main oilseed crops grown in India?',a:'Important oilseeds include <strong>groundnut, mustard, soyabean, sesamum (til), castor seeds, sunflower and cotton seeds</strong>. India is one of the largest producers of oilseeds in the world.'},
+
+// reform (6)
+{cat:'reform',q:'What was the Green Revolution?',a:'A programme in the <strong>1960s</strong> that introduced <strong>high-yielding variety (HYV) seeds, irrigation, chemical fertilisers and machinery</strong>. It sharply raised food-grain output and made India self-sufficient in food.'},
+{cat:'reform',q:'What was the White Revolution (Operation Flood)?',a:'A programme that <strong>boosted milk production</strong> through cooperatives, making India the world\'s largest milk producer. It improved the incomes of dairy farmers across the country.'},
+{cat:'reform',q:'Name some institutional reforms in Indian agriculture.',a:'<strong>Abolition of zamindari, collectivisation, consolidation of holdings</strong> and "land to the tiller". These land reforms aimed to give ownership and security to actual cultivators.'},
+{cat:'reform',q:'What is the Kissan Credit Card (KCC)?',a:'A scheme that provides farmers with <strong>affordable, timely credit</strong> to buy seeds, fertilisers and equipment, protecting them from moneylenders and debt traps.'},
+{cat:'reform',q:'What is Minimum Support Price (MSP)?',a:'A price announced by the government at which it <strong>procures crops from farmers</strong>, protecting them from a sharp fall in market prices and ensuring a stable income.'},
+{cat:'reform',q:'How does the government spread agricultural awareness?',a:'Through <strong>weather bulletins and agricultural programmes on radio and television</strong>, as well as announcing MSP, providing crop insurance and setting up grameen (rural) banks and cooperatives.'},
+
+// global & future (7)
+{cat:'global',q:'Is globalisation new to Indian agriculture?',a:'No. Even in <strong>ancient times</strong>, Indian spices, muslin and fine cotton textiles were traded and exported worldwide, earning great fame. Globalisation of Indian farm produce is very old.'},
+{cat:'global',q:'How did British rule harm Indian farmers?',a:'The British forced farmers to grow <strong>cotton and indigo as raw material for export</strong>, disrupting food production and ruining Indian farmers and cottage industries.'},
+{cat:'global',q:'What was the Champaran movement (1917)?',a:'A movement led by <strong>Gandhiji in Champaran, Bihar</strong>, against the <strong>forced cultivation of indigo</strong> by British planters — an early struggle linking farmers\' rights with the freedom movement.'},
+{cat:'global',q:'What challenges does globalisation pose to Indian farmers today?',a:'Indian farmers face <strong>competition from highly subsidised farm products of developed nations</strong>. Rising input costs and falling profits push many to shift crops or leave farming.'},
+{cat:'global',q:'How are farmers responding to falling profits?',a:'Many farmers are <strong>shifting from cereals to fruits, vegetables, oilseeds and flowers (horticulture)</strong>, and exploring organic farming and genetic engineering for better returns.'},
+{cat:'future',q:'What is the Bhoodan–Gramdan movement?',a:'A movement led by <strong>Vinoba Bhave</strong> (Gandhi\'s spiritual heir) in which <strong>landlords voluntarily donated land to the landless</strong>. Called the "blood-less revolution", it began at Pochampalli.'},
+{cat:'future',q:'Why must Indian agriculture become sustainable?',a:'Over-use of <strong>water and chemical fertilisers/pesticides degrades land and health</strong>. Sustainable practices like organic farming, crop rotation and conservation are needed to keep farming viable for the future.'},
+];
+
+const CATS={types:{label:'Farming Types',color:'var(--orange)',bg:'rgba(251,146,60,.12)'},seasons:{label:'Cropping Seasons',color:'var(--green)',bg:'rgba(74,222,128,.12)'},crops:{label:'Major Crops',color:'var(--red)',bg:'rgba(248,113,113,.12)'},reform:{label:'Reforms & Tech',color:'var(--blue)',bg:'rgba(96,165,250,.12)'},global:{label:'Globalisation',color:'var(--purple)',bg:'rgba(167,139,250,.12)'},future:{label:'Food & Future',color:'var(--teal)',bg:'rgba(52,211,153,.12)'}};
+
+let filtered=[...CARDS],idx=0,known=new Set(),currentCat='all';
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="setFilter('all',this)">All (${CARDS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=CARDS.filter(c=>c.cat===k).length;h+=`<button onclick="setFilter('${k}',this)">${v.label} (${n})</button>`;}f.innerHTML=h;}
+function setFilter(cat,btn){currentCat=cat;document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===cat);idx=0;render();}
+function render(){if(!filtered.length)return;if(idx>=filtered.length)idx=0;if(idx<0)idx=filtered.length-1;const c=filtered[idx],cat=CATS[c.cat];document.getElementById('deck').innerHTML=`<div class="flip-card" id="fc" onclick="flipCard()"><div class="front"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><h2>${c.q}</h2><span class="hint">tap to flip</span></div><div class="back"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><p>${c.a.replace(/\n/g,'<br>')}</p></div></div>`;document.getElementById('pos').textContent=`${idx+1} / ${filtered.length}`;document.getElementById('prog').style.width=((idx+1)/filtered.length*100)+'%';document.getElementById('knownCount').textContent=known.size+' known';}
+function flipCard(){document.getElementById('fc')?.classList.toggle('flipped')}
+function next(){idx++;render()} function prev(){idx--;render()}
+function markKnown(){known.add(filtered[idx].q);next();}
+function shuffle(){filtered.sort(()=>Math.random()-.5);idx=0;render();}
+function resetAll(){known.clear();filtered=currentCat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===currentCat);idx=0;render();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();else if(e.key===' '){e.preventDefault();flipCard();}else if(e.key==='k'||e.key==='K')markKnown();else if(e.key==='s'||e.key==='S')shuffle();});
+buildFilters();render();
+</script>
+</body>
+</html>
