@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Work — Manufacturing Industries · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#12080a;--card:#1e0f0c;--card2:#281510;--border:#3a220f;--text:#f4e4d8;--muted:#9a6a4a;
+  --geo:#f97316;--green:#4ade80;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--purple:#a78bfa;--orange:#fb923c;--cyan:#38bdf8;--pink:#f472b6;--teal:#34d399;--steel:#a3a3a3}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.2rem;background:rgba(18,8,10,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem;transition:all .2s}
+.site-nav a.back:hover{color:var(--geo);border-color:var(--geo)}
+header{text-align:center;padding:1.4rem 1rem .8rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3.5vw,1.8rem);font-weight:900;color:var(--orange)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+.wrap{max-width:960px;margin:0 auto;padding:0 1rem 3rem}
+.mode-bar{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem}
+.mode-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;padding:.45rem 1.2rem;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.mode-btn.active{border-color:var(--geo);color:var(--orange);background:rgba(249,115,22,.08)}
+.tab-bar{display:flex;gap:.4rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.3rem .8rem;border-radius:99px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tab-btn.active{border-color:var(--geo);color:var(--orange);background:rgba(249,115,22,.08)}
+.map-area{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;aspect-ratio:6/7;max-height:630px;margin:0 auto;max-width:540px}
+.map-area svg{width:100%;height:100%;display:block}
+.pin{cursor:pointer;transition:all .2s}
+.pin circle{transition:all .2s}
+.pin:hover circle{r:7;filter:drop-shadow(0 0 8px currentColor)}
+.pin text{font-family:'DM Mono',monospace;font-size:11px;pointer-events:none;opacity:0;transition:opacity .2s}
+.pin:hover text{opacity:1}
+.pin.highlight circle{animation:ping 1s ease infinite}
+@keyframes ping{0%,100%{r:5;opacity:1}50%{r:10;opacity:.5}}
+.info-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:1rem;min-height:80px}
+.info-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.info-desc{font-size:.84rem;color:var(--muted);line-height:1.65}
+.info-desc strong{color:var(--text)}
+.quiz-bar{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:1rem;flex-wrap:wrap}
+.quiz-q{flex:1;font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;min-width:200px}
+.quiz-score{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.quiz-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:4px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s}
+.quiz-btn:hover{border-color:var(--geo);color:var(--orange)}
+.feedback-flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;pointer-events:none;opacity:0;transition:opacity .3s;z-index:10;text-shadow:0 0 20px #000}
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+#indiaBase{opacity:0.9;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-manufacturing">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Map Work — Manufacturing Industries</h1>
+  <p>Class X · Geography Ch.6 · CBSE Board Map Work · Interactive</p>
+</header>
+<div class="wrap">
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('learn')">📖 Learn Mode</button>
+    <button class="mode-btn" onclick="setMode('test')">✍️ Test Yourself</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="setTab('steel')">⚙️ Iron & Steel Plants</button>
+    <button class="tab-btn" onclick="setTab('cotton')">🧵 Cotton Textile Centres</button>
+    <button class="tab-btn" onclick="setTab('software')">💻 Software Tech Parks</button>
+    <button class="tab-btn" onclick="setTab('other')">🏭 Other Industries</button>
+  </div>
+  <div class="map-area" id="mapArea">
+    <div class="feedback-flash" id="fbFlash"></div>
+    <svg viewBox="0 0 666.67 777.33" id="mapSvg">
+      <image id="indiaBase" href="../ch02_nationalism/India_outline.svg" x="0" y="0" width="666.67" height="777.33"/>
+    </svg>
+  </div>
+  <div class="legend" id="legendArea"></div>
+  <div class="info-panel" id="infoPanel">
+    <div class="info-title" id="infoTitle">Click any pin to learn about it</div>
+    <div class="info-desc" id="infoDesc">Explore major <strong>iron & steel plants</strong>, <strong>cotton textile centres</strong>, <strong>software technology parks</strong>, and <strong>other industrial hubs</strong> across India. CBSE Board asks map questions on locating and labelling these major industrial centres.</div>
+  </div>
+  <div class="quiz-bar" id="quizBar" style="display:none">
+    <div class="quiz-q" id="quizQ">Loading...</div>
+    <div class="quiz-score" id="quizScore">0/0</div>
+    <button class="quiz-btn" onclick="skipQ()">Skip →</button>
+  </div>
+</div>
+
+<script>
+const TABS = {
+  steel: {
+    legend: [
+      {color:'#a3a3a3',name:'Public Sector (SAIL)'},{color:'#fb923c',name:'Private Sector'}
+    ],
+    places: [
+      { id:'bhilai', x:330, y:445, color:'#a3a3a3', label:'Bhilai',
+        info:'<strong>Bhilai Steel Plant (Chhattisgarh)</strong> — a <strong>public sector (SAIL)</strong> plant set up with erstwhile USSR help. Uses iron ore from Dalli-Rajhara and coal from the Korba/Bengal fields.' },
+      { id:'durgapur', x:425, y:410, color:'#a3a3a3', label:'Durgapur',
+        info:'<strong>Durgapur Steel Plant (West Bengal)</strong> — a <strong>public sector (SAIL)</strong> plant in the Damodar valley, built with British collaboration. Draws on Raniganj-Jharia coal and Odisha iron ore.' },
+      { id:'bokaro', x:405, y:400, color:'#a3a3a3', label:'Bokaro',
+        info:'<strong>Bokaro Steel Plant (Jharkhand)</strong> — a large <strong>public sector (SAIL)</strong> plant built with Russian help, located on the Chota Nagpur plateau near coal and iron ore sources.' },
+      { id:'rourkela', x:390, y:435, color:'#a3a3a3', label:'Rourkela',
+        info:'<strong>Rourkela Steel Plant (Odisha)</strong> — a <strong>public sector (SAIL)</strong> plant set up with German collaboration, using local iron ore, manganese and hydel power.' },
+      { id:'jamshedpur', x:410, y:425, color:'#fb923c', label:'Jamshedpur (TISCO)',
+        info:'<strong>TISCO, Jamshedpur (Jharkhand)</strong> — India\'s first <strong>private sector</strong> integrated steel plant (Tata Iron & Steel Co.). Ideally located near iron ore, coal, water (Subarnarekha & Kharkai rivers) and Kolkata port.' },
+      { id:'vijayanagar', x:245, y:560, color:'#a3a3a3', label:'Vijayanagar',
+        info:'<strong>Vijayanagar Steel Plant (Karnataka)</strong> — a <strong>SAIL/JSW</strong> plant in the Ballari-Hospet region, using local iron ore of the Western Deccan.' },
+      { id:'salem', x:255, y:640, color:'#a3a3a3', label:'Salem',
+        info:'<strong>Salem Steel Plant (Tamil Nadu)</strong> — a <strong>public sector (SAIL)</strong> plant in the south, known for stainless steel production.' },
+    ]
+  },
+  cotton: {
+    legend: [
+      {color:'#f472b6',name:'Cotton Textile Centre'}
+    ],
+    places: [
+      { id:'mumbai', x:120, y:490, color:'#f472b6', label:'Mumbai',
+        info:'<strong>Mumbai (Maharashtra)</strong> — the "<strong>Cottonopolis of India</strong>". Site of India\'s first successful cotton textile mill (1854). Black soil, humid climate, port and capital made it ideal.' },
+      { id:'ahmedabad', x:150, y:445, color:'#f472b6', label:'Ahmedabad',
+        info:'<strong>Ahmedabad (Gujarat)</strong> — the "<strong>Manchester of India</strong>". A leading cotton textile centre with abundant raw cotton, labour and market.' },
+      { id:'surat', x:145, y:470, color:'#f472b6', label:'Surat',
+        info:'<strong>Surat (Gujarat)</strong> — a major cotton and synthetic textile centre, famous for its powerlooms and man-made fibre production.' },
+      { id:'indore', x:225, y:440, color:'#f472b6', label:'Indore',
+        info:'<strong>Indore (Madhya Pradesh)</strong> — an important cotton textile centre of central India, benefiting from nearby cotton-growing black-soil regions.' },
+      { id:'kanpur', x:295, y:365, color:'#f472b6', label:'Kanpur',
+        info:'<strong>Kanpur (Uttar Pradesh)</strong> — the "<strong>Manchester of North India</strong>", a large cotton textile and leather centre on the Ganga plain.' },
+      { id:'coimbatore', x:240, y:645, color:'#f472b6', label:'Coimbatore',
+        info:'<strong>Coimbatore (Tamil Nadu)</strong> — the "<strong>Manchester of South India</strong>", a leading cotton textile hub using cheap hydel power and local cotton.' },
+      { id:'madurai', x:255, y:680, color:'#f472b6', label:'Madurai',
+        info:'<strong>Madurai (Tamil Nadu)</strong> — an important cotton textile centre of the south, with a long tradition of handloom and mill weaving.' },
+    ]
+  },
+  software: {
+    legend: [
+      {color:'#38bdf8',name:'Software Technology Park'}
+    ],
+    places: [
+      { id:'bengaluru', x:250, y:600, color:'#38bdf8', label:'Bengaluru',
+        info:'<strong>Bengaluru (Karnataka)</strong> — the "<strong>Silicon Valley of India</strong>" / electronic capital. The leading hub of IT and electronics with the most Software Technology Parks.' },
+      { id:'hyderabad', x:290, y:525, color:'#38bdf8', label:'Hyderabad',
+        info:'<strong>Hyderabad (Telangana)</strong> — a major IT hub ("Cyberabad"/HITEC City), with many software firms and technology parks.' },
+      { id:'chennai', x:295, y:625, color:'#38bdf8', label:'Chennai',
+        info:'<strong>Chennai (Tamil Nadu)</strong> — an important IT and electronics centre of the south, with several Software Technology Parks.' },
+      { id:'pune', x:160, y:500, color:'#38bdf8', label:'Pune',
+        info:'<strong>Pune (Maharashtra)</strong> — a fast-growing IT and automobile hub near Mumbai, hosting many software parks.' },
+      { id:'noida', x:245, y:335, color:'#38bdf8', label:'Noida',
+        info:'<strong>Noida (Uttar Pradesh)</strong> — part of the Delhi–NCR IT belt, home to numerous software and electronics companies.' },
+      { id:'kolkata', x:430, y:425, color:'#38bdf8', label:'Kolkata',
+        info:'<strong>Kolkata (West Bengal)</strong> — a major eastern IT centre with Software Technology Parks like Salt Lake (Sector V).' },
+      { id:'tvm', x:255, y:715, color:'#38bdf8', label:'Thiruvananthapuram',
+        info:'<strong>Thiruvananthapuram (Kerala)</strong> — home to Technopark, one of India\'s earliest and largest IT parks.' },
+      { id:'gandhinagar', x:150, y:435, color:'#38bdf8', label:'Gandhinagar',
+        info:'<strong>Gandhinagar (Gujarat)</strong> — an IT centre near Ahmedabad, with a growing software technology park.' },
+    ]
+  },
+  other: {
+    legend: [
+      {color:'#60a5fa',name:'Aluminium'},{color:'#fbbf24',name:'Sugar'},
+      {color:'#4ade80',name:'Automobile'},{color:'#a78bfa',name:'Fertiliser'}
+    ],
+    places: [
+      { id:'korba_al', x:335, y:430, color:'#60a5fa', label:'Korba',
+        info:'<strong>Korba (Chhattisgarh)</strong> — a major <strong>aluminium</strong> smelting centre (BALCO), using local bauxite and thermal power.' },
+      { id:'hirakud', x:375, y:440, color:'#60a5fa', label:'Hirakud',
+        info:'<strong>Hirakud (Odisha)</strong> — an <strong>aluminium</strong> smelter powered by hydel electricity from the Hirakud dam on the Mahanadi.' },
+      { id:'chennai_auto', x:298, y:628, color:'#4ade80', label:'Chennai (Auto)',
+        info:'<strong>Chennai (Tamil Nadu)</strong> — the "<strong>Detroit of India</strong>", a leading <strong>automobile</strong> manufacturing hub.' },
+      { id:'gurugram', x:235, y:330, color:'#4ade80', label:'Gurugram',
+        info:'<strong>Gurugram (Haryana)</strong> — a major <strong>automobile</strong> centre (Maruti), part of the Delhi-NCR industrial belt.' },
+      { id:'meerut', x:255, y:345, color:'#fbbf24', label:'Meerut (Sugar)',
+        info:'<strong>Meerut belt (Uttar Pradesh)</strong> — part of the sugarcane-rich Ganga plain; UP leads India in <strong>sugar</strong> production.' },
+      { id:'kolhapur', x:170, y:530, color:'#fbbf24', label:'Kolhapur (Sugar)',
+        info:'<strong>Kolhapur (Maharashtra)</strong> — a leading <strong>sugar</strong>-producing belt; Maharashtra is a top sugar state with many cooperative mills.' },
+      { id:'sindri', x:405, y:410, color:'#a78bfa', label:'Sindri',
+        info:'<strong>Sindri (Jharkhand)</strong> — site of a historic <strong>fertiliser</strong> plant, one of India\'s earliest large fertiliser factories.' },
+    ]
+  }
+};
+
+let mode='learn', tab='steel', quizIdx=0, quizOrder=[], score=0, total=0;
+const svg=document.getElementById('mapSvg');
+const TAB_ORDER=['steel','cotton','software','other'];
+
+function setTab(t){
+  tab=t;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',TAB_ORDER[i]===t));
+  buildPins();
+  buildLegend();
+  document.getElementById('infoTitle').textContent='Click any pin to learn about it';
+  document.getElementById('infoDesc').innerHTML=TABS[t].places[0].info;
+  if(mode==='test'){ score=0;total=0;quizOrder=[...Array(TABS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function buildLegend(){
+  const area=document.getElementById('legendArea');
+  area.innerHTML=TABS[tab].legend.map(l=>`<div class="leg-item"><div class="leg-dot" style="background:${l.color}"></div>${l.name}</div>`).join('');
+}
+
+function buildPins(){
+  document.querySelectorAll('.pin').forEach(p=>p.remove());
+  TABS[tab].places.forEach(p=>{
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('pin'); g.id='pin-'+p.id;
+    g.innerHTML=`<circle cx="${p.x}" cy="${p.y}" r="5" fill="${p.color}" stroke="#000" stroke-width="1"/>
+      <text x="${p.x}" y="${p.y-9}" text-anchor="middle" fill="${p.color}">${p.label}</text>`;
+    g.addEventListener('click',()=>handleClick(p));
+    svg.appendChild(g);
+  });
+}
+
+function handleClick(place){
+  if(mode==='learn'){
+    document.getElementById('infoTitle').innerHTML=`📍 ${place.label}`;
+    document.getElementById('infoDesc').innerHTML=place.info;
+    document.querySelectorAll('.pin circle').forEach(c=>c.setAttribute('stroke-width','1'));
+    document.querySelector('#pin-'+place.id+' circle').setAttribute('stroke-width','3');
+  } else { checkAnswer(place); }
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.mode-btn:${m==='learn'?'first':'last'}-child`).classList.add('active');
+  document.getElementById('infoPanel').style.display=m==='learn'?'block':'none';
+  document.getElementById('quizBar').style.display=m==='test'?'flex':'none';
+  document.querySelectorAll('.pin text').forEach(t=>t.style.opacity=m==='learn'?'':'0');
+  if(m==='test'){ score=0;total=0;quizOrder=[...Array(TABS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function showQuestion(){
+  const places=TABS[tab].places;
+  if(quizIdx>=quizOrder.length){ quizIdx=0;quizOrder.sort(()=>Math.random()-.5); }
+  const p=places[quizOrder[quizIdx]];
+  document.getElementById('quizQ').innerHTML=`📍 Click on: <strong>${p.label}</strong>`;
+  document.getElementById('quizScore').textContent=`${score}/${total}`;
+  document.querySelectorAll('.pin').forEach(g=>g.classList.remove('highlight'));
+  document.querySelectorAll('.pin text').forEach(t=>{t.style.opacity='0';});
+}
+
+function checkAnswer(place){
+  const places=TABS[tab].places;
+  const expected=places[quizOrder[quizIdx]]; total++;
+  const flash=document.getElementById('fbFlash');
+  if(place.id===expected.id){ score++;flash.textContent='✓';flash.style.color='#4ade80'; }
+  else{ flash.textContent='✗';flash.style.color='#f87171';
+    document.querySelector('#pin-'+expected.id)?.classList.add('highlight');
+    setTimeout(()=>document.querySelector('#pin-'+expected.id)?.classList.remove('highlight'),1500);
+  }
+  flash.style.opacity='1'; setTimeout(()=>{flash.style.opacity='0';},800);
+  quizIdx++; setTimeout(showQuestion,1000);
+}
+
+function skipQ(){ quizIdx++; showQuestion(); }
+
+buildPins(); buildLegend();
+</script>
+</body>
+</html>

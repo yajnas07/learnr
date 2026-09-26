@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Manufacturing Industries</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#12080a;--card:#1e0f0c;--card2:#281510;--border:#3a220f;--text:#f4e4d8;--muted:#9a6a4a;--geo:#f97316;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c;--pink:#f472b6;--steel:#a3a3a3}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--orange)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1.2rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.74rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,.1)}
+
+.progress{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.progress .count{color:var(--orange);font-weight:700}
+.progress .known{color:var(--teal)}
+.prog-bar{width:140px;height:5px;background:var(--card);border-radius:9px;overflow:hidden}
+.prog-fill{height:100%;background:var(--orange);border-radius:9px;transition:width .3s}
+
+.deck{display:flex;justify-content:center;align-items:center;padding:1rem;min-height:380px;perspective:1200px}
+.flip-card{width:100%;max-width:520px;height:320px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-card .front,.flip-card .back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;border:1px solid var(--border)}
+.flip-card .front{background:var(--card)}
+.flip-card .back{background:var(--card2);transform:rotateY(180deg)}
+.flip-card .front h2{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;line-height:1.55;color:var(--text)}
+.flip-card .back p{font-size:.88rem;line-height:1.75;color:var(--text)}
+.flip-card .back p strong{color:var(--orange)}
+.flip-card .back p em{color:var(--teal);font-style:normal}
+.cat-badge{font-family:'DM Mono',monospace;font-size:.62rem;padding:.15rem .55rem;border-radius:99px;margin-bottom:.8rem}
+.hint{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:1rem}
+
+.controls{display:flex;justify-content:center;gap:.6rem;padding:.8rem 1rem;flex-wrap:wrap}
+.ctrl{font-family:'Lato',sans-serif;font-weight:700;font-size:.76rem;padding:.4rem 1.1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.ctrl:hover{color:var(--text);border-color:#5a3a1f}
+.ctrl.know{border-color:var(--teal);color:var(--teal);background:rgba(52,211,153,.06)}
+
+.keys{text-align:center;padding:.5rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(18,8,10,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,34,15,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid rgba(58,34,15,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:var(--orange)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Flashcards</h1>
+  <p>Manufacturing Industries · Geography Ch.6 · 35 Cards</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress"><span class="count" id="pos">1 / 35</span><div class="prog-bar"><div class="prog-fill" id="prog"></div></div><span class="known" id="knownCount">0 known</span></div>
+<div class="deck" id="deck"></div>
+<div class="controls">
+  <button class="ctrl" onclick="prev()">← Prev</button>
+  <button class="ctrl" onclick="flipCard()">⟳ Flip</button>
+  <button class="ctrl know" onclick="markKnown()">✓ Know it</button>
+  <button class="ctrl" onclick="next()">Next →</button>
+  <button class="ctrl" onclick="shuffle()">⤮ Shuffle</button>
+  <button class="ctrl" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="keys">Keyboard: ← → (navigate) · Space (flip) · K (know it) · S (shuffle)</div>
+
+<script>
+const CARDS=[
+// importance (6)
+{cat:'import',q:'What is manufacturing?',a:'Manufacturing is the <strong>production of goods in large quantities</strong> from raw materials into more valuable products — e.g., turning cotton into cloth or iron ore into steel.'},
+{cat:'import',q:'Why is manufacturing called the backbone of development?',a:'Because it <strong>modernises agriculture, creates jobs</strong> in secondary and tertiary sectors, reduces dependence on farming, brings foreign exchange through exports, and reduces regional disparities.'},
+{cat:'import',q:'How are industries classified by raw material?',a:'Into <strong>agro-based</strong> industries (using plant/animal material — cotton, jute, sugar, silk) and <strong>mineral-based</strong> industries (using minerals — iron & steel, cement, aluminium).'},
+{cat:'import',q:'How are industries classified by ownership?',a:'<strong>Public sector</strong> (SAIL), <strong>Private sector</strong> (TISCO), <strong>Joint sector</strong> (Oil India — govt + private), and <strong>Cooperative sector</strong> (AMUL, sugar mills — owned by producers/suppliers).'},
+{cat:'import',q:'What is the difference between basic and consumer industries?',a:'<strong>Basic (key) industries</strong> supply their products to other industries (e.g., iron & steel). <strong>Consumer industries</strong> produce goods for direct use by consumers (e.g., sugar, paper, toothpaste).'},
+{cat:'import',q:'How does manufacturing help reduce regional disparities?',a:'Setting up industries in <strong>backward and tribal areas</strong> creates local jobs and income, reducing poverty and bringing balanced regional development to less-developed regions.'},
+
+// textile (7)
+{cat:'textile',q:'Why is the textile industry so important to India?',a:'It is the <strong>largest industry in the organised sector</strong>, contributing significantly to industrial production, employment and foreign exchange. It is unique in being self-reliant across the whole value chain.'},
+{cat:'textile',q:'Where is the cotton textile industry concentrated and why?',a:'Mainly in <strong>Maharashtra and Gujarat (Mumbai, Ahmedabad)</strong> — because of black soil (cotton), a warm moist climate, ports, availability of labour, and a large market.'},
+{cat:'textile',q:'Where was India\'s first cotton mill set up?',a:'The first successful cotton textile mill was established in <strong>Mumbai in 1854</strong>. Mumbai\'s climate, port and financial facilities made it the "Cottonopolis" of India.'},
+{cat:'textile',q:'Why is the jute industry concentrated along the Hugli river?',a:'Because of <strong>proximity to jute-growing areas, cheap water transport, abundant labour</strong> from Bihar, Odisha and UP, and Kolkata port for export. Most mills are in West Bengal along the Hugli.'},
+{cat:'textile',q:'What challenges does the jute industry face?',a:'Stiff competition from <strong>synthetic substitutes</strong> and from other jute-producing countries like Bangladesh. The <strong>National Jute Policy (2005)</strong> was formed to boost demand and productivity.'},
+{cat:'textile',q:'What is meant by decentralised weaving?',a:'Weaving of cotton cloth is spread across the <strong>handloom, powerloom and mill sectors</strong>. This decentralisation provides huge employment, especially in rural areas.'},
+{cat:'textile',q:'How does the cotton textile industry link to other industries?',a:'It gets raw material from agriculture (cotton) and chemicals (dyes), and supplies cloth to industries making garments. It supports and is supported by many other sectors.'},
+
+// steel (7)
+{cat:'steel',q:'Why is iron and steel called a basic industry?',a:'Because <strong>all other industries — heavy, medium and light — depend on it</strong> for their machinery and tools. Steel is essential for engineering, construction, defence and daily goods.'},
+{cat:'steel',q:'What raw materials are needed for iron and steel, and in what ratio?',a:'<strong>Iron ore, coking coal and limestone</strong>, in roughly the ratio <strong>4 : 2 : 1</strong>. Some manganese is also needed to harden the steel.'},
+{cat:'steel',q:'Why are steel plants located in the Chota Nagpur plateau?',a:'Because raw materials are <strong>bulky and weight-losing</strong>. The plateau has <strong>cheap iron ore, high-grade coal, water, cheap labour and a nearby market</strong> — minimising transport costs.'},
+{cat:'steel',q:'Name some major integrated steel plants of India.',a:'<strong>TISCO (Jamshedpur), IISCO (Burnpur), Bhilai (Chhattisgarh), Rourkela (Odisha), Durgapur (WB) and Bokaro (Jharkhand)</strong>. Most lie in the Chota Nagpur plateau region.'},
+{cat:'steel',q:'What is the difference between TISCO and SAIL plants?',a:'<strong>TISCO</strong> (Tata Iron & Steel Co., Jamshedpur) is in the <strong>private sector</strong>. <strong>SAIL</strong> (Steel Authority of India Ltd) plants like Bhilai and Rourkela are in the <strong>public sector</strong>.'},
+{cat:'steel',q:'What challenges does the Indian steel industry face?',a:'<strong>High cost and limited coking coal, low labour productivity, irregular energy supply</strong> and poor infrastructure. Liberalisation and foreign investment are helping the industry grow.'},
+{cat:'steel',q:'What is India\'s position in world steel production?',a:'India is one of the <strong>largest producers of crude steel</strong> in the world and the <strong>largest producer of sponge iron</strong>. However, per-capita consumption is still low.'},
+
+// other (8)
+{cat:'other',q:'What raw materials does the cement industry need?',a:'<strong>Limestone, silica, alumina and gypsum</strong>, plus coal and electric power. Cement is essential for constructing houses, factories, roads, dams and bridges.'},
+{cat:'other',q:'Why is the aluminium smelting industry important?',a:'It is the <strong>second most important metallurgical industry</strong>. Aluminium (from bauxite) is <strong>light, strong, resists corrosion and conducts heat/electricity</strong> — used in aircraft, utensils and wires.'},
+{cat:'other',q:'What are the two branches of the chemical industry?',a:'<strong>Inorganic chemicals</strong> (sulphuric acid, soda ash, caustic soda, alkalis) and <strong>organic chemicals</strong> (petrochemicals, plastics, synthetic fibres, drugs). It is fast-growing and contributes ~3% of GDP.'},
+{cat:'other',q:'Where is the fertiliser industry usually located?',a:'Near <strong>petroleum refineries</strong>, which supply raw materials. It makes nitrogenous fertilisers (urea), phosphatic fertilisers and complex fertilisers used in agriculture.'},
+{cat:'other',q:'Where is the automobile industry located in India?',a:'Near markets — <strong>Delhi-Gurugram, Mumbai, Chennai, Pune, Bengaluru, Kolkata and Jamshedpur</strong>. It makes trucks, cars, buses, and two- and three-wheelers.'},
+{cat:'other',q:'Why is Bengaluru called the Silicon Valley of India?',a:'Because it is the <strong>"electronic capital"</strong> — a major hub for the IT and electronics industry, with many Software Technology Parks generating large employment and exports.'},
+{cat:'other',q:'What is the role of Software Technology Parks?',a:'They provide <strong>single-window service and high-speed communication</strong> to the IT industry, boosting software production and exports, and generating large-scale employment.'},
+{cat:'other',q:'Which industry contributes most to India\'s exports among these?',a:'The <strong>IT and Information Technology Enabled Services (ITES)</strong> sector is a huge foreign-exchange earner, along with textiles and engineering goods.'},
+
+// location & pollution (7)
+{cat:'locpol',q:'What factors decide the location of an industry?',a:'Availability of <strong>raw material, land, water, labour, power, capital, transport and market</strong>, plus government policy. Industries locate where production cost is least and profit highest.'},
+{cat:'locpol',q:'What are agglomeration economies?',a:'The <strong>benefits industries get by clustering together</strong> near cities or ports — shared infrastructure, labour pools, banking and services. This is why industrialisation and urbanisation go hand in hand.'},
+{cat:'locpol',q:'Name a few major industrial regions of India.',a:'<strong>Mumbai-Pune, Hugli, Bengaluru-Tamil Nadu, Gujarat, Chota Nagpur, Vishakhapatnam-Guntur, Gurugram-Delhi-Meerut and Kollam-Thiruvananthapuram</strong>.'},
+{cat:'locpol',q:'What are the four types of industrial pollution?',a:'<strong>Air pollution</strong> (smoke & gases), <strong>water pollution</strong> (effluents in rivers), <strong>thermal pollution</strong> (hot water) and <strong>land & noise pollution</strong> (solid waste, machinery).'},
+{cat:'locpol',q:'How does industry cause water pollution?',a:'Industries such as <strong>dyeing, tanning, paper and chemicals</strong> dump organic and inorganic effluents into rivers. Fly ash, phosphogypsum and slag also pollute water and land.'},
+{cat:'locpol',q:'How can industrial pollution be controlled?',a:'<strong>Minimise, reuse and recycle water</strong>; harvest rainwater; <strong>treat effluents and hot water</strong> before release; and fit chimneys with <strong>scrubbers, filters and electrostatic precipitators</strong>.'},
+{cat:'locpol',q:'Which organisation is a model of eco-friendly power production?',a:'The <strong>National Thermal Power Corporation (NTPC)</strong> is a leading example of a power producer committed to environment protection through efficient technologies and pollution control.'},
+];
+
+const CATS={import:{label:'Importance',color:'var(--blue)',bg:'rgba(96,165,250,.12)'},textile:{label:'Textiles',color:'var(--pink)',bg:'rgba(244,114,182,.12)'},steel:{label:'Iron & Steel',color:'var(--steel)',bg:'rgba(163,163,163,.14)'},other:{label:'Other Industries',color:'var(--green)',bg:'rgba(74,222,128,.12)'},locpol:{label:'Location & Pollution',color:'var(--orange)',bg:'rgba(251,146,60,.12)'}};
+
+let filtered=[...CARDS],idx=0,known=new Set(),currentCat='all';
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="setFilter('all',this)">All (${CARDS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=CARDS.filter(c=>c.cat===k).length;h+=`<button onclick="setFilter('${k}',this)">${v.label} (${n})</button>`;}f.innerHTML=h;}
+function setFilter(cat,btn){currentCat=cat;document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===cat);idx=0;render();}
+function render(){if(!filtered.length)return;if(idx>=filtered.length)idx=0;if(idx<0)idx=filtered.length-1;const c=filtered[idx],cat=CATS[c.cat];document.getElementById('deck').innerHTML=`<div class="flip-card" id="fc" onclick="flipCard()"><div class="front"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><h2>${c.q}</h2><span class="hint">tap to flip</span></div><div class="back"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><p>${c.a.replace(/\n/g,'<br>')}</p></div></div>`;document.getElementById('pos').textContent=`${idx+1} / ${filtered.length}`;document.getElementById('prog').style.width=((idx+1)/filtered.length*100)+'%';document.getElementById('knownCount').textContent=known.size+' known';}
+function flipCard(){document.getElementById('fc')?.classList.toggle('flipped')}
+function next(){idx++;render()} function prev(){idx--;render()}
+function markKnown(){known.add(filtered[idx].q);next();}
+function shuffle(){filtered.sort(()=>Math.random()-.5);idx=0;render();}
+function resetAll(){known.clear();filtered=currentCat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===currentCat);idx=0;render();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();else if(e.key===' '){e.preventDefault();flipCard();}else if(e.key==='k'||e.key==='K')markKnown();else if(e.key==='s'||e.key==='S')shuffle();});
+buildFilters();render();
+</script>
+</body>
+</html>

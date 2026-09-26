@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Manufacturing Industries</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#12080a;--card:#1e0f0c;--card2:#281510;--border:#3a220f;--text:#f4e4d8;--muted:#9a6a4a;--geo:#f97316;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c;--pink:#f472b6;--steel:#a3a3a3}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--orange)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.74rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,.1)}
+
+.scorebar{display:flex;justify-content:center;align-items:center;gap:1.4rem;padding:0 1rem 1rem;font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)}
+.scorebar .s-correct{color:var(--teal);font-weight:700}
+.scorebar .s-wrong{color:var(--red);font-weight:700}
+.scorebar .s-total{color:var(--orange);font-weight:700}
+
+.wrap{max-width:760px;margin:0 auto;padding:0 1rem 4rem}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:1.1rem}
+.q-head{display:flex;align-items:flex-start;gap:.7rem;margin-bottom:1rem}
+.q-num{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--orange);font-weight:700;flex-shrink:0;padding-top:.15rem}
+.q-cat{font-family:'DM Mono',monospace;font-size:.58rem;padding:.15rem .5rem;border-radius:99px;flex-shrink:0}
+.q-text{font-family:'Playfair Display',serif;font-size:1.02rem;font-weight:700;line-height:1.5;flex:1}
+.opts{display:flex;flex-direction:column;gap:.5rem}
+.opt{display:flex;align-items:center;gap:.7rem;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card2);cursor:pointer;transition:all .18s;font-size:.9rem}
+.opt:hover{border-color:#5a3a1f}
+.opt .letter{font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted);font-weight:700;width:20px;flex-shrink:0}
+.opt.correct{border-color:var(--teal);background:rgba(52,211,153,.1);color:var(--teal)}
+.opt.wrong{border-color:var(--red);background:rgba(248,113,113,.1);color:var(--red)}
+.opt.disabled{pointer-events:none;opacity:.72}
+.opt.correct .letter{color:var(--teal)}.opt.wrong .letter{color:var(--red)}
+.exp{margin-top:.9rem;padding:.8rem 1rem;background:rgba(249,115,22,.07);border-left:3px solid var(--orange);border-radius:6px;font-size:.84rem;line-height:1.6;color:var(--text);display:none}
+.exp.show{display:block}
+.exp strong{color:var(--orange)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(18,8,10,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,34,15,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid rgba(58,34,15,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:var(--orange)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Manufacturing Industries · Geography Ch.6 · 30 MCQs</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="scorebar"><span>Answered: <span class="s-total" id="sTotal">0</span></span><span>Correct: <span class="s-correct" id="sCorrect">0</span></span><span>Wrong: <span class="s-wrong" id="sWrong">0</span></span></div>
+<div class="wrap" id="wrap"></div>
+
+<script>
+const QS=[
+// importance
+{cat:'import',q:'Manufacturing is best defined as:',ops:['Growing of crops','Production of goods in large quantities from raw materials','Extraction of minerals','Transport of goods'],ans:1,exp:'Manufacturing means converting raw materials into more valuable finished goods in large quantities.'},
+{cat:'import',q:'Which of these is an agro-based industry?',ops:['Cement','Aluminium','Cotton textiles','Iron and steel'],ans:2,exp:'Cotton textiles use plant-based raw material (cotton), making it agro-based. Cement, aluminium and steel are mineral-based.'},
+{cat:'import',q:'AMUL is an example of which sector?',ops:['Public sector','Private sector','Cooperative sector','Joint sector'],ans:2,exp:'AMUL is owned and run by the producers/suppliers of milk, making it a cooperative sector enterprise.'},
+{cat:'import',q:'Iron and steel is an example of a:',ops:['Consumer industry','Basic industry','Light industry','Cottage industry'],ans:1,exp:'Iron & steel is a basic (key) industry because its products are used as raw material by many other industries.'},
+{cat:'import',q:'Oil India Limited, jointly run by the government and private companies, belongs to the:',ops:['Public sector','Private sector','Joint sector','Cooperative sector'],ans:2,exp:'A joint sector industry is owned jointly by the state and private individuals — e.g., Oil India Limited.'},
+{cat:'import',q:'Industries producing goods for direct use by consumers are called:',ops:['Basic industries','Key industries','Consumer industries','Heavy industries'],ans:2,exp:'Consumer industries — like sugar, paper and toothpaste — make goods consumed directly by people.'},
+
+// textile
+{cat:'textile',q:'India\'s first successful cotton textile mill was set up in:',ops:['Ahmedabad in 1861','Mumbai in 1854','Kolkata in 1855','Surat in 1850'],ans:1,exp:'The first successful cotton textile mill was established in Mumbai in 1854.'},
+{cat:'textile',q:'The cotton textile industry is mainly concentrated in:',ops:['West Bengal and Bihar','Maharashtra and Gujarat','Punjab and Haryana','Tamil Nadu and Kerala'],ans:1,exp:'Cotton textiles are concentrated in Maharashtra and Gujarat due to black soil, humid climate, ports and markets.'},
+{cat:'textile',q:'The jute industry is mostly located along the:',ops:['Godavari basin','Hugli river in West Bengal','Kaveri delta','Narmada valley'],ans:1,exp:'Most jute mills lie along the Hugli river in West Bengal, near jute-growing areas and Kolkata port.'},
+{cat:'textile',q:'The National Jute Policy was formulated in:',ops:['2000','2005','2010','1995'],ans:1,exp:'The National Jute Policy was formulated in 2005 to increase productivity and demand for jute.'},
+{cat:'textile',q:'Which of the following is NOT a factor for locating jute mills along the Hugli?',ops:['Cheap water transport','Abundant labour','Nearness to jute fields','Presence of iron ore'],ans:3,exp:'Iron ore is irrelevant to jute mills. Water transport, labour and nearness to jute fields are the key factors.'},
+{cat:'textile',q:'The textile industry is unique because it is:',ops:['Fully imported','Self-reliant and complete in the value chain','Only in the public sector','Located only near ports'],ans:1,exp:'The textile industry is self-reliant and complete in the value chain — from raw material to finished cloth.'},
+
+// steel
+{cat:'steel',q:'The approximate ratio of iron ore, coking coal and limestone in steel making is:',ops:['1:2:4','4:2:1','2:2:2','3:1:1'],ans:1,exp:'Iron ore, coking coal and limestone are used in roughly a 4:2:1 ratio.'},
+{cat:'steel',q:'Most iron and steel plants are located in the:',ops:['Deccan plateau','Chota Nagpur plateau','Malwa plateau','Coastal plains'],ans:1,exp:'The Chota Nagpur plateau offers cheap iron ore, coal, water, labour and market — ideal for steel plants.'},
+{cat:'steel',q:'TISCO at Jamshedpur belongs to the:',ops:['Public sector','Private sector','Cooperative sector','Foreign sector'],ans:1,exp:'TISCO (Tata Iron & Steel Company) at Jamshedpur is a private sector enterprise.'},
+{cat:'steel',q:'SAIL plants such as Bhilai and Rourkela belong to the:',ops:['Private sector','Public sector','Joint sector','Cooperative sector'],ans:1,exp:'SAIL (Steel Authority of India Limited) plants are public sector undertakings.'},
+{cat:'steel',q:'India is the largest producer in the world of:',ops:['Crude oil','Sponge iron','Natural gas','Gold'],ans:1,exp:'India is the largest producer of sponge iron and among the largest producers of crude steel.'},
+{cat:'steel',q:'Which of these is NOT a challenge for the Indian steel industry?',ops:['High cost of coking coal','Low labour productivity','Irregular energy supply','Excess cheap skilled labour'],ans:3,exp:'Cheap abundant skilled labour is an advantage, not a challenge. The others are genuine problems.'},
+
+// other
+{cat:'other',q:'Aluminium is obtained from the ore:',ops:['Haematite','Bauxite','Manganese','Mica'],ans:1,exp:'Aluminium smelting uses bauxite as the raw material. It is the second most important metallurgical industry.'},
+{cat:'other',q:'Which raw materials are essential for the cement industry?',ops:['Iron ore and coal','Limestone, silica, alumina and gypsum','Bauxite and mica','Cotton and jute'],ans:1,exp:'Cement needs limestone, silica, alumina and gypsum, along with coal and power.'},
+{cat:'other',q:'Bengaluru is known as the:',ops:['Manchester of India','Silicon Valley of India','Cottonopolis of India','Steel city of India'],ans:1,exp:'Bengaluru is called the Silicon Valley / electronic capital of India due to its IT industry.'},
+{cat:'other',q:'The fertiliser industry is usually located near:',ops:['Coal mines','Petroleum refineries','Cotton fields','Sea ports only'],ans:1,exp:'Fertiliser plants are located near petroleum refineries which supply raw materials.'},
+{cat:'other',q:'Which of these is an organic chemical?',ops:['Sulphuric acid','Soda ash','Petrochemical','Caustic soda'],ans:2,exp:'Petrochemicals, plastics and synthetic fibres are organic chemicals; the rest are inorganic.'},
+{cat:'other',q:'Software Technology Parks mainly provide:',ops:['Cheap land for farms','Single-window service and high-speed communication for IT','Coal to steel plants','Water to textile mills'],ans:1,exp:'Software Technology Parks give the IT industry single-window service and high-speed data communication.'},
+{cat:'other',q:'Aluminium is preferred in many industries because it is:',ops:['Heavy and rusts easily','Light, strong and corrosion-resistant','Cheap but weak','A poor conductor'],ans:1,exp:'Aluminium is light, strong, resistant to corrosion, and a good conductor — hence widely used.'},
+
+// location & pollution
+{cat:'locpol',q:'The benefits industries gain by locating close together are called:',ops:['Raw material economies','Agglomeration economies','Transport economies','Labour economies'],ans:1,exp:'Agglomeration economies are the advantages industries get from clustering — shared infrastructure and services.'},
+{cat:'locpol',q:'Discharge of hot water from factories into rivers causes:',ops:['Air pollution','Thermal pollution','Noise pollution','Land pollution'],ans:1,exp:'Releasing hot water into rivers and ponds raises their temperature — this is thermal pollution.'},
+{cat:'locpol',q:'Fly ash, phosphogypsum and slag from industries mainly cause:',ops:['Air pollution only','Land and water pollution','Noise pollution','No pollution'],ans:1,exp:'Solid wastes like fly ash, phosphogypsum and slag pollute both land and water.'},
+{cat:'locpol',q:'Which device fitted to chimneys helps reduce air pollution?',ops:['Water pump','Electrostatic precipitator','Boiler','Conveyor belt'],ans:1,exp:'Scrubbers, filters and electrostatic precipitators fitted to smokestacks trap particulates and reduce air pollution.'},
+{cat:'locpol',q:'Which organisation is a model of eco-friendly power production in India?',ops:['SAIL','NTPC','TISCO','ISRO'],ans:1,exp:'The National Thermal Power Corporation (NTPC) is a leading example of environment-friendly power production.'},
+{cat:'locpol',q:'The best way to reduce industrial water pollution is to:',ops:['Dump untreated waste in rivers','Minimise, reuse and recycle water and treat effluents','Increase water use','Ignore the effluents'],ans:1,exp:'Pollution control focuses on minimising water use, reusing and recycling, and treating effluents before release.'},
+];
+
+const CATS={import:{label:'Importance',color:'var(--blue)',bg:'rgba(96,165,250,.14)'},textile:{label:'Textiles',color:'var(--pink)',bg:'rgba(244,114,182,.14)'},steel:{label:'Iron & Steel',color:'var(--steel)',bg:'rgba(163,163,163,.16)'},other:{label:'Other Industries',color:'var(--green)',bg:'rgba(74,222,128,.14)'},locpol:{label:'Location & Pollution',color:'var(--orange)',bg:'rgba(251,146,60,.14)'}};
+
+let filtered=[...QS],answered={},sc={total:0,correct:0,wrong:0};
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="setFilter('all',this)">All (${QS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=QS.filter(q=>q.cat===k).length;h+=`<button onclick="setFilter('${k}',this)">${v.label} (${n})</button>`;}f.innerHTML=h;}
+function setFilter(cat,btn){document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...QS]:QS.filter(q=>q.cat===cat);render();}
+function render(){const w=document.getElementById('wrap');w.innerHTML=filtered.map((q)=>{const gi=QS.indexOf(q);const cat=CATS[q.cat];const ans=answered[gi];return `<div class="q-card"><div class="q-head"><span class="q-num">Q${gi+1}</span><span class="q-cat" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><span class="q-text">${q.q}</span></div><div class="opts" id="opts-${gi}">${q.ops.map((o,oi)=>{let cls='opt';if(ans!==undefined){cls+=' disabled';if(oi===q.ans)cls+=' correct';else if(oi===ans)cls+=' wrong';}return `<div class="${cls}" onclick="answer(${gi},${oi})"><span class="letter">${String.fromCharCode(65+oi)}</span><span>${o}</span></div>`;}).join('')}</div><div class="exp ${ans!==undefined?'show':''}" id="exp-${gi}"><strong>Explanation:</strong> ${q.exp}</div></div>`;}).join('');}
+function answer(gi,oi){if(answered[gi]!==undefined)return;answered[gi]=oi;const q=QS[gi];sc.total++;if(oi===q.ans)sc.correct++;else sc.wrong++;document.getElementById('sTotal').textContent=sc.total;document.getElementById('sCorrect').textContent=sc.correct;document.getElementById('sWrong').textContent=sc.wrong;render();}
+buildFilters();render();
+</script>
+</body>
+</html>

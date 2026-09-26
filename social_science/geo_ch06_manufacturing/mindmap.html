@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Manufacturing Industries</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#12080a; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:42px; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(18,8,10,.9) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#fb923c; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#8a5a3a; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #3a220f; background:rgba(18,8,10,.85);
+  color:#aa6a3a; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#fb923c; color:#fb923c; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#1c0f0a; border:1px solid #3a220f;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:290px; font-size:.8rem; color:#e8cdb8;
+  line-height:1.6; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.7);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#fb923c; font-size:.9rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%;
+  background:rgba(18,8,10,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(58,34,15,.75);
+  position:absolute; top:0; left:0; right:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#aa6a3a; text-decoration:none;
+  border:1px solid rgba(58,34,15,.9); border-radius:99px;
+  padding:.2rem .65rem;
+}
+.site-nav-back:hover { color:#fb923c; border-color:#6a4020; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<div id="ui">
+  <div>
+    <h1>Manufacturing Industries</h1>
+    <p>Class X · Geography Ch.6 — drag to pan · scroll to zoom · hover nodes</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2+20; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Manufacturing\nIndustries',
+  x:0, y:0, r:72, color:'#26120a', stroke:'#fb923c', textColor:'#fb923c', fontSize:14
+};
+
+const BRANCHES = [
+  // Importance
+  {
+    id:'import', label:'Importance &\nTypes', x:-320, y:-200, r:48,
+    color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+    info:'Manufacturing = producing goods in large quantities from raw materials.\n• Backbone of development.\n• Lifts & diversifies the economy.\n• Reduces dependence on agriculture.',
+    children:[
+      { id:'im1', label:'Why\nImportant', x:-510, y:-310, r:36, color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Importance of manufacturing:\n• Modernises agriculture.\n• Reduces dependence on farming; creates jobs in secondary & tertiary sectors.\n• Reduces regional disparities.\n• Brings in foreign exchange through exports.\n• Economic prosperity & national wealth.' },
+      { id:'im2', label:'Classification', x:-505, y:-160, r:36, color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Industries classified by:\n• Raw material — agro-based & mineral-based.\n• Role — basic (key) & consumer industries.\n• Capital — small & large scale.\n• Ownership — public, private, joint, cooperative.\n• Bulk & weight — heavy & light.' },
+      { id:'im3', label:'Agro vs\nMineral', x:-460, y:-50, r:36, color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'• Agro-based: use plant/animal raw material — cotton, jute, silk, woollen textiles, sugar.\n• Mineral-based: use minerals as raw material — iron & steel, cement, aluminium.\n• Ownership: Public (SAIL), Private (TISCO), Joint (Oil India), Cooperative (AMUL, sugar mills).' },
+    ]
+  },
+
+  // Textile
+  {
+    id:'textile', label:'Textile\nIndustry', x:320, y:-200, r:48,
+    color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+    info:'Largest industry in the organised sector. Contributes to industrial production, employment & foreign exchange. Cotton, jute, silk, woollen & synthetic.',
+    children:[
+      { id:'tx1', label:'Cotton\nTextiles', x:520, y:-320, r:36, color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Cotton textiles:\n• Traditionally handspun; now mill sector too.\n• Concentrated in Maharashtra & Gujarat (Mumbai, Ahmedabad) — black soil, moist climate, port, labour, market.\n• Provides raw material to & takes from many industries.\n• India exports yarn.' },
+      { id:'tx2', label:'Jute\nIndustry', x:540, y:-180, r:36, color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Jute industry:\n• Mostly along the Hugli river in West Bengal.\n• Factors: proximity to jute-growing areas, cheap water transport, labour from Bihar/Odisha/UP, Kolkata port.\n• Challenge: competition from synthetic substitutes.\n• National Jute Policy 2005 to boost demand.' },
+      { id:'tx3', label:'Location\nFactors', x:510, y:-60, r:36, color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Cotton industry location factors:\n• Availability of raw cotton, market, transport, labour, moist climate.\n• First mill in Mumbai (1854) — "Cottonopolis of India".\n• Also Coimbatore, Kanpur, Kolkata, Indore.\n• Weaving is decentralised (handloom, powerloom, mill).' },
+    ]
+  },
+
+  // Iron & Steel
+  {
+    id:'steel', label:'Iron &\nSteel', x:-310, y:220, r:48,
+    color:'#161616', stroke:'#a3a3a3', textColor:'#f5f5f5',
+    info:'Basic industry — all other industries depend on it. Called the "backbone" of modern industry. India is a major crude steel producer.',
+    children:[
+      { id:'st1', label:'Basic\nIndustry', x:-500, y:140, r:36, color:'#161616', stroke:'#a3a3a3', textColor:'#f5f5f5',
+        info:'Iron & steel is a basic/heavy industry:\n• Raw materials: iron ore, coking coal, limestone (~4:2:1).\n• Bulky & weight-losing, so located near raw materials.\n• All other industries — heavy, medium, light — depend on it.\n• India is the largest producer of sponge iron.' },
+      { id:'st2', label:'Chhota\nNagpur', x:-495, y:285, r:36, color:'#161616', stroke:'#a3a3a3', textColor:'#f5f5f5',
+        info:'Concentration in Chhota Nagpur plateau:\n• Low-cost iron ore, high-grade coal, cheap labour, water & market nearby.\n• Plants: TISCO (Jamshedpur), IISCO (Burnpur), Bhilai, Rourkela, Durgapur, Bokaro.\n• Most plants in this region for raw-material access.' },
+      { id:'st3', label:'Challenges', x:-440, y:400, r:36, color:'#161616', stroke:'#a3a3a3', textColor:'#f5f5f5',
+        info:'Challenges of steel industry:\n• High cost & limited availability of coking coal.\n• Lower labour productivity.\n• Irregular energy supply.\n• Poor infrastructure.\n• Liberalisation & FDI are boosting growth.' },
+    ]
+  },
+
+  // Other Industries
+  {
+    id:'other', label:'Other\nIndustries', x:310, y:220, r:48,
+    color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+    info:'Includes cement, aluminium smelting, chemical, fertiliser, automobile and IT industries.',
+    children:[
+      { id:'ot1', label:'Cement &\nAluminium', x:510, y:140, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'• Cement — needs limestone, silica, gypsum, coal. Essential for construction. Located near limestone (Gujarat, Rajasthan, MP).\n• Aluminium smelting — 2nd most important metallurgical industry. Bauxite as raw material. Light, resists corrosion.' },
+      { id:'ot2', label:'Chemical &\nFertiliser', x:530, y:270, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'• Chemical industry — inorganic (acids, alkalis) & organic (petrochemicals). Fast growing.\n• Fertiliser industry — makes nitrogenous (urea), phosphatic & complex fertilisers. Centred where petroleum refineries provide raw material.' },
+      { id:'ot3', label:'Automobile\n& IT', x:470, y:390, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'• Automobile — trucks, cars, two/three-wheelers. Located near markets (Delhi, Mumbai, Chennai, Pune).\n• IT & electronics — Bengaluru is the "electronic capital" / Silicon Valley of India. Software Technology Parks. Big employment & exports.' },
+    ]
+  },
+
+  // Industrial Regions
+  {
+    id:'regions', label:'Industrial\nLocation', x:0, y:-310, r:48,
+    color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+    info:'Industries locate where costs are least and profits highest. Key factors decide where an industry is set up.',
+    children:[
+      { id:'rg1', label:'Location\nFactors', x:-170, y:-430, r:36, color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Factors affecting location:\n• Raw materials, land, water, labour, power.\n• Capital, transport, market, banking.\n• Government policy & agglomeration economies.\n• Cities offer market, labour, banking — so industries cluster.' },
+      { id:'rg2', label:'Industrial\nRegions', x:0, y:-450, r:36, color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Major industrial regions:\n• Mumbai-Pune, Hugli, Bengaluru-Tamil Nadu, Gujarat, Chota Nagpur, Vishakhapatnam-Guntur, Gurugram-Delhi-Meerut, Kollam-Thiruvananthapuram.\n• Usually near cities, ports & coalfields.' },
+      { id:'rg3', label:'Agglomeration', x:170, y:-430, r:36, color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'• Industries tend to cluster where they benefit from shared facilities (agglomeration economies).\n• A market town or port attracts more industries.\n• Access to labour, services, transport & communication.\n• Industrialisation & urbanisation go hand in hand.' },
+    ]
+  },
+
+  // Pollution
+  {
+    id:'pollution', label:'Industrial\nPollution', x:0, y:310, r:48,
+    color:'#180a08', stroke:'#f87171', textColor:'#fecaca',
+    info:'Industries cause air, water, land & noise pollution and degrade the environment. Control measures are essential.',
+    children:[
+      { id:'pl1', label:'Types of\nPollution', x:-180, y:430, r:36, color:'#180a08', stroke:'#f87171', textColor:'#fecaca',
+        info:'Four types of industrial pollution:\n• Air — smoke, gases (SO₂, CO), dust.\n• Water — organic & inorganic effluents dumped in rivers.\n• Thermal — hot water from factories into water bodies.\n• Land & Noise — solid waste, machinery, generators.' },
+      { id:'pl2', label:'Bhopal\nGas', x:0, y:460, r:36, color:'#180a08', stroke:'#f87171', textColor:'#fecaca',
+        info:'• Water pollution: dyeing, tanning, paper, chemical industries release toxins.\n• Fly ash, phosphogypsum, slag degrade land.\n• Thermal pollution harms aquatic life.\n• Emphasises need for treatment & recycling.' },
+      { id:'pl3', label:'Control\nMeasures', x:180, y:430, r:36, color:'#180a08', stroke:'#f87171', textColor:'#fecaca',
+        info:'Control of pollution:\n• Minimise water use; reuse & recycle in two/more stages.\n• Harvest rainwater.\n• Treat hot water & effluents before release.\n• Fit smokestacks with scrubbers, filters, electrostatic precipitators.\n• Example: NTPC — environment-friendly power producer.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){return allNodes.find(n=>n.id===id);}
+
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found&&found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10,window.innerHeight-240)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {tip.style.display='none';canvas.style.cursor='grab';}
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx,cy);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.22,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2+20;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(251,146,60,.025)'; ctx.lineWidth=1;
+  for(let x=-1400;x<1400;x+=70){ctx.beginPath();ctx.moveTo(x,-1400);ctx.lineTo(x,1400);ctx.stroke();}
+  for(let y=-1400;y<1400;y+=70){ctx.beginPath();ctx.moveTo(-1400,y);ctx.lineTo(1400,y);ctx.stroke();}
+
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    const cpx=(a.x+b.x)/2+(b.y-a.y)*.15, cpy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cpx,cpy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?38:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-9,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

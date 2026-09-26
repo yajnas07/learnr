@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Manufacturing Industries · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#12080a;--card:#1e0f0c;--card2:#281510;--border:#3a220f;
+  --text:#f4e4d8;--muted:#9a6a4a;--geo:#f97316;
+  --green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--teal:#34d399;--orange:#fb923c;--pink:#f472b6;--steel:#a3a3a3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+.top-nav{display:flex;align-items:center;gap:16px;padding:10px 22px;background:rgba(18,8,10,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:27px}
+.nav-bc{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.nav-bc a{color:var(--muted);text-decoration:none}.nav-bc a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-cur{color:var(--geo);font-weight:700}
+.nav-back{margin-left:auto;padding:5px 13px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);border-radius:18px;color:var(--geo);font-size:.78rem;text-decoration:none;transition:all .2s}
+.nav-back:hover{background:rgba(249,115,22,.2)}
+
+.page-hdr{padding:28px 20px 16px;text-align:center}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.85rem;color:#fff;margin-bottom:5px}
+.page-hdr p{color:var(--muted);font-size:.9rem}
+.ch-badge{display:inline-block;padding:3px 10px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.35);border-radius:12px;color:var(--geo);font-size:.73rem;font-weight:700;margin-bottom:8px}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 56px}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:7px 16px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.tab.active{border-color:var(--geo);background:rgba(249,115,22,.1);color:var(--orange);font-weight:700}
+
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.panel-title{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;color:var(--text)}
+.panel-body{padding:18px}
+
+.rtable{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:4px}
+.rtable th{padding:8px 12px;background:rgba(249,115,22,.1);color:var(--orange);font-weight:700;text-align:left;border-bottom:1px solid var(--border)}
+.rtable td{padding:8px 12px;border-bottom:1px solid rgba(58,34,15,.4);vertical-align:top}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(249,115,22,.04)}
+
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.72rem;font-weight:700;margin-right:4px}
+.tag-e{background:rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.3)}
+.tag-v{background:rgba(251,191,36,.15);color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
+.tag-r{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3)}
+.tag-n{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+
+.ibox{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:12px}
+.ibox strong{color:var(--text)}
+.ibox .kw{color:var(--orange);font-weight:700}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px}
+.info-card{border-radius:12px;padding:14px;border:1px solid var(--border);background:var(--card2);transition:all .25s}
+.info-card:hover{transform:translateY(-2px);border-color:rgba(249,115,22,.3)}
+.info-card h4{font-size:.88rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+.info-card p{font-size:.76rem;line-height:1.65;color:var(--muted)}
+.info-card .ic-icon{font-size:1.5rem;margin-bottom:8px;display:block}
+
+.timeline{position:relative;padding-left:28px;margin-top:12px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--orange),var(--amber))}
+.tl-item{position:relative;margin-bottom:18px;padding-bottom:4px}
+.tl-item::before{content:'';position:absolute;left:-24px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--orange);background:var(--bg)}
+.tl-item h4{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.tl-item p{font-size:.76rem;line-height:1.6;color:var(--muted)}
+.tl-item .tl-year{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--orange);margin-bottom:2px}
+
+.bar-chart{margin-top:12px}
+.bar-row{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px}
+.bar-label span:first-child{color:var(--text)}
+.bar-label span:last-child{font-family:'DM Mono',monospace;color:var(--orange)}
+.bar-track{height:12px;background:#281510;border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width 1.2s ease}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../../index.html" class="nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <div class="nav-bc">
+    <a href="../../index.html">Home</a><span class="nav-sep">/</span>
+    <a href="../../index.html">Geography</a><span class="nav-sep">/</span>
+    <span class="nav-cur">Manufacturing Industries</span>
+  </div>
+  <a href="../../index.html" class="nav-back">← Back</a>
+</nav>
+
+<div class="page-hdr">
+  <div class="ch-badge">Geography · Ch.6</div>
+  <h1>Manufacturing Industries</h1>
+  <p>Importance, classification, textiles, iron & steel, location factors and industrial pollution</p>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="show(0,this)">🏭 Importance</button>
+    <button class="tab" onclick="show(1,this)">🧵 Textiles</button>
+    <button class="tab" onclick="show(2,this)">⚙️ Iron & Steel</button>
+    <button class="tab" onclick="show(3,this)">🏗️ Other Industries</button>
+    <button class="tab" onclick="show(4,this)">📍 Location</button>
+    <button class="tab" onclick="show(5,this)">🌫️ Pollution</button>
+  </div>
+
+  <!-- TAB 0: Importance -->
+  <div class="panel active" id="p0">
+    <div class="panel-card">
+      <div class="panel-title">🏭 Importance & Classification of Manufacturing</div>
+      <div class="panel-body">
+        <div class="ibox">
+          <span class="kw">Manufacturing</span> is the production of goods in large quantities from raw materials into more valuable products. It is considered the <strong>backbone of development</strong>, lifting and diversifying the economy.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--orange)">Why Manufacturing Matters</h3>
+        <div class="card-grid">
+          <div class="info-card"><div class="ic-icon">🚜</div><h4>Modernises Agriculture</h4><p>Provides machines, tools and fertilisers that make farming more efficient and productive.</p></div>
+          <div class="info-card"><div class="ic-icon">💼</div><h4>Creates Jobs</h4><p>Reduces dependence on agriculture by creating jobs in secondary and tertiary sectors.</p></div>
+          <div class="info-card"><div class="ic-icon">⚖️</div><h4>Reduces Disparity</h4><p>Setting up industries in backward areas reduces regional imbalances and poverty.</p></div>
+          <div class="info-card"><div class="ic-icon">💱</div><h4>Foreign Exchange</h4><p>Export of manufactured goods brings in valuable foreign exchange and national wealth.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--orange)">Classification of Industries</h3>
+        <table class="rtable">
+          <tr><th>Basis</th><th>Types</th></tr>
+          <tr><td><strong>Raw material</strong></td><td>Agro-based (cotton, jute, sugar) · Mineral-based (iron & steel, cement)</td></tr>
+          <tr><td><strong>Role</strong></td><td>Basic/key industries (iron & steel) · Consumer industries (sugar, paper)</td></tr>
+          <tr><td><strong>Capital investment</strong></td><td>Small-scale · Large-scale</td></tr>
+          <tr><td><strong>Ownership</strong></td><td>Public (SAIL) · Private (TISCO) · Joint · Cooperative (AMUL)</td></tr>
+          <tr><td><strong>Bulk & weight</strong></td><td>Heavy industries · Light industries</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: Textiles -->
+  <div class="panel" id="p1">
+    <div class="panel-card">
+      <div class="panel-title">🧵 Textile Industry</div>
+      <div class="panel-body">
+        <div class="ibox">
+          The textile industry is the <span class="kw">largest industry in the organised sector</span>. It contributes significantly to industrial production, employment and foreign exchange — and is the only industry <strong>self-reliant and complete</strong> in the value chain.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--pink)"><div class="ic-icon">🧶</div><h4>Cotton Textiles</h4><p>Concentrated in Maharashtra & Gujarat (Mumbai, Ahmedabad) — for black soil, moist climate, ports, labour and market. First mill: Mumbai, 1854.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--orange)"><div class="ic-icon">🧵</div><h4>Jute Industry</h4><p>Mostly along the Hugli river in West Bengal — near jute fields, cheap water transport, labour and Kolkata port. Faces competition from synthetics.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">🐛</div><h4>Silk & Wool</h4><p>India is a major silk producer. Woollen and synthetic (man-made fibre) textiles add to the sector's diversity.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🌐</div><h4>Decentralised Weaving</h4><p>Weaving is highly decentralised — handloom, powerloom and mill sectors provide huge rural employment.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--orange)">Cotton vs Jute — Location Factors</h3>
+        <table class="rtable">
+          <tr><th>Factor</th><th>Cotton Textiles</th><th>Jute Industry</th></tr>
+          <tr><td>Main region</td><td>Maharashtra, Gujarat</td><td>Hugli basin, West Bengal</td></tr>
+          <tr><td>Raw material</td><td>Raw cotton (black soil)</td><td>Raw jute (fertile flood plains)</td></tr>
+          <tr><td>Transport / Port</td><td>Mumbai port</td><td>Kolkata port, cheap river transport</td></tr>
+          <tr><td>Challenge</td><td>Global competition, old machinery</td><td>Synthetic substitutes</td></tr>
+        </table>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--orange)">
+          The <strong>National Jute Policy (2005)</strong> was formed to increase productivity, ensure good prices to farmers and enhance the yield per hectare of jute.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Iron & Steel -->
+  <div class="panel" id="p2">
+    <div class="panel-card">
+      <div class="panel-title">⚙️ Iron & Steel Industry</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Iron and steel is a <span class="kw">basic (heavy) industry</span> — all other industries depend on it for their machinery. It is often called the <strong>"backbone" of modern industry</strong>. Steel is needed for engineering, construction, defence and daily goods.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--orange)">Raw Material Ratio (approx.)</h3>
+        <div class="bar-chart">
+          <div class="bar-row"><div class="bar-label"><span>Iron ore</span><span>~4 parts</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--steel)" data-w="100%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Coking coal</span><span>~2 parts</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--orange)" data-w="55%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Limestone</span><span>~1 part</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--amber)" data-w="28%"></div></div></div>
+        </div>
+
+        <div class="ibox">
+          Because raw materials are <strong>bulky and weight-losing</strong>, most steel plants are located in the <span class="kw">Chota Nagpur plateau</span> region — with cheap iron ore, high-grade coal, water, labour and market close by.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--orange)">Major Steel Plants</h3>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--steel)"><div class="ic-icon">🏭</div><h4>TISCO</h4><p>Tata Iron & Steel Co., Jamshedpur (Jharkhand) — a private-sector plant near iron ore, coal and Kolkata port.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🏭</div><h4>Bhilai & Rourkela</h4><p>Public-sector plants (SAIL) set up with foreign collaboration — Bhilai (Chhattisgarh) and Rourkela (Odisha).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🏭</div><h4>Durgapur & Bokaro</h4><p>Located in the Damodar valley/West Bengal-Jharkhand belt, using local coal and iron ore.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--red)"><div class="ic-icon">⚠️</div><h4>Challenges</h4><p>High cost of coking coal, low labour productivity, irregular energy and poor infrastructure. Liberalisation & FDI are helping growth.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Other Industries -->
+  <div class="panel" id="p3">
+    <div class="panel-card">
+      <div class="panel-title">🏗️ Other Important Industries</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Beyond textiles and steel, India has a wide range of industries — <span class="kw">cement, aluminium, chemicals, fertilisers, automobiles and IT</span>.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--steel)"><div class="ic-icon">🧱</div><h4>Cement</h4><p>Needs limestone, silica, alumina and gypsum plus coal. Essential for construction of houses, roads, dams and bridges. Located near limestone (Gujarat, Rajasthan, MP).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🥫</div><h4>Aluminium Smelting</h4><p>Second most important metallurgical industry. Uses bauxite. Aluminium is light, resists corrosion and conducts well — used in aircraft, utensils and wires.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">⚗️</div><h4>Chemical Industry</h4><p>Fast growing — inorganic (acids, alkalis, soda ash) and organic (petrochemicals, plastics, drugs). Contributes ~3% of GDP.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">🌾</div><h4>Fertiliser Industry</h4><p>Makes nitrogenous (urea), phosphatic and complex fertilisers. Located near petroleum refineries which supply raw material.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--red)"><div class="ic-icon">🚗</div><h4>Automobile</h4><p>Trucks, cars, buses, two- and three-wheelers. Located near markets — Delhi, Gurugram, Mumbai, Chennai, Pune, Bengaluru.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">💻</div><h4>IT & Electronics</h4><p>Bengaluru is the "electronic capital" / Silicon Valley of India. Software Technology Parks generate huge employment and exports.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: Location -->
+  <div class="panel" id="p4">
+    <div class="panel-card">
+      <div class="panel-title">📍 Factors of Industrial Location</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Industries are located where <span class="kw">production costs are lowest and profits highest</span>. Ideally, they are set up where several factors — raw material, labour, capital, power and market — come together.
+        </div>
+        <div class="card-grid">
+          <div class="info-card"><div class="ic-icon">⛏️</div><h4>Raw Materials</h4><p>Weight-losing raw materials pull industries close to their source (e.g., steel near coal & ore).</p></div>
+          <div class="info-card"><div class="ic-icon">👷</div><h4>Labour & Power</h4><p>Availability of cheap, skilled labour and a regular power supply is essential.</p></div>
+          <div class="info-card"><div class="ic-icon">🚆</div><h4>Transport & Market</h4><p>Good roads, rail, ports and access to markets keep costs low and demand steady.</p></div>
+          <div class="info-card"><div class="ic-icon">🏦</div><h4>Capital & Banking</h4><p>Cities provide capital, banking, insurance and financial services that industries need.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--orange)">Major Industrial Regions of India</h3>
+        <div class="ibox">
+          <strong>Mumbai–Pune</strong>, <strong>Hugli</strong>, <strong>Bengaluru–Tamil Nadu</strong>, <strong>Gujarat</strong>, <strong>Chota Nagpur</strong>, <strong>Vishakhapatnam–Guntur</strong>, <strong>Gurugram–Delhi–Meerut</strong> and <strong>Kollam–Thiruvananthapuram</strong>. Industries tend to <span class="kw">cluster (agglomerate)</span> near cities, ports and coalfields to share facilities and services.
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--orange)">
+          <strong>Agglomeration economies:</strong> when many industries locate together, they benefit from shared infrastructure, labour pools and services — so industrialisation and urbanisation go hand in hand.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: Pollution -->
+  <div class="panel" id="p5">
+    <div class="panel-card">
+      <div class="panel-title">🌫️ Industrial Pollution & Control</div>
+      <div class="panel-body">
+        <div class="ibox">
+          While industries drive progress, they also cause <span class="kw">air, water, land and noise pollution</span>, degrading the environment. Controlling this pollution is essential for sustainable development.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--steel)"><div class="ic-icon">💨</div><h4>Air Pollution</h4><p>Caused by smoke and gases (sulphur dioxide, carbon monoxide) and dust from factories — harmful to human health.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🏞️</div><h4>Water Pollution</h4><p>Organic and inorganic effluents from dyeing, tanning, paper and chemical industries dumped into rivers.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--red)"><div class="ic-icon">🌡️</div><h4>Thermal Pollution</h4><p>Hot water from factories and power plants released into rivers and ponds harms aquatic life.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">🔊</div><h4>Land & Noise</h4><p>Solid waste (fly ash, slag, phosphogypsum) degrades land; machinery, generators and equipment cause noise pollution.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--orange)">Control Measures</h3>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-year">Water</div><h4>Minimise, Reuse & Recycle</h4><p>Reduce water use, reuse and recycle it in two or more stages, and harvest rainwater to meet demand.</p></div>
+          <div class="tl-item"><div class="tl-year">Effluents</div><h4>Treat Before Release</h4><p>Treat hot water and effluents (primary, secondary and tertiary treatment) before discharging into rivers.</p></div>
+          <div class="tl-item"><div class="tl-year">Air</div><h4>Fit Smokestack Devices</h4><p>Use scrubbers, filters and electrostatic precipitators in chimneys to reduce smoke and particulate pollution.</p></div>
+          <div class="tl-item"><div class="tl-year">Model</div><h4>NTPC — Eco-Friendly</h4><p>The National Thermal Power Corporation is a leading example of a power producer committed to environment protection.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  btn.classList.add('active');
+  animateBars();
+}
+
+function animateBars(){
+  setTimeout(()=>{
+    document.querySelectorAll('.panel.active .bar-fill').forEach(b=>{
+      b.style.width=b.dataset.w||'0%';
+    });
+  },100);
+}
+animateBars();
+</script>
+</body>
+</html>
