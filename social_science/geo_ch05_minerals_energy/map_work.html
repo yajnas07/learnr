@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Work — Minerals and Energy Resources · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0410;--card:#160a20;--card2:#1e0f2a;--border:#2e1a40;--text:#e8dcf4;--muted:#7a5a9a;
+  --geo:#a855f7;--green:#4ade80;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--purple:#c084fc;--orange:#fb923c;--cyan:#38bdf8;--pink:#f472b6;--teal:#34d399}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.2rem;background:rgba(10,4,16,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.site-nav a.logo img{height:26px}
+.site-nav a.back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:.2rem .65rem;transition:all .2s}
+.site-nav a.back:hover{color:var(--geo);border-color:var(--geo)}
+header{text-align:center;padding:1.4rem 1rem .8rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3.5vw,1.8rem);font-weight:900;color:var(--purple)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+.wrap{max-width:960px;margin:0 auto;padding:0 1rem 3rem}
+.mode-bar{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem}
+.mode-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;padding:.45rem 1.2rem;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.mode-btn.active{border-color:var(--geo);color:var(--purple);background:rgba(168,85,247,.08)}
+.tab-bar{display:flex;gap:.4rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.3rem .8rem;border-radius:99px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tab-btn.active{border-color:var(--geo);color:var(--purple);background:rgba(168,85,247,.08)}
+.map-area{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;aspect-ratio:6/7;max-height:630px;margin:0 auto;max-width:540px}
+.map-area svg{width:100%;height:100%;display:block}
+.pin{cursor:pointer;transition:all .2s}
+.pin circle{transition:all .2s}
+.pin:hover circle{r:7;filter:drop-shadow(0 0 8px currentColor)}
+.pin text{font-family:'DM Mono',monospace;font-size:11px;pointer-events:none;opacity:0;transition:opacity .2s}
+.pin:hover text{opacity:1}
+.pin.highlight circle{animation:ping 1s ease infinite}
+@keyframes ping{0%,100%{r:5;opacity:1}50%{r:10;opacity:.5}}
+.info-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:1rem;min-height:80px}
+.info-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.info-desc{font-size:.84rem;color:var(--muted);line-height:1.65}
+.info-desc strong{color:var(--text)}
+.quiz-bar{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:1rem;flex-wrap:wrap}
+.quiz-q{flex:1;font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;min-width:200px}
+.quiz-score{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.quiz-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:4px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s}
+.quiz-btn:hover{border-color:var(--geo);color:var(--purple)}
+.feedback-flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;pointer-events:none;opacity:0;transition:opacity .3s;z-index:10;text-shadow:0 0 20px #000}
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+#indiaBase{opacity:0.9;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <a class="back" href="../../index.html#ch-minerals">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Map Work — Minerals and Energy Resources</h1>
+  <p>Class X · Geography Ch.5 · CBSE Board Map Work · Interactive</p>
+</header>
+<div class="wrap">
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('learn')">📖 Learn Mode</button>
+    <button class="mode-btn" onclick="setMode('test')">✍️ Test Yourself</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="setTab('iron')">🔩 Iron Ore Mines</button>
+    <button class="tab-btn" onclick="setTab('minerals')">💎 Other Minerals</button>
+    <button class="tab-btn" onclick="setTab('fuels')">⛽ Coal & Oil Fields</button>
+    <button class="tab-btn" onclick="setTab('power')">⚡ Power Plants</button>
+  </div>
+  <div class="map-area" id="mapArea">
+    <div class="feedback-flash" id="fbFlash"></div>
+    <svg viewBox="0 0 666.67 777.33" id="mapSvg">
+      <image id="indiaBase" href="../ch02_nationalism/India_outline.svg" x="0" y="0" width="666.67" height="777.33"/>
+    </svg>
+  </div>
+  <div class="legend" id="legendArea"></div>
+  <div class="info-panel" id="infoPanel">
+    <div class="info-title" id="infoTitle">Click any pin to learn about it</div>
+    <div class="info-desc" id="infoDesc">Explore major <strong>iron ore mines</strong>, <strong>mineral deposits</strong>, <strong>coalfields & oil fields</strong>, and <strong>power plants</strong> across India. CBSE Board asks map questions on locating and labelling major mining and energy centres.</div>
+  </div>
+  <div class="quiz-bar" id="quizBar" style="display:none">
+    <div class="quiz-q" id="quizQ">Loading...</div>
+    <div class="quiz-score" id="quizScore">0/0</div>
+    <button class="quiz-btn" onclick="skipQ()">Skip →</button>
+  </div>
+</div>
+
+<script>
+const TABS = {
+  iron: {
+    legend: [
+      {color:'#f87171',name:'Iron Ore Mine'}
+    ],
+    places: [
+      { id:'mayurbhanj', x:400, y:420, color:'#f87171', label:'Badampahar',
+        info:'<strong>Badampahar Mines</strong> — in the <strong>Odisha–Jharkhand belt</strong> (Mayurbhanj & Kendujhar districts, Odisha). Source of high-grade <strong>haematite</strong> iron ore. One of the oldest and richest iron ore belts of India.' },
+      { id:'bailadila', x:330, y:475, color:'#f87171', label:'Bailadila',
+        info:'<strong>Bailadila Range</strong> — in the <strong>Durg–Bastar–Chandrapur belt</strong> (Chhattisgarh). Has very high-grade <strong>haematite</strong> ore. The ore is exported to <strong>Japan and South Korea</strong> via Vishakhapatnam port.' },
+      { id:'kudremukh', x:210, y:600, color:'#f87171', label:'Kudremukh',
+        info:'<strong>Kudremukh Mines</strong> — in the <strong>Ballari–Chitradurga–Tumakuru belt</strong> (Karnataka). One of the largest iron ore deposits in the world. A <strong>100% export unit</strong>; ore is exported as slurry through a pipeline to Mangaluru port.' },
+      { id:'ballari', x:245, y:555, color:'#f87171', label:'Ballari',
+        info:'<strong>Ballari–Chitradurga belt</strong> — Karnataka. Rich in iron ore. The Western Ghats region here carries huge reserves of haematite that supply steel plants and exports.' },
+      { id:'goa', x:175, y:520, color:'#f87171', label:'Goa Belt',
+        info:'<strong>Maharashtra–Goa Belt</strong> — includes Goa and the Ratnagiri district. Ore of slightly lower grade; exported through <strong>Marmagao port</strong> in Goa.' },
+    ]
+  },
+  minerals: {
+    legend: [
+      {color:'#fb923c',name:'Copper'},{color:'#60a5fa',name:'Bauxite'},
+      {color:'#c084fc',name:'Mica'},{color:'#34d399',name:'Manganese'}
+    ],
+    places: [
+      { id:'khetri', x:190, y:330, color:'#fb923c', label:'Khetri',
+        info:'<strong>Khetri (Rajasthan)</strong> — famous <strong>copper</strong> mines. Copper is malleable, ductile and a good conductor, used mainly in electricals and electronics.' },
+      { id:'balaghat', x:295, y:435, color:'#fb923c', label:'Balaghat',
+        info:'<strong>Balaghat (Madhya Pradesh)</strong> — major <strong>copper</strong> producing mines, supplying copper to industries across India.' },
+      { id:'koraput', x:360, y:480, color:'#60a5fa', label:'Panchpatmali',
+        info:'<strong>Panchpatmali deposits, Koraput (Odisha)</strong> — India\'s largest <strong>bauxite</strong> reserves. Bauxite is the ore of aluminium. Odisha is the largest bauxite-producing state.' },
+      { id:'amarkantak', x:315, y:415, color:'#60a5fa', label:'Amarkantak',
+        info:'<strong>Amarkantak Plateau & Maikal Hills</strong> — rich in <strong>bauxite</strong>, formed by decomposition of aluminium-rich rocks in the plateau region of Madhya Pradesh & Chhattisgarh.' },
+      { id:'hazaribagh', x:390, y:390, color:'#c084fc', label:'Chota Nagpur (Mica)',
+        info:'<strong>Chota Nagpur Plateau (Jharkhand–Bihar)</strong> — the Koderma–Gaya–Hazaribagh belt is the leading producer of <strong>mica</strong>. Mica has excellent di-electric strength and insulation, vital for electronics.' },
+      { id:'nellore', x:280, y:585, color:'#c084fc', label:'Nellore (Mica)',
+        info:'<strong>Nellore (Andhra Pradesh)</strong> — produces high-quality <strong>mica</strong>. Along with Rajasthan (Ajmer), it is a major mica belt of India.' },
+    ]
+  },
+  fuels: {
+    legend: [
+      {color:'#e8dcf4',name:'Coalfield'},{color:'#fbbf24',name:'Oil Field'}
+    ],
+    places: [
+      { id:'jharia', x:410, y:400, color:'#e8dcf4', label:'Jharia',
+        info:'<strong>Jharia (Jharkhand)</strong> — India\'s largest and most important <strong>coalfield</strong>, in the <strong>Damodar valley</strong>. Produces Gondwana coal (bituminous), used for metallurgy and power.' },
+      { id:'raniganj', x:430, y:405, color:'#e8dcf4', label:'Raniganj',
+        info:'<strong>Raniganj (West Bengal)</strong> — a major <strong>coalfield</strong> in the Damodar valley. One of the oldest coal-mining areas, supplying industry and thermal power.' },
+      { id:'korba', x:330, y:430, color:'#e8dcf4', label:'Korba',
+        info:'<strong>Korba (Chhattisgarh)</strong> — important <strong>coalfield</strong> and a major thermal-power hub of central India.' },
+      { id:'digboi', x:560, y:310, color:'#fbbf24', label:'Digboi',
+        info:'<strong>Digboi (Assam)</strong> — the <strong>oldest oil field in India</strong>. Part of the Assam oil fields (with Naharkatiya & Moran). Petroleum is called "black gold".' },
+      { id:'mumbai_high', x:120, y:490, color:'#fbbf24', label:'Mumbai High',
+        info:'<strong>Mumbai High</strong> — India\'s largest <strong>offshore oil field</strong>, in the Arabian Sea off the Mumbai coast. Oil is extracted using the platform "Sagar Samrat".' },
+      { id:'ankleshwar', x:150, y:445, color:'#fbbf24', label:'Ankleshwar',
+        info:'<strong>Ankleshwar (Gujarat)</strong> — a major onshore <strong>oil field</strong>. Gujarat and Assam are the leading petroleum-producing regions on land.' },
+    ]
+  },
+  power: {
+    legend: [
+      {color:'#38bdf8',name:'Nuclear Plant'},{color:'#34d399',name:'Wind Farm'},
+      {color:'#fbbf24',name:'Geothermal/Tidal'}
+    ],
+    places: [
+      { id:'tarapur', x:120, y:470, color:'#38bdf8', label:'Tarapur',
+        info:'<strong>Tarapur (Maharashtra)</strong> — India\'s first and one of the largest <strong>nuclear power plants</strong>. Uses uranium to generate atomic electricity.' },
+      { id:'kalpakkam', x:295, y:625, color:'#38bdf8', label:'Kalpakkam',
+        info:'<strong>Kalpakkam (Tamil Nadu)</strong> — a major <strong>nuclear power station</strong> on the east coast. Part of India\'s atomic energy programme using uranium and thorium.' },
+      { id:'nagarcoil', x:250, y:700, color:'#34d399', label:'Nagarcoil–Madurai',
+        info:'<strong>Nagarcoil to Madurai (Tamil Nadu)</strong> — the largest <strong>wind farm cluster</strong> in India, using strong coastal winds to generate electricity.' },
+      { id:'khambhat', x:135, y:445, color:'#fbbf24', label:'Gulf of Khambhat',
+        info:'<strong>Gulf of Khambhat & Gulf of Kutch (Gujarat)</strong> — sites with high potential for <strong>tidal energy</strong>, where strong ocean tides can turn turbines.' },
+      { id:'puga', x:245, y:150, color:'#fbbf24', label:'Puga Valley',
+        info:'<strong>Puga Valley (Ladakh)</strong> — an experimental <strong>geothermal energy</strong> project, using heat from the Earth\'s interior. Parvati valley (HP) is another site.' },
+      { id:'jaisalmer', x:130, y:355, color:'#34d399', label:'Jaisalmer',
+        info:'<strong>Jaisalmer (Rajasthan)</strong> — an important <strong>wind energy</strong> centre in the Thar desert, where strong dry winds drive wind turbines.' },
+    ]
+  }
+};
+
+let mode='learn', tab='iron', quizIdx=0, quizOrder=[], score=0, total=0;
+const svg=document.getElementById('mapSvg');
+const TAB_ORDER=['iron','minerals','fuels','power'];
+
+function setTab(t){
+  tab=t;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',TAB_ORDER[i]===t));
+  buildPins();
+  buildLegend();
+  document.getElementById('infoTitle').textContent='Click any pin to learn about it';
+  document.getElementById('infoDesc').innerHTML=TABS[t].places[0].info;
+  if(mode==='test'){ score=0;total=0;quizOrder=[...Array(TABS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function buildLegend(){
+  const area=document.getElementById('legendArea');
+  area.innerHTML=TABS[tab].legend.map(l=>`<div class="leg-item"><div class="leg-dot" style="background:${l.color}"></div>${l.name}</div>`).join('');
+}
+
+function buildPins(){
+  document.querySelectorAll('.pin').forEach(p=>p.remove());
+  TABS[tab].places.forEach(p=>{
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('pin'); g.id='pin-'+p.id;
+    g.innerHTML=`<circle cx="${p.x}" cy="${p.y}" r="5" fill="${p.color}" stroke="#000" stroke-width="1"/>
+      <text x="${p.x}" y="${p.y-9}" text-anchor="middle" fill="${p.color}">${p.label}</text>`;
+    g.addEventListener('click',()=>handleClick(p));
+    svg.appendChild(g);
+  });
+}
+
+function handleClick(place){
+  if(mode==='learn'){
+    document.getElementById('infoTitle').innerHTML=`📍 ${place.label}`;
+    document.getElementById('infoDesc').innerHTML=place.info;
+    document.querySelectorAll('.pin circle').forEach(c=>c.setAttribute('stroke-width','1'));
+    document.querySelector('#pin-'+place.id+' circle').setAttribute('stroke-width','3');
+  } else { checkAnswer(place); }
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.mode-btn:${m==='learn'?'first':'last'}-child`).classList.add('active');
+  document.getElementById('infoPanel').style.display=m==='learn'?'block':'none';
+  document.getElementById('quizBar').style.display=m==='test'?'flex':'none';
+  document.querySelectorAll('.pin text').forEach(t=>t.style.opacity=m==='learn'?'':'0');
+  if(m==='test'){ score=0;total=0;quizOrder=[...Array(TABS[tab].places.length).keys()].sort(()=>Math.random()-.5);quizIdx=0;showQuestion(); }
+}
+
+function showQuestion(){
+  const places=TABS[tab].places;
+  if(quizIdx>=quizOrder.length){ quizIdx=0;quizOrder.sort(()=>Math.random()-.5); }
+  const p=places[quizOrder[quizIdx]];
+  document.getElementById('quizQ').innerHTML=`📍 Click on: <strong>${p.label}</strong>`;
+  document.getElementById('quizScore').textContent=`${score}/${total}`;
+  document.querySelectorAll('.pin').forEach(g=>g.classList.remove('highlight'));
+  document.querySelectorAll('.pin text').forEach(t=>{t.style.opacity='0';});
+}
+
+function checkAnswer(place){
+  const places=TABS[tab].places;
+  const expected=places[quizOrder[quizIdx]]; total++;
+  const flash=document.getElementById('fbFlash');
+  if(place.id===expected.id){ score++;flash.textContent='✓';flash.style.color='#4ade80'; }
+  else{ flash.textContent='✗';flash.style.color='#f87171';
+    document.querySelector('#pin-'+expected.id)?.classList.add('highlight');
+    setTimeout(()=>document.querySelector('#pin-'+expected.id)?.classList.remove('highlight'),1500);
+  }
+  flash.style.opacity='1'; setTimeout(()=>{flash.style.opacity='0';},800);
+  quizIdx++; setTimeout(showQuestion,1000);
+}
+
+function skipQ(){ quizIdx++; showQuestion(); }
+
+buildPins(); buildLegend();
+</script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Minerals and Energy Resources · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0410;--card:#160a20;--card2:#1e0f2a;--border:#2e1a40;
+  --text:#e8dcf4;--muted:#7a5a9a;--geo:#a855f7;
+  --green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#c084fc;--teal:#34d399;--orange:#fb923c;--pink:#f472b6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+.top-nav{display:flex;align-items:center;gap:16px;padding:10px 22px;background:rgba(10,4,16,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:27px}
+.nav-bc{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.nav-bc a{color:var(--muted);text-decoration:none}.nav-bc a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-cur{color:var(--geo);font-weight:700}
+.nav-back{margin-left:auto;padding:5px 13px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);border-radius:18px;color:var(--geo);font-size:.78rem;text-decoration:none;transition:all .2s}
+.nav-back:hover{background:rgba(168,85,247,.2)}
+
+.page-hdr{padding:28px 20px 16px;text-align:center}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.85rem;color:#fff;margin-bottom:5px}
+.page-hdr p{color:var(--muted);font-size:.9rem}
+.ch-badge{display:inline-block;padding:3px 10px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.35);border-radius:12px;color:var(--geo);font-size:.73rem;font-weight:700;margin-bottom:8px}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 56px}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:7px 16px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.tab.active{border-color:var(--geo);background:rgba(168,85,247,.1);color:var(--purple);font-weight:700}
+
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.panel-title{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;color:var(--text)}
+.panel-body{padding:18px}
+
+.rtable{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:4px}
+.rtable th{padding:8px 12px;background:rgba(168,85,247,.1);color:var(--purple);font-weight:700;text-align:left;border-bottom:1px solid var(--border)}
+.rtable td{padding:8px 12px;border-bottom:1px solid rgba(46,26,64,.4);vertical-align:top}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(168,85,247,.04)}
+
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.72rem;font-weight:700;margin-right:4px}
+.tag-e{background:rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.3)}
+.tag-v{background:rgba(251,191,36,.15);color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
+.tag-r{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3)}
+.tag-n{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+
+.ibox{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:12px}
+.ibox strong{color:var(--text)}
+.ibox .kw{color:var(--purple);font-weight:700}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px}
+.info-card{border-radius:12px;padding:14px;border:1px solid var(--border);background:var(--card2);transition:all .25s}
+.info-card:hover{transform:translateY(-2px);border-color:rgba(168,85,247,.3)}
+.info-card h4{font-size:.88rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+.info-card p{font-size:.76rem;line-height:1.65;color:var(--muted)}
+.info-card .ic-icon{font-size:1.5rem;margin-bottom:8px;display:block}
+
+.timeline{position:relative;padding-left:28px;margin-top:12px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--purple),var(--pink))}
+.tl-item{position:relative;margin-bottom:18px;padding-bottom:4px}
+.tl-item::before{content:'';position:absolute;left:-24px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--purple);background:var(--bg)}
+.tl-item h4{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.tl-item p{font-size:.76rem;line-height:1.6;color:var(--muted)}
+.tl-item .tl-year{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--purple);margin-bottom:2px}
+
+.bar-chart{margin-top:12px}
+.bar-row{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px}
+.bar-label span:first-child{color:var(--text)}
+.bar-label span:last-child{font-family:'DM Mono',monospace;color:var(--purple)}
+.bar-track{height:12px;background:#1e0f2a;border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width 1.2s ease}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../../index.html" class="nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <div class="nav-bc">
+    <a href="../../index.html">Home</a><span class="nav-sep">/</span>
+    <a href="../../index.html">Geography</a><span class="nav-sep">/</span>
+    <span class="nav-cur">Minerals & Energy Resources</span>
+  </div>
+  <a href="../../index.html" class="nav-back">← Back</a>
+</nav>
+
+<div class="page-hdr">
+  <div class="ch-badge">Geography · Ch.5</div>
+  <h1>Minerals and Energy Resources</h1>
+  <p>Minerals, ferrous & non-ferrous metals, conservation, conventional & non-conventional energy</p>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="show(0,this)">💎 Mineral Basics</button>
+    <button class="tab" onclick="show(1,this)">🔩 Ferrous Minerals</button>
+    <button class="tab" onclick="show(2,this)">🥉 Other Minerals</button>
+    <button class="tab" onclick="show(3,this)">⛽ Power & Fuels</button>
+    <button class="tab" onclick="show(4,this)">☀️ Non-Conventional</button>
+    <button class="tab" onclick="show(5,this)">♻️ Conservation</button>
+  </div>
+
+  <!-- TAB 0: Mineral Basics -->
+  <div class="panel active" id="p0">
+    <div class="panel-card">
+      <div class="panel-title">💎 What is a Mineral?</div>
+      <div class="panel-body">
+        <div class="ibox">
+          A <span class="kw">mineral</span> is a homogenous, naturally occurring substance with a definable internal structure. Minerals are found in <strong>rocks</strong>, and an <span class="kw">ore</span> is a mineral from which a metal can be profitably extracted.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--purple)">Modes of Occurrence of Minerals</h3>
+        <div class="card-grid">
+          <div class="info-card"><div class="ic-icon">🪨</div><h4>Veins & Lodes</h4><p>In cracks, joints and faults of igneous & metamorphic rocks — e.g., tin, copper, zinc, lead.</p></div>
+          <div class="info-card"><div class="ic-icon">📚</div><h4>Beds & Layers</h4><p>In horizontal strata of sedimentary rocks — coal, gypsum, potash salt and sodium salt.</p></div>
+          <div class="info-card"><div class="ic-icon">🌦️</div><h4>Weathering Residue</h4><p>Left after soluble elements are washed away — e.g., bauxite is formed this way.</p></div>
+          <div class="info-card"><div class="ic-icon">🏞️</div><h4>Placer Deposits</h4><p>In sands of valley floors & hills — gold, silver, tin, platinum (not corroded by water).</p></div>
+          <div class="info-card"><div class="ic-icon">🌊</div><h4>Ocean Waters</h4><p>Common salt, magnesium and bromine are largely derived from ocean waters.</p></div>
+          <div class="info-card"><div class="ic-icon">⚒️</div><h4>Ores</h4><p>A mineral mixed with other elements. Mining is worthwhile only if the ore has enough metal content.</p></div>
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--purple)">
+          Minerals are generally extracted by <span class="kw">mining</span> (surface/underground), <span class="kw">drilling</span> (petroleum), or <span class="kw">quarrying</span>. Deep-bore mining is costly and risky.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: Ferrous Minerals -->
+  <div class="panel" id="p1">
+    <div class="panel-card">
+      <div class="panel-title">🔩 Ferrous Minerals</div>
+      <div class="panel-body">
+        <div class="ibox">
+          <span class="kw">Ferrous minerals</span> contain iron. They account for about <strong>three-fourths of the value</strong> of the production of metallic minerals and form the base of the metallurgical industries.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--purple)">Types of Iron Ore</h3>
+        <table class="rtable">
+          <tr><th>Type</th><th>Iron Content</th><th>Features</th></tr>
+          <tr><td><strong>Magnetite</strong></td><td>~70%</td><td>The finest iron ore; has excellent magnetic properties, valuable for electrical industry.</td></tr>
+          <tr><td><strong>Haematite</strong></td><td>50–60%</td><td>Most important industrial iron ore in terms of quantity used, though slightly lower grade.</td></tr>
+        </table>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--purple)">Major Iron Ore Belts</h3>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--red)"><div class="ic-icon">⛏️</div><h4>Odisha–Jharkhand Belt</h4><p>High-grade haematite from Badampahar mines (Mayurbhanj & Kendujhar districts).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--orange)"><div class="ic-icon">⛏️</div><h4>Durg–Bastar–Chandrapur</h4><p>Very high-grade haematite in the Bailadila range (Chhattisgarh) — exported to Japan & South Korea via Vishakhapatnam.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">⛏️</div><h4>Ballari–Chitradurga</h4><p>Karnataka belt; Kudremukh mines — 100% export unit — one of the largest deposits in the world.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">⛏️</div><h4>Maharashtra–Goa Belt</h4><p>Includes Goa and Ratnagiri; ore exported through Marmagao port.</p></div>
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--red)">
+          <strong>Manganese</strong> is used mainly to make <span class="kw">steel and ferro-manganese alloy</span> — nearly 10 kg is needed to make one tonne of steel. Also used in bleaching powder, insecticides and paints. <strong>Odisha</strong> is the largest producer.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Other Minerals -->
+  <div class="panel" id="p2">
+    <div class="panel-card">
+      <div class="panel-title">🥉 Non-Ferrous & Non-Metallic Minerals</div>
+      <div class="panel-body">
+        <div class="ibox">
+          <span class="kw">Non-ferrous minerals</span> (copper, bauxite, gold) do not contain iron but are vital for industry. <span class="kw">Non-metallic minerals</span> (mica, limestone) are equally important.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--orange)"><div class="ic-icon">🔌</div><h4>Copper</h4><p>Malleable, ductile and a good conductor — mainly used in electricals, electronics and alloys. Mined in Balaghat (MP), Khetri (Rajasthan) and Singhbhum (Jharkhand).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🥫</div><h4>Bauxite</h4><p>Ore of aluminium, formed by decomposition of rocks rich in aluminium silicates. Aluminium is light, strong and a good conductor. Odisha is the largest producer (Amarkantak, Maikal hills).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">💡</div><h4>Mica</h4><p>Splits into thin sheets; has excellent di-electric strength and insulating properties. Essential for electrical & electronic industries. Found in Chota Nagpur plateau, Ajmer, Nellore.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🏗️</div><h4>Limestone</h4><p>Found in sedimentary rocks (calcium carbonate). Basic raw material for cement and essential for smelting iron ore in blast furnaces.</p></div>
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--red)">
+          <strong style="color:var(--red)">⚠️ Hazards of Mining:</strong> Dust and fumes cause <span class="kw">pulmonary diseases</span>; mines can collapse or flood; water sources get polluted; and land, soil and rivers are degraded — mining is a "killer industry" for many workers.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Power & Fuels -->
+  <div class="panel" id="p3">
+    <div class="panel-card">
+      <div class="panel-title">⛽ Conventional Energy — Fossil Fuels & Power</div>
+      <div class="panel-body">
+        <div class="ibox">
+          <span class="kw">Conventional sources</span> of energy include firewood, cattle dung, and fossil fuels — <strong>coal, petroleum, natural gas</strong> — plus thermal and hydro electricity. Most are exhaustible and polluting.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--purple)">Grades of Coal (by carbon content)</h3>
+        <div class="bar-chart">
+          <div class="bar-row"><div class="bar-label"><span>Anthracite (highest quality)</span><span>Highest carbon</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--purple)" data-w="100%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Bituminous (most popular)</span><span>High carbon</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--blue)" data-w="75%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Lignite (brown coal)</span><span>Low carbon</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--amber)" data-w="45%"></div></div></div>
+          <div class="bar-row"><div class="bar-label"><span>Peat (lowest)</span><span>Lowest carbon</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--orange)" data-w="20%"></div></div></div>
+        </div>
+
+        <div class="card-grid" style="margin-top:16px">
+          <div class="info-card" style="border-left:3px solid var(--pink)"><div class="ic-icon">⚫</div><h4>Coal</h4><p>India's most abundant fossil fuel. Gondwana coal (older) in Damodar valley (Jharkhand-WB); Tertiary coal in the North-East. Used for power, industry & domestic fuel.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">🛢️</div><h4>Petroleum — "Black Gold"</h4><p>Fuel and raw material for petrochemicals. Found in anticlines & fault traps. Fields: Mumbai High, Gujarat, and Assam (Digboi, oldest).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🔥</div><h4>Natural Gas</h4><p>Clean fuel found with or without petroleum. Large reserves in the Krishna-Godavari basin. Used as fuel and for petrochemicals (CNG, LPG).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">⚡</div><h4>Electricity</h4><p>Hydro (running water, renewable) and thermal (burning coal/gas, non-renewable). India has over 310 thermal power plants.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: Non-Conventional -->
+  <div class="panel" id="p4">
+    <div class="panel-card">
+      <div class="panel-title">☀️ Non-Conventional Sources of Energy</div>
+      <div class="panel-body">
+        <div class="ibox">
+          <span class="kw">Non-conventional (renewable)</span> sources are clean, sustainable and eco-friendly. India is promoting them to reduce dependence on limited, polluting fossil fuels.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">☀️</div><h4>Solar Energy</h4><p>Photovoltaic technology converts sunlight into electricity. India (a tropical country) has huge potential. Used in rural areas to minimise firewood & dung use.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">💨</div><h4>Wind Energy</h4><p>India has a large wind-power potential. The largest wind farm cluster is in Tamil Nadu (Nagarcoil to Madurai). Also in Rajasthan, Gujarat, Maharashtra.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">♨️</div><h4>Biogas</h4><p>Decomposition of shrubs, farm & animal waste produces biogas — more efficient than kerosene, dung cake & charcoal. "Gobar gas" plants benefit farmers.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🌊</div><h4>Tidal Energy</h4><p>Ocean tides trapped in gulfs turn turbines to generate electricity. Potential in the Gulf of Khambhat, Gulf of Kutch and the Sundarbans.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--red)"><div class="ic-icon">🌋</div><h4>Geothermal Energy</h4><p>Heat and electricity from the Earth's interior. Experimental projects at Parvati valley (HP) and Puga valley (Ladakh).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">☢️</div><h4>Nuclear / Atomic Energy</h4><p>Energy from splitting uranium & thorium atoms. Thorium is found in monazite sands of Kerala. Plants at Kalpakkam, Tarapur, etc.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: Conservation -->
+  <div class="panel" id="p5">
+    <div class="panel-card">
+      <div class="panel-title">♻️ Conservation of Minerals & Energy</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Minerals and fossil fuels are <span class="kw">non-renewable</span> — they take millions of years to form but are being used up rapidly. Planned, sustainable use is essential.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">📉</div><h4>Why Conserve</h4><p>Rich mineral deposits are limited and depleting fast. As mining goes deeper, extraction becomes costlier and quality falls.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--green)"><div class="ic-icon">♻️</div><h4>Recycle Metals</h4><p>Recycling scrap metals (like copper and aluminium) greatly reduces the need for fresh mining and saves energy.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🔄</div><h4>Use Substitutes</h4><p>Develop alternatives and use improved technologies to make use of low-grade ores at a lower cost.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">💡</div><h4>Save Energy</h4><p>Use energy-efficient appliances, public transport and switch to renewable sources to conserve fossil fuels.</p></div>
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--purple)">
+          <strong>Key Takeaway:</strong> A <span class="kw">concerted, sustained effort</span> and improved technology are needed to use our mineral and energy resources in a planned and sustainable manner for future generations.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  btn.classList.add('active');
+  animateBars();
+}
+
+function animateBars(){
+  setTimeout(()=>{
+    document.querySelectorAll('.panel.active .bar-fill').forEach(b=>{
+      b.style.width=b.dataset.w||'0%';
+    });
+  },100);
+}
+animateBars();
+</script>
+</body>
+</html>

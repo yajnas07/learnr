@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Minerals and Energy Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0410;--card:#160a20;--card2:#1e0f2a;--border:#2e1a40;--text:#e8dcf4;--muted:#7a5a9a;--geo:#a855f7;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#c084fc;--teal:#34d399;--orange:#fb923c;--pink:#f472b6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--purple)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1.2rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.74rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--purple);color:var(--purple);background:rgba(168,85,247,.1)}
+
+.progress{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.progress .count{color:var(--purple);font-weight:700}
+.progress .known{color:var(--teal)}
+.prog-bar{width:140px;height:5px;background:var(--card);border-radius:9px;overflow:hidden}
+.prog-fill{height:100%;background:var(--purple);border-radius:9px;transition:width .3s}
+
+.deck{display:flex;justify-content:center;align-items:center;padding:1rem;min-height:380px;perspective:1200px}
+.flip-card{width:100%;max-width:520px;height:320px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-card .front,.flip-card .back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;border:1px solid var(--border)}
+.flip-card .front{background:var(--card)}
+.flip-card .back{background:var(--card2);transform:rotateY(180deg)}
+.flip-card .front h2{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;line-height:1.55;color:var(--text)}
+.flip-card .back p{font-size:.88rem;line-height:1.75;color:var(--text)}
+.flip-card .back p strong{color:var(--purple)}
+.flip-card .back p em{color:var(--teal);font-style:normal}
+.cat-badge{font-family:'DM Mono',monospace;font-size:.62rem;padding:.15rem .55rem;border-radius:99px;margin-bottom:.8rem}
+.hint{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:1rem}
+
+.controls{display:flex;justify-content:center;gap:.6rem;padding:.8rem 1rem;flex-wrap:wrap}
+.ctrl{font-family:'Lato',sans-serif;font-weight:700;font-size:.76rem;padding:.4rem 1.1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.ctrl:hover{color:var(--text);border-color:#4a2a60}
+.ctrl.know{border-color:var(--teal);color:var(--teal);background:rgba(52,211,153,.06)}
+
+.keys{text-align:center;padding:.5rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(10,4,16,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(46,26,64,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid rgba(46,26,64,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:var(--purple)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Flashcards</h1>
+  <p>Minerals and Energy Resources · Geography Ch.5 · 35 Cards</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress"><span class="count" id="pos">1 / 35</span><div class="prog-bar"><div class="prog-fill" id="prog"></div></div><span class="known" id="knownCount">0 known</span></div>
+<div class="deck" id="deck"></div>
+<div class="controls">
+  <button class="ctrl" onclick="prev()">← Prev</button>
+  <button class="ctrl" onclick="flipCard()">⟳ Flip</button>
+  <button class="ctrl know" onclick="markKnown()">✓ Know it</button>
+  <button class="ctrl" onclick="next()">Next →</button>
+  <button class="ctrl" onclick="shuffle()">⤮ Shuffle</button>
+  <button class="ctrl" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="keys">Keyboard: ← → (navigate) · Space (flip) · K (know it) · S (shuffle)</div>
+
+<script>
+const CARDS=[
+// basics (6)
+{cat:'basics',q:'What is a mineral?',a:'A mineral is a <strong>naturally occurring, homogenous substance</strong> with a definable internal structure. It may be made of a single element or a combination of elements. Over 2000 minerals have been identified.'},
+{cat:'basics',q:'What is the difference between a rock, a mineral and an ore?',a:'<strong>Minerals</strong> are the natural substances; <strong>rocks</strong> are combinations of minerals; an <strong>ore</strong> is a mineral mixed with other elements from which a metal can be profitably extracted.'},
+{cat:'basics',q:'How do minerals occur in veins and lodes?',a:'In <strong>cracks, joints, faults and cavities</strong> of igneous and metamorphic rocks. Molten/gaseous forms are forced into these spaces and solidify — e.g., tin, copper, zinc and lead.'},
+{cat:'basics',q:'How are minerals like coal and gypsum formed?',a:'They occur in <strong>beds and layers</strong> formed by deposition, accumulation and concentration in horizontal strata of <strong>sedimentary rocks</strong> — e.g., coal, gypsum, potash and sodium salts.'},
+{cat:'basics',q:'What are placer deposits?',a:'Minerals found in the <strong>sands of valley floors and base of hills (alluvial deposits)</strong>. They are usually not corroded by water — e.g., gold, silver, tin and platinum.'},
+{cat:'basics',q:'How are minerals extracted?',a:'By <strong>mining</strong> (surface/open-cast or underground/shaft), <strong>drilling</strong> (for petroleum & natural gas) and <strong>quarrying</strong>. Deep-bore mining is costly and dangerous.'},
+
+// ferrous (7)
+{cat:'ferrous',q:'What are ferrous minerals and how important are they?',a:'Ferrous minerals <strong>contain iron</strong>. They account for about <strong>three-fourths of the value</strong> of metallic mineral production and provide the base for metallurgical industries.'},
+{cat:'ferrous',q:'Compare magnetite and haematite iron ores.',a:'<strong>Magnetite</strong> is the finest iron ore with up to <strong>70% iron</strong> and excellent magnetic properties. <strong>Haematite</strong> is the most important industrial ore by quantity, with <strong>50–60% iron</strong>.'},
+{cat:'ferrous',q:'Name the four major iron ore belts of India.',a:'1) <strong>Odisha–Jharkhand</strong> belt, 2) <strong>Durg–Bastar–Chandrapur</strong> belt, 3) <strong>Ballari–Chitradurga–Tumakuru</strong> belt (Karnataka), 4) <strong>Maharashtra–Goa</strong> belt.'},
+{cat:'ferrous',q:'What is special about the Bailadila range?',a:'In the <strong>Durg–Bastar–Chandrapur</strong> belt (Chhattisgarh), the Bailadila range has very <strong>high-grade haematite</strong>. This ore is exported to Japan and South Korea via Vishakhapatnam port.'},
+{cat:'ferrous',q:'What is Kudremukh known for?',a:'<strong>Kudremukh</strong> in the Ballari–Chitradurga belt of Karnataka has one of the largest iron ore deposits in the world. It is a <strong>100% export unit</strong>.'},
+{cat:'ferrous',q:'What is manganese used for?',a:'Manganese is used mainly to <strong>manufacture steel and ferro-manganese alloy</strong> — nearly <strong>10 kg is needed to make one tonne of steel</strong>. It is also used in bleaching powder, insecticides and paints.'},
+{cat:'ferrous',q:'Which state is the largest producer of manganese?',a:'<strong>Odisha</strong> is the largest producer of manganese in India. Manganese deposits are also found in Karnataka, Madhya Pradesh, Maharashtra and Telangana.'},
+
+// other minerals (7)
+{cat:'other',q:'Why is copper important, and where is it mined?',a:'Copper is <strong>malleable, ductile and a good conductor</strong>, mainly used in electrical cables, electronics and alloys. Mined at <strong>Balaghat (MP), Khetri (Rajasthan) and Singhbhum (Jharkhand)</strong>.'},
+{cat:'other',q:'What is bauxite and how is it formed?',a:'<strong>Bauxite is the ore of aluminium</strong>, formed by the <strong>decomposition of rocks rich in aluminium silicates</strong>. Aluminium is light, strong and a good conductor. Odisha is the largest producer.'},
+{cat:'other',q:'What are the properties and uses of mica?',a:'Mica splits easily into <strong>thin transparent sheets</strong> and has <strong>excellent di-electric strength and insulation</strong>. It is indispensable in electrical and electronic industries. Found in Chota Nagpur plateau, Ajmer and Nellore.'},
+{cat:'other',q:'Why is limestone an important mineral?',a:'Limestone (calcium carbonate) is the <strong>basic raw material for the cement industry</strong> and is <strong>essential for smelting iron ore</strong> in blast furnaces. It is found in sedimentary rocks.'},
+{cat:'other',q:'What are the health hazards of mining?',a:'Miners face <strong>pulmonary diseases</strong> from dust and fumes, risk of <strong>mine collapse and flooding</strong>, and polluted water. Mining is often called a "killer industry".'},
+{cat:'other',q:'How does mining harm the environment?',a:'Mining causes <strong>land degradation, soil erosion, deforestation and pollution of rivers</strong> from waste and slurry. It disturbs ecological balance around mining areas.'},
+{cat:'other',q:'Where is most of India\'s bauxite found?',a:'Bauxite deposits are mainly in the <strong>Amarkantak plateau, Maikal hills and the plateau region of Bilaspur-Katni</strong>. <strong>Odisha</strong> is the largest bauxite-producing state (Panchpatmali deposits in Koraput).'},
+
+// fuels (8)
+{cat:'fuels',q:'Why is coal India\'s most important energy source?',a:'Coal is the <strong>most abundant fossil fuel</strong> in India, providing bulk of the energy for <strong>power generation, industry and domestic use</strong>. It is also used to make steel.'},
+{cat:'fuels',q:'List the grades of coal by carbon content.',a:'In increasing order of carbon and quality: <strong>Peat → Lignite → Bituminous → Anthracite</strong>. Anthracite is the highest quality hard coal; bituminous is the most widely used.'},
+{cat:'fuels',q:'Where are the Gondwana and Tertiary coalfields located?',a:'<strong>Gondwana coal</strong> (older, metallurgical) is found in the <strong>Damodar valley (Jharkhand-West Bengal)</strong>, Godavari, Mahanadi and Wardha valleys. <strong>Tertiary coal</strong> (younger) is found in the <strong>North-Eastern states</strong>.'},
+{cat:'fuels',q:'Why is petroleum called "black gold"?',a:'Petroleum is called <strong>"black gold"</strong> because of its dark colour and high value. It is a fuel and the <strong>raw material for many petrochemical industries</strong> (plastics, fertilisers, synthetic fibres).'},
+{cat:'fuels',q:'Where is petroleum found in India?',a:'In <strong>anticlines and fault traps</strong> of rock formations. Major fields: <strong>Mumbai High (offshore), Gujarat (Ankleshwar) and Assam (Digboi — the oldest oil field)</strong>.'},
+{cat:'fuels',q:'What is natural gas and where are its reserves?',a:'Natural gas is a <strong>clean fuel</strong> found with or without petroleum. India has large reserves in the <strong>Krishna-Godavari basin</strong>, Mumbai High and Gulf of Cambay. Used as CNG and for petrochemicals.'},
+{cat:'fuels',q:'Distinguish between hydro and thermal electricity.',a:'<strong>Hydro-electricity</strong> is generated from <strong>running water</strong> — renewable and clean. <strong>Thermal electricity</strong> is generated by <strong>burning coal, petroleum or gas</strong> — non-renewable and polluting.'},
+{cat:'fuels',q:'What is nuclear (atomic) energy based on?',a:'Nuclear energy is obtained by <strong>altering the structure of atoms (uranium and thorium)</strong>. <strong>Thorium</strong> is found in the monazite sands of Kerala. Plants include Kalpakkam and Tarapur.'},
+
+// non-conventional (7)
+{cat:'nonconv',q:'Why do we need non-conventional energy sources?',a:'Because <strong>fossil fuels are limited, exhausting fast, and cause pollution</strong>. Renewable sources like solar and wind are <strong>clean, sustainable and reduce global warming</strong> while meeting rising energy demand.'},
+{cat:'nonconv',q:'Why does India have great solar energy potential?',a:'India is a <strong>tropical country</strong> receiving abundant sunlight. <strong>Photovoltaic technology</strong> converts sunlight directly into electricity, helping rural areas reduce dependence on firewood and dung cakes.'},
+{cat:'nonconv',q:'Where is India\'s largest wind farm cluster?',a:'The largest wind farm cluster stretches from <strong>Nagarcoil to Madurai in Tamil Nadu</strong>. Other important wind-energy states are Rajasthan, Gujarat, Maharashtra and Karnataka.'},
+{cat:'nonconv',q:'What is biogas and why is it useful?',a:'Biogas is produced by the <strong>decomposition of shrubs, farm and animal waste</strong>. It has a higher thermal efficiency than kerosene, dung cake and charcoal. "Gobar gas" plants also provide good manure.'},
+{cat:'nonconv',q:'What is tidal energy and where can it be produced in India?',a:'Ocean <strong>tides trapped in gulfs</strong> turn turbines to generate electricity. India has potential in the <strong>Gulf of Khambhat, Gulf of Kutch (Gujarat) and the Sundarbans (West Bengal)</strong>.'},
+{cat:'nonconv',q:'What is geothermal energy?',a:'Electricity generated using <strong>heat from the Earth\'s interior</strong>. Experimental projects exist at the <strong>Parvati valley (Himachal Pradesh) and Puga valley (Ladakh)</strong>.'},
+{cat:'nonconv',q:'How can minerals and energy be conserved?',a:'Use resources in a <strong>planned, sustainable way</strong>; <strong>recycle metals</strong> (scrap); use <strong>substitutes and improved technology</strong> for low-grade ores; and shift to renewable energy sources.'},
+];
+
+const CATS={basics:{label:'Mineral Basics',color:'var(--blue)',bg:'rgba(96,165,250,.12)'},ferrous:{label:'Ferrous Minerals',color:'var(--red)',bg:'rgba(248,113,113,.12)'},other:{label:'Other Minerals',color:'var(--orange)',bg:'rgba(251,146,60,.12)'},fuels:{label:'Power & Fuels',color:'var(--pink)',bg:'rgba(244,114,182,.12)'},nonconv:{label:'Non-Conventional',color:'var(--teal)',bg:'rgba(52,211,153,.12)'}};
+
+let filtered=[...CARDS],idx=0,known=new Set(),currentCat='all';
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="setFilter('all',this)">All (${CARDS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=CARDS.filter(c=>c.cat===k).length;h+=`<button onclick="setFilter('${k}',this)">${v.label} (${n})</button>`;}f.innerHTML=h;}
+function setFilter(cat,btn){currentCat=cat;document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===cat);idx=0;render();}
+function render(){if(!filtered.length)return;if(idx>=filtered.length)idx=0;if(idx<0)idx=filtered.length-1;const c=filtered[idx],cat=CATS[c.cat];document.getElementById('deck').innerHTML=`<div class="flip-card" id="fc" onclick="flipCard()"><div class="front"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><h2>${c.q}</h2><span class="hint">tap to flip</span></div><div class="back"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><p>${c.a.replace(/\n/g,'<br>')}</p></div></div>`;document.getElementById('pos').textContent=`${idx+1} / ${filtered.length}`;document.getElementById('prog').style.width=((idx+1)/filtered.length*100)+'%';document.getElementById('knownCount').textContent=known.size+' known';}
+function flipCard(){document.getElementById('fc')?.classList.toggle('flipped')}
+function next(){idx++;render()} function prev(){idx--;render()}
+function markKnown(){known.add(filtered[idx].q);next();}
+function shuffle(){filtered.sort(()=>Math.random()-.5);idx=0;render();}
+function resetAll(){known.clear();filtered=currentCat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===currentCat);idx=0;render();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();else if(e.key===' '){e.preventDefault();flipCard();}else if(e.key==='k'||e.key==='K')markKnown();else if(e.key==='s'||e.key==='S')shuffle();});
+buildFilters();render();
+</script>
+</body>
+</html>

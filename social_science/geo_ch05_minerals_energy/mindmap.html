@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Minerals and Energy Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#0a0410; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:42px; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(10,4,16,.9) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#c084fc; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#6a4a8a; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #2a1a3a; background:rgba(10,4,16,.85);
+  color:#8a5aaa; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#c084fc; color:#c084fc; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#140720; border:1px solid #2a1a3a;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:290px; font-size:.8rem; color:#d4c4e8;
+  line-height:1.6; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.7);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#c084fc; font-size:.9rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%;
+  background:rgba(10,4,16,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(42,26,58,.75);
+  position:absolute; top:0; left:0; right:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#8a5aaa; text-decoration:none;
+  border:1px solid rgba(42,26,58,.9); border-radius:99px;
+  padding:.2rem .65rem;
+}
+.site-nav-back:hover { color:#c084fc; border-color:#503070; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<div id="ui">
+  <div>
+    <h1>Minerals and Energy Resources</h1>
+    <p>Class X · Geography Ch.5 — drag to pan · scroll to zoom · hover nodes</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2+20; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Minerals &\nEnergy',
+  x:0, y:0, r:70, color:'#1a0e26', stroke:'#c084fc', textColor:'#c084fc', fontSize:14
+};
+
+const BRANCHES = [
+  // What is a Mineral
+  {
+    id:'basics', label:'Mineral\nBasics', x:-320, y:-200, r:48,
+    color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+    info:'A mineral is a homogenous, naturally occurring substance with a definable internal structure.\n• Found in rocks (ores), varying in composition & hardness.\n• Geologists define by physical & chemical properties.\n• Formed in different ways.',
+    children:[
+      { id:'b1', label:'What is a\nMineral', x:-510, y:-310, r:36, color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'A mineral is:\n• A naturally occurring, homogenous substance.\n• Has a definable internal structure.\n• Made of one element or combination.\n• Over 2000 minerals identified, but a few dozen are common in rocks.' },
+      { id:'b2', label:'Mode of\nOccurrence', x:-505, y:-160, r:36, color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Minerals occur in:\n• Veins & lodes — cracks/joints of igneous & metamorphic rocks.\n• Beds & layers — sedimentary rocks (coal, gypsum, salt).\n• Weathering residue — bauxite.\n• Alluvial deposits (placer) — gold, tin (not corroded by water).\n• Ocean waters — common salt, magnesium.' },
+      { id:'b3', label:'Rocks &\nOres', x:-460, y:-50, r:36, color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'• Rocks are combinations of minerals.\n• Some minerals abundant, some rare.\n• An ore is a mineral mixed with other elements from which metal can be profitably extracted.\n• Mineral content in ore must be enough to be worth mining.' },
+    ]
+  },
+
+  // Ferrous Minerals
+  {
+    id:'ferrous', label:'Ferrous\nMinerals', x:320, y:-200, r:48,
+    color:'#180a0a', stroke:'#f87171', textColor:'#fecaca',
+    info:'Metallic minerals containing iron. Account for about 3/4 of the value of metallic mineral production.',
+    children:[
+      { id:'fe1', label:'Iron Ore', x:520, y:-320, r:36, color:'#180a0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Iron ore — basic raw material for industry:\n• Magnetite — finest ore, ~70% iron, magnetic.\n• Haematite — most important industrial ore, ~50-60% iron.\n• Belts: Odisha-Jharkhand, Durg-Bastar-Chandrapur, Ballari-Chitradurga, Maharashtra-Goa.' },
+      { id:'fe2', label:'Manganese', x:540, y:-180, r:36, color:'#180a0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Manganese:\n• Used to make steel & ferro-manganese alloy.\n• ~10 kg needed to make 1 tonne of steel.\n• Also used in bleaching powder, insecticides, paints.\n• Odisha is the largest producer.' },
+      { id:'fe3', label:'Iron Ore\nBelts', x:510, y:-60, r:36, color:'#180a0a', stroke:'#f87171', textColor:'#fecaca',
+        info:'Major iron ore belts:\n• Odisha-Jharkhand belt — Badampahar mines.\n• Durg-Bastar-Chandrapur (Chhattisgarh-Maharashtra) — Bailadila range.\n• Ballari-Chitradurga-Tumakuru (Karnataka) — Kudremukh (100% export).\n• Maharashtra-Goa belt.' },
+    ]
+  },
+
+  // Conservation
+  {
+    id:'conserv', label:'Conservation\nof Minerals', x:-310, y:220, r:48,
+    color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+    info:'Minerals take millions of years to form and are finite & non-renewable. Rich deposits are exhausting fast.',
+    children:[
+      { id:'cv1', label:'Why\nConserve', x:-500, y:140, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'• Minerals form very slowly (geological time) — non-renewable.\n• Continued extraction increases cost as depth increases.\n• Rich deposits limited & fast depleting.\n• Must use minerals in a planned & sustainable manner.' },
+      { id:'cv2', label:'How to\nConserve', x:-495, y:285, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'Ways to conserve:\n• Use minerals in a planned way.\n• Recycle metals (scrap).\n• Use substitutes/alternatives.\n• Improved technologies to use low-grade ore at low cost.' },
+      { id:'cv3', label:'Sustainable\nUse', x:-440, y:400, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'• A concerted effort needed for sustainable use.\n• Recycling of metals reduces demand for new extraction.\n• Reduce wastage in mining & processing.\n• Balance development needs with resource conservation.' },
+    ]
+  },
+
+  // Energy Resources
+  {
+    id:'energy', label:'Energy\nResources', x:310, y:220, r:48,
+    color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+    info:'Energy is needed for cooking, light, industry, transport & agriculture. Sources are conventional & non-conventional.',
+    children:[
+      { id:'en1', label:'Conventional\nSources', x:510, y:140, r:36, color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Conventional energy sources:\n• Firewood & cattle dung cake (rural).\n• Fossil fuels — coal, petroleum, natural gas.\n• Electricity (thermal & hydro).\n• Most are exhaustible & polluting.' },
+      { id:'en2', label:'Non-Conventional\nSources', x:530, y:270, r:36, color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Non-conventional (renewable) energy:\n• Solar, wind, tidal, geothermal.\n• Biogas, nuclear.\n• Clean, renewable, eco-friendly.\n• India promotes these to reduce fossil-fuel dependence.' },
+      { id:'en3', label:'Why New\nSources', x:470, y:390, r:36, color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Need for non-conventional energy:\n• Rising demand for energy.\n• Fossil fuels are limited & cause pollution.\n• Their prices are rising.\n• Renewables are sustainable & reduce global warming.' },
+    ]
+  },
+
+  // Non-Ferrous & Non-Metallic
+  {
+    id:'other', label:'Other\nMinerals', x:0, y:-310, r:48,
+    color:'#0a1414', stroke:'#22d3ee', textColor:'#cffafe',
+    info:'Includes non-ferrous minerals (copper, bauxite) and non-metallic minerals (mica, limestone).',
+    children:[
+      { id:'ot1', label:'Copper &\nBauxite', x:-170, y:-430, r:36, color:'#0a1414', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Non-ferrous metallic minerals:\n• Copper — malleable, ductile, good conductor; used in electricals. Balaghat (MP), Khetri (Rajasthan).\n• Bauxite — ore of aluminium; formed from decomposition of rocks. Amarkantak, Maikal hills. Odisha is largest producer.' },
+      { id:'ot2', label:'Mica', x:0, y:-450, r:36, color:'#0a1414', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Mica (non-metallic):\n• Made of thin sheets/leaves; can be split easily.\n• Excellent di-electric strength & insulation.\n• Used in electrical & electronic industries.\n• Found in Chota Nagpur plateau, Ajmer, Nellore.' },
+      { id:'ot3', label:'Limestone', x:170, y:-430, r:36, color:'#0a1414', stroke:'#22d3ee', textColor:'#cffafe',
+        info:'Limestone (non-metallic):\n• Found in sedimentary rocks (calcium carbonate).\n• Basic raw material for cement industry.\n• Essential for smelting iron ore in blast furnace.\n• Also used in chemical industries.' },
+    ]
+  },
+
+  // Hazards & Fuels
+  {
+    id:'fuels', label:'Power &\nFuels', x:0, y:310, r:48,
+    color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+    info:'Fossil fuels and power sources that run India\'s economy.',
+    children:[
+      { id:'fu1', label:'Coal', x:-180, y:430, r:36, color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Coal — most abundant fossil fuel in India:\n• Used for power generation, industry & domestic needs.\n• Types by carbon content: Peat < Lignite < Bituminous < Anthracite.\n• Gondwana coal (older) in Damodar valley; Tertiary coal in NE.\n• Provides bulk of India\'s energy.' },
+      { id:'fu2', label:'Petroleum &\nNatural Gas', x:0, y:460, r:36, color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'• Petroleum — "black gold"; fuel & raw material for petrochemicals.\n• Found in anticlines & fault traps of rock formations.\n• Fields: Mumbai High, Gujarat, Assam (Digboi).\n• Natural gas — clean fuel; found with/without petroleum. Krishna-Godavari basin.' },
+      { id:'fu3', label:'Electricity', x:180, y:430, r:36, color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Electricity generation:\n• Hydro-electricity — from running water (renewable). Bhakra Nangal, etc.\n• Thermal — burning coal, petroleum, gas (non-renewable).\n• Nuclear/Atomic — from uranium/thorium (Rajasthan, Jharkhand monazite sands).\n• Over 310 thermal plants in India.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){return allNodes.find(n=>n.id===id);}
+
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found&&found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10,window.innerHeight-240)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {tip.style.display='none';canvas.style.cursor='grab';}
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx,cy);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.22,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2+20;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(192,132,252,.025)'; ctx.lineWidth=1;
+  for(let x=-1400;x<1400;x+=70){ctx.beginPath();ctx.moveTo(x,-1400);ctx.lineTo(x,1400);ctx.stroke();}
+  for(let y=-1400;y<1400;y+=70){ctx.beginPath();ctx.moveTo(-1400,y);ctx.lineTo(1400,y);ctx.stroke();}
+
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    const cpx=(a.x+b.x)/2+(b.y-a.y)*.15, cpy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cpx,cpy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?38:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-9,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

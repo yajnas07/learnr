@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Minerals and Energy Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0410;--card:#160a20;--card2:#1e0f2a;--border:#2e1a40;--text:#e8dcf4;--muted:#7a5a9a;--geo:#a855f7;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#c084fc;--teal:#34d399;--orange:#fb923c;--pink:#f472b6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--purple)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.72rem;padding:.32rem .85rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--purple);color:var(--purple);background:rgba(168,85,247,.08)}
+
+.score-bar{display:flex;justify-content:center;gap:1.5rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.score-bar span.right{color:var(--green)} .score-bar span.wrong{color:var(--red)}
+
+.questions{max-width:820px;margin:auto;padding:0 1rem 3rem;display:flex;flex-direction:column;gap:1rem}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.4rem;transition:border-color .2s}
+.q-card:hover{border-color:#4a2a60}
+.q-num{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--purple);margin-bottom:.4rem}
+.q-text{font-size:.88rem;font-weight:600;line-height:1.7;margin-bottom:.9rem}
+.opts{display:grid;gap:.4rem}
+.opt{display:flex;align-items:flex-start;gap:.5rem;padding:.5rem .8rem;border-radius:9px;border:1px solid var(--border);cursor:pointer;font-size:.82rem;line-height:1.5;transition:all .15s;background:transparent}
+.opt:hover{border-color:#4a2a60;background:var(--card2)}
+.opt.correct{border-color:var(--green);background:rgba(74,222,128,.1);color:var(--green)}
+.opt.wrong{border-color:var(--red);background:rgba(248,113,113,.08);color:var(--red)}
+.opt .circle{min-width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;margin-top:1px}
+.opt.correct .circle{border-color:var(--green);background:var(--green);color:#000}
+.opt.wrong .circle{border-color:var(--red);background:var(--red);color:#fff}
+.explain{display:none;margin-top:.7rem;font-size:.78rem;line-height:1.7;color:var(--muted);background:var(--card2);border-radius:8px;padding:.7rem 1rem;border-left:3px solid var(--purple)}
+.explain.show{display:block}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(10,4,16,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(46,26,64,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid rgba(46,26,64,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:var(--purple)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Minerals and Energy Resources · Geography Ch.5 · 30 MCQs</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="score-bar"><span>Score: <span class="right" id="sc-r">0</span> ✓ / <span class="wrong" id="sc-w">0</span> ✗</span><span id="sc-tot">0 / 30 attempted</span></div>
+<div class="questions" id="qlist"></div>
+
+<script>
+const QS=[
+// Basics
+{cat:'basics',q:'A mineral is best defined as a:',ops:['Man-made chemical compound','Naturally occurring homogenous substance with a definable internal structure','Type of rock only','Living organism'],ans:1,exp:'A mineral is a homogenous, naturally occurring substance with a definable internal structure. Rocks are combinations of minerals.'},
+{cat:'basics',q:'A mineral from which a metal can be profitably extracted is called a/an:',ops:['Rock','Ore','Fossil','Alloy'],ans:1,exp:'An ore is a mineral mixed with other elements from which a metal can be profitably extracted. The metal content must be high enough to be worth mining.'},
+{cat:'basics',q:'Minerals like coal, gypsum and potash occur in:',ops:['Veins and lodes','Beds and layers of sedimentary rocks','Ocean waters only','Placer deposits'],ans:1,exp:'Coal, gypsum, potash and sodium salts occur in beds and layers formed by deposition and concentration in horizontal strata of sedimentary rocks.'},
+{cat:'basics',q:'Which minerals are typically found in placer (alluvial) deposits?',ops:['Coal and gypsum','Gold, silver, tin and platinum','Iron and manganese','Mica and limestone'],ans:1,exp:'Placer deposits occur in the sands of valley floors and base of hills. They contain minerals not corroded by water — gold, silver, tin and platinum.'},
+{cat:'basics',q:'Bauxite is an example of a mineral formed by:',ops:['Volcanic eruption','Decomposition/weathering of rocks','Ocean evaporation','Placer deposition'],ans:1,exp:'Bauxite is formed by the decomposition (weathering) of rocks rich in aluminium silicates, leaving a residual mineral deposit.'},
+
+// Ferrous
+{cat:'ferrous',q:'Which is the finest quality iron ore with about 70% iron?',ops:['Haematite','Magnetite','Limonite','Siderite'],ans:1,exp:'Magnetite is the finest iron ore with up to 70% iron content and excellent magnetic properties, valuable for the electrical industry.'},
+{cat:'ferrous',q:'Ferrous minerals account for about what share of the value of metallic mineral production?',ops:['One-fourth','Half','Three-fourths','One-tenth'],ans:2,exp:'Ferrous minerals (containing iron) account for about three-fourths of the value of the production of metallic minerals and provide a base for metallurgical industries.'},
+{cat:'ferrous',q:'The high-grade iron ore of the Bailadila range is found in which belt?',ops:['Odisha-Jharkhand','Durg-Bastar-Chandrapur','Maharashtra-Goa','Ballari-Chitradurga'],ans:1,exp:'The Bailadila range in the Durg-Bastar-Chandrapur belt (Chhattisgarh) has very high-grade haematite, exported to Japan and South Korea via Vishakhapatnam.'},
+{cat:'ferrous',q:'Kudremukh mines in Karnataka are famous as a:',ops:['Coal mine','100% export unit of iron ore','Copper mine','Bauxite mine'],ans:1,exp:'Kudremukh in the Ballari-Chitradurga belt has one of the largest iron ore deposits in the world and is a 100% export unit.'},
+{cat:'ferrous',q:'Approximately how much manganese is needed to make one tonne of steel?',ops:['1 kg','10 kg','100 kg','500 kg'],ans:1,exp:'About 10 kg of manganese is required to manufacture one tonne of steel. Manganese is also used in bleaching powder, insecticides and paints.'},
+
+// Other Minerals
+{cat:'other',q:'Bauxite is the ore of which metal?',ops:['Copper','Aluminium','Iron','Zinc'],ans:1,exp:'Bauxite is the ore of aluminium. Aluminium is light, strong and a good conductor. Odisha is the largest bauxite-producing state.'},
+{cat:'other',q:'Khetri in Rajasthan is famous for which mineral?',ops:['Mica','Copper','Limestone','Manganese'],ans:1,exp:'Khetri in Rajasthan is famous for its copper mines. Copper is malleable, ductile and a good conductor, mainly used in electricals and electronics.'},
+{cat:'other',q:'Which mineral has excellent di-electric strength and is used in electronics?',ops:['Limestone','Mica','Bauxite','Manganese'],ans:1,exp:'Mica has excellent di-electric strength and insulating properties, making it indispensable in electrical and electronic industries. It splits into thin sheets.'},
+{cat:'other',q:'Limestone is the basic raw material for which industry?',ops:['Textile','Cement','Paper','Sugar'],ans:1,exp:'Limestone (calcium carbonate) is the basic raw material for the cement industry and is essential for smelting iron ore in blast furnaces.'},
+{cat:'other',q:'Mining is sometimes called a "killer industry" because:',ops:['It kills animals','Miners face health hazards, collapse and pollution','It is very profitable','It uses machines'],ans:1,exp:'Mining is called a killer industry because miners face pulmonary diseases from dust, risk of mine collapse and flooding, and water pollution.'},
+
+// Fuels
+{cat:'fuels',q:'Which of these is the highest grade of coal?',ops:['Peat','Lignite','Bituminous','Anthracite'],ans:3,exp:'Anthracite is the highest quality hard coal with the greatest carbon content. The order is Peat < Lignite < Bituminous < Anthracite.'},
+{cat:'fuels',q:'Petroleum is popularly known as:',ops:['White gold','Black gold','Golden fibre','Blue fuel'],ans:1,exp:'Petroleum is called "black gold" due to its dark colour and high value. It is a fuel and a raw material for petrochemical industries.'},
+{cat:'fuels',q:'Digboi, the oldest oil field in India, is located in:',ops:['Gujarat','Assam','Maharashtra','Rajasthan'],ans:1,exp:'Digboi in Assam is the oldest oil field in India. Other major fields are Mumbai High (offshore) and Ankleshwar in Gujarat.'},
+{cat:'fuels',q:'Gondwana coal deposits are mainly found in the:',ops:['North-Eastern states','Damodar valley','Thar desert','Coastal Kerala'],ans:1,exp:'Gondwana coal (older, metallurgical coal) is found in the Damodar valley (Jharkhand-West Bengal), and Godavari, Mahanadi and Wardha valleys.'},
+{cat:'fuels',q:'India has large reserves of natural gas in the:',ops:['Krishna-Godavari basin','Sundarbans','Nilgiri hills','Thar desert'],ans:0,exp:'India has large natural gas reserves in the Krishna-Godavari basin, along with Mumbai High and the Gulf of Cambay. Natural gas is a clean fuel.'},
+{cat:'fuels',q:'Thermal electricity is generated by:',ops:['Running water','Burning coal, petroleum or gas','Splitting atoms','Sunlight'],ans:1,exp:'Thermal electricity is generated by burning fossil fuels (coal, petroleum, natural gas). It is non-renewable and polluting, unlike hydro-electricity from running water.'},
+
+// Non-Conventional
+{cat:'nonconv',q:'The largest wind farm cluster in India is located between:',ops:['Nagarcoil and Madurai','Mumbai and Pune','Delhi and Agra','Kolkata and Patna'],ans:0,exp:'India\'s largest wind farm cluster stretches from Nagarcoil to Madurai in Tamil Nadu. Rajasthan, Gujarat and Maharashtra are also important wind states.'},
+{cat:'nonconv',q:'Photovoltaic technology is used to harness which energy?',ops:['Wind energy','Solar energy','Tidal energy','Geothermal energy'],ans:1,exp:'Photovoltaic technology converts sunlight directly into electricity — solar energy. India, being a tropical country, has huge solar potential.'},
+{cat:'nonconv',q:'Biogas ("gobar gas") is produced by decomposing:',ops:['Coal','Farm and animal waste','Rocks','Petroleum'],ans:1,exp:'Biogas is produced by the decomposition of shrubs, farm and animal waste. It has higher thermal efficiency than kerosene, dung cake and charcoal.'},
+{cat:'nonconv',q:'Tidal energy in India has potential in the:',ops:['Gulf of Khambhat and Kutch','Thar desert','Chota Nagpur plateau','Nilgiri hills'],ans:0,exp:'Tidal energy can be harnessed in the Gulf of Khambhat, Gulf of Kutch (Gujarat) and the Sundarbans (West Bengal), where tides are strong.'},
+{cat:'nonconv',q:'Thorium, used in nuclear energy, is obtained from the monazite sands of:',ops:['Rajasthan','Kerala','Assam','Punjab'],ans:1,exp:'Thorium is found in the monazite sands of Kerala. Nuclear energy is obtained by altering the atomic structure of uranium and thorium.'},
+
+// Mixed / Conservation
+{cat:'nonconv',q:'Geothermal energy projects in India exist at:',ops:['Parvati and Puga valleys','Damodar valley','Mumbai High','Bailadila range'],ans:0,exp:'Experimental geothermal projects exist at the Parvati valley (Himachal Pradesh) and Puga valley (Ladakh), using heat from the Earth\'s interior.'},
+{cat:'basics',q:'Which of the following is a way to conserve minerals?',ops:['Mine faster','Recycle metals and use substitutes','Waste low-grade ore','Stop all research'],ans:1,exp:'Minerals can be conserved by using them in a planned way, recycling metals, using substitutes, and improving technology to use low-grade ores at low cost.'},
+{cat:'other',q:'Odisha is the largest producer of which two minerals mentioned in the chapter?',ops:['Copper and mica','Manganese and bauxite','Gold and silver','Coal and petroleum'],ans:1,exp:'Odisha is the largest producer of both manganese and bauxite in India, along with significant iron ore reserves.'},
+{cat:'fuels',q:'Petroleum and natural gas are usually found trapped in:',ops:['Placer deposits','Anticlines and fault traps','Ocean waters','Veins and lodes'],ans:1,exp:'Petroleum and natural gas occur in anticlines and fault traps of rock formations, where porous rocks are covered by non-porous rocks that prevent the oil from rising or spreading.'},
+];
+
+const CATS={basics:{l:'Mineral Basics',c:'var(--blue)'},ferrous:{l:'Ferrous Minerals',c:'var(--red)'},other:{l:'Other Minerals',c:'var(--orange)'},fuels:{l:'Power & Fuels',c:'var(--pink)'},nonconv:{l:'Non-Conventional',c:'var(--teal)'}};
+
+let filtered=[...QS],scoreR=0,scoreW=0,attempted=0,answered=new Set();
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="filter('all',this)">All (${QS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=QS.filter(q=>q.cat===k).length;h+=`<button onclick="filter('${k}',this)">${v.l} (${n})</button>`;}f.innerHTML=h;}
+function filter(cat,btn){document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...QS]:QS.filter(q=>q.cat===cat);render();}
+function render(){const c=document.getElementById('qlist');c.innerHTML=filtered.map((q,i)=>{const gi=QS.indexOf(q);const letters='ABCD';return`<div class="q-card" id="q${gi}"><div class="q-num">Q${gi+1} · ${CATS[q.cat].l}</div><div class="q-text">${q.q}</div><div class="opts">${q.ops.map((o,j)=>`<div class="opt" data-qi="${gi}" data-oi="${j}" onclick="answer(${gi},${j},this)"><span class="circle">${letters[j]}</span><span>${o}</span></div>`).join('')}</div><div class="explain" id="exp${gi}">${q.exp}</div></div>`;}).join('');}
+function answer(qi,oi,el){if(answered.has(qi))return;answered.add(qi);attempted++;const q=QS[qi];const opts=document.querySelectorAll(`[data-qi="${qi}"]`);opts.forEach(o=>{const idx=+o.dataset.oi;if(idx===q.ans)o.classList.add('correct');else if(idx===oi)o.classList.add('wrong');});if(oi===q.ans)scoreR++;else scoreW++;document.getElementById('sc-r').textContent=scoreR;document.getElementById('sc-w').textContent=scoreW;document.getElementById('sc-tot').textContent=`${attempted} / ${QS.length} attempted`;document.getElementById(`exp${qi}`).classList.add('show');}
+buildFilters();render();
+</script>
+</body>
+</html>
