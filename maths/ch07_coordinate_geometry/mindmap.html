@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Coordinate Geometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #040810; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#38bdf8,#22c55e,#f59e0b);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 260px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%; align-self:stretch; flex-shrink:0;
+  background:rgba(4,8,16,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(26,45,69,.75);
+  position:sticky; top:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; width:auto; display:block; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#7a9ab8; text-decoration:none; transition:all .2s;
+  border:1px solid rgba(26,45,69,.9); border-radius:99px;
+  padding:.2rem .65rem; white-space:nowrap;
+}
+.site-nav-back:hover { color:#dde6f5; border-color:#2a4060; background:rgba(255,255,255,.04); }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+<div id="ui">
+  <div>
+    <h1>Coordinate Geometry</h1>
+    <p>Class X · CBSE · Mind Map — hover nodes to explore</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+
+let W, H, scale = 1, ox = 0, oy = 0;
+let dragging = false, dragStart = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ox = W/2; oy = H/2 + 20;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Coordinate\nGeometry', x:0, y:0, r:60,
+  color:'#001525', stroke:'#38bdf8', textColor:'#7dd3fc', fontSize:14
+};
+
+const BRANCHES = [
+  {
+    id:'basics', label:'Coordinate\nBasics', x:0, y:-290, r:44,
+    color:'#001525', stroke:'#38bdf8', textColor:'#7dd3fc',
+    info:'The Cartesian plane is formed by two perpendicular number lines: the x-axis (horizontal) and y-axis (vertical), meeting at the origin O(0,0).\nEvery point is written as an ordered pair (x, y).',
+    children:[
+      { id:'ba1', label:'Ordered Pair\n(x, y)', x:-180, y:-410, r:34, color:'#001525', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'A point is written as (x, y):\n• x = abscissa (horizontal distance from y-axis)\n• y = ordinate (vertical distance from x-axis)\nOrder matters: (2,3) ≠ (3,2).' },
+      { id:'ba2', label:'Four\nQuadrants', x:0, y:-440, r:34, color:'#001525', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'The axes divide the plane into 4 quadrants:\n• I: (+,+)\n• II: (−,+)\n• III: (−,−)\n• IV: (+,−)\nSigns of x and y decide the quadrant.' },
+      { id:'ba3', label:'Points on\nAxes', x:180, y:-410, r:34, color:'#001525', stroke:'#7dd3fc', textColor:'#bae6fd',
+        info:'On the x-axis: y = 0 → (x, 0).\nOn the y-axis: x = 0 → (0, y).\nOrigin O = (0, 0).\nDistance of (x,y) from x-axis = |y|, from y-axis = |x|.' },
+    ]
+  },
+  {
+    id:'dist', label:'Distance\nFormula', x:-300, y:-185, r:44,
+    color:'#001a08', stroke:'#22c55e', textColor:'#86efac',
+    info:'The distance between two points P(x₁,y₁) and Q(x₂,y₂):\nPQ = √[(x₂−x₁)² + (y₂−y₁)²]\nDerived from the Pythagoras Theorem.',
+    children:[
+      { id:'d1', label:'√[(x₂−x₁)²\n+(y₂−y₁)²]', x:-510, y:-300, r:36, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'Distance between P(x₁,y₁) and Q(x₂,y₂):\nPQ = √[(x₂−x₁)² + (y₂−y₁)²]\nBased on the right triangle formed by horizontal and vertical differences.' },
+      { id:'d2', label:'Distance\nfrom Origin', x:-540, y:-170, r:34, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'Distance of P(x, y) from origin O(0,0):\nOP = √(x² + y²)\nA special case with x₁=y₁=0.' },
+      { id:'d3', label:'Prove\nGeometry', x:-510, y:-55, r:34, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'Use distances to prove figures:\n• All sides equal → equilateral/rhombus\n• Two sides equal → isosceles\n• Diagonals equal → rectangle/square\nCompare side and diagonal lengths.' },
+      { id:'d4', label:'From\nPythagoras', x:-330, y:-360, r:34, color:'#001a08', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'Drop a right triangle: horizontal leg = |x₂−x₁|, vertical leg = |y₂−y₁|.\nHypotenuse = distance.\nApplying c²=a²+b² gives the distance formula.' },
+    ]
+  },
+  {
+    id:'sec', label:'Section\nFormula', x:-300, y:185, r:44,
+    color:'#1a1200', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'The point P dividing the join of A(x₁,y₁) and B(x₂,y₂) internally in ratio m:n:\nP = ( (mx₂+nx₁)/(m+n) , (my₂+ny₁)/(m+n) )',
+    children:[
+      { id:'s1', label:'Internal\nDivision m:n', x:-510, y:80, r:36, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'P divides AB internally in ratio m:n:\nP = ( (mx₂+nx₁)/(m+n), (my₂+ny₁)/(m+n) )\nRemember: the ratio "m" multiplies the FARTHER point B.' },
+      { id:'s2', label:'Ratio via\nx or y', x:-540, y:210, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'To find the ratio in which a point divides a segment:\nUse the section formula on the x-coordinate (or y).\nSolve m:n = (x−x₁):(x₂−x) — the "k" method.' },
+      { id:'s3', label:'Points of\nTrisection', x:-500, y:340, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Trisection points divide AB into 3 equal parts.\nFirst point divides in 1:2, second in 2:1.\nApply the section formula with these ratios.' },
+      { id:'s4', label:'On the\nAxes', x:-310, y:390, r:34, color:'#1a1200', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'To find where a line cuts an axis:\n• x-axis → set y = 0, find the ratio\n• y-axis → set x = 0\nUse the section formula to solve for the ratio.' },
+    ]
+  },
+  {
+    id:'mid', label:'Midpoint\nFormula', x:300, y:-185, r:44,
+    color:'#0a0020', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'The midpoint of A(x₁,y₁) and B(x₂,y₂):\nM = ( (x₁+x₂)/2 , (y₁+y₂)/2 )\nA special case of the section formula with ratio 1:1.',
+    children:[
+      { id:'m1', label:'((x₁+x₂)/2,\n(y₁+y₂)/2)', x:510, y:-300, r:36, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Midpoint = average of the coordinates:\nM = ( (x₁+x₂)/2, (y₁+y₂)/2 )\nEquidistant from both endpoints.' },
+      { id:'m2', label:'Ratio 1:1', x:540, y:-170, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'Midpoint is the section formula with m:n = 1:1.\nSubstituting m=n gives the average of coordinates.' },
+      { id:'m3', label:'Diagonals\nBisect', x:510, y:-55, r:34, color:'#0a0020', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'In a parallelogram, diagonals bisect each other.\nSo their midpoints coincide.\nEquate midpoints of the two diagonals to find a missing vertex.' },
+    ]
+  },
+  {
+    id:'area', label:'Area of\nTriangle', x:300, y:185, r:44,
+    color:'#12041c', stroke:'#d946ef', textColor:'#f0abfc',
+    info:'Area of a triangle with vertices (x₁,y₁), (x₂,y₂), (x₃,y₃):\nArea = ½ |x₁(y₂−y₃) + x₂(y₃−y₁) + x₃(y₁−y₂)|',
+    children:[
+      { id:'a1', label:'½|x₁(y₂−y₃)\n+...|', x:510, y:80, r:36, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'Area = ½ |x₁(y₂−y₃) + x₂(y₃−y₁) + x₃(y₁−y₂)|\nAlways take the absolute value → area is non-negative.' },
+      { id:'a2', label:'Collinearity\nArea=0', x:540, y:220, r:34, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'Three points are collinear (on one line) if the area of the triangle they form is 0.\nSet the area expression = 0 to test or find unknowns.' },
+      { id:'a3', label:'Quadrilateral\nArea', x:500, y:360, r:34, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'Split a quadrilateral into two triangles using a diagonal.\nAdd the two triangle areas to get the total area.' },
+      { id:'a4', label:'Absolute\nValue', x:310, y:390, r:34, color:'#12041c', stroke:'#e879f9', textColor:'#f5d0fe',
+        info:'The modulus | | ensures a positive area regardless of the order of vertices.\nWithout it you may get a negative number.' },
+    ]
+  },
+  {
+    id:'app', label:'Applications', x:0, y:290, r:44,
+    color:'#1a0010', stroke:'#f43f5e', textColor:'#fda4af',
+    info:'Coordinate geometry proves properties of figures, locates points, and solves real-world positioning problems.',
+    children:[
+      { id:'ap1', label:'Type of\nQuadrilateral', x:-170, y:420, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'Compute all four sides and both diagonals.\n• All sides equal, diagonals equal → square\n• All sides equal, diagonals unequal → rhombus\n• Opposite sides equal → parallelogram.' },
+      { id:'ap2', label:'Centroid of\nTriangle', x:0, y:460, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'Centroid G divides each median 2:1.\nG = ( (x₁+x₂+x₃)/3, (y₁+y₂+y₃)/3 )\nThe average of the three vertices.' },
+      { id:'ap3', label:'Locating\nPositions', x:170, y:420, r:34, color:'#1a0010', stroke:'#fb7185', textColor:'#fecdd3',
+        info:'Maps, seating plans and playgrounds use coordinates.\nDistance and section formulas find gaps and dividing points in real layouts.' },
+    ]
+  }
+];
+
+// Build flat list
+const allNodes = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allNodes.push(b);
+  allEdges.push({from:'c', to:b.id});
+  (b.children||[]).forEach(ch => {
+    allNodes.push(ch);
+    allEdges.push({from:b.id, to:ch.id});
+  });
+});
+
+function getNode(id) { return allNodes.find(n=>n.id===id); }
+
+// Pan & zoom
+canvas.addEventListener('mousedown', e => { dragging=true; dragStart={x:e.clientX,y:e.clientY}; dragOrigin={x:ox,y:oy}; });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { ox = dragOrigin.x+(e.clientX-dragStart.x); oy = dragOrigin.y+(e.clientY-dragStart.y); draw(); return; }
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{ const dx=mx-n.x,dy=my-n.y; if(Math.sqrt(dx*dx+dy*dy)<n.r+6) found=n; });
+  if(found && found.info){ tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else { tip.style.display='none'; canvas.style.cursor='grab'; }
+});
+canvas.addEventListener('mouseup', ()=>dragging=false);
+canvas.addEventListener('mouseleave', ()=>{ dragging=false; tip.style.display='none'; });
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:0.91; zoomAt(f,e.clientX,e.clientY); },{passive:false});
+
+// Touch
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ dragging=true; dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; dragOrigin={x:ox,y:oy}; }});
+canvas.addEventListener('touchmove',e=>{ e.preventDefault();
+  if(e.touches.length===1&&dragging){ ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x); oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y); draw(); }
+  if(e.touches.length===2){ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){ const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2; zoomAt(d/lastTouchDist,cx,cy); }
+    lastTouchDist=d; }
+},{passive:false});
+canvas.addEventListener('touchend',()=>{ dragging=false; lastTouchDist=null; });
+
+function zoomAt(f,cx,cy){ const prev=scale; scale=Math.max(.3,Math.min(2.5,scale*f)); ox=cx-(cx-ox)*(scale/prev); oy=cy-(cy-oy)*(scale/prev); draw(); }
+function zoom(f){ zoomAt(f,W/2,H/2); }
+function resetView(){ scale=1; ox=W/2; oy=H/2+20; draw(); }
+
+// Draw
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy);
+  ctx.scale(scale,scale);
+
+  // grid
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.025)';
+  ctx.lineWidth=1;
+  for(let x=-1000;x<1000;x+=60){ ctx.beginPath();ctx.moveTo(x,-1000);ctx.lineTo(x,1000);ctx.stroke(); }
+  for(let y=-1000;y<1000;y+=60){ ctx.beginPath();ctx.moveTo(-1000,y);ctx.lineTo(1000,y);ctx.stroke(); }
+  ctx.restore();
+
+  // edges
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'88');
+    grd.addColorStop(1,b.stroke+'44');
+    ctx.beginPath();
+    const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2-30;
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[4,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // nodes
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke;
+    ctx.shadowBlur=n.id==='c'?30:16;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke;
+    ctx.lineWidth=n.id==='c'?3:2;
+    ctx.stroke();
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||11}px Nunito,sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=14;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

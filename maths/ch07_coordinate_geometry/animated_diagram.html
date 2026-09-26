@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive — Coordinate Geometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.4rem 1rem .4rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.tabs{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;padding:.9rem 1rem;max-width:900px;margin:0 auto;}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.4rem .8rem;border-radius:99px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);cursor:pointer;transition:.15s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:#04121e;font-weight:700;}
+
+.panel{display:none;max-width:720px;margin:0 auto;padding:1rem 1.2rem 2.5rem;}
+.panel.active{display:block;}
+.stage{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem;}
+canvas{width:100%;background:var(--card2);border-radius:10px;display:block;touch-action:none;}
+.desc{font-size:.85rem;line-height:1.6;color:var(--text);margin-top:.9rem;}
+.desc b{color:var(--blue);}
+.readout{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--teal);background:var(--card2);border-radius:8px;padding:.6rem .8rem;margin-top:.8rem;line-height:1.7;}
+.readout b{color:var(--amber);}
+.ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;margin-top:.9rem;}
+.ctrl-row label{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.5rem;flex:1;min-width:180px;}
+input[type=range]{flex:1;accent-color:var(--blue);}
+.btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.45rem .8rem;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);cursor:pointer;}
+.btn:hover{border-color:var(--blue);color:var(--blue);}
+.hint-txt{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);margin-top:.6rem;text-align:center;}
+
+.app-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.4rem;}
+@media(max-width:520px){.app-grid{grid-template-columns:1fr;}}
+.app-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:.9rem;}
+.app-card h4{font-family:'Playfair Display',serif;font-size:.9rem;color:var(--blue);margin-bottom:.4rem;}
+.app-card p{font-size:.8rem;line-height:1.5;color:var(--text);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Coordinate Geometry — Interactive</h1>
+  <p>Class X · Mathematics Ch.7 · 6 Interactive Modules</p>
+</header>
+
+<div class="tabs" id="tabs">
+  <button class="tab-btn active" onclick="showTab(0,this,'#38bdf8')">📍 Plot Points</button>
+  <button class="tab-btn" onclick="showTab(1,this,'#22c55e')">📏 Distance</button>
+  <button class="tab-btn" onclick="showTab(2,this,'#f59e0b')">✂️ Section</button>
+  <button class="tab-btn" onclick="showTab(3,this,'#818cf8')">⚖️ Midpoint</button>
+  <button class="tab-btn" onclick="showTab(4,this,'#d946ef')">🔺 Triangle Area</button>
+  <button class="tab-btn" onclick="showTab(5,this,'#f43f5e')">🌍 Applications</button>
+</div>
+
+<!-- 0: PLOT POINTS -->
+<div class="panel active">
+  <div class="stage">
+    <canvas id="cvPlot" width="640" height="480"></canvas>
+    <div class="ctrl-row">
+      <label>x = <span id="pxVal">3</span><input type="range" id="px" min="-6" max="6" value="3" step="1"></label>
+      <label>y = <span id="pyVal">2</span><input type="range" id="py" min="-6" max="6" value="2" step="1"></label>
+    </div>
+    <div class="readout" id="plotOut"></div>
+    <div class="desc">Drag the sliders to move the point <b>(x, y)</b>. Watch which quadrant it lands in and how the abscissa &amp; ordinate change sign.</div>
+  </div>
+</div>
+
+<!-- 1: DISTANCE -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvDist" width="640" height="480"></canvas>
+    <div class="hint-txt">Drag either point on the grid</div>
+    <div class="readout" id="distOut"></div>
+    <div class="desc"><b>Distance Formula:</b> PQ = √[(x₂−x₁)² + (y₂−y₁)²]. The dashed legs form a right triangle — the distance is its hypotenuse (Pythagoras).</div>
+  </div>
+</div>
+
+<!-- 2: SECTION -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvSec" width="640" height="480"></canvas>
+    <div class="ctrl-row">
+      <label>m = <span id="mVal">1</span><input type="range" id="mR" min="1" max="5" value="1" step="1"></label>
+      <label>n = <span id="nVal">1</span><input type="range" id="nR" min="1" max="5" value="1" step="1"></label>
+    </div>
+    <div class="readout" id="secOut"></div>
+    <div class="desc"><b>Section Formula:</b> the point P divides AB internally in the ratio m : n. Change m and n to slide P along the segment.</div>
+  </div>
+</div>
+
+<!-- 3: MIDPOINT -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvMid" width="640" height="480"></canvas>
+    <div class="hint-txt">Drag either endpoint</div>
+    <div class="readout" id="midOut"></div>
+    <div class="desc"><b>Midpoint:</b> M = ( (x₁+x₂)/2 , (y₁+y₂)/2 ) — simply the average of the coordinates. It always sits exactly halfway.</div>
+  </div>
+</div>
+
+<!-- 4: TRIANGLE AREA -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvArea" width="640" height="480"></canvas>
+    <div class="hint-txt">Drag any of the three vertices</div>
+    <div class="readout" id="areaOut"></div>
+    <div class="desc"><b>Area = ½|x₁(y₂−y₃)+x₂(y₃−y₁)+x₃(y₁−y₂)|.</b> Line the vertices up and watch the area shrink to 0 — that is the collinearity test!</div>
+  </div>
+</div>
+
+<!-- 5: APPLICATIONS -->
+<div class="panel">
+  <div class="app-grid">
+    <div class="app-card"><h4>🧭 Navigation &amp; Maps</h4><p>GPS positions are coordinates. The distance formula gives the straight-line distance between two locations.</p></div>
+    <div class="app-card"><h4>🏗️ Design &amp; Graphics</h4><p>Every pixel on a screen has (x, y) coordinates. Midpoints and sections place objects precisely.</p></div>
+    <div class="app-card"><h4>📐 Surveying Land</h4><p>The area formula finds a plot's area directly from the coordinates of its corners.</p></div>
+    <div class="app-card"><h4>🤖 Robotics</h4><p>Robot arms plan paths by dividing segments in ratios — exactly the section formula.</p></div>
+    <div class="app-card"><h4>🎮 Game Physics</h4><p>Collision checks use distances; sprite centres use midpoints and centroids.</p></div>
+    <div class="app-card"><h4>✈️ Air Traffic</h4><p>Checking if three waypoints are collinear (area = 0) keeps aircraft on a straight route.</p></div>
+  </div>
+  <div class="desc" style="text-align:center;">Coordinate geometry turns geometry into <b>algebra</b> — every shape becomes a set of equations you can calculate with.</div>
+</div>
+
+<script>
+// ---------- shared grid helpers ----------
+function makeGrid(cv,unit){
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+  function toPx(x,y){return [cx+x*unit, cy-y*unit];}
+  function toXY(px,py){return [Math.round((px-cx)/unit), Math.round(-(py-cy)/unit)];}
+  function grid(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(26,45,69,.6)';ctx.lineWidth=1;
+    for(let gx=-7;gx<=7;gx++){const[px]=toPx(gx,0);ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,H);ctx.stroke();}
+    for(let gy=-7;gy<=7;gy++){const[,py]=toPx(0,gy);ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(W,py);ctx.stroke();}
+    ctx.strokeStyle='#4a6890';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.font='11px "DM Mono"';
+    ctx.fillText('x',W-14,cy-6);ctx.fillText('y',cx+6,12);
+  }
+  function dot(x,y,color,label){
+    const[px,py]=toPx(x,y);
+    ctx.fillStyle=color;ctx.beginPath();ctx.arc(px,py,6,0,7);ctx.fill();
+    ctx.fillStyle='#cce4ff';ctx.font='12px "DM Mono"';
+    if(label)ctx.fillText(label,px+9,py-9);
+  }
+  return {ctx,W,H,cx,cy,toPx,toXY,grid,dot};
+}
+
+// ---------- 0: PLOT ----------
+(function(){
+  const g=makeGrid(document.getElementById('cvPlot'),34);
+  const px=document.getElementById('px'),py=document.getElementById('py');
+  function draw(){
+    const x=+px.value,y=+py.value;
+    document.getElementById('pxVal').textContent=x;
+    document.getElementById('pyVal').textContent=y;
+    g.grid();
+    const[ppx,ppy]=g.toPx(x,y);
+    g.ctx.strokeStyle='rgba(56,189,248,.5)';g.ctx.setLineDash([5,4]);
+    g.ctx.beginPath();g.ctx.moveTo(ppx,g.cy);g.ctx.lineTo(ppx,ppy);g.ctx.stroke();
+    g.ctx.beginPath();g.ctx.moveTo(g.cx,ppy);g.ctx.lineTo(ppx,ppy);g.ctx.stroke();
+    g.ctx.setLineDash([]);
+    g.dot(x,y,'#38bdf8','('+x+', '+y+')');
+    let quad='on an axis';
+    if(x>0&&y>0)quad='Quadrant I';else if(x<0&&y>0)quad='Quadrant II';
+    else if(x<0&&y<0)quad='Quadrant III';else if(x>0&&y<0)quad='Quadrant IV';
+    else if(x===0&&y===0)quad='the Origin';
+    document.getElementById('plotOut').innerHTML=
+      `Point <b>(${x}, ${y})</b> — abscissa = ${x}, ordinate = ${y}<br>Location: <b>${quad}</b>`;
+  }
+  px.oninput=py.oninput=draw;draw();
+})();
+
+// ---------- generic draggable canvas ----------
+function draggable(cv,unit,pts,onDraw){
+  const g=makeGrid(cv,unit);
+  let drag=-1;
+  function evtXY(e){
+    const r=cv.getBoundingClientRect();
+    const t=e.touches?e.touches[0]:e;
+    return [(t.clientX-r.left)*cv.width/r.width, (t.clientY-r.top)*cv.height/r.height];
+  }
+  function nearest(mx,my){
+    for(let i=0;i<pts.length;i++){const[px,py]=g.toPx(pts[i].x,pts[i].y);
+      if(Math.hypot(px-mx,py-my)<18)return i;}return -1;
+  }
+  function down(e){const[mx,my]=evtXY(e);drag=nearest(mx,my);if(drag>=0)e.preventDefault();}
+  function move(e){if(drag<0)return;const[mx,my]=evtXY(e);const[gx,gy]=g.toXY(mx,my);
+    pts[drag].x=Math.max(-6,Math.min(6,gx));pts[drag].y=Math.max(-6,Math.min(6,gy));onDraw(g);e.preventDefault();}
+  function up(){drag=-1;}
+  cv.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
+  cv.addEventListener('touchstart',down,{passive:false});cv.addEventListener('touchmove',move,{passive:false});cv.addEventListener('touchend',up);
+  onDraw(g);return g;
+}
+
+// ---------- 1: DISTANCE ----------
+(function(){
+  const pts=[{x:-3,y:-2},{x:3,y:2}];
+  draggable(document.getElementById('cvDist'),34,pts,g=>{
+    g.grid();
+    const P=pts[0],Q=pts[1];
+    const[p1x,p1y]=g.toPx(P.x,P.y),[q1x,q1y]=g.toPx(Q.x,Q.y);
+    g.ctx.strokeStyle='rgba(34,197,94,.4)';g.ctx.setLineDash([5,4]);
+    g.ctx.beginPath();g.ctx.moveTo(p1x,p1y);g.ctx.lineTo(q1x,p1y);g.ctx.lineTo(q1x,q1y);g.ctx.stroke();
+    g.ctx.setLineDash([]);
+    g.ctx.strokeStyle='#22c55e';g.ctx.lineWidth=2;
+    g.ctx.beginPath();g.ctx.moveTo(p1x,p1y);g.ctx.lineTo(q1x,q1y);g.ctx.stroke();
+    g.dot(P.x,P.y,'#38bdf8','P('+P.x+','+P.y+')');
+    g.dot(Q.x,Q.y,'#f59e0b','Q('+Q.x+','+Q.y+')');
+    const dx=Q.x-P.x,dy=Q.y-P.y,d=Math.hypot(dx,dy);
+    document.getElementById('distOut').innerHTML=
+      `PQ = √[(${Q.x}−${P.x})² + (${Q.y}−${P.y})²] = √[${dx*dx} + ${dy*dy}] = <b>${d.toFixed(2)}</b> units`;
+  });
+})();
+
+// ---------- 2: SECTION ----------
+(function(){
+  const g=makeGrid(document.getElementById('cvSec'),34);
+  const A={x:-4,y:-3},B={x:4,y:3};
+  const mR=document.getElementById('mR'),nR=document.getElementById('nR');
+  function draw(){
+    const m=+mR.value,n=+nR.value;
+    document.getElementById('mVal').textContent=m;
+    document.getElementById('nVal').textContent=n;
+    g.grid();
+    const[ax,ay]=g.toPx(A.x,A.y),[bx,by]=g.toPx(B.x,B.y);
+    g.ctx.strokeStyle='#f59e0b';g.ctx.lineWidth=2;
+    g.ctx.beginPath();g.ctx.moveTo(ax,ay);g.ctx.lineTo(bx,by);g.ctx.stroke();
+    const Px=(m*B.x+n*A.x)/(m+n),Py=(m*B.y+n*A.y)/(m+n);
+    g.dot(A.x,A.y,'#38bdf8','A('+A.x+','+A.y+')');
+    g.dot(B.x,B.y,'#22c55e','B('+B.x+','+B.y+')');
+    g.dot(Px,Py,'#f43f5e','P');
+    document.getElementById('secOut').innerHTML=
+      `Ratio <b>${m} : ${n}</b> → P = ( (${m}·${B.x}+${n}·${A.x})/${m+n} , (${m}·${B.y}+${n}·${A.y})/${m+n} ) = <b>(${Px.toFixed(2)}, ${Py.toFixed(2)})</b>`;
+  }
+  mR.oninput=nR.oninput=draw;draw();
+})();
+
+// ---------- 3: MIDPOINT ----------
+(function(){
+  const pts=[{x:-4,y:2},{x:4,y:-2}];
+  draggable(document.getElementById('cvMid'),34,pts,g=>{
+    g.grid();
+    const A=pts[0],B=pts[1];
+    const[ax,ay]=g.toPx(A.x,A.y),[bx,by]=g.toPx(B.x,B.y);
+    g.ctx.strokeStyle='#818cf8';g.ctx.lineWidth=2;
+    g.ctx.beginPath();g.ctx.moveTo(ax,ay);g.ctx.lineTo(bx,by);g.ctx.stroke();
+    const Mx=(A.x+B.x)/2,My=(A.y+B.y)/2;
+    g.dot(A.x,A.y,'#38bdf8','A('+A.x+','+A.y+')');
+    g.dot(B.x,B.y,'#22c55e','B('+B.x+','+B.y+')');
+    g.dot(Mx,My,'#f59e0b','M');
+    document.getElementById('midOut').innerHTML=
+      `M = ( (${A.x}+${B.x})/2 , (${A.y}+${B.y})/2 ) = <b>(${Mx}, ${My})</b>`;
+  });
+})();
+
+// ---------- 4: TRIANGLE AREA ----------
+(function(){
+  const pts=[{x:-3,y:-2},{x:3,y:-2},{x:0,y:3}];
+  draggable(document.getElementById('cvArea'),34,pts,g=>{
+    g.grid();
+    const[A,B,C]=pts;
+    const[ax,ay]=g.toPx(A.x,A.y),[bx,by]=g.toPx(B.x,B.y),[cx,cy]=g.toPx(C.x,C.y);
+    g.ctx.fillStyle='rgba(217,70,239,.15)';g.ctx.strokeStyle='#d946ef';g.ctx.lineWidth=2;
+    g.ctx.beginPath();g.ctx.moveTo(ax,ay);g.ctx.lineTo(bx,by);g.ctx.lineTo(cx,cy);g.ctx.closePath();g.ctx.fill();g.ctx.stroke();
+    g.dot(A.x,A.y,'#38bdf8','A');g.dot(B.x,B.y,'#22c55e','B');g.dot(C.x,C.y,'#f59e0b','C');
+    const area=Math.abs(A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y))/2;
+    const col=area<0.01?'#f43f5e':'#2dd4bf';
+    document.getElementById('areaOut').innerHTML=
+      `Area = ½|${A.x}(${B.y}−${C.y}) + ${B.x}(${C.y}−${A.y}) + ${C.x}(${A.y}−${B.y})| = <b style="color:${col}">${area.toFixed(2)} sq. units</b>`
+      +(area<0.01?'  ← <b style="color:#f43f5e">Collinear!</b>':'');
+  });
+})();
+
+// ---------- tabs ----------
+function showTab(i,btn,color){
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',j===i));
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.style.background='';});
+  btn.classList.add('active');btn.style.background=color;
+}
+document.querySelector('.tab-btn').style.background='#38bdf8';
+</script>
+</body>
+</html>

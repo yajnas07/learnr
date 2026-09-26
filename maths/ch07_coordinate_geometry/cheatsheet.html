@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Coordinate Geometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:1rem;padding:1rem 1.2rem 2rem;max-width:1100px;margin:0 auto;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.panel-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;}
+.panel-head .icon{font-size:1rem;}
+.panel-body{padding:.8rem 1rem 1rem;display:flex;flex-direction:column;gap:.6rem;}
+
+.ph-bas .panel-head{background:rgba(56,189,248,.12);color:var(--blue);}
+.ph-dis .panel-head{background:rgba(34,197,94,.12);color:var(--green);}
+.ph-sec .panel-head{background:rgba(245,158,11,.12);color:var(--amber);}
+.ph-mid .panel-head{background:rgba(129,140,248,.12);color:var(--indigo);}
+.ph-area .panel-head{background:rgba(217,70,239,.12);color:var(--purple);}
+.ph-app .panel-head{background:rgba(244,63,94,.12);color:var(--red);}
+.ph-vit .panel-head{background:rgba(45,212,191,.12);color:var(--teal);}
+.ph-mem .panel-head{background:rgba(74,104,144,.18);color:#9ab8d8;}
+
+.formula-block{background:var(--card2);border-radius:8px;padding:.6rem .8rem;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--teal);line-height:1.7;}
+.formula-block strong{color:var(--amber);}
+.sub-label{font-family:'Playfair Display',serif;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem;}
+
+table{width:100%;border-collapse:collapse;font-size:.76rem;}
+th{padding:.4rem .5rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+td{padding:.38rem .5rem;border-bottom:1px solid rgba(26,45,69,.5);line-height:1.4;}
+tr:last-child td{border-bottom:none;}
+td.mono{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--teal);}
+td.amber{color:var(--amber);}td.green{color:var(--green);}td.red{color:var(--red);}
+
+.hbox{display:flex;gap:.5rem;flex-wrap:wrap;}
+.fact{background:var(--card2);border-radius:6px;padding:.4rem .65rem;font-size:.76rem;color:var(--text);flex:1;min-width:100px;}
+.fact strong{display:block;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:.15rem;}
+.trick{background:rgba(245,158,11,.07);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.trick strong{color:var(--amber);}
+.tip{background:rgba(45,212,191,.07);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.tip strong{color:var(--teal);}
+.warn{background:rgba(244,63,94,.07);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.warn strong{color:var(--red);}
+
+.step-list{counter-reset:step;display:flex;flex-direction:column;gap:.3rem;}
+.step-list li{display:flex;align-items:flex-start;gap:.5rem;font-size:.78rem;list-style:none;counter-increment:step;line-height:1.5;}
+.step-list li::before{content:counter(step);background:var(--card2);color:var(--muted);font-family:'DM Mono',monospace;font-size:.65rem;
+  min-width:1.4rem;height:1.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:.1rem;flex-shrink:0;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Coordinate Geometry — Cheat Sheet</h1>
+  <p>Class X · Mathematics Ch.7 · 8 Panels · Quick Reference</p>
+</header>
+
+<div class="panel-grid">
+
+<!-- 1. BASICS -->
+<div class="panel ph-bas">
+  <div class="panel-head"><span class="icon">📍</span> The Cartesian Plane</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      A point = <strong>(x, y)</strong><br>
+      x = abscissa (from y-axis) &nbsp;|&nbsp; y = ordinate (from x-axis)<br>
+      Origin O = (0, 0)
+    </div>
+    <div class="sub-label">Sign of Coordinates by Quadrant</div>
+    <table>
+      <tr><th>Quadrant</th><th>x</th><th>y</th></tr>
+      <tr><td class="green">I</td><td class="mono">+</td><td class="mono">+</td></tr>
+      <tr><td class="amber">II</td><td class="mono">−</td><td class="mono">+</td></tr>
+      <tr><td class="red">III</td><td class="mono">−</td><td class="mono">−</td></tr>
+      <tr><td class="mono">IV</td><td class="mono">+</td><td class="mono">−</td></tr>
+    </table>
+    <div class="tip"><strong>On the axes:</strong> x-axis → (x, 0); y-axis → (0, y).</div>
+  </div>
+</div>
+
+<!-- 2. DISTANCE FORMULA -->
+<div class="panel ph-dis">
+  <div class="panel-head"><span class="icon">📏</span> Distance Formula</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      Between P(x₁,y₁) and Q(x₂,y₂):<br>
+      <strong>PQ = √[(x₂−x₁)² + (y₂−y₁)²]</strong>
+    </div>
+    <div class="formula-block">
+      Distance from origin:<br>
+      <strong>OP = √(x² + y²)</strong>
+    </div>
+    <div class="sub-label">Proving Figures</div>
+    <table>
+      <tr><th>Figure</th><th>Condition</th></tr>
+      <tr><td class="green">Isosceles Δ</td><td>two sides equal</td></tr>
+      <tr><td class="green">Equilateral Δ</td><td>all three sides equal</td></tr>
+      <tr><td class="green">Square</td><td>all sides equal &amp; diagonals equal</td></tr>
+      <tr><td class="green">Rhombus</td><td>all sides equal, diagonals unequal</td></tr>
+    </table>
+    <div class="warn"><strong>Careful:</strong> always square the differences before adding. Never forget the square root at the end.</div>
+  </div>
+</div>
+
+<!-- 3. SECTION FORMULA -->
+<div class="panel ph-sec">
+  <div class="panel-head"><span class="icon">✂️</span> Section Formula</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      P divides A(x₁,y₁)–B(x₂,y₂) internally in <strong>m : n</strong>:<br>
+      <strong>P = ( (mx₂+nx₁)/(m+n) , (my₂+ny₁)/(m+n) )</strong>
+    </div>
+    <div class="trick"><strong>Memory aid:</strong> the ratio part touching a point uses the OTHER point's coordinate — m goes with x₂, n goes with x₁.</div>
+    <div class="sub-label">Finding the Ratio (k method)</div>
+    <ol class="step-list">
+      <li>Let the ratio be <strong>k : 1</strong></li>
+      <li>Write x = (kx₂ + x₁)/(k+1)</li>
+      <li>Solve for k, then the ratio is k : 1</li>
+    </ol>
+    <div class="tip"><strong>Trisection:</strong> points dividing AB in 1:2 and 2:1 split it into three equal parts.</div>
+  </div>
+</div>
+
+<!-- 4. MIDPOINT -->
+<div class="panel ph-mid">
+  <div class="panel-head"><span class="icon">⚖️</span> Midpoint Formula</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      Midpoint of A(x₁,y₁) and B(x₂,y₂):<br>
+      <strong>M = ( (x₁+x₂)/2 , (y₁+y₂)/2 )</strong>
+    </div>
+    <div class="tip"><strong>Just the average</strong> of the x's and the average of the y's — the section formula with ratio 1:1.</div>
+    <div class="trick"><strong>Parallelogram trick:</strong> diagonals bisect each other, so midpoint of one diagonal = midpoint of the other. Equate them to find a missing vertex.</div>
+    <div class="formula-block">
+      <strong>Centroid</strong> of a triangle:<br>
+      G = ( (x₁+x₂+x₃)/3 , (y₁+y₂+y₃)/3 )
+    </div>
+  </div>
+</div>
+
+<!-- 5. AREA OF TRIANGLE -->
+<div class="panel ph-area">
+  <div class="panel-head"><span class="icon">🔺</span> Area of a Triangle</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      Vertices (x₁,y₁), (x₂,y₂), (x₃,y₃):<br>
+      <strong>Area = ½ |x₁(y₂−y₃) + x₂(y₃−y₁) + x₃(y₁−y₂)|</strong>
+    </div>
+    <div class="warn"><strong>Always use | |</strong> (modulus) so the area is never negative.</div>
+    <div class="sub-label">Collinearity Test</div>
+    <div class="formula-block">
+      Three points are <strong>collinear</strong> ⇔ Area = 0<br>
+      i.e. x₁(y₂−y₃) + x₂(y₃−y₁) + x₃(y₁−y₂) = 0
+    </div>
+    <div class="tip"><strong>Quadrilateral area:</strong> split into two triangles with a diagonal, then add their areas.</div>
+  </div>
+</div>
+
+<!-- 6. KEY RESULTS -->
+<div class="panel ph-vit">
+  <div class="panel-head"><span class="icon">⭐</span> Key Results</div>
+  <div class="panel-body">
+    <div class="tip"><strong>Centroid</strong> divides each median in the ratio 2 : 1 (measured from the vertex).</div>
+    <div class="tip"><strong>Distance from an axis:</strong> point (x, y) is |y| from the x-axis and |x| from the y-axis.</div>
+    <div class="trick"><strong>Equidistant point:</strong> if P is equidistant from A and B, set PA² = PB² and simplify — the squares remove the roots.</div>
+    <div class="trick"><strong>Point on an axis:</strong> a point on the x-axis is (x, 0); on the y-axis is (0, y). Use this to reduce unknowns.</div>
+  </div>
+</div>
+
+<!-- 7. APPLICATIONS -->
+<div class="panel ph-app">
+  <div class="panel-head"><span class="icon">🌍</span> Common Applications</div>
+  <div class="panel-body">
+    <div class="hbox">
+      <div class="fact"><strong>Classify Quadrilateral</strong>Find all sides &amp; diagonals; compare to identify square/rhombus/rectangle/parallelogram</div>
+      <div class="fact"><strong>Find Missing Vertex</strong>Use midpoint/section/area equations to solve for unknown coordinates</div>
+    </div>
+    <div class="hbox">
+      <div class="fact"><strong>Seating / Maps</strong>Locate points and find distances on a coordinate grid</div>
+      <div class="fact"><strong>Dividing a Path</strong>Section formula finds where a point splits a route in a given ratio</div>
+    </div>
+    <div class="tip"><strong>Approach:</strong> plot roughly, choose the right formula (distance / section / area), substitute, and simplify carefully.</div>
+  </div>
+</div>
+
+<!-- 8. EXAM QUICK RECALL -->
+<div class="panel ph-mem">
+  <div class="panel-head"><span class="icon">🧠</span> Exam Quick Recall</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Quantity</th><th>Formula</th></tr>
+      <tr><td>Distance</td><td class="mono">√[(x₂−x₁)²+(y₂−y₁)²]</td></tr>
+      <tr><td>Section (m:n)</td><td class="mono">((mx₂+nx₁)/(m+n), …)</td></tr>
+      <tr><td>Midpoint</td><td class="mono">((x₁+x₂)/2, (y₁+y₂)/2)</td></tr>
+      <tr><td>Centroid</td><td class="mono">((Σx)/3, (Σy)/3)</td></tr>
+      <tr><td>Area</td><td class="mono">½|x₁(y₂−y₃)+…|</td></tr>
+      <tr><td>Collinear</td><td class="mono">Area = 0</td></tr>
+    </table>
+    <div class="warn"><strong>Common mistakes:</strong> mixing up (x,y) order; forgetting the modulus in area; swapping m and n in the section formula.</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

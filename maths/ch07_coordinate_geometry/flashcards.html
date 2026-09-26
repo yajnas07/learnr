@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Coordinate Geometry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.4rem 1rem .4rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--blue);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.filters{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;padding:.8rem 1rem;max-width:800px;margin:0 auto;}
+.filt{font-family:'DM Mono',monospace;font-size:.68rem;padding:.3rem .7rem;border-radius:99px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);cursor:pointer;transition:.15s;}
+.filt:hover{color:var(--text);}
+.filt.active{background:var(--blue);color:#04121e;border-color:var(--blue);font-weight:700;}
+
+.progress{text-align:center;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:.3rem 0;}
+
+.stage{max-width:560px;margin:0 auto;padding:1rem 1.2rem 2rem;}
+.card{perspective:1600px;height:340px;cursor:pointer;}
+.card-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.card.flipped .card-inner{transform:rotateY(180deg);}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;border:1px solid var(--border);
+  background:var(--card);padding:1.6rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.face-back{transform:rotateY(180deg);background:var(--card2);}
+.cat-tag{position:absolute;top:1rem;left:1rem;font-family:'DM Mono',monospace;font-size:.62rem;padding:.2rem .55rem;border-radius:99px;}
+.face .side{position:absolute;top:1rem;right:1rem;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);}
+.q-text{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;line-height:1.45;}
+.a-text{font-size:.95rem;line-height:1.6;color:var(--text);}
+.hint{margin-top:1rem;font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);font-style:italic;}
+.flip-hint{position:absolute;bottom:1rem;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);}
+
+.controls{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:1.2rem;}
+.btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.5rem .9rem;border-radius:8px;border:1px solid var(--border);
+  background:var(--card);color:var(--text);cursor:pointer;transition:.15s;}
+.btn:hover{border-color:var(--blue);color:var(--blue);}
+.btn-known{border-color:rgba(34,197,94,.4);color:var(--green);}
+.btn-review{border-color:rgba(245,158,11,.4);color:var(--amber);}
+.mark-row{display:flex;justify-content:center;gap:.6rem;margin-top:.7rem;}
+.counter{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);min-width:64px;text-align:center;}
+.util-row{display:flex;justify-content:center;gap:.6rem;margin-top:1rem;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Coordinate Geometry</h1>
+  <p>Class X · Mathematics Ch.7 · 36 Flashcards · 6 Categories</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress" id="progress"></div>
+
+<div class="stage">
+  <div class="card" id="card" onclick="flip()">
+    <div class="card-inner">
+      <div class="face face-front">
+        <span class="cat-tag" id="catFront"></span>
+        <span class="side" id="sideFront"></span>
+        <div class="q-text" id="qText"></div>
+        <div class="hint" id="hintText"></div>
+        <div class="flip-hint">click / space to flip →</div>
+      </div>
+      <div class="face face-back">
+        <span class="cat-tag" id="catBack"></span>
+        <span class="side">answer</span>
+        <div class="a-text" id="aText"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="nav(-1)">← Prev</button>
+    <span class="counter" id="counter"></span>
+    <button class="btn" onclick="nav(1)">Next →</button>
+  </div>
+  <div class="mark-row">
+    <button class="btn btn-known" onclick="markKnown()">✓ Known</button>
+    <button class="btn btn-review" onclick="markReview()">↻ Review</button>
+  </div>
+  <div class="util-row">
+    <button class="btn" onclick="shuffle()">🔀 Shuffle</button>
+    <button class="btn" onclick="resetAll()">♻ Reset</button>
+  </div>
+</div>
+
+<script>
+const catColors={bas:'#38bdf8',dist:'#22c55e',sec:'#f59e0b',mid:'#818cf8',area:'#d946ef',app:'#f43f5e'};
+const catNames={bas:'Basics',dist:'Distance',sec:'Section',mid:'Midpoint',area:'Area',app:'Applications'};
+
+const ALL_CARDS=[
+// BASICS
+{cat:'bas',q:'What are the coordinates of a point called?',a:'(x, y) where x = abscissa (distance from y-axis) and y = ordinate (distance from x-axis).',hint:'abscissa & ordinate'},
+{cat:'bas',q:'What are the coordinates of the origin?',a:'The origin O is (0, 0) — the intersection of the x-axis and y-axis.',hint:'the meeting point'},
+{cat:'bas',q:'Give the sign of x and y in each of the four quadrants.',a:'I: (+, +),  II: (−, +),  III: (−, −),  IV: (+, −).',hint:'anticlockwise from top-right'},
+{cat:'bas',q:'What form does a point on the x-axis take?',a:'(x, 0) — its ordinate (y-coordinate) is 0.',hint:'y = 0'},
+{cat:'bas',q:'What form does a point on the y-axis take?',a:'(0, y) — its abscissa (x-coordinate) is 0.',hint:'x = 0'},
+{cat:'bas',q:'How far is the point (x, y) from the x-axis and the y-axis?',a:'It is |y| units from the x-axis and |x| units from the y-axis.',hint:'perpendicular distances'},
+// DISTANCE
+{cat:'dist',q:'State the distance formula between P(x₁,y₁) and Q(x₂,y₂).',a:'PQ = √[(x₂−x₁)² + (y₂−y₁)²].',hint:'root of sum of squared differences'},
+{cat:'dist',q:'What is the distance of a point (x, y) from the origin?',a:'√(x² + y²).',hint:'origin is (0,0)'},
+{cat:'dist',q:'How do you prove three points form an isosceles triangle?',a:'Compute all three side lengths; exactly two of them must be equal.',hint:'two equal sides'},
+{cat:'dist',q:'What must be true for four points to form a square?',a:'All four sides are equal AND the two diagonals are equal.',hint:'sides = , diagonals ='},
+{cat:'dist',q:'How is the distance formula derived?',a:'From the Pythagoras theorem applied to the right triangle formed by the horizontal and vertical differences.',hint:'Pythagoras'},
+{cat:'dist',q:'A point on the x-axis is equidistant from two points. How do you find it?',a:'Take the point as (x, 0), set its distances (squared) to both points equal, and solve for x.',hint:'(x,0), PA²=PB²'},
+// SECTION
+{cat:'sec',q:'State the section formula for internal division in ratio m : n.',a:'P = ( (mx₂+nx₁)/(m+n) , (my₂+ny₁)/(m+n) ).',hint:'m with far point, n with near'},
+{cat:'sec',q:'How do you find the ratio in which a point divides a segment?',a:'Assume ratio k : 1, use x = (kx₂+x₁)/(k+1), solve for k; ratio is k : 1.',hint:'the k:1 method'},
+{cat:'sec',q:'What are the points of trisection of a segment?',a:'The two points dividing it in ratios 1 : 2 and 2 : 1, splitting it into three equal parts.',hint:'1:2 and 2:1'},
+{cat:'sec',q:'If the dividing point lies on the x-axis, what does that tell you?',a:'Its y-coordinate is 0, so (my₂+ny₁)/(m+n) = 0 — use this to find the ratio.',hint:'y-part = 0'},
+{cat:'sec',q:'Which coordinate can you use to find the dividing ratio?',a:'Either the x-coordinate equation or the y-coordinate equation — both give the same ratio.',hint:'x or y works'},
+{cat:'sec',q:'The section formula reduces to which formula when m = n?',a:'The midpoint formula (ratio 1 : 1).',hint:'equal ratio'},
+// MIDPOINT
+{cat:'mid',q:'State the midpoint formula.',a:'M = ( (x₁+x₂)/2 , (y₁+y₂)/2 ) — the average of the coordinates.',hint:'just the averages'},
+{cat:'mid',q:'Why do the diagonals of a parallelogram help find a vertex?',a:'Diagonals bisect each other, so the midpoints of both diagonals are equal — equate them to solve for the unknown vertex.',hint:'diagonals bisect'},
+{cat:'mid',q:'State the centroid formula of a triangle.',a:'G = ( (x₁+x₂+x₃)/3 , (y₁+y₂+y₃)/3 ).',hint:'average of three vertices'},
+{cat:'mid',q:'In what ratio does the centroid divide each median?',a:'2 : 1, measured from the vertex.',hint:'vertex side is bigger'},
+{cat:'mid',q:'How can the midpoint be seen as a special section?',a:'It is the section formula with ratio 1 : 1.',hint:'equal parts'},
+{cat:'mid',q:'Given the midpoint and one endpoint, how do you find the other endpoint?',a:'Use 2·(midpoint) − (known endpoint) for each coordinate.',hint:'2M − A = B'},
+// AREA
+{cat:'area',q:'State the area formula of a triangle with given vertices.',a:'Area = ½ |x₁(y₂−y₃) + x₂(y₃−y₁) + x₃(y₁−y₂)|.',hint:'half of the modulus'},
+{cat:'area',q:'Why is the modulus (| |) used in the area formula?',a:'Because area cannot be negative — the sign depends on the order of vertices, so we take the absolute value.',hint:'no negative area'},
+{cat:'area',q:'What condition makes three points collinear?',a:'The area of the triangle they form is 0.',hint:'Area = 0'},
+{cat:'area',q:'How do you find the area of a quadrilateral from its vertices?',a:'Split it into two triangles using a diagonal, find each area, and add them.',hint:'diagonal split'},
+{cat:'area',q:'If the area formula gives 0, what does it mean?',a:'The three points lie on a straight line (they are collinear).',hint:'a straight line'},
+{cat:'area',q:'What value of k makes A(1,2), B(2,k), C(3,4) collinear?',a:'Set area = 0: ½|1(k−4)+2(4−2)+3(2−k)| = 0 → k = 3.',hint:'plug into area = 0'},
+// APPLICATIONS
+{cat:'app',q:'How do you identify the type of quadrilateral from its vertices?',a:'Find all four sides and both diagonals with the distance formula, then compare (equal sides / diagonals).',hint:'sides & diagonals'},
+{cat:'app',q:'How do you check if a quadrilateral is a parallelogram?',a:'Show that the diagonals bisect each other (their midpoints coincide), or opposite sides are equal.',hint:'diagonals bisect'},
+{cat:'app',q:'How do you find where a point divides a road/path in a given ratio?',a:'Apply the section formula with the given ratio to the two endpoints.',hint:'section formula'},
+{cat:'app',q:'How do you find a point equidistant from three given points?',a:'Set the squared distances equal pairwise (two equations) and solve the resulting linear system.',hint:'the circumcentre'},
+{cat:'app',q:'A rhombus is identified by which distance condition?',a:'All four sides are equal but the diagonals are unequal.',hint:'equal sides only'},
+{cat:'app',q:'Why plot a rough diagram before solving?',a:'It helps pick the correct formula, check quadrant signs, and validate that the final answer is reasonable.',hint:'sanity check'},
+];
+
+let cards=[...ALL_CARDS];
+let idx=0, filter='all';
+const known=new Set(), review=new Set();
+
+function buildFilters(){
+  const f=document.getElementById('filters');
+  const cats=['all',...Object.keys(catNames)];
+  f.innerHTML=cats.map(c=>{
+    const label=c==='all'?'All':catNames[c];
+    return `<button class="filt${c===filter?' active':''}" onclick="setFilter('${c}')">${label}</button>`;
+  }).join('');
+}
+function setFilter(c){
+  filter=c;
+  cards = c==='all' ? [...ALL_CARDS] : ALL_CARDS.filter(x=>x.cat===c);
+  idx=0; buildFilters(); render();
+}
+function render(){
+  if(!cards.length)return;
+  const card=cards[idx];
+  document.getElementById('card').classList.remove('flipped');
+  const col=catColors[card.cat];
+  const tag=`<span style="background:${col}22;color:${col}">${catNames[card.cat]}</span>`;
+  document.getElementById('catFront').outerHTML=`<span class="cat-tag" id="catFront" style="background:${col}22;color:${col}">${catNames[card.cat]}</span>`;
+  document.getElementById('catBack').outerHTML=`<span class="cat-tag" id="catBack" style="background:${col}22;color:${col}">${catNames[card.cat]}</span>`;
+  document.getElementById('qText').textContent=card.q;
+  document.getElementById('aText').textContent=card.a;
+  document.getElementById('hintText').textContent='💡 '+card.hint;
+  document.getElementById('sideFront').textContent='question';
+  document.getElementById('counter').textContent=`${idx+1} / ${cards.length}`;
+  updateProgress();
+}
+function updateProgress(){
+  document.getElementById('progress').textContent=
+    `Known: ${known.size}  ·  To review: ${review.size}  ·  Total: ${ALL_CARDS.length}`;
+}
+function flip(){document.getElementById('card').classList.toggle('flipped');}
+function nav(d){idx=(idx+d+cards.length)%cards.length;render();}
+function markKnown(){const c=cards[idx];known.add(c.q);review.delete(c.q);updateProgress();nav(1);}
+function markReview(){const c=cards[idx];review.add(c.q);known.delete(c.q);updateProgress();nav(1);}
+function shuffle(){for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}idx=0;render();}
+function resetAll(){known.clear();review.clear();setFilter('all');}
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();flip();}
+  else if(e.code==='ArrowRight')nav(1);
+  else if(e.code==='ArrowLeft')nav(-1);
+});
+buildFilters();render();
+</script>
+</body>
+</html>
