@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Lifelines of National Economy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04141a;--card:#072028;--card2:#0a2c36;--border:#0f3a44;--text:#e4f4f8;--muted:#4a8a9a;--geo:#06b6d4;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#c084fc;--teal:#2dd4bf;--cyan:#22d3ee;--pink:#f472b6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--cyan)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.74rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--cyan);color:var(--cyan);background:rgba(34,211,238,.1)}
+
+.scorebar{display:flex;justify-content:center;align-items:center;gap:1.4rem;padding:0 1rem 1rem;font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted)}
+.scorebar .s-correct{color:var(--teal);font-weight:700}
+.scorebar .s-wrong{color:var(--red);font-weight:700}
+.scorebar .s-total{color:var(--cyan);font-weight:700}
+
+.wrap{max-width:760px;margin:0 auto;padding:0 1rem 4rem}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:1.1rem}
+.q-head{display:flex;align-items:flex-start;gap:.7rem;margin-bottom:1rem}
+.q-num{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--cyan);font-weight:700;flex-shrink:0;padding-top:.15rem}
+.q-cat{font-family:'DM Mono',monospace;font-size:.58rem;padding:.15rem .5rem;border-radius:99px;flex-shrink:0}
+.q-text{font-family:'Playfair Display',serif;font-size:1.02rem;font-weight:700;line-height:1.5;flex:1}
+.opts{display:flex;flex-direction:column;gap:.5rem}
+.opt{display:flex;align-items:center;gap:.7rem;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card2);cursor:pointer;transition:all .18s;font-size:.9rem}
+.opt:hover{border-color:#1a6a7a}
+.opt .letter{font-family:'DM Mono',monospace;font-size:.74rem;color:var(--muted);font-weight:700;width:20px;flex-shrink:0}
+.opt.correct{border-color:var(--teal);background:rgba(45,212,191,.1);color:var(--teal)}
+.opt.wrong{border-color:var(--red);background:rgba(248,113,113,.1);color:var(--red)}
+.opt.disabled{pointer-events:none;opacity:.72}
+.opt.correct .letter{color:var(--teal)}.opt.wrong .letter{color:var(--red)}
+.exp{margin-top:.9rem;padding:.8rem 1rem;background:rgba(6,182,212,.07);border-left:3px solid var(--cyan);border-radius:6px;font-size:.84rem;line-height:1.6;color:var(--text);display:none}
+.exp.show{display:block}
+.exp strong{color:var(--cyan)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(4,20,26,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(15,58,68,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid rgba(15,58,68,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:var(--cyan)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Question Bank</h1>
+  <p>Lifelines of National Economy · Geography Ch.7 · 30 MCQs</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="scorebar"><span>Answered: <span class="s-total" id="sTotal">0</span></span><span>Correct: <span class="s-correct" id="sCorrect">0</span></span><span>Wrong: <span class="s-wrong" id="sWrong">0</span></span></div>
+<div class="wrap" id="wrap"></div>
+
+<script>
+const QS=[
+// road
+{cat:'road',q:'The Golden Quadrilateral super highways connect:',ops:['Delhi-Kanpur-Patna-Kolkata','Delhi-Mumbai-Chennai-Kolkata','Mumbai-Pune-Goa-Kochi','Delhi-Jaipur-Ahmedabad-Surat'],ans:1,exp:'The Golden Quadrilateral links Delhi, Mumbai, Chennai and Kolkata with six-lane super highways.'},
+{cat:'road',q:'Road density is highest in which state?',ops:['Uttar Pradesh','Jammu & Kashmir','Kerala','Rajasthan'],ans:2,exp:'Road density (road length per 100 sq km) is highest in Kerala and lowest in Jammu & Kashmir.'},
+{cat:'road',q:'Border roads are constructed and maintained by the:',ops:['CPWD','NHAI','Border Roads Organisation','State PWD'],ans:2,exp:'The Border Roads Organisation (BRO) builds and maintains strategic roads in border areas.'},
+{cat:'road',q:'National Highways are laid and maintained by the:',ops:['State PWD','CPWD','NHAI only','Municipalities'],ans:1,exp:'National Highways are laid and maintained by the Central Public Works Department (CPWD).'},
+{cat:'road',q:'Roads carry approximately what share of India\'s passenger traffic?',ops:['50%','70%','85%','100%'],ans:2,exp:'Roads carry about 85% of passenger traffic and nearly 70% of freight traffic.'},
+{cat:'road',q:'Which organisation implements the Golden Quadrilateral project?',ops:['BRO','NHAI','AAI','Indian Railways'],ans:1,exp:'The National Highways Authority of India (NHAI) implements the Golden Quadrilateral.'},
+
+// rail
+{cat:'rail',q:'The first train in India ran in the year:',ops:['1850','1853','1857','1869'],ans:1,exp:'The first train ran in 1853 from Mumbai to Thane, a distance of 34 km.'},
+{cat:'rail',q:'The distance between rails in broad gauge is:',ops:['1.0 m','0.762 m','1.676 m','2.0 m'],ans:2,exp:'Broad gauge has a rail distance of 1.676 m; metre gauge is 1.0 m and narrow gauge 0.762/0.610 m.'},
+{cat:'rail',q:'"Project Unigauge" refers to converting all lines to:',ops:['Metre gauge','Narrow gauge','Broad gauge','Electric lines'],ans:2,exp:'Project Unigauge converts metre and narrow gauge lines into broad gauge for uniformity.'},
+{cat:'rail',q:'Railways are densest in which region?',ops:['The Himalayas','The northern plains','The Thar desert','The Sundarbans'],ans:1,exp:'Railways are densest in the northern plains due to level land, dense population and prosperous agriculture.'},
+{cat:'rail',q:'The Konkan Railway, opened in 1998, links:',ops:['Delhi to Mumbai','Mumbai to Mangaluru','Chennai to Kolkata','Kolkata to Guwahati'],ans:1,exp:'The Konkan Railway links Mumbai to Mangaluru along the west coast through the Western Ghats.'},
+{cat:'rail',q:'Indian Railways is:',ops:['A private company','The largest public sector undertaking','Owned by states','A joint venture'],ans:1,exp:'Indian Railways is the largest public sector undertaking in the country and the lifeline of the nation.'},
+
+// pipe
+{cat:'pipe',q:'The HBJ pipeline stands for:',ops:['Haldia-Barauni-Jaipur','Hazira-Vijaipur-Jagdishpur','Hyderabad-Bhopal-Jodhpur','Haldia-Bhilai-Jamshedpur'],ans:1,exp:'The HBJ gas pipeline runs Hazira-Vijaipur-Jagdishpur, supplying fertiliser and power plants.'},
+{cat:'pipe',q:'National Waterway No.1 (NW1) is on which river?',ops:['Brahmaputra','Godavari','Ganga','Krishna'],ans:2,exp:'NW1 is the Ganga between Allahabad and Haldia (1620 km).'},
+{cat:'pipe',q:'National Waterway No.2 (NW2) lies on the:',ops:['Ganga','Brahmaputra','Mahanadi','West Coast Canal'],ans:1,exp:'NW2 is the Brahmaputra between Sadiya and Dhubri (891 km).'},
+{cat:'pipe',q:'Which is the largest port of India?',ops:['Kandla','Chennai','Mumbai','Kolkata'],ans:2,exp:'Mumbai is the largest port of India, handling a huge volume of trade.'},
+{cat:'pipe',q:'The deepest landlocked and well-protected port is:',ops:['Vishakhapatnam','Kandla','Marmagao','Tuticorin'],ans:0,exp:'Vishakhapatnam is the deepest, landlocked and well-protected port on the east coast.'},
+{cat:'pipe',q:'Kandla (Deendayal) port is a:',ops:['Container port','Tidal port','River port','Fishing harbour'],ans:1,exp:'Kandla (Deendayal) in Gujarat is a tidal port, developed to serve the western and north-western regions.'},
+{cat:'pipe',q:'Why are waterways preferred for heavy goods?',ops:['They are fastest','They are cheapest and eco-friendly','They reach every village','They need no fuel'],ans:1,exp:'Waterways are the cheapest, fuel-efficient and environment-friendly means for carrying bulky goods.'},
+
+// air
+{cat:'air',q:'Air transport in India was nationalised in:',ops:['1947','1950','1953','1962'],ans:2,exp:'Air transport was nationalised in 1953.'},
+{cat:'air',q:'Pawan Hans Limited provides:',ops:['International flights','Helicopter services','Cargo ships','Railway catering'],ans:1,exp:'Pawan Hans provides helicopter services to the petroleum sector, NE region and inaccessible areas.'},
+{cat:'air',q:'Airports in India are managed by the:',ops:['Air India','AAI','NHAI','Pawan Hans'],ans:1,exp:'The Airports Authority of India (AAI) manages the airports across the country.'},
+{cat:'air',q:'Which mode is most useful in the difficult terrain of the North-East?',ops:['Railways','Waterways','Air transport','Pipelines'],ans:2,exp:'Air transport is vital in the NE region owing to its difficult relief, rivers and dense forests.'},
+{cat:'air',q:'Which is the chief advantage of air transport?',ops:['Cheapest','Fastest','Carries bulky goods','Reaches villages'],ans:1,exp:'Air transport is the fastest and most comfortable mode, ideal for long distances and difficult terrain.'},
+
+// comm
+{cat:'comm',q:'India has the world\'s largest:',ops:['Railway network','Postal network','Road network','Airport network'],ans:1,exp:'India has the largest postal network in the world.'},
+{cat:'comm',q:'All India Radio (Akashvani) has broadcast programmes since:',ops:['1923','1936','1947','1959'],ans:0,exp:'All India Radio (Akashvani) has broadcast information, education and entertainment since 1923.'},
+{cat:'comm',q:'India is the largest producer of:',ops:['Newspapers','Feature films','Televisions','Radios'],ans:1,exp:'India is the largest producer of feature films in the world.'},
+
+// trade
+{cat:'trade',q:'Balance of trade is the difference between:',ops:['Income and expenditure','Exports and imports','Savings and spending','GDP and GNP'],ans:1,exp:'Balance of trade = Exports − Imports. It is favourable when exports exceed imports.'},
+{cat:'trade',q:'International trade is considered the:',ops:['Economic barometer of a country','Backbone of agriculture','Basic industry','Only source of income'],ans:0,exp:'International trade is the economic barometer of a country, reflecting its economic health.'},
+{cat:'trade',q:'Roughly how many people are employed directly in tourism in India?',ops:['5 million','15 million','50 million','1 million'],ans:1,exp:'Over 15 million people are employed directly in the tourism industry in India.'},
+];
+
+const CATS={road:{label:'Roadways',color:'var(--blue)',bg:'rgba(96,165,250,.14)'},rail:{label:'Railways',color:'var(--pink)',bg:'rgba(244,114,182,.14)'},pipe:{label:'Pipelines & Water',color:'var(--green)',bg:'rgba(74,222,128,.14)'},air:{label:'Airways',color:'var(--amber)',bg:'rgba(251,191,36,.14)'},comm:{label:'Communication',color:'var(--purple)',bg:'rgba(192,132,252,.14)'},trade:{label:'Trade & Tourism',color:'var(--cyan)',bg:'rgba(34,211,238,.14)'}};
+
+let filtered=[...QS],answered={},sc={total:0,correct:0,wrong:0};
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="setFilter('all',this)">All (${QS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=QS.filter(q=>q.cat===k).length;h+=`<button onclick="setFilter('${k}',this)">${v.label} (${n})</button>`;}f.innerHTML=h;}
+function setFilter(cat,btn){document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...QS]:QS.filter(q=>q.cat===cat);render();}
+function render(){const w=document.getElementById('wrap');w.innerHTML=filtered.map((q)=>{const gi=QS.indexOf(q);const cat=CATS[q.cat];const ans=answered[gi];return `<div class="q-card"><div class="q-head"><span class="q-num">Q${gi+1}</span><span class="q-cat" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><span class="q-text">${q.q}</span></div><div class="opts" id="opts-${gi}">${q.ops.map((o,oi)=>{let cls='opt';if(ans!==undefined){cls+=' disabled';if(oi===q.ans)cls+=' correct';else if(oi===ans)cls+=' wrong';}return `<div class="${cls}" onclick="answer(${gi},${oi})"><span class="letter">${String.fromCharCode(65+oi)}</span><span>${o}</span></div>`;}).join('')}</div><div class="exp ${ans!==undefined?'show':''}" id="exp-${gi}"><strong>Explanation:</strong> ${q.exp}</div></div>`;}).join('');}
+function answer(gi,oi){if(answered[gi]!==undefined)return;answered[gi]=oi;const q=QS[gi];sc.total++;if(oi===q.ans)sc.correct++;else sc.wrong++;document.getElementById('sTotal').textContent=sc.total;document.getElementById('sCorrect').textContent=sc.correct;document.getElementById('sWrong').textContent=sc.wrong;render();}
+buildFilters();render();
+</script>
+</body>
+</html>

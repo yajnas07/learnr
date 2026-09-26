@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Lifelines of National Economy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04141a;--card:#072028;--card2:#0a2c36;--border:#0f3a44;--text:#e4f4f8;--muted:#4a8a9a;--geo:#06b6d4;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#c084fc;--teal:#2dd4bf;--cyan:#22d3ee;--pink:#f472b6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+
+header{text-align:center;padding:1.8rem 1rem 1rem}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--cyan)}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem}
+
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;padding:.5rem 1rem 1.2rem}
+.filters button{font-family:'Lato',sans-serif;font-weight:700;font-size:.74rem;padding:.35rem .9rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.filters button:hover{color:var(--text)}
+.filters button.active{border-color:var(--cyan);color:var(--cyan);background:rgba(34,211,238,.1)}
+
+.progress{display:flex;justify-content:center;align-items:center;gap:1.2rem;padding:0 1rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.progress .count{color:var(--cyan);font-weight:700}
+.progress .known{color:var(--teal)}
+.prog-bar{width:140px;height:5px;background:var(--card);border-radius:9px;overflow:hidden}
+.prog-fill{height:100%;background:var(--cyan);border-radius:9px;transition:width .3s}
+
+.deck{display:flex;justify-content:center;align-items:center;padding:1rem;min-height:380px;perspective:1200px}
+.flip-card{width:100%;max-width:520px;height:320px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-card .front,.flip-card .back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;border:1px solid var(--border)}
+.flip-card .front{background:var(--card)}
+.flip-card .back{background:var(--card2);transform:rotateY(180deg)}
+.flip-card .front h2{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;line-height:1.55;color:var(--text)}
+.flip-card .back p{font-size:.88rem;line-height:1.75;color:var(--text)}
+.flip-card .back p strong{color:var(--cyan)}
+.flip-card .back p em{color:var(--teal);font-style:normal}
+.cat-badge{font-family:'DM Mono',monospace;font-size:.62rem;padding:.15rem .55rem;border-radius:99px;margin-bottom:.8rem}
+.hint{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:1rem}
+
+.controls{display:flex;justify-content:center;gap:.6rem;padding:.8rem 1rem;flex-wrap:wrap}
+.ctrl{font-family:'Lato',sans-serif;font-weight:700;font-size:.76rem;padding:.4rem 1.1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.ctrl:hover{color:var(--text);border-color:#1a6a7a}
+.ctrl.know{border-color:var(--teal);color:var(--teal);background:rgba(45,212,191,.06)}
+
+.keys{text-align:center;padding:.5rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;background:rgba(4,20,26,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(15,58,68,.75);position:sticky;top:0;z-index:9999}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none}
+.site-nav-img{height:28px;border-radius:4px}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-decoration:none;border:1px solid rgba(15,58,68,.9);border-radius:99px;padding:.2rem .65rem}
+.site-nav-back:hover{color:var(--cyan)}
+</style>
+</head>
+<body>
+<nav class="site-nav"><a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a><a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a></nav>
+
+<header>
+  <h1>Flashcards</h1>
+  <p>Lifelines of National Economy · Geography Ch.7 · 35 Cards</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress"><span class="count" id="pos">1 / 35</span><div class="prog-bar"><div class="prog-fill" id="prog"></div></div><span class="known" id="knownCount">0 known</span></div>
+<div class="deck" id="deck"></div>
+<div class="controls">
+  <button class="ctrl" onclick="prev()">← Prev</button>
+  <button class="ctrl" onclick="flipCard()">⟳ Flip</button>
+  <button class="ctrl know" onclick="markKnown()">✓ Know it</button>
+  <button class="ctrl" onclick="next()">Next →</button>
+  <button class="ctrl" onclick="shuffle()">⤮ Shuffle</button>
+  <button class="ctrl" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="keys">Keyboard: ← → (navigate) · Space (flip) · K (know it) · S (shuffle)</div>
+
+<script>
+const CARDS=[
+// roads (7)
+{cat:'road',q:'Why are roadways preferred over railways in many cases?',a:'Roads are <strong>cheaper to construct</strong>, can negotiate <strong>hilly and dissected terrain</strong>, and offer <strong>door-to-door service</strong> with lower loading costs. They also act as feeders to railways, airports and ports.'},
+{cat:'road',q:'What is the Golden Quadrilateral?',a:'A network of <strong>six-lane super highways</strong> connecting <strong>Delhi–Mumbai–Chennai–Kolkata</strong>, along with the North-South and East-West corridors. It is laid and maintained by the <strong>NHAI</strong> to reduce time and distance.'},
+{cat:'road',q:'Name the different types of roads in India.',a:'<strong>Golden Quadrilateral super highways, National Highways, State Highways, District roads, Other roads</strong>, and strategic <strong>Border Roads</strong> built by the Border Roads Organisation (BRO).'},
+{cat:'road',q:'What are National Highways?',a:'Roads that <strong>link states and major cities</strong>, laid and maintained by the <strong>Central Public Works Department (CPWD)</strong>. Example: the historic Sher-Shah Suri Marg (NH-1) from Delhi to Amritsar.'},
+{cat:'road',q:'What is road density and where is it highest/lowest?',a:'Road density is the <strong>length of road per 100 sq km of area</strong>. It is <strong>highest in Kerala</strong> and <strong>lowest in Jammu & Kashmir</strong>.'},
+{cat:'road',q:'What is the role of Border Roads?',a:'The <strong>Border Roads Organisation (BRO)</strong> constructs and maintains roads in the <strong>bordering and strategic areas</strong>. They improve accessibility and help the economic development of remote regions.'},
+{cat:'road',q:'What share of traffic do roads carry in India?',a:'Roads carry about <strong>85% of passenger traffic</strong> and nearly <strong>70% of freight traffic</strong>, making road transport the dominant mode of internal transport.'},
+
+// rail (7)
+{cat:'rail',q:'Why are railways called the lifeline of the nation?',a:'Railways are the <strong>principal mode of transport</strong> for freight and passengers, binding the country <strong>economically and socially</strong>. They carry out multifarious activities — business, travel, pilgrimage and long-distance goods.'},
+{cat:'rail',q:'When and where did the first train run in India?',a:'The first train ran in <strong>1853</strong> from <strong>Mumbai to Thane</strong>, covering a distance of <strong>34 km</strong>.'},
+{cat:'rail',q:'What are the three railway gauges in India?',a:'<strong>Broad gauge</strong> (1.676 m), <strong>Metre gauge</strong> (1.0 m), and <strong>Narrow gauge</strong> (0.762 m & 0.610 m — mostly in hilly areas).'},
+{cat:'rail',q:'What is Project Unigauge?',a:'A programme of Indian Railways to <strong>convert metre and narrow gauge lines into broad gauge</strong>, creating uniformity and improving speed and efficiency across the network.'},
+{cat:'rail',q:'What factors affect the distribution of railways?',a:'<strong>Physical (relief), economic and administrative factors</strong>. Railways are dense in the <strong>northern plains</strong> (level land, dense population, farming) but sparse in the Himalayas, deserts, forests and marshy Sundarbans.'},
+{cat:'rail',q:'What is the Konkan Railway?',a:'Opened in <strong>1998</strong>, it links <strong>Mumbai to Mangaluru</strong> along the west coast. An engineering marvel with many tunnels and bridges through the difficult Western Ghats terrain.'},
+{cat:'rail',q:'What problems does the railway system face?',a:'Problems include <strong>ticketless travel, theft and damage of railway property, and unnecessary pulling of chains</strong>, which cause losses and delays.'},
+
+// pipe (7)
+{cat:'pipe',q:'What do pipelines transport?',a:'Pipelines carry <strong>crude oil, petroleum products and natural gas</strong> from oil and gas fields to refineries, factories and towns. They can even transport solids as slurry.'},
+{cat:'pipe',q:'What are the advantages and drawbacks of pipelines?',a:'Advantages: <strong>rugged terrain and undersea routes possible, low running cost, minimal transhipment loss</strong>. Drawback: <strong>high initial cost</strong> and difficulty in detecting or repairing leaks.'},
+{cat:'pipe',q:'Name the important pipeline networks of India.',a:'(1) Upper Assam → Kanpur (via Guwahati, Barauni); (2) Salaya (Gujarat) → Jalandhar (via Viramgam, Mathura, Delhi); (3) <strong>Hazira–Vijaipur–Jagdishpur (HBJ)</strong> gas pipeline.'},
+{cat:'pipe',q:'Why are waterways considered ideal for bulky goods?',a:'Waterways are the <strong>cheapest means of transport</strong>, most suited for <strong>heavy and bulky goods</strong>. They are <strong>fuel-efficient and environment-friendly</strong>.'},
+{cat:'pipe',q:'What are National Waterways NW1, NW2 and NW3?',a:'<strong>NW1</strong>: the Ganga between Allahabad and Haldia (1620 km). <strong>NW2</strong>: the Brahmaputra between Sadiya and Dhubri (891 km). <strong>NW3</strong>: the West Coast Canal in Kerala.'},
+{cat:'pipe',q:'Which are some distinctive major seaports of India?',a:'<strong>Kandla (Deendayal)</strong> — tidal port; <strong>Mumbai</strong> — largest port; <strong>JLN (Nhava Sheva)</strong> — largest container port; <strong>Chennai</strong> — oldest; <strong>Vishakhapatnam</strong> — deepest, landlocked.'},
+{cat:'pipe',q:'How many major ports does India have?',a:'India has <strong>12 major ports</strong> and around <strong>200 non-major (minor) ports</strong>. They handle about 95% of India\'s foreign trade by volume.'},
+
+// air (6)
+{cat:'air',q:'Why is air transport the most preferred for long distances?',a:'It is the <strong>fastest, most comfortable and prestigious</strong> mode. It can cover <strong>difficult terrain</strong> like high mountains, dreary deserts, dense forests and long oceanic stretches with ease.'},
+{cat:'air',q:'When was air transport nationalised in India?',a:'Air transport was <strong>nationalised in 1953</strong>. <strong>Air India</strong> provides international services, while <strong>Indian Airlines and Alliance Air</strong> provided domestic services.'},
+{cat:'air',q:'What is Pawan Hans Limited?',a:'A company that provides <strong>helicopter services</strong> to the <strong>petroleum sector, the North-East region and other inaccessible/hilly areas</strong>.'},
+{cat:'air',q:'Why is air travel especially important in the North-East?',a:'The North-East has <strong>difficult relief, numerous rivers and dense forests</strong>, making surface transport hard. Air travel provides quick, reliable connectivity and is vital during floods and disaster relief.'},
+{cat:'air',q:'Which body manages airports in India?',a:'The <strong>Airports Authority of India (AAI)</strong> manages the airports. Major international airports include Delhi, Mumbai, Kolkata, Chennai, Bengaluru and Hyderabad.'},
+{cat:'air',q:'What kinds of goods are best carried by air?',a:'Air transport is best for <strong>high-value, light-weight and perishable goods</strong>, and for carrying passengers quickly over long distances.'},
+
+// comm (4)
+{cat:'comm',q:'What are the two types of communication?',a:'<strong>Personal communication</strong> (post, telephone, mobile) and <strong>mass communication</strong> (radio, television, newspapers, magazines and films).'},
+{cat:'comm',q:'How is the Indian postal network described?',a:'India has the <strong>largest postal network in the world</strong>. Mail is divided into <strong>first-class</strong> (cards, envelopes — carried by air) and <strong>second-class</strong> (book packets, registered newspapers).'},
+{cat:'comm',q:'How does mass communication work in India?',a:'Through <strong>radio (All India Radio/Akashvani, since 1923)</strong>, <strong>Doordarshan</strong> (one of the largest terrestrial TV networks), newspapers in over 100 languages, and films. India is the <strong>largest producer of feature films</strong> in the world.'},
+{cat:'comm',q:'What makes India\'s telecom network notable?',a:'India has one of the largest telecom networks in Asia. There is a <strong>uniform rate of STD</strong> across the country, linked through <strong>satellite communication</strong>, with 24-hour STD facilities even in villages.'},
+
+// trade (4)
+{cat:'trade',q:'What is the difference between local trade and international trade?',a:'Trade <strong>within a country</strong> is internal (local) trade; trade <strong>between two countries</strong> is international trade, carried on through sea, air or land routes.'},
+{cat:'trade',q:'What is balance of trade?',a:'<strong>Balance of trade = Exports − Imports.</strong> It is <strong>favourable</strong> when exports exceed imports, and <strong>unfavourable</strong> when imports exceed exports.'},
+{cat:'trade',q:'What are India\'s main exports and imports?',a:'<strong>Exports:</strong> gems & jewellery, chemicals, textiles, engineering goods, agricultural & petroleum products. <strong>Imports:</strong> petroleum, machinery, gold, silver and electronic goods.'},
+{cat:'trade',q:'Why is tourism important to India?',a:'Tourism is a <strong>growing industry</strong> employing over <strong>15 million people</strong> directly. It <strong>promotes national integration, earns foreign exchange</strong>, and supports local handicrafts and culture. Types include heritage, eco, medical and adventure tourism.'},
+];
+
+const CATS={road:{label:'Roadways',color:'var(--blue)',bg:'rgba(96,165,250,.12)'},rail:{label:'Railways',color:'var(--pink)',bg:'rgba(244,114,182,.12)'},pipe:{label:'Pipelines & Water',color:'var(--green)',bg:'rgba(74,222,128,.12)'},air:{label:'Airways',color:'var(--amber)',bg:'rgba(251,191,36,.12)'},comm:{label:'Communication',color:'var(--purple)',bg:'rgba(192,132,252,.12)'},trade:{label:'Trade & Tourism',color:'var(--cyan)',bg:'rgba(34,211,238,.12)'}};
+
+let filtered=[...CARDS],idx=0,known=new Set(),currentCat='all';
+
+function buildFilters(){const f=document.getElementById('filters');let h=`<button class="active" onclick="setFilter('all',this)">All (${CARDS.length})</button>`;for(const[k,v]of Object.entries(CATS)){const n=CARDS.filter(c=>c.cat===k).length;h+=`<button onclick="setFilter('${k}',this)">${v.label} (${n})</button>`;}f.innerHTML=h;}
+function setFilter(cat,btn){currentCat=cat;document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filtered=cat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===cat);idx=0;render();}
+function render(){if(!filtered.length)return;if(idx>=filtered.length)idx=0;if(idx<0)idx=filtered.length-1;const c=filtered[idx],cat=CATS[c.cat];document.getElementById('deck').innerHTML=`<div class="flip-card" id="fc" onclick="flipCard()"><div class="front"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><h2>${c.q}</h2><span class="hint">tap to flip</span></div><div class="back"><span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span><p>${c.a.replace(/\n/g,'<br>')}</p></div></div>`;document.getElementById('pos').textContent=`${idx+1} / ${filtered.length}`;document.getElementById('prog').style.width=((idx+1)/filtered.length*100)+'%';document.getElementById('knownCount').textContent=known.size+' known';}
+function flipCard(){document.getElementById('fc')?.classList.toggle('flipped')}
+function next(){idx++;render()} function prev(){idx--;render()}
+function markKnown(){known.add(filtered[idx].q);next();}
+function shuffle(){filtered.sort(()=>Math.random()-.5);idx=0;render();}
+function resetAll(){known.clear();filtered=currentCat==='all'?[...CARDS]:CARDS.filter(c=>c.cat===currentCat);idx=0;render();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();else if(e.key===' '){e.preventDefault();flipCard();}else if(e.key==='k'||e.key==='K')markKnown();else if(e.key==='s'||e.key==='S')shuffle();});
+buildFilters();render();
+</script>
+</body>
+</html>

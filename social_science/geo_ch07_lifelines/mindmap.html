@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Lifelines of National Economy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#04141a; font-family:'Lato',sans-serif; overflow:hidden; width:100vw; height:100vh; }
+canvas { position:absolute; inset:0; }
+
+#ui {
+  position:absolute; top:42px; left:0; right:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1.2rem; z-index:10; pointer-events:none;
+  background:linear-gradient(to bottom, rgba(4,20,26,.9) 0%, transparent 100%);
+}
+#ui h1 {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900;
+  color:#22d3ee; letter-spacing:.5px;
+}
+#ui p { font-family:'DM Mono',monospace; font-size:.65rem; color:#3a7a8a; margin-top:.1rem; }
+
+.ctrl-bar {
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.ctrl-btn {
+  font-family:'DM Mono',monospace; font-weight:500; font-size:.72rem;
+  padding:.4rem 1rem; border-radius:99px;
+  border:1px solid #0f3a44; background:rgba(4,20,26,.85);
+  color:#3a9aab; cursor:pointer; transition:all .2s; pointer-events:all;
+  backdrop-filter:blur(4px);
+}
+.ctrl-btn:hover { border-color:#22d3ee; color:#22d3ee; }
+
+#tooltip {
+  position:absolute; z-index:20; pointer-events:none;
+  background:#072028; border:1px solid #0f3a44;
+  border-radius:10px; padding:.7rem 1rem;
+  max-width:290px; font-size:.8rem; color:#cdeef4;
+  line-height:1.6; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.7);
+}
+#tooltip strong { font-family:'Playfair Display',serif; display:block; margin-bottom:.3rem; color:#22d3ee; font-size:.9rem; }
+
+.site-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.42rem 1.2rem; width:100%;
+  background:rgba(4,20,26,.9); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(15,58,68,.75);
+  position:absolute; top:0; left:0; right:0; z-index:9999;
+}
+.site-nav-logo { display:flex; align-items:center; text-decoration:none; }
+.site-nav-img  { height:28px; border-radius:4px; }
+.site-nav-back {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:#3a9aab; text-decoration:none;
+  border:1px solid rgba(15,58,68,.9); border-radius:99px;
+  padding:.2rem .65rem;
+}
+.site-nav-back:hover { color:#22d3ee; border-color:#1a6a7a; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+
+<div id="ui">
+  <div>
+    <h1>Lifelines of National Economy</h1>
+    <p>Class X · Geography Ch.7 — drag to pan · scroll to zoom · hover nodes</p>
+  </div>
+</div>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="zoom(1.2)">＋ Zoom</button>
+  <button class="ctrl-btn" onclick="zoom(0.83)">－ Zoom</button>
+  <button class="ctrl-btn" onclick="resetView()">⌖ Reset</button>
+</div>
+
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const tip = document.getElementById('tooltip');
+let W, H, scale=1, ox=0, oy=0;
+let dragging=false, dragStart={x:0,y:0}, dragOrigin={x:0,y:0};
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; ox=W/2; oy=H/2+20; draw(); }
+window.addEventListener('resize', resize);
+
+const CENTER = {
+  id:'c', label:'Lifelines of\nNational Economy',
+  x:0, y:0, r:74, color:'#062028', stroke:'#22d3ee', textColor:'#22d3ee', fontSize:13
+};
+
+const BRANCHES = [
+  // Roadways
+  {
+    id:'road', label:'Roadways', x:-320, y:-200, r:48,
+    color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+    info:'India has one of the largest road networks in the world (~62.16 lakh km). Roads are more suited to hilly terrain and are cheaper to build than railways.',
+    children:[
+      { id:'rd1', label:'Types of\nRoads', x:-510, y:-310, r:36, color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Classification of roads:\n• Golden Quadrilateral Super Highways — link Delhi-Mumbai-Chennai-Kolkata.\n• National Highways — link states, built by CPWD.\n• State Highways — link state capital to districts.\n• District & Other roads.\n• Border Roads — strategic, in border areas (BRO).' },
+      { id:'rd2', label:'Golden\nQuadrilateral', x:-505, y:-160, r:36, color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Golden Quadrilateral:\n• 6-lane super highways linking Delhi–Mumbai–Chennai–Kolkata.\n• North-South corridor: Srinagar to Kanniyakumari.\n• East-West corridor: Silchar to Porbandar.\n• Implemented by NHAI. Reduces time & distance.' },
+      { id:'rd3', label:'Road\nDensity', x:-460, y:-50, r:36, color:'#0a1420', stroke:'#60a5fa', textColor:'#dbeafe',
+        info:'Road density = length of road per 100 sq km area.\n• Highest in Kerala; lowest in Jammu & Kashmir.\n• Roads still carry ~85% of passenger & 70% of freight traffic.\n• Advantages: cheaper, door-to-door, feed railways & ports.' },
+    ]
+  },
+
+  // Railways
+  {
+    id:'rail', label:'Railways', x:320, y:-200, r:48,
+    color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+    info:'The principal mode of transport for freight & passengers. The lifeline of the nation — largest public sector undertaking. First train ran in 1853 (Mumbai to Thane).',
+    children:[
+      { id:'rl1', label:'Railway\nGauges', x:520, y:-320, r:36, color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Railway gauges (distance between rails):\n• Broad gauge (1.676 m).\n• Metre gauge (1.0 m).\n• Narrow gauge (0.762 & 0.610 m) — hilly areas.\n• "Project Unigauge" converts all to broad gauge.\n• First train: 1853, Mumbai to Thane (34 km).' },
+      { id:'rl2', label:'Distribution', x:540, y:-180, r:36, color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Railway distribution influenced by relief, population, economy:\n• Dense in the northern plains — level land, dense population, farming.\n• Sparse in Himalayas, deserts, forests, marshy Sundarbans.\n• Konkan Railway (1998) links Mumbai-Mangaluru along the west coast.' },
+      { id:'rl3', label:'Importance', x:510, y:-60, r:36, color:'#180a14', stroke:'#f472b6', textColor:'#fce7f3',
+        info:'Importance of railways:\n• Conduct multifarious activities — business, sightseeing, pilgrimage, long-distance goods.\n• Bind the country economically & socially.\n• Problems: ticketless travel, theft, pulling chains unnecessarily.' },
+    ]
+  },
+
+  // Pipelines & Waterways
+  {
+    id:'pipe', label:'Pipelines &\nWaterways', x:-310, y:220, r:48,
+    color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+    info:'Pipelines transport crude oil, gas & liquids. Waterways are the cheapest means for heavy & bulky goods — fuel-efficient & eco-friendly.',
+    children:[
+      { id:'pp1', label:'Pipelines', x:-500, y:140, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'Pipelines:\n• Transport crude oil, petroleum products & natural gas.\n• Now used to supply fertiliser factories & power/industry.\n• Networks: Oil field (Assam) to Kanpur; Salaya (Gujarat) to Jalandhar; HBJ gas pipeline (Hazira-Vijaipur-Jagdishpur).\n• High initial cost but low running cost.' },
+      { id:'pp2', label:'Inland\nWaterways', x:-495, y:285, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'Inland Waterways (National Waterways):\n• NW1: Ganga (Allahabad-Haldia) 1620 km.\n• NW2: Brahmaputra (Sadiya-Dhubri) 891 km.\n• NW3: West Coast Canal (Kerala).\n• Also Godavari, Krishna, Barak, Sundarbans, Buckingham Canal.' },
+      { id:'pp3', label:'Major\nSeaports', x:-440, y:400, r:36, color:'#0a1808', stroke:'#a3e635', textColor:'#ecfccb',
+        info:'India has 12 major & 200 non-major ports:\n• Kandla (Deendayal) — tidal port, Gujarat.\n• Mumbai — largest port. JLN (Nhava Sheva) — largest container port.\n• Marmagao, New Mangaluru, Kochi, Chennai (oldest), Vishakhapatnam (deepest), Paradip, Haldia, Kolkata, Tuticorin.' },
+    ]
+  },
+
+  // Airways
+  {
+    id:'air', label:'Airways', x:310, y:220, r:48,
+    color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+    info:'The fastest, most comfortable & prestigious mode of transport. Can cover difficult terrain like high mountains, deserts & oceans easily.',
+    children:[
+      { id:'ar1', label:'Air\nTravel', x:510, y:140, r:36, color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Air travel:\n• Fastest but costliest mode.\n• Nationalised in 1953.\n• Air India — international; Indian Airlines/Alliance Air — domestic.\n• Pawan Hans Ltd — helicopter services to petroleum sector & inaccessible areas.' },
+      { id:'ar2', label:'Reach &\nUses', x:530, y:270, r:36, color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Uses of airways:\n• Overcomes barriers of terrain — mountains, deserts, oceans.\n• Vital for the NE region (relief), disaster relief.\n• Carries high-value, perishable & light goods.\n• Air travel now accessible to common people (regional connectivity).' },
+      { id:'ar3', label:'Airports', x:470, y:390, r:36, color:'#1a1000', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'Major airports:\n• International: Delhi, Mumbai, Kolkata, Chennai, Bengaluru, Hyderabad.\n• Airports Authority of India (AAI) manages airports.\n• Air transport connects India to the world for trade & tourism.' },
+    ]
+  },
+
+  // Communication
+  {
+    id:'comm', label:'Communication', x:0, y:-310, r:48,
+    color:'#180a1a', stroke:'#c084fc', textColor:'#f3e8ff',
+    info:'Communication networks help share information over long distances. Personal (post, telephone) & mass communication (radio, TV, press, films).',
+    children:[
+      { id:'cm1', label:'Postal &\nTelecom', x:-170, y:-430, r:36, color:'#180a1a', stroke:'#c084fc', textColor:'#f3e8ff',
+        info:'Personal communication:\n• Indian postal network is the largest in the world.\n• 1st class (cards, envelopes) & 2nd class (book packets, registered).\n• Rapid post, Speed post, media post.\n• India has one of the largest telecom networks — STD & mobile everywhere.' },
+      { id:'cm2', label:'Mass\nMedia', x:0, y:-450, r:36, color:'#180a1a', stroke:'#c084fc', textColor:'#f3e8ff',
+        info:'Mass communication:\n• Radio (All India Radio/Akashvani) — since 1923.\n• Doordarshan (TV) — one of the largest terrestrial networks.\n• Newspapers in many languages; Hindi has the largest circulation.\n• India is the largest producer of feature films in the world.' },
+      { id:'cm3', label:'Uniform\nAccess', x:170, y:-430, r:36, color:'#180a1a', stroke:'#c084fc', textColor:'#f3e8ff',
+        info:'Uniform telecom access:\n• Uniform rate of STD facilities across India — linked by satellite communication.\n• 24-hour STD everywhere, from towns to villages.\n• Boosts business, banking & social connectivity.' },
+    ]
+  },
+
+  // Trade & Tourism
+  {
+    id:'trade', label:'Trade &\nTourism', x:0, y:310, r:48,
+    color:'#08181a', stroke:'#2dd4bf', textColor:'#ccfbf1',
+    info:'Trade is the exchange of goods & services. International trade is the economic barometer of a nation. Tourism promotes national integration & foreign exchange.',
+    children:[
+      { id:'tr1', label:'Int\'l\nTrade', x:-180, y:430, r:36, color:'#08181a', stroke:'#2dd4bf', textColor:'#ccfbf1',
+        info:'International trade:\n• Trade between two countries = international trade (via sea, air, land).\n• Balance of trade = exports − imports. Favourable when exports > imports.\n• India exports gems, chemicals, textiles, engineering & petroleum products.\n• Imports: petroleum, machinery, gold, electronics.' },
+      { id:'tr2', label:'Exports &\nImports', x:0, y:460, r:36, color:'#08181a', stroke:'#2dd4bf', textColor:'#ccfbf1',
+        info:'India\'s trade:\n• Exports: agricultural products, ores, gems & jewellery, engineering goods, petroleum products, chemicals.\n• Imports: petroleum, machinery, precious stones, chemicals.\n• International trade is the economic barometer of a country.' },
+      { id:'tr3', label:'Tourism', x:180, y:430, r:36, color:'#08181a', stroke:'#2dd4bf', textColor:'#ccfbf1',
+        info:'Tourism in India:\n• A growing industry; supports many others.\n• Over 15 million people employed directly.\n• Promotes national integration, foreign exchange & local handicrafts/culture.\n• Types: heritage, eco, medical, adventure, business tourism.\n• Foreign tourists visit for heritage, beaches, wildlife.' },
+    ]
+  },
+];
+
+const allNodes=[CENTER];
+const allEdges=[];
+BRANCHES.forEach(b=>{
+  allNodes.push(b);
+  allEdges.push({from:'c',to:b.id});
+  (b.children||[]).forEach(ch=>{
+    allNodes.push(ch);
+    allEdges.push({from:b.id,to:ch.id});
+  });
+});
+function getNode(id){return allNodes.find(n=>n.id===id);}
+
+canvas.addEventListener('mousedown',e=>{dragging=true;dragStart={x:e.clientX,y:e.clientY};dragOrigin={x:ox,y:oy};});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){ox=dragOrigin.x+(e.clientX-dragStart.x);oy=dragOrigin.y+(e.clientY-dragStart.y);draw();return;}
+  const mx=(e.clientX-ox)/scale, my=(e.clientY-oy)/scale;
+  let found=null;
+  allNodes.forEach(n=>{const dx=mx-n.x,dy=my-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.r+6)found=n;});
+  if(found&&found.info){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=Math.min(e.clientY-10,window.innerHeight-240)+'px';
+    tip.innerHTML=`<strong>${found.label.replace(/\n/g,' ')}</strong>${found.info.replace(/\n/g,'<br>')}`;
+    canvas.style.cursor='pointer';
+  } else {tip.style.display='none';canvas.style.cursor='grab';}
+});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>{dragging=false;tip.style.display='none';});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.1:0.91,e.clientX,e.clientY);},{passive:false});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX,y:e.touches[0].clientY};dragOrigin={x:ox,y:oy};}});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&dragging){ox=dragOrigin.x+(e.touches[0].clientX-dragStart.x);oy=dragOrigin.y+(e.touches[0].clientY-dragStart.y);draw();}
+  if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist){const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;zoomAt(d/lastTouchDist,cx,cy);}
+    lastTouchDist=d;}
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=false;lastTouchDist=null;});
+
+function zoomAt(f,cx,cy){const prev=scale;scale=Math.max(.22,Math.min(2.5,scale*f));ox=cx-(cx-ox)*(scale/prev);oy=cy-(cy-oy)*(scale/prev);draw();}
+function zoom(f){zoomAt(f,W/2,H/2);}
+function resetView(){scale=1;ox=W/2;oy=H/2+20;draw();}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+  ctx.strokeStyle='rgba(34,211,238,.03)'; ctx.lineWidth=1;
+  for(let x=-1400;x<1400;x+=70){ctx.beginPath();ctx.moveTo(x,-1400);ctx.lineTo(x,1400);ctx.stroke();}
+  for(let y=-1400;y<1400;y+=70){ctx.beginPath();ctx.moveTo(-1400,y);ctx.lineTo(1400,y);ctx.stroke();}
+
+  allEdges.forEach(e=>{
+    const a=getNode(e.from),b=getNode(e.to);
+    if(!a||!b)return;
+    const grd=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    grd.addColorStop(0,a.stroke+'66');
+    grd.addColorStop(1,b.stroke+'33');
+    const cpx=(a.x+b.x)/2+(b.y-a.y)*.15, cpy=(a.y+b.y)/2-(b.x-a.x)*.15;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(cpx,cpy,b.x,b.y);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=e.from==='c'?2.5:1.5;
+    ctx.setLineDash(e.from==='c'?[]:[5,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  allNodes.forEach(n=>{
+    ctx.save();
+    ctx.shadowColor=n.stroke; ctx.shadowBlur=n.id==='c'?38:20;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.strokeStyle=n.stroke; ctx.lineWidth=n.id==='c'?3:2; ctx.stroke();
+
+    if(n.id==='c'){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r-9,0,Math.PI*2);
+      ctx.strokeStyle=n.stroke+'44'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    ctx.fillStyle=n.textColor;
+    ctx.font=`700 ${n.fontSize||10}px Lato,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lines=n.label.split('\n');
+    const lh=13;
+    const startY=n.y-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,n.x,startY+i*lh));
+  });
+
+  ctx.restore();
+}
+
+resize();
+</script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Lifelines of National Economy · LearnR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04141a;--card:#072028;--card2:#0a2c36;--border:#0f3a44;
+  --text:#e4f4f8;--muted:#4a8a9a;--geo:#06b6d4;
+  --green:#4ade80;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#c084fc;--teal:#2dd4bf;--cyan:#22d3ee;--pink:#f472b6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+.top-nav{display:flex;align-items:center;gap:16px;padding:10px 22px;background:rgba(4,20,26,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:27px}
+.nav-bc{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.nav-bc a{color:var(--muted);text-decoration:none}.nav-bc a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-cur{color:var(--cyan);font-weight:700}
+.nav-back{margin-left:auto;padding:5px 13px;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);border-radius:18px;color:var(--cyan);font-size:.78rem;text-decoration:none;transition:all .2s}
+.nav-back:hover{background:rgba(6,182,212,.2)}
+
+.page-hdr{padding:28px 20px 16px;text-align:center}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.85rem;color:#fff;margin-bottom:5px}
+.page-hdr p{color:var(--muted);font-size:.9rem}
+.ch-badge{display:inline-block;padding:3px 10px;background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.35);border-radius:12px;color:var(--cyan);font-size:.73rem;font-weight:700;margin-bottom:8px}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 56px}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:7px 16px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.tab.active{border-color:var(--geo);background:rgba(6,182,212,.1);color:var(--cyan);font-weight:700}
+
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.panel-title{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;color:var(--text)}
+.panel-body{padding:18px}
+
+.rtable{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:4px}
+.rtable th{padding:8px 12px;background:rgba(6,182,212,.1);color:var(--cyan);font-weight:700;text-align:left;border-bottom:1px solid var(--border)}
+.rtable td{padding:8px 12px;border-bottom:1px solid rgba(15,58,68,.5);vertical-align:top}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(6,182,212,.04)}
+
+.ibox{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:12px}
+.ibox strong{color:var(--text)}
+.ibox .kw{color:var(--cyan);font-weight:700}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px}
+.info-card{border-radius:12px;padding:14px;border:1px solid var(--border);background:var(--card2);transition:all .25s}
+.info-card:hover{transform:translateY(-2px);border-color:rgba(6,182,212,.3)}
+.info-card h4{font-size:.88rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+.info-card p{font-size:.76rem;line-height:1.65;color:var(--muted)}
+.info-card .ic-icon{font-size:1.5rem;margin-bottom:8px;display:block}
+
+.timeline{position:relative;padding-left:28px;margin-top:12px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--cyan),var(--teal))}
+.tl-item{position:relative;margin-bottom:18px;padding-bottom:4px}
+.tl-item::before{content:'';position:absolute;left:-24px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--cyan);background:var(--bg)}
+.tl-item h4{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.tl-item p{font-size:.76rem;line-height:1.6;color:var(--muted)}
+.tl-item .tl-year{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--cyan);margin-bottom:2px}
+
+.bar-chart{margin-top:12px}
+.bar-row{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px}
+.bar-label span:first-child{color:var(--text)}
+.bar-label span:last-child{font-family:'DM Mono',monospace;color:var(--cyan)}
+.bar-track{height:12px;background:#0a2c36;border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width 1.2s ease}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../../index.html" class="nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <div class="nav-bc">
+    <a href="../../index.html">Home</a><span class="nav-sep">/</span>
+    <a href="../../index.html">Geography</a><span class="nav-sep">/</span>
+    <span class="nav-cur">Lifelines of National Economy</span>
+  </div>
+  <a href="../../index.html" class="nav-back">← Back</a>
+</nav>
+
+<div class="page-hdr">
+  <div class="ch-badge">Geography · Ch.7</div>
+  <h1>Lifelines of National Economy</h1>
+  <p>Roadways, railways, pipelines, waterways, airways, communication and international trade</p>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="show(0,this)">🛣️ Roadways</button>
+    <button class="tab" onclick="show(1,this)">🚆 Railways</button>
+    <button class="tab" onclick="show(2,this)">🛢️ Pipelines & Water</button>
+    <button class="tab" onclick="show(3,this)">✈️ Airways</button>
+    <button class="tab" onclick="show(4,this)">📡 Communication</button>
+    <button class="tab" onclick="show(5,this)">🌍 Trade & Tourism</button>
+  </div>
+
+  <!-- TAB 0: Roadways -->
+  <div class="panel active" id="p0">
+    <div class="panel-card">
+      <div class="panel-title">🛣️ Road Transport</div>
+      <div class="panel-body">
+        <div class="ibox">
+          India has one of the <span class="kw">largest road networks in the world</span> (~62.16 lakh km). Roads are cheaper to build, suit hilly & dissected terrain, and offer <strong>door-to-door service</strong>. They carry ~85% of passenger and ~70% of freight traffic.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">Classification of Roads</h3>
+        <table class="rtable">
+          <tr><th>Type</th><th>Description</th></tr>
+          <tr><td><strong>Golden Quadrilateral</strong></td><td>6-lane super highways linking Delhi–Mumbai–Chennai–Kolkata; N-S & E-W corridors. By NHAI.</td></tr>
+          <tr><td><strong>National Highways</strong></td><td>Link states & major cities; maintained by CPWD. E.g., NH-1 (Delhi–Amritsar).</td></tr>
+          <tr><td><strong>State Highways</strong></td><td>Link state capital with district headquarters; built by State PWD.</td></tr>
+          <tr><td><strong>District Roads</strong></td><td>Connect district headquarters with other places of the district.</td></tr>
+          <tr><td><strong>Border Roads</strong></td><td>Strategic roads in border areas; built by Border Roads Organisation (BRO).</td></tr>
+        </table>
+
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--cyan)">
+          <strong>Road density</strong> = length of road per 100 sq km of area. It is <span class="kw">highest in Kerala</span> and <span class="kw">lowest in Jammu & Kashmir</span>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: Railways -->
+  <div class="panel" id="p1">
+    <div class="panel-card">
+      <div class="panel-title">🚆 Rail Transport</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Railways are the <span class="kw">principal mode of transport</span> for freight and passengers, and the <strong>largest public sector undertaking</strong> in India. The first train ran in <strong>1853</strong> from Mumbai to Thane (34 km).
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">Railway Gauges</h3>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--cyan)"><div class="ic-icon">🛤️</div><h4>Broad Gauge</h4><p>Distance between rails = 1.676 m. Most common; "Project Unigauge" converts other lines to broad gauge.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🛤️</div><h4>Metre Gauge</h4><p>Distance = 1.0 m. Being converted to broad gauge for uniformity.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">🛤️</div><h4>Narrow Gauge</h4><p>0.762 m & 0.610 m — mostly in hilly areas (e.g., Nilgiri, Darjeeling toy trains).</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🌊</div><h4>Konkan Railway</h4><p>Opened 1998; links Mumbai to Mangaluru along the west coast — an engineering marvel with many tunnels.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">Factors Affecting Distribution</h3>
+        <div class="ibox">
+          Railway distribution depends on <strong>relief, population and economic activity</strong>. It is <span class="kw">dense in the northern plains</span> (level land, dense population, farming) but sparse in the Himalayas, deserts, forests and the marshy Sundarbans.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Pipelines & Waterways -->
+  <div class="panel" id="p2">
+    <div class="panel-card">
+      <div class="panel-title">🛢️ Pipelines & Waterways</div>
+      <div class="panel-body">
+        <div class="ibox">
+          <span class="kw">Pipelines</span> transport crude oil, petroleum products and natural gas. <span class="kw">Waterways</span> are the <strong>cheapest, most fuel-efficient and eco-friendly</strong> means for carrying heavy and bulky goods.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">Major Pipeline Networks</h3>
+        <table class="rtable">
+          <tr><th>Pipeline</th><th>Route</th></tr>
+          <tr><td>Assam network</td><td>Upper Assam oil fields → Kanpur (via Guwahati, Barauni)</td></tr>
+          <tr><td>Salaya–Jalandhar</td><td>Salaya (Gujarat) → Jalandhar (via Viramgam, Mathura, Delhi)</td></tr>
+          <tr><td>HBJ gas pipeline</td><td>Hazira → Vijaipur → Jagdishpur; supplies fertiliser & power plants</td></tr>
+        </table>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">National Waterways</h3>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--cyan)"><div class="ic-icon">🚢</div><h4>NW1</h4><p>The Ganga between Allahabad and Haldia — 1620 km.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🚢</div><h4>NW2</h4><p>The Brahmaputra between Sadiya and Dhubri — 891 km.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🚢</div><h4>NW3</h4><p>The West Coast Canal in Kerala (Kottapuram–Kollam) with Champakara & Udyogmandal canals.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">Major Seaports</h3>
+        <div class="ibox">
+          <strong>Kandla (Deendayal)</strong> — tidal port · <strong>Mumbai</strong> — largest port · <strong>JLN (Nhava Sheva)</strong> — largest container port · <strong>Marmagao, New Mangaluru, Kochi</strong> (west) · <strong>Chennai</strong> — oldest · <strong>Vishakhapatnam</strong> — deepest · <strong>Paradip, Haldia, Kolkata, Tuticorin</strong> (east).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Airways -->
+  <div class="panel" id="p3">
+    <div class="panel-card">
+      <div class="panel-title">✈️ Air Transport</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Air transport is the <span class="kw">fastest, most comfortable and prestigious</span> mode. It can cover difficult terrain — high mountains, deserts and oceans — with ease. Air travel was <strong>nationalised in 1953</strong>.
+        </div>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--cyan)"><div class="ic-icon">🌐</div><h4>Air India</h4><p>Provides international air services connecting India to the rest of the world.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">🛫</div><h4>Domestic Services</h4><p>Indian Airlines & Alliance Air (plus private airlines) provide domestic connectivity.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">🚁</div><h4>Pawan Hans</h4><p>Provides helicopter services to the petroleum sector, NE region and inaccessible/hilly areas.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">🆘</div><h4>Vital in Emergencies</h4><p>Crucial for the North-East (difficult relief) and for disaster relief operations.</p></div>
+        </div>
+        <div class="ibox" style="margin-top:14px;border-left:3px solid var(--cyan)">
+          Main <strong>international airports</strong>: Delhi, Mumbai, Kolkata, Chennai, Bengaluru & Hyderabad. Airports are managed by the <span class="kw">Airports Authority of India (AAI)</span>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: Communication -->
+  <div class="panel" id="p4">
+    <div class="panel-card">
+      <div class="panel-title">📡 Communication Networks</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Communication helps share information over long distances. It is of two types — <span class="kw">personal</span> (post, telephone) and <span class="kw">mass communication</span> (radio, TV, newspapers, films).
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">Personal Communication</h3>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--cyan)"><div class="ic-icon">📮</div><h4>Postal Network</h4><p>India has the largest postal network in the world. 1st class (cards, envelopes) & 2nd class (book packets, registered). Rapid/Speed/Media post.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--blue)"><div class="ic-icon">📞</div><h4>Telecom</h4><p>One of the largest telecom networks in Asia. Uniform STD rates across India via satellite. 24-hour STD everywhere.</p></div>
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">Mass Communication</h3>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--amber)"><div class="ic-icon">📻</div><h4>Radio (Akashvani)</h4><p>All India Radio broadcasts since 1923 — programmes on information, education and entertainment.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">📺</div><h4>Doordarshan</h4><p>One of the largest terrestrial television networks in the world.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">📰</div><h4>Press & Films</h4><p>Newspapers in ~100+ languages; India is the largest producer of feature films in the world.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: Trade & Tourism -->
+  <div class="panel" id="p5">
+    <div class="panel-card">
+      <div class="panel-title">🌍 International Trade & Tourism</div>
+      <div class="panel-body">
+        <div class="ibox">
+          Trade is the exchange of goods and services. <span class="kw">International trade</span> — between countries via sea, air or land — is the <strong>economic barometer</strong> of a nation.
+        </div>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">Balance of Trade</h3>
+        <div class="ibox">
+          <strong>Balance of trade = Exports − Imports.</strong> It is <span class="kw">favourable</span> when exports exceed imports, and <span class="kw">unfavourable</span> when imports exceed exports.
+        </div>
+
+        <table class="rtable" style="margin-top:14px">
+          <tr><th>India Exports</th><th>India Imports</th></tr>
+          <tr><td>Gems & jewellery, chemicals</td><td>Petroleum & crude products</td></tr>
+          <tr><td>Engineering goods, textiles</td><td>Machinery & equipment</td></tr>
+          <tr><td>Agricultural & petroleum products</td><td>Gold, silver, electronics</td></tr>
+        </table>
+
+        <h3 style="margin:18px 0 10px;font-size:.9rem;color:var(--cyan)">Tourism as an Industry</h3>
+        <div class="card-grid">
+          <div class="info-card" style="border-left:3px solid var(--cyan)"><div class="ic-icon">👥</div><h4>Employment</h4><p>Over 15 million people are employed directly in the tourism industry.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--teal)"><div class="ic-icon">💱</div><h4>Foreign Exchange</h4><p>A major source of foreign exchange and a promoter of national integration.</p></div>
+          <div class="info-card" style="border-left:3px solid var(--purple)"><div class="ic-icon">🏛️</div><h4>Types</h4><p>Heritage, eco, medical, adventure & business tourism — plus support to local handicrafts and culture.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  btn.classList.add('active');
+  animateBars();
+}
+
+function animateBars(){
+  setTimeout(()=>{
+    document.querySelectorAll('.panel.active .bar-fill').forEach(b=>{
+      b.style.width=b.dataset.w||'0%';
+    });
+  },100);
+}
+animateBars();
+</script>
+</body>
+</html>
