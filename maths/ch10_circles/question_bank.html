@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Circles</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(34,197,94,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .6rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--green);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.wrap{max-width:820px;margin:0 auto;padding:1rem 1.2rem 3rem;}
+.section-head{display:flex;align-items:center;gap:.6rem;margin:1.6rem 0 .8rem;font-family:'Playfair Display',serif;font-weight:900;font-size:1.05rem;color:var(--green);}
+.section-head .marks{margin-left:auto;font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);font-weight:400;}
+
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin-bottom:.9rem;border-left:3px solid var(--border);}
+.strip-bas{border-left-color:var(--green);}
+.strip-tan{border-left-color:var(--teal);}
+.strip-perp{border-left-color:var(--amber);}
+.strip-two{border-left-color:var(--purple);}
+.strip-num{border-left-color:var(--indigo);}
+.strip-app{border-left-color:var(--red);}
+.q-num{font-family:'DM Mono',monospace;font-size:.64rem;color:var(--muted);}
+.q-text{font-size:.92rem;line-height:1.55;margin:.3rem 0 .7rem;}
+.q-text b{color:var(--amber);}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+@media(max-width:520px){.opts{grid-template-columns:1fr;}}
+.opt{font-family:'DM Mono',monospace;font-size:.8rem;padding:.5rem .7rem;border:1px solid var(--border);border-radius:8px;
+  background:var(--card2);cursor:pointer;transition:.15s;text-align:left;color:var(--text);}
+.opt:hover{border-color:var(--green);}
+.opt.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+.opt.wrong{background:rgba(244,63,94,.15);border-color:var(--red);color:var(--red);}
+
+.reveal-btn{font-family:'DM Mono',monospace;font-size:.7rem;padding:.4rem .8rem;border-radius:7px;border:1px solid var(--border);
+  background:var(--card2);color:var(--teal);cursor:pointer;margin-top:.3rem;}
+.reveal-btn:hover{border-color:var(--teal);}
+.answer{display:none;margin-top:.7rem;padding:.7rem .9rem;background:rgba(45,212,191,.06);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;font-size:.85rem;line-height:1.6;}
+.answer.show{display:block;}
+.answer b{color:var(--teal);}
+.answer .mono{font-family:'DM Mono',monospace;color:var(--amber);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Circles — Question Bank</h1>
+  <p>Class X · Mathematics Ch.10 · CBSE Pattern · 30 Questions</p>
+</header>
+
+<div class="wrap">
+
+<!-- SECTION A: MCQ -->
+<div class="section-head">🟢 Section A — Multiple Choice <span class="marks">10 × 1 = 10 marks</span></div>
+
+<div class="q strip-perp">
+  <div class="q-num">Q1 · MCQ</div>
+  <div class="q-text">The angle between a tangent to a circle and the radius at the point of contact is:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'w')">45°</button>
+    <button class="opt" onclick="mcq(this,'w')">60°</button>
+    <button class="opt" onclick="mcq(this,'c')">90°</button>
+    <button class="opt" onclick="mcq(this,'w')">180°</button>
+  </div>
+</div>
+
+<div class="q strip-num">
+  <div class="q-num">Q2 · MCQ</div>
+  <div class="q-text">The number of tangents that can be drawn from a point inside a circle is:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">0</button>
+    <button class="opt" onclick="mcq(this,'w')">1</button>
+    <button class="opt" onclick="mcq(this,'w')">2</button>
+    <button class="opt" onclick="mcq(this,'w')">infinite</button>
+  </div>
+</div>
+
+<div class="q strip-num">
+  <div class="q-num">Q3 · MCQ</div>
+  <div class="q-text">From a point 10 cm from the centre of a circle of radius 6 cm, the tangent length is:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">8 cm</button>
+    <button class="opt" onclick="mcq(this,'w')">4 cm</button>
+    <button class="opt" onclick="mcq(this,'w')">16 cm</button>
+    <button class="opt" onclick="mcq(this,'w')">√136 cm</button>
+  </div>
+</div>
+
+<div class="q strip-two">
+  <div class="q-num">Q4 · MCQ</div>
+  <div class="q-text">If PA and PB are tangents from an external point P with PA = 5 cm, then PB is:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">5 cm</button>
+    <button class="opt" onclick="mcq(this,'w')">10 cm</button>
+    <button class="opt" onclick="mcq(this,'w')">2.5 cm</button>
+    <button class="opt" onclick="mcq(this,'w')">cannot be found</button>
+  </div>
+</div>
+
+<div class="q strip-bas">
+  <div class="q-num">Q5 · MCQ</div>
+  <div class="q-text">A line intersecting a circle at two points is called a:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'w')">Tangent</button>
+    <button class="opt" onclick="mcq(this,'c')">Secant</button>
+    <button class="opt" onclick="mcq(this,'w')">Radius</button>
+    <button class="opt" onclick="mcq(this,'w')">Diameter</button>
+  </div>
+</div>
+
+<div class="q strip-num">
+  <div class="q-num">Q6 · MCQ</div>
+  <div class="q-text">The number of tangents from a point on the circle is:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'w')">0</button>
+    <button class="opt" onclick="mcq(this,'c')">1</button>
+    <button class="opt" onclick="mcq(this,'w')">2</button>
+    <button class="opt" onclick="mcq(this,'w')">3</button>
+  </div>
+</div>
+
+<div class="q strip-app">
+  <div class="q-num">Q7 · MCQ</div>
+  <div class="q-text">For a quadrilateral ABCD circumscribing a circle, which is true?</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">AB + CD = BC + DA</button>
+    <button class="opt" onclick="mcq(this,'w')">AB + BC = CD + DA</button>
+    <button class="opt" onclick="mcq(this,'w')">AB = CD</button>
+    <button class="opt" onclick="mcq(this,'w')">AC = BD</button>
+  </div>
+</div>
+
+<div class="q strip-tan">
+  <div class="q-num">Q8 · MCQ</div>
+  <div class="q-text">The tangents at the two endpoints of a diameter of a circle are:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">Parallel</button>
+    <button class="opt" onclick="mcq(this,'w')">Perpendicular</button>
+    <button class="opt" onclick="mcq(this,'w')">Intersecting</button>
+    <button class="opt" onclick="mcq(this,'w')">Equal in length</button>
+  </div>
+</div>
+
+<div class="q strip-two">
+  <div class="q-num">Q9 · MCQ</div>
+  <div class="q-text">If two tangents from P make an angle of 60°, the angle ∠AOB at the centre is:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">120°</button>
+    <button class="opt" onclick="mcq(this,'w')">60°</button>
+    <button class="opt" onclick="mcq(this,'w')">90°</button>
+    <button class="opt" onclick="mcq(this,'w')">30°</button>
+  </div>
+</div>
+
+<div class="q strip-app">
+  <div class="q-num">Q10 · MCQ</div>
+  <div class="q-text">A parallelogram circumscribing a circle is always a:</div>
+  <div class="opts">
+    <button class="opt" onclick="mcq(this,'c')">Rhombus</button>
+    <button class="opt" onclick="mcq(this,'w')">Rectangle</button>
+    <button class="opt" onclick="mcq(this,'w')">Square</button>
+    <button class="opt" onclick="mcq(this,'w')">Trapezium</button>
+  </div>
+</div>
+
+<!-- SECTION B: ASSERTION-REASON -->
+<div class="section-head">🟣 Section B — Assertion &amp; Reason <span class="marks">3 × 1 = 3 marks</span></div>
+<p style="font-size:.76rem;color:var(--muted);margin-bottom:.7rem;font-family:'DM Mono',monospace;">
+(a) Both A &amp; R true, R explains A &nbsp;·&nbsp; (b) Both true, R doesn't explain A &nbsp;·&nbsp; (c) A true, R false &nbsp;·&nbsp; (d) A false, R true</p>
+
+<div class="q strip-perp">
+  <div class="q-num">Q11 · A–R</div>
+  <div class="q-text"><b>Assertion:</b> The tangent at any point of a circle is perpendicular to the radius at the point of contact.<br>
+  <b>Reason:</b> The perpendicular is the shortest distance from a point to a line.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer"><b>(a)</b> Both true and R correctly explains A. The radius is the shortest (perpendicular) distance from the centre to the tangent.</div>
+</div>
+
+<div class="q strip-two">
+  <div class="q-num">Q12 · A–R</div>
+  <div class="q-text"><b>Assertion:</b> Tangents drawn from an external point to a circle are equal in length.<br>
+  <b>Reason:</b> A tangent touches the circle at two points.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer"><b>(c)</b> Assertion is true, but the Reason is false — a tangent touches the circle at exactly ONE point, not two.</div>
+</div>
+
+<div class="q strip-num">
+  <div class="q-num">Q13 · A–R</div>
+  <div class="q-text"><b>Assertion:</b> Two tangents can be drawn to a circle from an external point.<br>
+  <b>Reason:</b> A point outside a circle lies farther from the centre than the radius.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer"><b>(a)</b> Both true and R explains A — because the point is outside (distance &gt; radius), exactly two equal tangents exist.</div>
+</div>
+
+<!-- SECTION C: SHORT ANSWER -->
+<div class="section-head">🟢 Section C — Short Answer <span class="marks">12 × 2 = 24 marks</span></div>
+
+<div class="q strip-num">
+  <div class="q-num">Q14 · Short</div>
+  <div class="q-text">A tangent is drawn from a point 25 cm from the centre of a circle of radius 7 cm. Find its length.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">ℓ = √(d²−r²) = √(25²−7²) = √(625−49) = √576 = <span class="mono">24 cm</span>.</div>
+</div>
+
+<div class="q strip-perp">
+  <div class="q-num">Q15 · Short</div>
+  <div class="q-text">A tangent PQ at a point P of a circle of radius 5 cm meets a line through the centre O at Q so that OQ = 13 cm. Find PQ.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">∠OPQ = 90°. PQ = √(OQ²−OP²) = √(169−25) = √144 = <span class="mono">12 cm</span>.</div>
+</div>
+
+<div class="q strip-two">
+  <div class="q-num">Q16 · Short</div>
+  <div class="q-text">Prove that the tangents drawn from an external point to a circle are equal.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">In △OAP and △OBP: OA = OB (radii), OP common, ∠OAP = ∠OBP = 90°. By <b>RHS</b>, △OAP ≅ △OBP, so <span class="mono">PA = PB</span> (CPCT).</div>
+</div>
+
+<div class="q strip-app">
+  <div class="q-num">Q17 · Short</div>
+  <div class="q-text">A quadrilateral ABCD circumscribes a circle. If AB = 6, BC = 7, CD = 4, find DA.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">AB + CD = BC + DA → 6 + 4 = 7 + DA → DA = <span class="mono">3 units</span>.</div>
+</div>
+
+<div class="q strip-two">
+  <div class="q-num">Q18 · Short</div>
+  <div class="q-text">Two tangents from P touch a circle at A and B. If ∠APB = 70°, find ∠OAB (O is the centre).</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">∠AOB = 180° − 70° = 110°. △OAB is isosceles (OA=OB), so ∠OAB = (180−110)/2 = <span class="mono">35°</span>.</div>
+</div>
+
+<div class="q strip-bas">
+  <div class="q-num">Q19 · Short</div>
+  <div class="q-text">Define: (a) tangent to a circle, (b) point of contact.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">(a) A <b>tangent</b> is a line touching the circle at exactly one point. (b) The <b>point of contact</b> is that single common point of the tangent and the circle.</div>
+</div>
+
+<div class="q strip-num">
+  <div class="q-num">Q20 · Short</div>
+  <div class="q-text">The length of a tangent from a point 17 cm from the centre is 15 cm. Find the radius.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">r = √(d²−ℓ²) = √(17²−15²) = √(289−225) = √64 = <span class="mono">8 cm</span>.</div>
+</div>
+
+<div class="q strip-perp">
+  <div class="q-num">Q21 · Short</div>
+  <div class="q-text">A tangent to a circle of radius 6 cm from a point P has length 8 cm. Find the distance OP.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">OP = √(r²+ℓ²) = √(6²+8²) = √(36+64) = √100 = <span class="mono">10 cm</span>.</div>
+</div>
+
+<div class="q strip-two">
+  <div class="q-num">Q22 · Short</div>
+  <div class="q-text">If two tangents from an external point are inclined at 80° to each other, find the angle each tangent makes with the line joining P to the centre.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">OP bisects ∠APB, so each half = 80°/2 = <span class="mono">40°</span>.</div>
+</div>
+
+<div class="q strip-app">
+  <div class="q-num">Q23 · Short</div>
+  <div class="q-text">Prove that a parallelogram circumscribing a circle is a rhombus.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">AB+CD = BC+DA. In a parallelogram AB=CD and BC=DA, so 2AB = 2BC → AB = BC. All sides equal ⇒ <b>rhombus</b>.</div>
+</div>
+
+<div class="q strip-num">
+  <div class="q-num">Q24 · Short</div>
+  <div class="q-text">How many tangents can be drawn to a circle that are parallel to a given secant? Explain.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer"><b>Two</b> — one on each side of the circle, both parallel to the given line and touching the circle at diametrically opposite points.</div>
+</div>
+
+<div class="q strip-bas">
+  <div class="q-num">Q25 · Short</div>
+  <div class="q-text">Two concentric circles have radii 5 cm and 3 cm. Find the length of the chord of the larger circle that touches the smaller.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">The smaller circle bisects the chord. Half-chord = √(5²−3²) = √16 = 4. Full chord = <span class="mono">8 cm</span>.</div>
+</div>
+
+<!-- SECTION D: LONG ANSWER -->
+<div class="section-head">🔴 Section D — Long Answer <span class="marks">5 × 2 = 10 marks</span></div>
+
+<div class="q strip-perp">
+  <div class="q-num">Q26 · Long</div>
+  <div class="q-text">Prove that the tangent at any point of a circle is perpendicular to the radius through the point of contact.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Let XY be a tangent at P, O the centre. Take any other point Q on XY. Q lies outside the circle, so OQ &gt; OP. Thus OP is the shortest distance from O to XY, and the shortest distance to a line is the perpendicular. Hence <span class="mono">OP ⊥ XY</span>.</div>
+</div>
+
+<div class="q strip-app">
+  <div class="q-num">Q27 · Long</div>
+  <div class="q-text">A circle touches all four sides of quadrilateral ABCD. Prove AB + CD = BC + DA.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Let tangent lengths from A,B,C,D be p,q,r,s. Then AB = p+q, BC = q+r, CD = r+s, DA = s+p. AB+CD = p+q+r+s and BC+DA = q+r+s+p. Both equal ⇒ <span class="mono">AB+CD = BC+DA</span>.</div>
+</div>
+
+<div class="q strip-two">
+  <div class="q-num">Q28 · Long</div>
+  <div class="q-text">Two tangents TP and TQ are drawn to a circle with centre O from an external point T. Prove that ∠PTQ = 2∠OPQ.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Let ∠PTQ = θ. TP = TQ ⇒ △TPQ isosceles ⇒ ∠TPQ = ∠TQP = (180−θ)/2 = 90 − θ/2. Since OP ⊥ TP, ∠OPQ = 90 − ∠TPQ = 90 − (90−θ/2) = θ/2. Hence <span class="mono">∠PTQ = 2∠OPQ</span>.</div>
+</div>
+
+<div class="q strip-num">
+  <div class="q-num">Q29 · Long</div>
+  <div class="q-text">A circle of radius 4 cm is inscribed in a triangle. A tangent from vertex A has length 8 cm. If the other two tangent lengths are 6 cm and 10 cm, find the perimeter.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Each side = sum of two tangent segments. Sides = (8+6), (6+10), (10+8) = 14, 16, 18. Perimeter = <span class="mono">48 cm</span>.</div>
+</div>
+
+<div class="q strip-perp">
+  <div class="q-num">Q30 · Long</div>
+  <div class="q-text">PQ is a chord of length 8 cm of a circle of radius 5 cm. The tangents at P and Q meet at T. Find TP.</div>
+  <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+  <div class="answer">Perpendicular from O bisects PQ at M: PM = 4, OM = √(5²−4²) = 3. Let TP = TQ = x, TM = √(x²−16). Using similar triangles OP/PT = OM/... → solve: TP = <span class="mono">20/3 cm ≈ 6.67 cm</span>.</div>
+</div>
+
+</div>
+
+<script>
+function mcq(btn,type){
+  const parent=btn.parentElement;
+  if(parent.dataset.done)return;
+  parent.dataset.done='1';
+  if(type==='c'){btn.classList.add('correct');}
+  else{btn.classList.add('wrong');
+    parent.querySelectorAll('.opt').forEach(o=>{if(o.getAttribute('onclick').includes("'c'"))o.classList.add('correct');});
+  }
+}
+function reveal(btn){
+  const ans=btn.nextElementSibling;
+  ans.classList.toggle('show');
+  btn.textContent=ans.classList.contains('show')?'Hide Answer':'Show Answer';
+}
+</script>
+</body>
+</html>

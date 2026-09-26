@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Circles</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(34,197,94,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--green);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:1rem;padding:1rem 1.2rem 2rem;max-width:1100px;margin:0 auto;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.panel-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;}
+.panel-head .icon{font-size:1rem;}
+.panel-body{padding:.8rem 1rem 1rem;display:flex;flex-direction:column;gap:.6rem;}
+
+.ph-bas .panel-head{background:rgba(34,197,94,.12);color:var(--green);}
+.ph-tan .panel-head{background:rgba(45,212,191,.12);color:var(--teal);}
+.ph-perp .panel-head{background:rgba(245,158,11,.12);color:var(--amber);}
+.ph-two .panel-head{background:rgba(217,70,239,.12);color:var(--purple);}
+.ph-num .panel-head{background:rgba(129,140,248,.12);color:var(--indigo);}
+.ph-app .panel-head{background:rgba(244,63,94,.12);color:var(--red);}
+.ph-vit .panel-head{background:rgba(56,189,248,.12);color:var(--blue);}
+.ph-mem .panel-head{background:rgba(74,104,144,.18);color:#9ab8d8;}
+
+.formula-block{background:var(--card2);border-radius:8px;padding:.6rem .8rem;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--teal);line-height:1.7;}
+.formula-block strong{color:var(--amber);}
+.sub-label{font-family:'Playfair Display',serif;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem;}
+
+table{width:100%;border-collapse:collapse;font-size:.76rem;}
+th{padding:.4rem .5rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+td{padding:.38rem .5rem;border-bottom:1px solid rgba(26,45,69,.5);line-height:1.4;}
+tr:last-child td{border-bottom:none;}
+td.mono{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--teal);}
+td.amber{color:var(--amber);}td.green{color:var(--green);}td.red{color:var(--red);}
+
+.hbox{display:flex;gap:.5rem;flex-wrap:wrap;}
+.fact{background:var(--card2);border-radius:6px;padding:.4rem .65rem;font-size:.76rem;color:var(--text);flex:1;min-width:100px;}
+.fact strong{display:block;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:.15rem;}
+.trick{background:rgba(245,158,11,.07);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.trick strong{color:var(--amber);}
+.tip{background:rgba(45,212,191,.07);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.tip strong{color:var(--teal);}
+.warn{background:rgba(244,63,94,.07);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:.45rem .7rem;font-size:.77rem;color:var(--text);line-height:1.5;}
+.warn strong{color:var(--red);}
+
+.step-list{counter-reset:step;display:flex;flex-direction:column;gap:.3rem;}
+.step-list li{display:flex;align-items:flex-start;gap:.5rem;font-size:.78rem;list-style:none;counter-increment:step;line-height:1.5;}
+.step-list li::before{content:counter(step);background:var(--card2);color:var(--muted);font-family:'DM Mono',monospace;font-size:.65rem;
+  min-width:1.4rem;height:1.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:.1rem;flex-shrink:0;}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Circles — Cheat Sheet</h1>
+  <p>Class X · Mathematics Ch.10 · 8 Panels · Quick Reference</p>
+</header>
+
+<div class="panel-grid">
+
+<!-- 1. BASICS -->
+<div class="panel ph-bas">
+  <div class="panel-head"><span class="icon">⭕</span> Line &amp; Circle Basics</div>
+  <div class="panel-body">
+    <div class="sub-label">A line and a circle can meet in…</div>
+    <table>
+      <tr><th>Line</th><th>Common Points</th></tr>
+      <tr><td class="red">Non-intersecting</td><td class="mono">0</td></tr>
+      <tr><td class="amber">Tangent</td><td class="mono">1 (point of contact)</td></tr>
+      <tr><td class="green">Secant</td><td class="mono">2 (a chord)</td></tr>
+    </table>
+    <div class="tip"><strong>Key terms:</strong> radius = centre to circle; chord = joins two points; diameter = longest chord = 2r.</div>
+    <div class="trick"><strong>Tangent</strong> is the limiting position of a secant when its two intersection points merge into one.</div>
+  </div>
+</div>
+
+<!-- 2. TANGENT -->
+<div class="panel ph-tan">
+  <div class="panel-head"><span class="icon">📍</span> Tangent to a Circle</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      A <strong>tangent</strong> touches the circle at exactly<br>ONE point → the <strong>point of contact</strong>.
+    </div>
+    <div class="tip"><strong>One per point:</strong> through any point ON a circle there is exactly one tangent.</div>
+    <div class="tip"><strong>Whole circle</strong> lies on one side of the tangent — it touches, never cuts.</div>
+    <div class="warn"><strong>Don't confuse:</strong> a secant cuts the circle at two points; a tangent only touches at one.</div>
+  </div>
+</div>
+
+<!-- 3. TANGENT ⊥ RADIUS -->
+<div class="panel ph-perp">
+  <div class="panel-head"><span class="icon">📐</span> Theorem 1 · Radius ⊥ Tangent</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      The tangent at any point of a circle is<br>
+      <strong>perpendicular to the radius</strong> through<br>the point of contact.
+    </div>
+    <div class="sub-label">Why?</div>
+    <div class="tip"><strong>Shortest distance</strong> from the centre to the tangent line is the perpendicular — and that perpendicular IS the radius.</div>
+    <div class="trick"><strong>Converse:</strong> a line ⊥ to a radius at its outer endpoint is a tangent. Use it to prove a line is a tangent.</div>
+    <div class="warn"><strong>Exam gold:</strong> the ∠ between radius and tangent at contact is always <b>90°</b> — creates a right triangle for calculations.</div>
+  </div>
+</div>
+
+<!-- 4. TWO TANGENTS -->
+<div class="panel ph-two">
+  <div class="panel-head"><span class="icon">✌️</span> Theorem 2 · Equal Tangents</div>
+  <div class="panel-body">
+    <div class="formula-block">
+      From an external point P:<br>
+      <strong>PA = PB</strong> &nbsp;(the two tangent lengths are equal)
+    </div>
+    <div class="sub-label">Proof outline</div>
+    <ol class="step-list">
+      <li>△OAP ≅ △OBP by RHS</li>
+      <li>OA = OB (radii), OP common, right angles at A, B</li>
+      <li>⇒ PA = PB (CPCT)</li>
+    </ol>
+    <div class="tip"><strong>Also:</strong> OP bisects ∠APB and ∠AOB. So ∠OPA = ∠OPB.</div>
+  </div>
+</div>
+
+<!-- 5. NUMBER OF TANGENTS -->
+<div class="panel ph-num">
+  <div class="panel-head"><span class="icon">🔢</span> Number of Tangents</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Position of Point</th><th>Tangents</th></tr>
+      <tr><td class="red">Inside the circle</td><td class="mono">0</td></tr>
+      <tr><td class="amber">On the circle</td><td class="mono">1</td></tr>
+      <tr><td class="green">Outside the circle</td><td class="mono">2 (equal)</td></tr>
+    </table>
+    <div class="formula-block">
+      Tangent length from external point at distance d:<br>
+      <strong>ℓ = √(d² − r²)</strong> &nbsp;(r = radius)
+    </div>
+    <div class="tip"><strong>From:</strong> right triangle with hypotenuse d, one leg r → other leg is the tangent.</div>
+  </div>
+</div>
+
+<!-- 6. KEY RESULTS -->
+<div class="panel ph-vit">
+  <div class="panel-head"><span class="icon">⭐</span> Key Results</div>
+  <div class="panel-body">
+    <div class="tip"><strong>Circumscribed quadrilateral:</strong> AB + CD = BC + DA (sums of opposite sides are equal).</div>
+    <div class="tip"><strong>Supplementary angles:</strong> ∠ between two tangents + ∠ between the two radii = 180°.</div>
+    <div class="trick"><strong>Parallel tangents:</strong> the two tangents at the ends of a diameter are parallel.</div>
+    <div class="trick"><strong>Perpendicular from centre</strong> to a chord bisects the chord.</div>
+  </div>
+</div>
+
+<!-- 7. APPLICATIONS -->
+<div class="panel ph-app">
+  <div class="panel-head"><span class="icon">🌍</span> Problem Types &amp; Uses</div>
+  <div class="panel-body">
+    <div class="hbox">
+      <div class="fact"><strong>Find Tangent Length</strong>Use ℓ = √(d²−r²) with the right triangle</div>
+      <div class="fact"><strong>Prove PA = PB</strong>Congruent triangles OAP &amp; OBP</div>
+    </div>
+    <div class="hbox">
+      <div class="fact"><strong>Quadrilateral Sides</strong>Opposite side sums equal for circumscribed shapes</div>
+      <div class="fact"><strong>Find Angles</strong>Use 90° radius-tangent &amp; angle sum</div>
+    </div>
+    <div class="tip"><strong>Real world:</strong> pulley belts, bicycle chains and a ball on the ground all form tangents to circles.</div>
+  </div>
+</div>
+
+<!-- 8. EXAM QUICK RECALL -->
+<div class="panel ph-mem">
+  <div class="panel-head"><span class="icon">🧠</span> Exam Quick Recall</div>
+  <div class="panel-body">
+    <table>
+      <tr><th>Fact</th><th>Result</th></tr>
+      <tr><td>Radius–tangent angle</td><td class="mono">90°</td></tr>
+      <tr><td>Tangents from ext. point</td><td class="mono">equal (PA = PB)</td></tr>
+      <tr><td>Tangent length</td><td class="mono">√(d² − r²)</td></tr>
+      <tr><td>Point inside / on / out</td><td class="mono">0 / 1 / 2 tangents</td></tr>
+      <tr><td>Circumscribed quad</td><td class="mono">AB+CD = BC+DA</td></tr>
+    </table>
+    <div class="warn"><strong>Common mistakes:</strong> forgetting the 90° angle; assuming a secant equals a tangent; mislabelling the point of contact.</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

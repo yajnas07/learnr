@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive — Circles</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(34,197,94,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.4rem 1rem .4rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--green);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.tabs{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;padding:.9rem 1rem;max-width:900px;margin:0 auto;}
+.tab-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.4rem .8rem;border-radius:99px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);cursor:pointer;transition:.15s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:#04121e;font-weight:700;}
+
+.panel{display:none;max-width:720px;margin:0 auto;padding:1rem 1.2rem 2.5rem;}
+.panel.active{display:block;}
+.stage{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem;}
+canvas{width:100%;background:var(--card2);border-radius:10px;display:block;touch-action:none;}
+.desc{font-size:.85rem;line-height:1.6;color:var(--text);margin-top:.9rem;}
+.desc b{color:var(--green);}
+.readout{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--teal);background:var(--card2);border-radius:8px;padding:.6rem .8rem;margin-top:.8rem;line-height:1.7;}
+.readout b{color:var(--amber);}
+.ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;margin-top:.9rem;}
+.ctrl-row label{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.5rem;flex:1;min-width:180px;}
+input[type=range]{flex:1;accent-color:var(--green);}
+.hint-txt{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);margin-top:.6rem;text-align:center;}
+
+.app-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.4rem;}
+@media(max-width:520px){.app-grid{grid-template-columns:1fr;}}
+.app-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:.9rem;}
+.app-card h4{font-family:'Playfair Display',serif;font-size:.9rem;color:var(--green);margin-bottom:.4rem;}
+.app-card p{font-size:.8rem;line-height:1.5;color:var(--text);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Circles — Interactive</h1>
+  <p>Class X · Mathematics Ch.10 · 6 Interactive Modules</p>
+</header>
+
+<div class="tabs" id="tabs">
+  <button class="tab-btn active" onclick="showTab(0,this,'#22c55e')">⭕ Line &amp; Circle</button>
+  <button class="tab-btn" onclick="showTab(1,this,'#2dd4bf')">📍 Tangent</button>
+  <button class="tab-btn" onclick="showTab(2,this,'#f59e0b')">📐 Radius ⊥ Tan</button>
+  <button class="tab-btn" onclick="showTab(3,this,'#d946ef')">✌️ Two Tangents</button>
+  <button class="tab-btn" onclick="showTab(4,this,'#818cf8')">🔢 Tangent Length</button>
+  <button class="tab-btn" onclick="showTab(5,this,'#f43f5e')">🌍 Applications</button>
+</div>
+
+<!-- 0: LINE & CIRCLE -->
+<div class="panel active">
+  <div class="stage">
+    <canvas id="cvLine" width="640" height="440"></canvas>
+    <div class="ctrl-row">
+      <label>Line distance from centre: <span id="lineVal">40</span><input type="range" id="lineD" min="0" max="180" value="40" step="2"></label>
+    </div>
+    <div class="readout" id="lineOut"></div>
+    <div class="desc">Slide the line towards or away from the centre. When it is far it <b>misses</b> (0 points); when the distance equals the radius it is a <b>tangent</b> (1 point); when closer it is a <b>secant</b> (2 points).</div>
+  </div>
+</div>
+
+<!-- 1: TANGENT -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvTan" width="640" height="440"></canvas>
+    <div class="ctrl-row">
+      <label>Point of contact angle: <span id="tanVal">45</span>°<input type="range" id="tanA" min="0" max="360" value="45" step="3"></label>
+    </div>
+    <div class="readout" id="tanOut"></div>
+    <div class="desc">The <b>tangent</b> touches the circle at exactly one point. Rotate the point of contact and watch the tangent line stay touching — never crossing — the circle.</div>
+  </div>
+</div>
+
+<!-- 2: RADIUS ⊥ TANGENT -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvPerp" width="640" height="440"></canvas>
+    <div class="ctrl-row">
+      <label>Contact angle: <span id="perpVal">30</span>°<input type="range" id="perpA" min="0" max="360" value="30" step="3"></label>
+    </div>
+    <div class="readout" id="perpOut"></div>
+    <div class="desc"><b>Theorem 1:</b> the radius drawn to the point of contact is always perpendicular (90°) to the tangent — no matter where the contact point is.</div>
+  </div>
+</div>
+
+<!-- 3: TWO TANGENTS -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvTwo" width="640" height="440"></canvas>
+    <div class="ctrl-row">
+      <label>External point distance: <span id="twoVal">200</span><input type="range" id="twoD" min="130" max="290" value="200" step="4"></label>
+    </div>
+    <div class="readout" id="twoOut"></div>
+    <div class="desc"><b>Theorem 2:</b> the two tangents PA and PB from an external point P are always equal. Move P and watch both lengths stay identical.</div>
+  </div>
+</div>
+
+<!-- 4: TANGENT LENGTH -->
+<div class="panel">
+  <div class="stage">
+    <canvas id="cvLen" width="640" height="440"></canvas>
+    <div class="ctrl-row">
+      <label>Radius r: <span id="rVal">70</span><input type="range" id="rR" min="40" max="110" value="70" step="2"></label>
+      <label>Distance d: <span id="dVal">200</span><input type="range" id="dR" min="130" max="280" value="200" step="4"></label>
+    </div>
+    <div class="readout" id="lenOut"></div>
+    <div class="desc"><b>Tangent length ℓ = √(d² − r²).</b> The radius, tangent, and line to the centre form a right triangle — Pythagoras gives the tangent length.</div>
+  </div>
+</div>
+
+<!-- 5: APPLICATIONS -->
+<div class="panel">
+  <div class="app-grid">
+    <div class="app-card"><h4>🚲 Bicycle Chain</h4><p>The chain runs tangent to both gear wheels — the straight sections are common tangents to two circles.</p></div>
+    <div class="app-card"><h4>⚙️ Pulley Belts</h4><p>A belt over two pulleys touches each along a tangent line, transferring rotation efficiently.</p></div>
+    <div class="app-card"><h4>🏀 Ball on Ground</h4><p>A ball resting on a flat surface touches it at one point — the ground is tangent to the ball.</p></div>
+    <div class="app-card"><h4>📐 Inscribed Circles</h4><p>A circle inscribed in a triangle or quadrilateral touches every side — each side is a tangent.</p></div>
+    <div class="app-card"><h4>🛰️ Satellite Range</h4><p>The horizon line from a satellite is tangent to the Earth, defining the edge of its coverage.</p></div>
+    <div class="app-card"><h4>🎯 Gear Design</h4><p>Meshing gears and cam followers rely on tangent contact for smooth motion.</p></div>
+  </div>
+  <div class="desc" style="text-align:center;">Tangents describe how curved objects <b>touch</b> straight surfaces and each other — everywhere in engineering and daily life.</div>
+</div>
+
+<script>
+function ctxOf(id){return document.getElementById(id).getContext('2d');}
+
+// ---------- 0: LINE & CIRCLE ----------
+(function(){
+  const cv=document.getElementById('cvLine'),ctx=cv.getContext('2d');
+  const cx=cv.width/2,cy=cv.height/2,R=110;
+  const s=document.getElementById('lineD');
+  function draw(){
+    const d=+s.value;document.getElementById('lineVal').textContent=d;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    // circle
+    ctx.strokeStyle='#22c55e';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();
+    ctx.fillStyle='#22c55e';ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill();
+    ctx.fillStyle='#4a6890';ctx.font='12px "DM Mono"';ctx.fillText('O',cx+8,cy-8);
+    // line (horizontal, at distance d below centre)
+    const ly=cy+d;
+    let state,col;
+    if(d>R){state='Non-intersecting — 0 points';col='#f43f5e';}
+    else if(Math.abs(d-R)<3){state='Tangent — 1 point';col='#f59e0b';}
+    else{state='Secant — 2 points';col='#22c55e';}
+    ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(40,ly);ctx.lineTo(cv.width-40,ly);ctx.stroke();
+    // intersection points
+    if(d<=R){
+      const half=Math.sqrt(R*R-d*d);
+      ctx.fillStyle='#38bdf8';
+      if(d<R-3){ctx.beginPath();ctx.arc(cx-half,ly,5,0,7);ctx.fill();ctx.beginPath();ctx.arc(cx+half,ly,5,0,7);ctx.fill();}
+      else{ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(cx,ly,6,0,7);ctx.fill();}
+    }
+    document.getElementById('lineOut').innerHTML=`Distance from centre = <b>${d}</b>, radius = <b>${R}</b> → <b style="color:${col}">${state}</b>`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 1: TANGENT ----------
+(function(){
+  const cv=document.getElementById('cvTan'),ctx=cv.getContext('2d');
+  const cx=cv.width/2,cy=cv.height/2,R=100;
+  const s=document.getElementById('tanA');
+  function draw(){
+    const a=+s.value*Math.PI/180;document.getElementById('tanVal').textContent=+s.value;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle='#2dd4bf';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill();ctx.font='12px "DM Mono"';ctx.fillText('O',cx+8,cy-8);
+    const px=cx+R*Math.cos(a),py=cy+R*Math.sin(a);
+    // tangent line perpendicular to radius
+    const tx=-Math.sin(a),ty=Math.cos(a);const L=200;
+    ctx.strokeStyle='#5eead4';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(px-tx*L,py-ty*L);ctx.lineTo(px+tx*L,py+ty*L);ctx.stroke();
+    ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(px,py,6,0,7);ctx.fill();
+    ctx.fillStyle='#ccfbf1';ctx.fillText('P (point of contact)',px+10,py);
+    document.getElementById('tanOut').innerHTML=`The tangent touches at exactly <b>1</b> point P — it never enters the circle.`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 2: RADIUS ⊥ TANGENT ----------
+(function(){
+  const cv=document.getElementById('cvPerp'),ctx=cv.getContext('2d');
+  const cx=cv.width/2,cy=cv.height/2,R=100;
+  const s=document.getElementById('perpA');
+  function draw(){
+    const a=+s.value*Math.PI/180;document.getElementById('perpVal').textContent=+s.value;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle='#f59e0b';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill();ctx.font='12px "DM Mono"';ctx.fillText('O',cx-16,cy);
+    const px=cx+R*Math.cos(a),py=cy+R*Math.sin(a);
+    // radius
+    ctx.strokeStyle='#fbbf24';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(px,py);ctx.stroke();
+    // tangent
+    const tx=-Math.sin(a),ty=Math.cos(a);const L=190;
+    ctx.strokeStyle='#38bdf8';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(px-tx*L,py-ty*L);ctx.lineTo(px+tx*L,py+ty*L);ctx.stroke();
+    // right-angle marker
+    const sz=14;const rx=-Math.cos(a),ry=-Math.sin(a);
+    ctx.strokeStyle='#f43f5e';ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(px+rx*sz,py+ry*sz);ctx.lineTo(px+rx*sz+tx*sz,py+ry*sz+ty*sz);ctx.lineTo(px+tx*sz,py+ty*sz);ctx.stroke();
+    ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(px,py,5,0,7);ctx.fill();
+    document.getElementById('perpOut').innerHTML=`Angle between radius OP and the tangent = <b style="color:#f43f5e">90°</b> — always, at every contact point.`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 3: TWO TANGENTS ----------
+(function(){
+  const cv=document.getElementById('cvTwo'),ctx=cv.getContext('2d');
+  const cx=cv.width/2-40,cy=cv.height/2,R=80;
+  const s=document.getElementById('twoD');
+  function draw(){
+    const d=+s.value;document.getElementById('twoVal').textContent=d;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle='#d946ef';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill();ctx.font='12px "DM Mono"';ctx.fillText('O',cx-16,cy);
+    const px=cx+d,py=cy;
+    // tangent points: angle where tangent touches
+    const alpha=Math.acos(R/d);
+    const a1=alpha,a2=-alpha;
+    // direction from center to P is angle 0
+    const A={x:cx+R*Math.cos(a1),y:cy+R*Math.sin(a1)};
+    const B={x:cx+R*Math.cos(a2),y:cy+R*Math.sin(a2)};
+    ctx.strokeStyle='#e879f9';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(A.x,A.y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(B.x,B.y);ctx.stroke();
+    // line to centre
+    ctx.strokeStyle='rgba(255,255,255,.2)';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(cx,cy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#f59e0b';[A,B].forEach(pt=>{ctx.beginPath();ctx.arc(pt.x,pt.y,5,0,7);ctx.fill();});
+    ctx.fillStyle='#f5d0fe';ctx.beginPath();ctx.arc(px,py,6,0,7);ctx.fill();ctx.fillStyle='#ccc';ctx.fillText('P',px+8,py-6);
+    ctx.fillText('A',A.x+6,A.y-4);ctx.fillText('B',B.x+6,B.y+12);
+    const len=Math.sqrt(d*d-R*R);
+    document.getElementById('twoOut').innerHTML=`PA = PB = √(${d}²−${R}²) = <b>${len.toFixed(1)}</b> px — the two tangents are equal.`;
+  }
+  s.oninput=draw;draw();
+})();
+
+// ---------- 4: TANGENT LENGTH ----------
+(function(){
+  const cv=document.getElementById('cvLen'),ctx=cv.getContext('2d');
+  const cx=cv.width/2-60,cy=cv.height/2;
+  const rR=document.getElementById('rR'),dR=document.getElementById('dR');
+  function draw(){
+    let r=+rR.value,d=+dR.value;
+    if(d<=r)d=r+10;
+    document.getElementById('rVal').textContent=r;document.getElementById('dVal').textContent=d;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle='#818cf8';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();
+    ctx.fillStyle='#4a6890';ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill();ctx.font='12px "DM Mono"';ctx.fillText('O',cx-16,cy);
+    const px=cx+d,py=cy;
+    const alpha=Math.acos(r/d);
+    const A={x:cx+r*Math.cos(alpha),y:cy+r*Math.sin(alpha)};
+    // triangle O-A-P
+    ctx.strokeStyle='#a5b4fc';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(A.x,A.y);ctx.stroke();// radius
+    ctx.strokeStyle='#22c55e';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(px,py);ctx.stroke();// tangent
+    ctx.strokeStyle='rgba(255,255,255,.25)';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(px,py);ctx.stroke();ctx.setLineDash([]);// hyp
+    ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(A.x,A.y,5,0,7);ctx.fill();
+    ctx.fillStyle='#c7d2fe';ctx.beginPath();ctx.arc(px,py,6,0,7);ctx.fill();
+    ctx.fillStyle='#ccc';ctx.fillText('A',A.x-4,A.y-8);ctx.fillText('P',px+8,py+4);
+    const len=Math.sqrt(d*d-r*r);
+    document.getElementById('lenOut').innerHTML=`ℓ = √(d² − r²) = √(${d}² − ${r}²) = <b>${len.toFixed(1)}</b> px &nbsp;(right angle at A)`;
+  }
+  rR.oninput=dR.oninput=draw;draw();
+})();
+
+// ---------- tabs ----------
+function showTab(i,btn,color){
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',j===i));
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.style.background='';});
+  btn.classList.add('active');btn.style.background=color;
+}
+document.querySelector('.tab-btn').style.background='#22c55e';
+</script>
+</body>
+</html>
