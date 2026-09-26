@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagram — Arithmetic Progressions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040810;--card:#0a1422;--card2:#0f1c30;
+  --border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;
+  --green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(45,212,191,.05) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.2rem 1rem .6rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--teal);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.tabs{display:flex;gap:.3rem;flex-wrap:wrap;justify-content:center;padding:.3rem 1rem .8rem;}
+.tab-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.72rem;padding:.35rem .85rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.on{color:#040810;border-color:transparent;}
+
+.stage{max-width:900px;margin:0 auto;padding:0 1rem 2rem;}
+.panel{display:none;animation:fadeIn .3s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.canvas-box{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1rem;}
+canvas{display:block;width:100%;height:360px;}
+.controls{display:flex;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border-top:1px solid var(--border);align-items:center;}
+.ctrl-group{display:flex;flex-direction:column;gap:.2rem;}
+.ctrl-group label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+.ctrl-group input[type=range]{width:120px;accent-color:var(--teal);}
+.ctrl-value{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);min-width:30px;text-align:center;}
+.info-box{background:var(--card2);border-radius:8px;padding:.5rem .8rem;font-family:'DM Mono',monospace;font-size:.75rem;line-height:1.7;color:var(--text);margin:.5rem 0;}
+.info-box strong{color:var(--amber);}
+.info-box em{color:var(--teal);font-style:normal;}
+
+.stepper{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
+.step-title{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;color:var(--teal);margin-bottom:.8rem;}
+.step-box{display:flex;flex-direction:column;gap:.5rem;}
+.step-item{background:var(--card2);border-radius:8px;padding:.6rem .9rem;border-left:3px solid var(--border);
+  opacity:.35;transform:translateX(-8px);transition:all .4s ease;}
+.step-item.active{opacity:1;transform:translateX(0);border-left-color:var(--teal);}
+.step-item.done{opacity:.7;transform:translateX(0);border-left-color:var(--green);}
+.step-num{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-bottom:.15rem;}
+.step-content{font-size:.84rem;line-height:1.5;}
+.step-content strong{color:var(--amber);}
+.step-content em{color:var(--teal);font-style:normal;}
+.step-nav{display:flex;gap:.6rem;margin-top:.8rem;justify-content:center;}
+.step-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.35rem 1rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.step-btn:hover:not(:disabled){border-color:#2a4a6a;color:var(--text);}
+.step-btn:disabled{opacity:.3;cursor:default;}
+
+.calc-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
+.calc-inputs{display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.8rem;}
+.calc-field{display:flex;flex-direction:column;gap:.2rem;}
+.calc-field label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+.calc-field input{width:80px;padding:.35rem .5rem;border-radius:6px;border:1px solid var(--border);
+  background:var(--card2);color:var(--teal);font-family:'DM Mono',monospace;font-size:.9rem;text-align:center;}
+.calc-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.45rem 1.2rem;
+  border-radius:6px;border:none;background:var(--teal);color:#040810;cursor:pointer;transition:all .2s;align-self:flex-end;}
+.calc-btn:hover{background:var(--blue);}
+.calc-result{background:var(--card2);border-radius:10px;padding:.8rem 1rem;font-family:'DM Mono',monospace;font-size:.82rem;line-height:1.8;margin-top:.5rem;}
+.calc-result strong{color:var(--amber);}
+.calc-result em{color:var(--teal);font-style:normal;}
+
+.sel-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-top:.6rem;}
+.sel-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;cursor:pointer;transition:all .3s;}
+.sel-card:hover,.sel-card.active{transform:translateY(-3px);border-color:var(--teal);}
+.sel-icon{font-size:2rem;margin-bottom:.3rem;}
+.sel-label{font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;margin-bottom:.3rem;}
+.sel-cond{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);margin-bottom:.3rem;}
+.sel-desc{font-size:.78rem;color:var(--muted);line-height:1.4;}
+
+.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.7rem;}
+.app-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;cursor:pointer;transition:all .3s;}
+.app-card:hover{border-color:#2a4a6a;transform:translateY(-2px);}
+.app-card.open .app-detail{display:block;}
+.app-head{display:flex;align-items:center;gap:.5rem;}
+.app-emoji{font-size:1.3rem;}
+.app-title{font-family:'Playfair Display',serif;font-size:.82rem;font-weight:700;}
+.app-detail{display:none;margin-top:.6rem;padding-top:.5rem;border-top:1px solid var(--border);font-size:.8rem;line-height:1.6;}
+.app-detail strong{color:var(--amber);}
+.app-detail em{color:var(--teal);font-style:normal;}
+.app-detail .formula{font-family:'DM Mono',monospace;font-size:.78rem;background:var(--card2);border-radius:6px;padding:.35rem .6rem;margin:.3rem 0;display:block;color:var(--teal);}
+
+@media(max-width:500px){canvas{height:280px;}.controls{flex-direction:column;gap:.5rem;}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Arithmetic Progressions</h1>
+  <p>Class X · Mathematics Ch.5 · Interactive Explorations · 6 Modules</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn on" onclick="showTab(0,this,'var(--teal)')" style="background:var(--teal);color:#040810">📊 AP Explorer</button>
+  <button class="tab-btn" onclick="showTab(1,this,'var(--amber)')">➕ Common Difference</button>
+  <button class="tab-btn" onclick="showTab(2,this,'var(--blue)')">📍 nth Term</button>
+  <button class="tab-btn" onclick="showTab(3,this,'var(--green)')">➗ Sum Builder</button>
+  <button class="tab-btn" onclick="showTab(4,this,'var(--indigo)')">🎯 Smart Selections</button>
+  <button class="tab-btn" onclick="showTab(5,this,'var(--red)')">🌍 Applications</button>
+</div>
+
+<div class="stage">
+<!-- ═══════════════ TAB 0: AP EXPLORER ═══════════════ -->
+<div class="panel active" id="p0">
+  <div class="canvas-box">
+    <canvas id="apCanvas"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>First term a = <span class="ctrl-value" id="va">2</span></label>
+        <input type="range" id="sa" min="-10" max="15" step="1" value="2" oninput="updateAP()">
+      </div>
+      <div class="ctrl-group">
+        <label>Common diff d = <span class="ctrl-value" id="vd">3</span></label>
+        <input type="range" id="sd" min="-6" max="6" step="1" value="3" oninput="updateAP()">
+      </div>
+      <div class="ctrl-group">
+        <label>Terms n = <span class="ctrl-value" id="vn">8</span></label>
+        <input type="range" id="sn" min="3" max="12" step="1" value="8" oninput="updateAP()">
+      </div>
+    </div>
+  </div>
+  <div class="info-box" id="ap-info"></div>
+  <div class="info-box" style="opacity:.7;">
+    💡 Each bar is a term of the AP. The <strong>height difference</strong> between consecutive bars is always the common difference <em>d</em>. If d &gt; 0 the AP grows; if d &lt; 0 it shrinks; if d = 0 all bars are equal.
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 1: COMMON DIFFERENCE ═══════════════ -->
+<div class="panel" id="p1">
+  <div class="stepper">
+    <div class="step-title">Testing Whether a Sequence is an AP</div>
+    <div class="info-box">Example: Is <strong>3, 7, 11, 15, 19, …</strong> an AP?</div>
+    <div class="step-box" id="cd-steps">
+      <div class="step-item active"><div class="step-num">Step 1</div><div class="step-content">Recall the rule: a list is an AP if the difference between <strong>every</strong> pair of consecutive terms is the <em>same</em>.</div></div>
+      <div class="step-item"><div class="step-num">Step 2</div><div class="step-content">a₂ − a₁ = 7 − 3 = <strong>4</strong></div></div>
+      <div class="step-item"><div class="step-num">Step 3</div><div class="step-content">a₃ − a₂ = 11 − 7 = <strong>4</strong></div></div>
+      <div class="step-item"><div class="step-num">Step 4</div><div class="step-content">a₄ − a₃ = 15 − 11 = <strong>4</strong></div></div>
+      <div class="step-item"><div class="step-num">Step 5</div><div class="step-content">All differences are equal to <em>4</em>. ✓</div></div>
+      <div class="step-item"><div class="step-num">Step 6</div><div class="step-content">∴ It <strong>IS an AP</strong> with first term a = 3 and common difference <strong>d = 4</strong>.</div></div>
+      <div class="step-item"><div class="step-num">Counter-example</div><div class="step-content">For 1, 4, 9, 16, …: differences are 3, 5, 7 — <em>not equal</em> → NOT an AP.</div></div>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn" id="cd-prev" onclick="cdStep(-1)" disabled>← Prev</button>
+      <button class="step-btn" id="cd-next" onclick="cdStep(1)">Next →</button>
+    </div>
+  </div>
+  <div class="info-box" style="margin-top:.8rem;opacity:.7;">
+    💡 Formula: <em>d = aₙ − aₙ₋₁</em> for any n. Sign of d tells direction — positive (rising), negative (falling), zero (constant).
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 2: nth TERM CALCULATOR ═══════════════ -->
+<div class="panel" id="p2">
+  <div class="info-box" style="text-align:center;font-size:1rem;padding:.8rem;">
+    <strong style="font-size:1.1rem;">aₙ = a + (n − 1)d</strong><br>
+    <span style="font-size:.72rem;color:var(--muted)">The nth term of an AP with first term a and common difference d</span>
+  </div>
+  <div class="calc-wrap">
+    <div class="step-title">nth Term Calculator</div>
+    <div class="calc-inputs">
+      <div class="calc-field"><label>a (1st term)</label><input type="number" id="na" value="2"></div>
+      <div class="calc-field"><label>d (common diff)</label><input type="number" id="nd" value="5"></div>
+      <div class="calc-field"><label>n (which term)</label><input type="number" id="nn" value="10"></div>
+      <button class="calc-btn" onclick="calcNth()">Find aₙ</button>
+    </div>
+    <div class="calc-result" id="nth-result">
+      Click <strong>Find aₙ</strong> to compute the nth term step by step.
+    </div>
+  </div>
+  <div class="calc-wrap" style="margin-top:.8rem;">
+    <div class="step-title">Reverse: Which term equals a given value?</div>
+    <div class="calc-inputs">
+      <div class="calc-field"><label>a</label><input type="number" id="ra" value="3"></div>
+      <div class="calc-field"><label>d</label><input type="number" id="rd" value="5"></div>
+      <div class="calc-field"><label>value</label><input type="number" id="rv" value="78"></div>
+      <button class="calc-btn" onclick="calcWhich()">Find n</button>
+    </div>
+    <div class="calc-result" id="which-result">
+      Enter a value to check whether (and where) it appears in the AP.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 3: SUM BUILDER ═══════════════ -->
+<div class="panel" id="p3">
+  <div class="info-box" style="text-align:center;font-size:.95rem;">
+    <strong>Sₙ = n/2 [2a + (n − 1)d] = n/2 (a + l)</strong>
+  </div>
+  <div class="canvas-box">
+    <canvas id="sumCanvas" style="height:280px;"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>a = <span class="ctrl-value" id="sva">1</span></label>
+        <input type="range" id="ssa" min="1" max="10" step="1" value="1" oninput="updateSum()">
+      </div>
+      <div class="ctrl-group">
+        <label>d = <span class="ctrl-value" id="svd">1</span></label>
+        <input type="range" id="ssd" min="1" max="5" step="1" value="1" oninput="updateSum()">
+      </div>
+      <div class="ctrl-group">
+        <label>n = <span class="ctrl-value" id="svn">6</span></label>
+        <input type="range" id="ssn" min="2" max="10" step="1" value="6" oninput="updateSum()">
+      </div>
+    </div>
+  </div>
+  <div class="info-box" id="sum-info"></div>
+  <div class="info-box" style="opacity:.7;">
+    💡 <strong>Gauss trick:</strong> Pair the first term with the last, the second with the second-last… each pair sums to (a + l). There are n/2 such pairs, giving Sₙ = n/2 (a + l).
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 4: SMART SELECTIONS ═══════════════ -->
+<div class="panel" id="p4">
+  <div class="info-box" style="text-align:center;font-size:.95rem;">
+    <strong>Choosing unknown terms symmetrically</strong> makes the d-terms cancel in the sum
+  </div>
+  <div class="sel-cases">
+    <div class="sel-card active" onclick="showSel(0)">
+      <div class="sel-icon">3️⃣</div>
+      <div class="sel-label" style="color:var(--teal)">Three Terms</div>
+      <div class="sel-cond">a−d, a, a+d</div>
+      <div class="sel-desc">Sum = 3a. Common difference is d.</div>
+    </div>
+    <div class="sel-card" onclick="showSel(1)">
+      <div class="sel-icon">4️⃣</div>
+      <div class="sel-label" style="color:var(--amber)">Four Terms</div>
+      <div class="sel-cond">a−3d, a−d, a+d, a+3d</div>
+      <div class="sel-desc">Sum = 4a. Common difference is 2d.</div>
+    </div>
+    <div class="sel-card" onclick="showSel(2)">
+      <div class="sel-icon">5️⃣</div>
+      <div class="sel-label" style="color:var(--indigo)">Five Terms</div>
+      <div class="sel-cond">a−2d, a−d, a, a+d, a+2d</div>
+      <div class="sel-desc">Sum = 5a. Common difference is d.</div>
+    </div>
+  </div>
+  <div class="calc-result" id="sel-info" style="margin-top:.8rem;"></div>
+</div>
+
+<!-- ═══════════════ TAB 5: APPLICATIONS ═══════════════ -->
+<div class="panel" id="p5">
+  <div class="info-box">💡 Click any real-life situation to see how it becomes an AP problem.</div>
+  <div class="app-grid">
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">💰</span><span class="app-title">Savings & Salary</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> A fixed amount is added each period.<br>
+        <span class="formula">aₙ = a + (n−1)d</span>
+        <strong>Example:</strong> Saves ₹200 first month, ₹50 more each month. Month 12?<br>
+        a=200, d=50 → a₁₂ = 200 + 11×50 = <em>₹750</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🎭</span><span class="app-title">Seats in Rows</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Each row has a fixed number more seats than the previous.<br>
+        <span class="formula">Row n seats = a + (n−1)d</span>
+        <strong>Example:</strong> Row 1 has 20, each next row +2. Row 10?<br>
+        a=20, d=2 → a₁₀ = 20 + 9×2 = <em>38 seats</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🪵</span><span class="app-title">Stacking Logs / Bricks</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Each row up has one fewer object → use Sum formula.<br>
+        <span class="formula">Sₙ = n/2 [2a + (n−1)d]</span>
+        <strong>Example:</strong> 20 logs bottom row, 19 next… 200 logs total.<br>
+        200 = n/2[41−n] → n²−41n+400=0 → <em>16 rows</em> (reject 25)
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🔢</span><span class="app-title">Multiples in a Range</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Multiples of k form an AP with d = k.<br>
+        <span class="formula">Count: l = a + (n−1)d → solve for n</span>
+        <strong>Example:</strong> Multiples of 4 between 10 and 250: 12,16,…,248.<br>
+        248 = 12 + (n−1)4 → <em>60 numbers</em>
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">🏆</span><span class="app-title">Cash Prizes / Instalments</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> Amounts change by a fixed step; total known → Sum formula.<br>
+        <span class="formula">Sₙ = n/2 [2a + (n−1)d]</span>
+        <strong>Example:</strong> ₹700 in 7 prizes, each ₹20 less than previous.<br>
+        700 = 7/2(2a−120) → a = <em>₹160</em> (top prize)
+      </div>
+    </div>
+    <div class="app-card" onclick="toggleApp(this)">
+      <div class="app-head"><span class="app-emoji">📉</span><span class="app-title">Depreciation Steps</span></div>
+      <div class="app-detail">
+        <strong>Pattern:</strong> A fixed value is lost each year (linear decrease).<br>
+        <span class="formula">Value after n years = a − (n−1)×loss</span>
+        <strong>Example:</strong> Machine ₹80,000, loses ₹5,000/yr. After 6 years?<br>
+        a=80000, d=−5000 → a₆ = 80000 − 5×5000 = <em>₹55,000</em>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /stage -->
+
+<script>
+function showTab(i, btn, clr){
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';});
+  btn.classList.add('on');btn.style.background=clr;btn.style.color='#040810';
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  if(i===0) updateAP();
+  if(i===3) updateSum();
+  if(i===4) showSel(currentSel);
+}
+
+// ── TAB 0: AP Explorer (bars) ──
+const apCanvas=document.getElementById('apCanvas');
+const apCtx=apCanvas.getContext('2d');
+function updateAP(){
+  const a=parseInt(document.getElementById('sa').value);
+  const d=parseInt(document.getElementById('sd').value);
+  const n=parseInt(document.getElementById('sn').value);
+  document.getElementById('va').textContent=a;
+  document.getElementById('vd').textContent=d;
+  document.getElementById('vn').textContent=n;
+  drawAP(a,d,n);
+  const terms=[];for(let i=0;i<n;i++)terms.push(a+i*d);
+  const dir=d>0?'increasing ↑':d<0?'decreasing ↓':'constant →';
+  document.getElementById('ap-info').innerHTML=
+    `<strong>AP:</strong> ${terms.join(', ')} &nbsp;|&nbsp; <em>a=${a}, d=${d}</em> (${dir}) &nbsp;|&nbsp; <em>Last term (a${n}):</em> ${a+(n-1)*d}`;
+}
+function drawAP(a,d,n){
+  const W=apCanvas.width=apCanvas.offsetWidth*2;
+  const H=apCanvas.height=apCanvas.offsetHeight*2;
+  apCtx.clearRect(0,0,W,H);
+  const terms=[];for(let i=0;i<n;i++)terms.push(a+i*d);
+  const maxAbs=Math.max(...terms.map(Math.abs),1);
+  const baseY=H*0.85, topY=H*0.1;
+  const usable=baseY-topY;
+  const gap=W/(n+1);
+  const barW=gap*0.55;
+  // zero line
+  apCtx.strokeStyle='rgba(204,228,255,.25)';apCtx.lineWidth=2;
+  apCtx.beginPath();apCtx.moveTo(0,baseY);apCtx.lineTo(W,baseY);apCtx.stroke();
+  apCtx.font='20px DM Mono';apCtx.fillStyle='#4a6890';apCtx.fillText('0',6,baseY-6);
+  terms.forEach((t,i)=>{
+    const x=gap*(i+1)-barW/2;
+    const h=(Math.abs(t)/maxAbs)*usable;
+    const y=t>=0?baseY-h:baseY;
+    apCtx.fillStyle=t>=0?'rgba(45,212,191,.75)':'rgba(244,63,94,.7)';
+    apCtx.fillRect(x,y,barW,h);
+    // value
+    apCtx.fillStyle='#f59e0b';apCtx.font='bold 22px DM Mono';apCtx.textAlign='center';
+    apCtx.fillText(t,x+barW/2,t>=0?y-10:y+h+28);
+    // index
+    apCtx.fillStyle='#4a6890';apCtx.font='18px DM Mono';
+    apCtx.fillText('a'+(i+1),x+barW/2,baseY+30);
+    apCtx.textAlign='left';
+  });
+}
+
+// ── TAB 1: Common Difference Stepper ──
+let cdIdx=0;
+function cdStep(dir){
+  const items=document.querySelectorAll('#cd-steps .step-item');
+  items[cdIdx].classList.remove('active');items[cdIdx].classList.add('done');
+  cdIdx=Math.max(0,Math.min(items.length-1,cdIdx+dir));
+  items.forEach((it,i)=>{it.classList.remove('active');if(i>cdIdx)it.classList.remove('done');});
+  items[cdIdx].classList.add('active');
+  document.getElementById('cd-prev').disabled=cdIdx===0;
+  document.getElementById('cd-next').disabled=cdIdx===items.length-1;
+}
+
+// ── TAB 2: nth Term ──
+function calcNth(){
+  const a=parseFloat(document.getElementById('na').value)||0;
+  const d=parseFloat(document.getElementById('nd').value)||0;
+  const n=parseInt(document.getElementById('nn').value)||1;
+  const res=document.getElementById('nth-result');
+  if(n<1){res.innerHTML='<strong style="color:var(--red)">n must be a positive integer.</strong>';return;}
+  const an=a+(n-1)*d;
+  let html=`<strong>Given:</strong> a=${a}, d=${d}, n=${n}<br>`;
+  html+=`<strong>Formula:</strong> aₙ = a + (n−1)d<br>`;
+  html+=`a${n} = ${a} + (${n}−1)(${d})<br>`;
+  html+=`&nbsp;&nbsp;&nbsp; = ${a} + ${n-1}×${d}<br>`;
+  html+=`&nbsp;&nbsp;&nbsp; = ${a} + ${(n-1)*d}<br>`;
+  html+=`<strong>a${n} = ${an}</strong>`;
+  res.innerHTML=html;
+}
+function calcWhich(){
+  const a=parseFloat(document.getElementById('ra').value)||0;
+  const d=parseFloat(document.getElementById('rd').value)||0;
+  const v=parseFloat(document.getElementById('rv').value)||0;
+  const res=document.getElementById('which-result');
+  if(d===0){res.innerHTML=v===a?'Every term equals '+a+' (d=0).':'<strong style="color:var(--red)">Not a term (d=0 and value ≠ a).</strong>';return;}
+  const n=(v-a)/d+1;
+  let html=`<strong>Given:</strong> a=${a}, d=${d}, value=${v}<br>`;
+  html+=`Set aₙ = ${v}: ${v} = ${a} + (n−1)(${d})<br>`;
+  html+=`${v-a} = ${d}(n−1) → n−1 = ${((v-a)/d).toFixed(3)} → n = ${n.toFixed(3)}<br>`;
+  if(Number.isInteger(n)&&n>0){
+    html+=`<strong style="color:var(--green)">✓ Yes — ${v} is the ${n}th term of the AP.</strong>`;
+  } else {
+    html+=`<strong style="color:var(--red)">✗ No — n is not a positive integer, so ${v} is NOT a term.</strong>`;
+  }
+  res.innerHTML=html;
+}
+
+// ── TAB 3: Sum Builder ──
+const sumCanvas=document.getElementById('sumCanvas');
+const sumCtx=sumCanvas.getContext('2d');
+function updateSum(){
+  const a=parseInt(document.getElementById('ssa').value);
+  const d=parseInt(document.getElementById('ssd').value);
+  const n=parseInt(document.getElementById('ssn').value);
+  document.getElementById('sva').textContent=a;
+  document.getElementById('svd').textContent=d;
+  document.getElementById('svn').textContent=n;
+  drawSum(a,d,n);
+  const terms=[];for(let i=0;i<n;i++)terms.push(a+i*d);
+  const l=terms[n-1];
+  const S=n/2*(2*a+(n-1)*d);
+  document.getElementById('sum-info').innerHTML=
+    `<strong>Terms:</strong> ${terms.join(' + ')} &nbsp;|&nbsp; <em>a=${a}, l=${l}, n=${n}</em><br>`+
+    `Sₙ = n/2(a+l) = ${n}/2 × (${a}+${l}) = ${n/2} × ${a+l} = <strong>${S}</strong>`;
+}
+function drawSum(a,d,n){
+  const W=sumCanvas.width=sumCanvas.offsetWidth*2;
+  const H=sumCanvas.height=sumCanvas.offsetHeight*2;
+  sumCtx.clearRect(0,0,W,H);
+  const terms=[];for(let i=0;i<n;i++)terms.push(a+i*d);
+  const maxT=Math.max(...terms,1);
+  const baseY=H*0.82,topY=H*0.12,usable=baseY-topY;
+  const gap=W/(n+1),barW=gap*0.55;
+  sumCtx.strokeStyle='rgba(204,228,255,.2)';sumCtx.lineWidth=2;
+  sumCtx.beginPath();sumCtx.moveTo(0,baseY);sumCtx.lineTo(W,baseY);sumCtx.stroke();
+  terms.forEach((t,i)=>{
+    const x=gap*(i+1)-barW/2;
+    const h=(t/maxT)*usable;
+    const y=baseY-h;
+    // color-pair the first with last etc.
+    const pairIdx=Math.min(i,n-1-i);
+    const hue=[ '#2dd4bf','#38bdf8','#818cf8','#d946ef','#f59e0b' ][pairIdx%5];
+    sumCtx.fillStyle=hue;
+    sumCtx.fillRect(x,y,barW,h);
+    sumCtx.fillStyle='#cce4ff';sumCtx.font='bold 20px DM Mono';sumCtx.textAlign='center';
+    sumCtx.fillText(t,x+barW/2,y-8);
+    sumCtx.textAlign='left';
+  });
+  sumCtx.fillStyle='#4a6890';sumCtx.font='18px DM Mono';sumCtx.textAlign='center';
+  sumCtx.fillText('matching colors = pairs summing to (a + l)',W/2,H-12);
+  sumCtx.textAlign='left';
+}
+
+// ── TAB 4: Smart Selections ──
+let currentSel=0;
+const selData=[
+  {title:'Three terms in AP',setup:'Take them as a−d, a, a+d.',
+   ex:'<strong>Problem:</strong> Sum of 3 numbers in AP is 27, sum of squares 293.<br>Sum: 3a = 27 → a = 9.<br>Squares: 3a² + 2d² = 293 → 2d² = 50 → d = ±5.<br><strong>Numbers: 4, 9, 14.</strong>'},
+  {title:'Four terms in AP',setup:'Take them as a−3d, a−d, a+d, a+3d (common difference 2d).',
+   ex:'<strong>Problem:</strong> Sum of 4 numbers in AP is 20, sum of squares 120.<br>Sum: 4a = 20 → a = 5.<br>Squares: 4a² + 20d² = 120 → 100 + 20d² = 120 → d² = 1 → d = ±1.<br><strong>Numbers: 2, 4, 6, 8.</strong>'},
+  {title:'Five terms in AP',setup:'Take them as a−2d, a−d, a, a+d, a+2d.',
+   ex:'<strong>Problem:</strong> Sum of 5 numbers in AP is 25, product of extremes needed.<br>Sum: 5a = 25 → a = 5.<br>The middle term is a = 5. Extremes are 5−2d and 5+2d.<br><strong>Middle term = average = 5 always.</strong>'},
+];
+function showSel(idx){
+  currentSel=idx;
+  document.querySelectorAll('.sel-card').forEach((c,i)=>c.classList.toggle('active',i===idx));
+  const s=selData[idx];
+  document.getElementById('sel-info').innerHTML=`<strong>${s.title}</strong><br><em>${s.setup}</em><br><br>${s.ex}`;
+}
+
+// ── TAB 5: Applications ──
+function toggleApp(el){el.classList.toggle('open');}
+
+updateAP();
+window.addEventListener('resize',()=>{updateAP();const p3=document.getElementById('p3');if(p3.classList.contains('active'))updateSum();});
+showSel(0);
+</script>
+</body>
+</html>

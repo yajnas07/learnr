@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Arithmetic Progressions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(45,212,191,.05) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;width:100%;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--teal);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.prog-row{display:flex;align-items:center;gap:1rem;padding:.5rem 1rem .8rem;width:100%;max-width:580px;}
+.prog-bar{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--blue));transition:width .4s ease;}
+.prog-text{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap;}
+
+.filters{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;padding:.2rem 1rem .8rem;}
+.f-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.72rem;padding:.3rem .9rem;border-radius:3px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.f-btn:hover{color:var(--text);}
+.f-btn.on{color:#040810;border-color:transparent;}
+.f-all.on{background:var(--muted);color:var(--text)!important;}
+.f-bas.on{background:var(--teal);}
+.f-cd.on{background:var(--amber);}
+.f-nth.on{background:var(--blue);}
+.f-sum.on{background:var(--green);}
+.f-prop.on{background:var(--indigo);}
+.f-app.on{background:var(--red);}
+
+.stage{width:100%;max-width:580px;padding:0 1rem;perspective:1200px;}
+.fc-wrap{width:100%;aspect-ratio:3/2;position:relative;cursor:pointer;
+  transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);}
+.fc-wrap.flipped{transform:rotateY(180deg);}
+.fc-face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.4rem;text-align:center;}
+.fc-front{background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.6);}
+.fc-back{transform:rotateY(180deg);background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.6);}
+.fc-tag{font-family:'DM Mono',monospace;font-size:.65rem;font-weight:500;padding:.18rem .65rem;border-radius:2px;margin-bottom:.7rem;}
+.fc-q{font-family:'Playfair Display',serif;font-size:clamp(.88rem,2.4vw,1.1rem);font-weight:700;line-height:1.45;}
+.fc-hint{font-size:.68rem;color:var(--muted);margin-top:.5rem;font-family:'DM Mono',monospace;}
+.fc-flip-hint{position:absolute;bottom:.75rem;font-size:.65rem;font-family:'DM Mono',monospace;color:#1a2d45;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.fc-ans-lbl{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--green);margin-bottom:.5rem;}
+.fc-ans{font-size:clamp(.78rem,2vw,.95rem);line-height:1.65;color:var(--text);}
+.fc-ans strong{color:var(--amber);}
+.fc-ans em{color:var(--teal);font-style:normal;}
+.known-badge{position:absolute;top:.7rem;right:.7rem;font-size:.62rem;font-family:'DM Mono',monospace;padding:.12rem .45rem;border-radius:2px;}
+.known{background:rgba(34,197,94,.15);color:#4ade80;}
+.unknown{background:rgba(239,68,68,.1);color:#f87171;}
+
+.nav-row{display:flex;gap:.7rem;align-items:center;padding:1rem;}
+.nav-btn{font-family:'Playfair Display',serif;font-weight:700;font-size:.85rem;padding:.5rem 1.3rem;border-radius:4px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.nav-btn:hover:not(:disabled){border-color:#2a4a6a;color:var(--text);}
+.nav-btn:disabled{opacity:.3;cursor:default;}
+.nav-ctr{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);min-width:80px;text-align:center;}
+.action-row{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;padding:0 1rem .5rem;}
+.act-btn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.32rem .9rem;border-radius:3px;
+  border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;transition:all .2s;}
+.act-btn:hover{color:var(--text);border-color:#2a4a6a;}
+.stats-bar{display:flex;gap:1.2rem;justify-content:center;padding:.3rem 0 1rem;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);}
+.stats-bar span strong{color:var(--text);}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Arithmetic Progressions</h1>
+  <p>Class X · Mathematics Ch.5 · 36 Flashcards · 6 Categories</p>
+</header>
+
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  <div class="prog-text" id="prog-text">0 / 36</div>
+</div>
+
+<div class="filters">
+  <button class="f-btn f-all on" onclick="setFilter('all',this)">All (36)</button>
+  <button class="f-btn f-bas" onclick="setFilter('bas',this)">🔢 Basics (6)</button>
+  <button class="f-btn f-cd" onclick="setFilter('cd',this)">➕ Common Diff (6)</button>
+  <button class="f-btn f-nth" onclick="setFilter('nth',this)">📍 nth Term (7)</button>
+  <button class="f-btn f-sum" onclick="setFilter('sum',this)">➗ Sum (7)</button>
+  <button class="f-btn f-prop" onclick="setFilter('prop',this)">✨ Properties (5)</button>
+  <button class="f-btn f-app" onclick="setFilter('app',this)">🌍 Applications (5)</button>
+</div>
+
+<div class="stage">
+  <div class="fc-wrap" id="fc" onclick="flip()">
+    <div class="fc-face fc-front" id="fc-front"></div>
+    <div class="fc-face fc-back" id="fc-back"></div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="nav(-1)" disabled>&#8592; Prev</button>
+  <span class="nav-ctr" id="nav-ctr">1 / 36</span>
+  <button class="nav-btn" id="next-btn" onclick="nav(1)">Next &#8594;</button>
+</div>
+<div class="action-row">
+  <button class="act-btn" onclick="markKnown()">✓ Mark Known</button>
+  <button class="act-btn" onclick="markReview()">↩ Need Review</button>
+  <button class="act-btn" onclick="shuffle()">⇄ Shuffle</button>
+  <button class="act-btn" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="stats-bar">
+  <span>Known: <strong id="s-known">0</strong></span>
+  <span>Review: <strong id="s-review">0</strong></span>
+  <span>Remaining: <strong id="s-remain">36</strong></span>
+</div>
+
+<script>
+const ALL_CARDS=[
+// ── BASICS (6) ──
+{cat:'bas',q:'What is an Arithmetic Progression (AP)?',a:'A list of numbers in which <strong>each term is obtained by adding a fixed number</strong> to the previous term. Form: <em>a, a+d, a+2d, …</em>',hint:'Constant difference between terms'},
+{cat:'bas',q:'What do "a" and "d" stand for in an AP?',a:'<strong>a</strong> = the <em>first term</em> (a₁).<br><strong>d</strong> = the <em>common difference</em> added each step.',hint:'Start value and step size'},
+{cat:'bas',q:'What is the difference between a finite and an infinite AP?',a:'A <strong>finite AP</strong> has a last term (e.g., 2,4,…,100).<br>An <strong>infinite AP</strong> continues forever (e.g., 1,4,7,…).',hint:'Does it have a last term?'},
+{cat:'bas',q:'Write the general form of an AP with first term a and common difference d.',a:'<strong>a, a+d, a+2d, a+3d, …</strong><br>The kth term is <em>a+(k−1)d</em>.',hint:'Keep adding d'},
+{cat:'bas',q:'Is 2, 4, 8, 16, … an AP? Why or why not?',a:'<strong>No.</strong> Differences are 2, 4, 8, … which are not equal. It is a geometric progression, not an AP.',hint:'Check the differences'},
+{cat:'bas',q:'What is the common difference of a constant AP like 7, 7, 7, …?',a:'<strong>d = 0.</strong> A constant sequence is a valid AP with common difference zero.',hint:'Every term is the same'},
+
+// ── COMMON DIFFERENCE (6) ──
+{cat:'cd',q:'How do you find the common difference d of an AP?',a:'<strong>d = aₙ − aₙ₋₁</strong> — subtract any term from the term just after it.<br>e.g., 5,8,11 → d = 8−5 = <em>3</em>.',hint:'Later term minus earlier term'},
+{cat:'cd',q:'What does the sign of d tell you about the AP?',a:'<strong>d &gt; 0</strong> → increasing.<br><strong>d &lt; 0</strong> → decreasing.<br><strong>d = 0</strong> → constant.',hint:'Positive, negative, or zero'},
+{cat:'cd',q:'Find the common difference: 10, 7, 4, 1, …',a:'d = 7 − 10 = <strong>−3</strong>.<br>The AP is decreasing by 3 each time.',hint:'Second term minus first'},
+{cat:'cd',q:'How do you check whether a list of numbers is an AP?',a:'Compute the difference between each pair of consecutive terms. If <strong>all differences are equal</strong>, it is an AP; otherwise it is not.',hint:'Are all gaps equal?'},
+{cat:'cd',q:'For 3, 3+√2, 3+2√2, …, find d and state if it is an AP.',a:'d = (3+√2) − 3 = <strong>√2</strong>. The difference is constant, so <em>yes, it is an AP</em>.',hint:'Subtract consecutive terms'},
+{cat:'cd',q:'The first term of an AP is 7 and d = −2. Write its first four terms.',a:'<strong>7, 5, 3, 1</strong><br>(each term is 2 less than the previous one).',hint:'Add d = −2 repeatedly'},
+
+// ── nth TERM (7) ──
+{cat:'nth',q:'State the nth term formula of an AP.',a:'<strong>aₙ = a + (n − 1)d</strong><br>where a = first term, d = common difference, n = term number.',hint:'a plus (n−1) times d'},
+{cat:'nth',q:'Find the 10th term of the AP: 2, 7, 12, …',a:'a = 2, d = 5.<br>a₁₀ = 2 + (10−1)×5 = 2 + 45 = <strong>47</strong>.',hint:'a₁₀ = a + 9d'},
+{cat:'nth',q:'Which term of the AP 3, 8, 13, … is 78?',a:'a=3, d=5. 78 = 3 + (n−1)5<br>75 = 5(n−1) → n−1 = 15 → <strong>n = 16</strong>.',hint:'Set aₙ = 78, solve for n'},
+{cat:'nth',q:'Is 100 a term of the AP 5, 11, 17, …?',a:'a=5, d=6. 100 = 5+(n−1)6 → 95 = 6(n−1) → n−1 = 15.83…<br><strong>Not a whole number → 100 is NOT a term.</strong>',hint:'n must be a positive whole number'},
+{cat:'nth',q:'What is the formula for the nth term from the end of a finite AP?',a:'<strong>nth term from end = l − (n − 1)d</strong><br>where l is the last term.',hint:'Count backward from l'},
+{cat:'nth',q:'The 5th term of an AP is 19 and the 8th is 31. Find a and d.',a:'a+4d=19, a+7d=31. Subtract: 3d=12 → d=<strong>4</strong>.<br>a = 19−16 = <strong>3</strong>.',hint:'Subtract the two equations'},
+{cat:'nth',q:'How many two-digit numbers are divisible by 3?',a:'AP: 12,15,…,99. a=12,d=3,l=99.<br>99=12+(n−1)3 → n−1=29 → <strong>n=30</strong>.',hint:'First is 12, last is 99'},
+
+// ── SUM (7) ──
+{cat:'sum',q:'State the sum formula for the first n terms of an AP.',a:'<strong>Sₙ = n/2 [2a + (n − 1)d]</strong>',hint:'n over 2, times [2a+(n−1)d]'},
+{cat:'sum',q:'Give the sum formula when the last term l is known.',a:'<strong>Sₙ = n/2 (a + l)</strong><br>Sum = number of terms × average of first &amp; last term.',hint:'Average of ends × count'},
+{cat:'sum',q:'Find the sum of the first 20 terms of 2, 5, 8, …',a:'a=2, d=3, n=20.<br>S₂₀ = 20/2[4 + 19×3] = 10×61 = <strong>610</strong>.',hint:'S = n/2[2a+(n−1)d]'},
+{cat:'sum',q:'Find 1 + 2 + 3 + … + 100.',a:'a=1, l=100, n=100.<br>S = 100/2 (1+100) = 50×101 = <strong>5050</strong>.',hint:'Gauss trick: n/2(a+l)'},
+{cat:'sum',q:'What is the sum of the first n natural numbers?',a:'<strong>Sₙ = n(n+1)/2</strong><br>(a special case with a=1, d=1).',hint:'n times (n+1) over 2'},
+{cat:'sum',q:'How can you find aₙ if you know Sₙ and Sₙ₋₁?',a:'<strong>aₙ = Sₙ − Sₙ₋₁</strong><br>The nth term is the difference of consecutive sums.',hint:'Difference of two sums'},
+{cat:'sum',q:'If Sₙ = 3n² + 2n, find the first term and common difference.',a:'S₁ = a = 3+2 = <strong>5</strong>.<br>S₂ = 12+4 = 16 → a₂ = 16−5 = 11 → d = 11−5 = <strong>6</strong>.',hint:'a = S₁, a₂ = S₂ − S₁'},
+
+// ── PROPERTIES (5) ──
+{cat:'prop',q:'How should you choose 3 unknown terms in AP?',a:'Take them as <strong>a−d, a, a+d</strong>. Their sum = 3a, so the d-terms cancel — making equations easy.',hint:'Symmetric around a'},
+{cat:'prop',q:'How should you choose 4 unknown terms in AP?',a:'Take them as <strong>a−3d, a−d, a+d, a+3d</strong> (common difference 2d). Sum = 4a.',hint:'Odd multiples of d around a'},
+{cat:'prop',q:'What happens to an AP if you add a constant k to every term?',a:'It remains an AP with the <strong>same common difference d</strong> — only the first term shifts by k.',hint:'d is unchanged'},
+{cat:'prop',q:'What happens if you multiply every term of an AP by k?',a:'It stays an AP, but the common difference becomes <strong>kd</strong>.',hint:'The step scales by k'},
+{cat:'prop',q:'In an AP, how is each term related to its neighbours?',a:'Each term is the <strong>average of its neighbours</strong>: aₖ = (aₖ₋₁ + aₖ₊₁)/2.',hint:'Middle term = mean of the two around it'},
+
+// ── APPLICATIONS (5) ──
+{cat:'app',q:'A man saves ₹200 in month 1, ₹250 in month 2, ₹300 in month 3… How much in month 12?',a:'a=200, d=50. a₁₂ = 200 + 11×50 = <strong>₹750</strong>.',hint:'aₙ = a + (n−1)d'},
+{cat:'app',q:'A theatre has 20 seats in row 1, 22 in row 2, 24 in row 3… How many in row 10?',a:'a=20, d=2. a₁₀ = 20 + 9×2 = <strong>38 seats</strong>.',hint:'It is an AP with d=2'},
+{cat:'app',q:'How many multiples of 4 lie between 10 and 250?',a:'AP: 12,16,…,248. a=12,d=4,l=248.<br>248=12+(n−1)4 → n−1=59 → <strong>n=60</strong>.',hint:'First multiple 12, last 248'},
+{cat:'app',q:'A sum of ₹700 is to be repaid in instalments that increase by ₹10, starting at ₹? over 10 months totalling 700. Set it up.',a:'S₁₀=700, d=10, n=10.<br>700 = 10/2[2a + 9×10] = 5(2a+90)<br>140 = 2a+90 → a = <strong>₹25</strong>.',hint:'Use Sₙ = n/2[2a+(n−1)d]'},
+{cat:'app',q:'200 logs are stacked with 20 in the bottom row, 19 in the next… How many rows to reach 200 logs?',a:'a=20, d=−1, Sₙ=200.<br>200 = n/2[40−(n−1)] → n²−41n+400=0 → n=16 or 25.<br><strong>n = 16 rows</strong> (25 gives negative logs, reject).',hint:'Solve Sₙ = 200 for n'},
+];
+
+let deck=[...ALL_CARDS.map((_,i)=>i)];
+let current=0,flipped=false,filterCat='all';
+const known=new Set(),review=new Set();
+
+function filteredDeck(){return filterCat==='all'?deck:deck.filter(i=>ALL_CARDS[i].cat===filterCat);}
+function setFilter(cat,btn){filterCat=cat;document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');current=0;render();}
+
+function render(){
+  const fd=filteredDeck();
+  if(!fd.length){document.getElementById('fc-front').innerHTML='<div class="fc-q">No cards in this category.</div>';return;}
+  const idx=fd[current%fd.length],card=ALL_CARDS[idx],fc=document.getElementById('fc');
+  fc.classList.remove('flipped');flipped=false;
+  const catColors={bas:['var(--teal)','rgba(45,212,191,.15)'],cd:['var(--amber)','rgba(245,158,11,.15)'],
+    nth:['var(--blue)','rgba(56,189,248,.15)'],sum:['var(--green)','rgba(34,197,94,.15)'],
+    prop:['var(--indigo)','rgba(129,140,248,.15)'],app:['var(--red)','rgba(244,63,94,.15)']};
+  const catNames={bas:'🔢 Basics',cd:'➕ Common Diff',nth:'📍 nth Term',sum:'➗ Sum',prop:'✨ Properties',app:'🌍 Applications'};
+  const [cc,cb]=catColors[card.cat]||['var(--muted)','rgba(100,116,139,.15)'];
+  const isK=known.has(idx),isR=review.has(idx);
+  const badge=isK?'<span class="known-badge known">✓ Known</span>':isR?'<span class="known-badge unknown">↩ Review</span>':'';
+  document.getElementById('fc-front').innerHTML=`${badge}<span class="fc-tag" style="background:${cb};color:${cc}">${catNames[card.cat]}</span><div class="fc-q">${card.q}</div>${card.hint?`<div class="fc-hint">Hint: ${card.hint}</div>`:''}<div class="fc-flip-hint">tap to reveal answer</div>`;
+  document.getElementById('fc-back').innerHTML=`${badge}<div class="fc-ans-lbl">✦ ANSWER</div><div class="fc-ans">${card.a}</div>`;
+  document.getElementById('nav-ctr').textContent=`${(current%fd.length)+1} / ${fd.length}`;
+  document.getElementById('prev-btn').disabled=current===0;
+  document.getElementById('next-btn').disabled=current>=fd.length-1;
+  updateProgress();
+}
+function flip(){flipped=!flipped;document.getElementById('fc').classList.toggle('flipped',flipped);}
+function nav(d){const fd=filteredDeck();current=Math.max(0,Math.min(fd.length-1,current+d));render();}
+function markKnown(){const fd=filteredDeck();if(fd.length){known.add(fd[current%fd.length]);review.delete(fd[current%fd.length]);render();updateStats();}}
+function markReview(){const fd=filteredDeck();if(fd.length){review.add(fd[current%fd.length]);known.delete(fd[current%fd.length]);render();updateStats();}}
+function shuffle(){for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}current=0;render();}
+function resetAll(){known.clear();review.clear();deck=[...ALL_CARDS.map((_,i)=>i)];current=0;render();updateStats();}
+function updateProgress(){const fd=filteredDeck(),seen=fd.slice(0,current+1).length,pct=fd.length?Math.round(seen/fd.length*100):0;document.getElementById('prog').style.width=pct+'%';document.getElementById('prog-text').textContent=`${seen} / ${fd.length}`;}
+function updateStats(){document.getElementById('s-known').textContent=known.size;document.getElementById('s-review').textContent=review.size;document.getElementById('s-remain').textContent=ALL_CARDS.length-known.size-review.size;}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')nav(1);if(e.key==='ArrowLeft')nav(-1);if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}});
+render();updateStats();
+</script>
+</body>
+</html>

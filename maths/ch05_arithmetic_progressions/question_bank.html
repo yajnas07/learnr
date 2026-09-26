@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Arithmetic Progressions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040810;--card:#0a1422;--card2:#0f1c30;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;
+  --amber:#f59e0b;--teal:#2dd4bf;--blue:#38bdf8;--green:#22c55e;--red:#f43f5e;--indigo:#818cf8;--purple:#d946ef;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(45,212,191,.06) 0%,transparent 60%);}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.42rem 1.2rem;
+  background:rgba(4,8,16,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,45,69,.75);position:sticky;top:0;z-index:9999;}
+.site-nav-logo{display:flex;align-items:center;text-decoration:none;}
+.site-nav-img{height:28px;}
+.site-nav-back{font-family:'DM Mono',monospace;font-size:.68rem;color:#7a9ab8;text-decoration:none;border:1px solid rgba(26,45,69,.9);border-radius:99px;padding:.2rem .65rem;}
+.site-nav-back:hover{color:#dde6f5;}
+
+header{text-align:center;padding:1.6rem 1rem .8rem;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--teal);}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.3rem;}
+
+.dash{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;padding:.5rem 1rem 1.2rem;}
+.dash-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.55rem 1.1rem;text-align:center;min-width:90px;}
+.dash-card .num{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;}
+.dash-card .lbl{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.1rem;}
+
+.section-label{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;padding:.4rem 1.2rem .2rem;color:var(--muted);letter-spacing:.04em;display:flex;align-items:center;gap:.5rem;max-width:800px;margin:0 auto;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.qwrap{max-width:800px;margin:0 auto;padding:0 1rem 2rem;display:flex;flex-direction:column;gap:1rem;}
+
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.q-card.strip-bas{border-left:3px solid var(--teal);}
+.q-card.strip-cd{border-left:3px solid var(--amber);}
+.q-card.strip-nth{border-left:3px solid var(--blue);}
+.q-card.strip-sum{border-left:3px solid var(--green);}
+.q-card.strip-prop{border-left:3px solid var(--indigo);}
+.q-card.strip-app{border-left:3px solid var(--red);}
+
+.q-header{display:flex;align-items:flex-start;gap:.7rem;padding:.7rem 1rem .5rem;}
+.q-num{font-family:'DM Mono',monospace;font-size:.68rem;font-weight:500;color:#040810;padding:.18rem .5rem;border-radius:2px;margin-top:.08rem;flex-shrink:0;white-space:nowrap;}
+.badge-mcq{background:var(--blue);}
+.badge-ar{background:var(--purple);}
+.badge-sa{background:var(--teal);}
+.badge-la{background:var(--amber);}
+.q-text{font-size:.88rem;line-height:1.6;}
+.q-text strong{color:var(--amber);}
+.q-text em{color:var(--teal);font-style:normal;}
+.q-marks{font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);padding:0 1rem .2rem 3.2rem;}
+
+.mcq-opts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;padding:.2rem 1rem .6rem;}
+.opt-btn{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.4rem .65rem;font-size:.8rem;color:var(--text);cursor:pointer;text-align:left;transition:all .2s;}
+.opt-btn:hover{border-color:#2a4a6a;}
+.opt-btn.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+.opt-btn.wrong{background:rgba(244,63,94,.1);border-color:var(--red);color:var(--red);}
+
+.feedback{font-size:.78rem;line-height:1.5;padding:.45rem 1rem .6rem;display:none;}
+.feedback.correct{color:var(--green);}
+.feedback.wrong{color:var(--red);}
+.feedback.shown{display:block;}
+
+.ans-reveal{padding:.1rem 1rem .6rem;}
+.show-btn{font-family:'DM Mono',monospace;font-size:.7rem;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:.28rem .75rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+.show-btn:hover{color:var(--text);border-color:#2a4a6a;}
+.ans-body{background:var(--card2);border-radius:8px;margin-top:.5rem;padding:.7rem .9rem;font-size:.82rem;line-height:1.7;display:none;}
+.ans-body.shown{display:block;}
+.ans-body strong{color:var(--amber);}
+.ans-body em{color:var(--teal);font-style:normal;}
+
+.ar-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;padding:.3rem 1rem .5rem;}
+.ar-box{background:var(--card2);border-radius:6px;padding:.45rem .7rem;font-size:.8rem;line-height:1.5;}
+.ar-box span{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);display:block;margin-bottom:.15rem;}
+.ar-choices{display:flex;gap:.4rem;flex-wrap:wrap;padding:.1rem 1rem .3rem;}
+.ar-choices button{font-size:.74rem;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:.28rem .65rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+.ar-choices button:hover{color:var(--text);}
+.ar-choices button.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green);}
+.ar-choices button.wrong{background:rgba(244,63,94,.1);border-color:var(--red);color:var(--red);}
+
+@media(max-width:500px){.mcq-opts{grid-template-columns:1fr;}.ar-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html" class="site-nav-logo"><img src="../../logos/learnr-colored-dark.svg" alt="learnr" class="site-nav-img"></a>
+  <a href="../../index.html" class="site-nav-back">&#8592; Back to Portal</a>
+</nav>
+<header>
+  <h1>Arithmetic Progressions — Question Bank</h1>
+  <p>Class X · Mathematics Ch.5 · CBSE Pattern · 30 Questions</p>
+</header>
+
+<div class="dash">
+  <div class="dash-card"><div class="num" style="color:var(--blue)">10</div><div class="lbl">MCQ (1 mark)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--purple)">3</div><div class="lbl">Assertion-Reason</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--teal)">12</div><div class="lbl">Short Answer (2-3 m)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--amber)">5</div><div class="lbl">Long Answer (5 m)</div></div>
+  <div class="dash-card"><div class="num" style="color:var(--green)">47</div><div class="lbl">Total Marks</div></div>
+</div>
+
+<!-- ═══════════ MCQ ═══════════ -->
+<div class="section-label">Section A — Multiple Choice Questions (1 Mark Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-bas">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 1</span><div class="q-text">Which of the following lists of numbers forms an AP?</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 2, 4, 8, 16, …</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) 3, 7, 11, 15, …</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 1, 4, 9, 16, …</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 1, 3, 6, 10, …</button>
+  </div>
+  <div class="feedback">✓ B is correct. Consecutive differences are all 4 (constant). A doubles (GP), C are squares, D are triangular numbers — none have a constant difference.</div>
+</div>
+
+<div class="q-card strip-nth">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 2</span><div class="q-text">The 10th term of the AP <strong>2, 7, 12, …</strong> is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 45</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) 47</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 50</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 52</button>
+  </div>
+  <div class="feedback">✓ B is correct. a=2, d=5. a₁₀ = 2 + (10−1)×5 = 2 + 45 = 47.</div>
+</div>
+
+<div class="q-card strip-cd">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 3</span><div class="q-text">The common difference of the AP <strong>10, 7, 4, 1, …</strong> is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 3</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) −3</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) −7</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 7</button>
+  </div>
+  <div class="feedback">✓ B is correct. d = 7 − 10 = −3. The AP is decreasing.</div>
+</div>
+
+<div class="q-card strip-sum">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 4</span><div class="q-text">The sum of the first n natural numbers is given by:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'c')">A) n(n+1)/2</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) n(n−1)/2</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) n²</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) n(n+1)</button>
+  </div>
+  <div class="feedback">✓ A is correct. With a=1, d=1: Sₙ = n/2(1+n) = n(n+1)/2.</div>
+</div>
+
+<div class="q-card strip-nth">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 5</span><div class="q-text">Which term of the AP <strong>3, 8, 13, 18, …</strong> is 78?</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 12th</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) 14th</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">C) 16th</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 18th</button>
+  </div>
+  <div class="feedback">✓ C is correct. 78 = 3 + (n−1)5 → 75 = 5(n−1) → n = 16.</div>
+</div>
+
+<div class="q-card strip-bas">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 6</span><div class="q-text">The common difference of a constant AP such as 5, 5, 5, … is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'c')">A) 0</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) 5</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 1</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) undefined</button>
+  </div>
+  <div class="feedback">✓ A is correct. Every term equals the previous one, so d = 0. It is a valid AP.</div>
+</div>
+
+<div class="q-card strip-sum">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 7</span><div class="q-text">The sum of the first 20 terms of the AP <strong>2, 5, 8, …</strong> is:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 590</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) 610</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) 620</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 640</button>
+  </div>
+  <div class="feedback">✓ B is correct. a=2, d=3, n=20. S₂₀ = 20/2[4 + 19×3] = 10 × 61 = 610.</div>
+</div>
+
+<div class="q-card strip-nth">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 8</span><div class="q-text">If aₙ = Sₙ − Sₙ₋₁ and Sₙ = 3n² + 5n, then a₁ equals:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 3</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) 5</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">C) 8</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 11</button>
+  </div>
+  <div class="feedback">✓ C is correct. a₁ = S₁ = 3(1)² + 5(1) = 3 + 5 = 8.</div>
+</div>
+
+<div class="q-card strip-prop">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 9</span><div class="q-text">Three numbers in AP are best represented as:</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) a, a+d, a+2d</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">B) a−d, a, a+d</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">C) a, ar, ar²</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) a−2d, a, a+2d</button>
+  </div>
+  <div class="feedback">✓ B is correct. a−d, a, a+d keeps the sum as 3a, cancelling d and simplifying calculations.</div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-mcq">MCQ 10</span><div class="q-text">How many two-digit numbers are divisible by 3?</div></div>
+  <div class="mcq-opts">
+    <button class="opt-btn" onclick="mcq(this,'w')">A) 27</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">B) 29</button>
+    <button class="opt-btn" onclick="mcq(this,'c')">C) 30</button>
+    <button class="opt-btn" onclick="mcq(this,'w')">D) 33</button>
+  </div>
+  <div class="feedback">✓ C is correct. AP: 12, 15, …, 99. 99 = 12 + (n−1)3 → n−1 = 29 → n = 30.</div>
+</div>
+
+</div>
+
+<!-- ═══════════ ASSERTION-REASON ═══════════ -->
+<div class="section-label">Section B — Assertion &amp; Reason (1 Mark Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-cd">
+  <div class="q-header"><span class="q-num badge-ar">A-R 1</span><div class="q-text">Choose the correct option about the statements below.</div></div>
+  <div class="ar-grid">
+    <div class="ar-box"><span>ASSERTION (A)</span>The sequence 5, 8, 11, 14, … is an AP.</div>
+    <div class="ar-box"><span>REASON (R)</span>A sequence is an AP if the difference between consecutive terms is constant.</div>
+  </div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'c')">A: Both true, R explains A</button>
+    <button onclick="ar(this,'w')">B: Both true, R doesn't explain A</button>
+    <button onclick="ar(this,'w')">C: A true, R false</button>
+    <button onclick="ar(this,'w')">D: A false, R true</button>
+  </div>
+  <div class="feedback">✓ A is correct. Differences are all 3 (constant), so A is true, and R is the exact definition explaining why it is an AP.</div>
+</div>
+
+<div class="q-card strip-nth">
+  <div class="q-header"><span class="q-num badge-ar">A-R 2</span><div class="q-text">Choose the correct option about the statements below.</div></div>
+  <div class="ar-grid">
+    <div class="ar-box"><span>ASSERTION (A)</span>The number 100 is a term of the AP 5, 11, 17, …</div>
+    <div class="ar-box"><span>REASON (R)</span>A value is a term of an AP only if aₙ = a+(n−1)d gives a positive integer n.</div>
+  </div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'w')">A: Both true, R explains A</button>
+    <button onclick="ar(this,'w')">B: Both true, R doesn't explain A</button>
+    <button onclick="ar(this,'w')">C: A true, R false</button>
+    <button onclick="ar(this,'c')">D: A false, R true</button>
+  </div>
+  <div class="feedback">✓ D is correct. 100 = 5+(n−1)6 → n−1 = 15.83… (not an integer), so A is false. R is a true and correct criterion.</div>
+</div>
+
+<div class="q-card strip-prop">
+  <div class="q-header"><span class="q-num badge-ar">A-R 3</span><div class="q-text">Choose the correct option about the statements below.</div></div>
+  <div class="ar-grid">
+    <div class="ar-box"><span>ASSERTION (A)</span>If a constant k is added to each term of an AP, the result is still an AP.</div>
+    <div class="ar-box"><span>REASON (R)</span>Adding a constant to every term changes the common difference.</div>
+  </div>
+  <div class="ar-choices">
+    <button onclick="ar(this,'w')">A: Both true, R explains A</button>
+    <button onclick="ar(this,'w')">B: Both true, R doesn't explain A</button>
+    <button onclick="ar(this,'c')">C: A true, R false</button>
+    <button onclick="ar(this,'w')">D: A false, R true</button>
+  </div>
+  <div class="feedback">✓ C is correct. A is true — it stays an AP. But R is false: the common difference is unchanged; only the first term shifts.</div>
+</div>
+
+</div>
+
+<!-- ═══════════ SHORT ANSWER ═══════════ -->
+<div class="section-label">Section C — Short Answer Questions (2–3 Marks Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-cd">
+  <div class="q-header"><span class="q-num badge-sa">SA 1</span><div class="q-text">Check whether −150 is a term of the AP <strong>11, 8, 5, 2, …</strong></div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a = 11, d = 8−11 = −3.<br>
+    aₙ = 11 + (n−1)(−3) = 14 − 3n.<br>
+    Set 14 − 3n = −150 → 3n = 164 → n = 54.67…<br><br>
+    Since n is <strong>not a positive integer</strong>, −150 is <em>not a term</em> of this AP.</div>
+  </div>
+</div>
+
+<div class="q-card strip-nth">
+  <div class="q-header"><span class="q-num badge-sa">SA 2</span><div class="q-text">The 5th term of an AP is 19 and the 8th term is 31. Find the AP.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a + 4d = 19 … (i)<br>
+    a + 7d = 31 … (ii)<br><br>
+    Subtract (i) from (ii): 3d = 12 → <strong>d = 4</strong>.<br>
+    From (i): a = 19 − 16 = <strong>3</strong>.<br><br>
+    The AP is <strong>3, 7, 11, 15, …</strong></div>
+  </div>
+</div>
+
+<div class="q-card strip-nth">
+  <div class="q-header"><span class="q-num badge-sa">SA 3</span><div class="q-text">Find the 20th term from the end of the AP <strong>3, 8, 13, …, 253</strong>.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a = 3, d = 5, l = 253.<br>
+    nth term from end = l − (n−1)d.<br>
+    20th from end = 253 − (20−1)×5 = 253 − 95 = <strong>158</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-sum">
+  <div class="q-header"><span class="q-num badge-sa">SA 4</span><div class="q-text">Find the sum: <strong>7 + 10½ + 14 + … + 84</strong>.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a = 7, d = 3.5, l = 84.<br>
+    84 = 7 + (n−1)(3.5) → 77 = 3.5(n−1) → n−1 = 22 → n = 23.<br><br>
+    Sₙ = n/2 (a + l) = 23/2 (7 + 84) = 23/2 × 91 = <strong>1046.5</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-cd">
+  <div class="q-header"><span class="q-num badge-sa">SA 5</span><div class="q-text">For what value of k are the numbers <strong>k+2, 4k−6, 3k−2</strong> in AP?</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">In an AP, middle term = average of neighbours, so:<br>
+    2(4k−6) = (k+2) + (3k−2)<br>
+    8k − 12 = 4k<br>
+    4k = 12 → <strong>k = 3</strong>.<br><br>
+    Check: terms become 5, 6, 7 — an AP with d = 1 ✓</div>
+  </div>
+</div>
+
+<div class="q-card strip-nth">
+  <div class="q-header"><span class="q-num badge-sa">SA 6</span><div class="q-text">How many terms of the AP <strong>18, 16, 14, …</strong> are needed to give a sum of 78?</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a = 18, d = −2, Sₙ = 78.<br>
+    78 = n/2[36 + (n−1)(−2)] = n/2[38 − 2n] = n(19 − n)<br>
+    n² − 19n + 78 = 0 → (n−6)(n−13) = 0<br>
+    <strong>n = 6 or n = 13</strong>.<br><br>
+    Both are valid (terms 7–13 sum to 0), so the sum is 78 at either 6 or 13 terms.</div>
+  </div>
+</div>
+
+<div class="q-card strip-nth">
+  <div class="q-header"><span class="q-num badge-sa">SA 7</span><div class="q-text">Find the middle term of the AP <strong>7, 13, 19, …, 247</strong>.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a = 7, d = 6, l = 247.<br>
+    247 = 7 + (n−1)6 → n−1 = 40 → n = 41 terms (odd).<br>
+    Middle term = the (41+1)/2 = 21st term.<br>
+    a₂₁ = 7 + 20×6 = <strong>127</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-sa">SA 8</span><div class="q-text">A man saves ₹200 in the first month and increases his savings by ₹50 each month. How much does he save in the 12th month?</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a = 200, d = 50.<br>
+    a₁₂ = 200 + (12−1)×50 = 200 + 550 = <strong>₹750</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-cd">
+  <div class="q-header"><span class="q-num badge-sa">SA 9</span><div class="q-text">The first term of an AP is 5, the last term is 45 and the sum of all terms is 400. Find the number of terms and the common difference.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Sₙ = n/2 (a + l) → 400 = n/2 (5 + 45) = 25n → <strong>n = 16</strong>.<br><br>
+    l = a + (n−1)d → 45 = 5 + 15d → 15d = 40 → <strong>d = 8/3</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-sum">
+  <div class="q-header"><span class="q-num badge-sa">SA 10</span><div class="q-text">If Sₙ = 4n − n², find the first term, the second term and the nth term.</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">S₁ = 4 − 1 = 3 → <strong>a₁ = 3</strong>.<br>
+    S₂ = 8 − 4 = 4 → a₂ = S₂ − S₁ = 4 − 3 = <strong>1</strong> → d = −2.<br><br>
+    aₙ = Sₙ − Sₙ₋₁ = (4n − n²) − [4(n−1) − (n−1)²]<br>
+    = 4n − n² − (4n − 4 − n² + 2n − 1) = <strong>5 − 2n</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-nth">
+  <div class="q-header"><span class="q-num badge-sa">SA 11</span><div class="q-text">Determine the AP whose 3rd term is 5 and 7th term is 9.</div></div>
+  <div class="q-marks">[2 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a + 2d = 5, a + 6d = 9. Subtract: 4d = 4 → <strong>d = 1</strong>.<br>
+    a = 5 − 2 = <strong>3</strong>.<br>
+    AP: <strong>3, 4, 5, 6, …</strong></div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-sa">SA 12</span><div class="q-text">In a flower bed, there are 23 rose plants in the first row, 21 in the second, 19 in the third, and so on. If there are 5 plants in the last row, how many rows are there?</div></div>
+  <div class="q-marks">[3 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a = 23, d = −2, last term l = 5.<br>
+    5 = 23 + (n−1)(−2)<br>
+    −18 = −2(n−1) → n−1 = 9 → <strong>n = 10 rows</strong>.</div>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════ LONG ANSWER ═══════════ -->
+<div class="section-label">Section D — Long Answer Questions (5 Marks Each)</div>
+<div class="qwrap">
+
+<div class="q-card strip-prop">
+  <div class="q-header"><span class="q-num badge-la">LA 1</span><div class="q-text">The sum of three numbers in AP is 27 and the sum of their squares is 293. Find the numbers.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let the numbers be <strong>a−d, a, a+d</strong>.<br>
+    Sum: (a−d)+a+(a+d) = 3a = 27 → <strong>a = 9</strong>.<br><br>
+    Sum of squares: (a−d)² + a² + (a+d)² = 293<br>
+    3a² + 2d² = 293 → 3(81) + 2d² = 293<br>
+    2d² = 293 − 243 = 50 → d² = 25 → <strong>d = ±5</strong>.<br><br>
+    Numbers are <strong>4, 9, 14</strong> (or 14, 9, 4).</div>
+  </div>
+</div>
+
+<div class="q-card strip-sum">
+  <div class="q-header"><span class="q-num badge-la">LA 2</span><div class="q-text">Find the sum of all three-digit numbers which are divisible by 7.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Smallest 3-digit multiple of 7 = 105; largest = 994.<br>
+    AP: 105, 112, …, 994, with d = 7.<br><br>
+    994 = 105 + (n−1)7 → 889 = 7(n−1) → n−1 = 127 → <strong>n = 128</strong>.<br><br>
+    Sₙ = n/2 (a + l) = 128/2 (105 + 994) = 64 × 1099 = <strong>70,336</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-la">LA 3</span><div class="q-text">200 logs are stacked so that there are 20 logs in the bottom row, 19 in the next, 18 in the row above and so on. In how many rows are the 200 logs placed, and how many logs are in the top row?</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">a = 20, d = −1, Sₙ = 200.<br>
+    200 = n/2[40 + (n−1)(−1)] = n/2[41 − n]<br>
+    400 = 41n − n² → n² − 41n + 400 = 0<br>
+    (n − 16)(n − 25) = 0 → n = 16 or 25.<br><br>
+    For n = 25: a₂₅ = 20 + 24(−1) = −4 (impossible — reject).<br>
+    So <strong>n = 16 rows</strong>. Top row: a₁₆ = 20 + 15(−1) = <strong>5 logs</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-app">
+  <div class="q-header"><span class="q-num badge-la">LA 4</span><div class="q-text">A sum of ₹700 is to be used to give seven cash prizes to students. If each prize is ₹20 less than the preceding prize, find the value of each of the prizes.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">Let the largest prize = a, d = −20, n = 7, S₇ = 700.<br>
+    700 = 7/2 [2a + 6(−20)] = 7/2 (2a − 120)<br>
+    200 = 2a − 120 → 2a = 320 → <strong>a = 160</strong>.<br><br>
+    Prizes: <strong>₹160, ₹140, ₹120, ₹100, ₹80, ₹60, ₹40</strong>.</div>
+  </div>
+</div>
+
+<div class="q-card strip-sum">
+  <div class="q-header"><span class="q-num badge-la">LA 5</span><div class="q-text">If the sum of the first 7 terms of an AP is 49 and that of the first 17 terms is 289, find the sum of its first n terms.</div></div>
+  <div class="q-marks">[5 marks]</div>
+  <div class="ans-reveal"><button class="show-btn" onclick="reveal(this)">Show Solution</button>
+    <div class="ans-body">S₇ = 7/2[2a + 6d] = 7(a + 3d) = 49 → a + 3d = 7 … (i)<br>
+    S₁₇ = 17/2[2a + 16d] = 17(a + 8d) = 289 → a + 8d = 17 … (ii)<br><br>
+    Subtract: 5d = 10 → <strong>d = 2</strong>; from (i) a = 7 − 6 = <strong>1</strong>.<br><br>
+    Sₙ = n/2[2(1) + (n−1)2] = n/2[2n] = <strong>n²</strong>.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function mcq(btn,result){
+  const card=btn.closest('.q-card');
+  if(card.querySelector('.opt-btn.correct')||card.querySelector('.opt-btn.wrong'))return;
+  btn.classList.add(result==='c'?'correct':'wrong');
+  const fb=card.querySelector('.feedback');
+  fb.classList.add(result==='c'?'correct':'wrong','shown');
+}
+function ar(btn,result){
+  const card=btn.closest('.q-card');
+  if(card.querySelector('.ar-choices button.correct')||card.querySelector('.ar-choices button.wrong'))return;
+  btn.classList.add(result==='c'?'correct':'wrong');
+  const fb=card.querySelector('.feedback');
+  if(fb)fb.classList.add(result==='c'?'correct':'wrong','shown');
+}
+function reveal(btn){
+  const body=btn.nextElementSibling;
+  if(body.classList.contains('shown')){body.classList.remove('shown');btn.textContent='Show Solution';}
+  else{body.classList.add('shown');btn.textContent='Hide Solution';}
+}
+</script>
+</body>
+</html>
