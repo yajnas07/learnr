@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Electricity</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080f1e;--card:#111c2e;--card2:#162236;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;--blue:#38bdf8;--green:#22c55e;--amber:#f59e0b;--purple:#a78bfa;--pink:#f472b6;--teal:#2dd4bf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+header{text-align:center;padding:2.2rem 1rem 1rem;position:relative}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.1),transparent 70%);pointer-events:none}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4.5vw,2.5rem);font-weight:800;background:linear-gradient(135deg,#38bdf8,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;margin-top:.3rem}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;padding:.8rem 1rem}
+.fbtn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .85rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.fbtn:hover{border-color:#64748b;color:var(--text)}
+.fbtn.active{border-color:var(--blue);color:#fff;background:rgba(56,189,248,.12)}
+
+/* progress */
+.progress-bar{max-width:600px;margin:.5rem auto;padding:0 1rem;display:flex;align-items:center;gap:.6rem}
+.pbar{flex:1;height:6px;border-radius:3px;background:var(--card2);overflow:hidden}
+.pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .3s}
+.ptext{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);min-width:80px;text-align:right}
+
+/* toolbar */
+.toolbar{display:flex;justify-content:center;gap:.5rem;padding:.3rem 1rem .8rem}
+.tbtn{font-family:'Playfair Display',serif;font-weight:700;font-size:.78rem;padding:.35rem 1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tbtn:hover{border-color:#64748b;color:var(--text)}
+
+/* card area */
+.card-area{display:flex;justify-content:center;align-items:center;min-height:340px;padding:1rem;perspective:900px}
+.flip-card{width:min(520px,92vw);height:300px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flip-card.flipped{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center}
+.flip-front{background:var(--card);border:1.5px solid var(--border)}
+.flip-back{background:var(--card2);border:1.5px solid rgba(56,189,248,.25);transform:rotateY(180deg)}
+.flip-front .cat{font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.8rem;padding:.2rem .7rem;border-radius:99px;border:1px solid var(--border)}
+.flip-front .q{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;line-height:1.6}
+.flip-back .a{font-size:.95rem;line-height:1.75;color:var(--text)}
+.flip-back .a strong{color:var(--blue)}
+.flip-hint{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-top:auto;padding-top:1rem}
+.card-num{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);position:absolute;top:.8rem;right:1rem}
+
+/* nav arrows */
+.card-nav{display:flex;justify-content:center;align-items:center;gap:1.5rem;padding:.5rem}
+.nav-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-size:1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.nav-btn:hover{border-color:var(--blue);color:var(--text)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+
+/* keyboard hint */
+.kb-hint{text-align:center;font-family:'DM Mono',monospace;font-size:.65rem;color:#334155;padding:.5rem}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(8,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.5);position:relative;z-index:100}
+.site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#64748b;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e2e8f0}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Electricity</h1>
+  <p>Flashcards · 42 cards · CBSE Class X · Ch.12</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="progress-bar"><div class="pbar"><div class="pfill" id="pfill"></div></div><div class="ptext" id="ptext">0 / 0</div></div>
+<div class="toolbar">
+  <button class="tbtn" onclick="shuffle()">🔀 Shuffle</button>
+  <button class="tbtn" onclick="markKnown()">✅ Known</button>
+  <button class="tbtn" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="card-area"><div class="flip-card" id="fc" onclick="flip()"><div class="flip-front" id="ff"></div><div class="flip-back" id="fb"></div></div></div>
+<div class="card-nav">
+  <button class="nav-btn" id="prevBtn" onclick="prev()">◀</button>
+  <button class="nav-btn" id="nextBtn" onclick="next()">▶</button>
+</div>
+<div class="kb-hint">← → to navigate · Space to flip · K to mark known</div>
+
+<script>
+const CARDS = [
+  // CURRENT & CIRCUIT (current)
+  {cat:'current',q:'What is electric current?',a:'The <strong>rate of flow of electric charge</strong> through a conductor.<br><strong>I = Q/t</strong>. SI unit: ampere (A), where 1 A = 1 coulomb/second.'},
+  {cat:'current',q:'Define one ampere.',a:'One ampere is the current when a charge of <strong>one coulomb</strong> flows through a conductor in <strong>one second</strong>. 1 A = 1 C/s.'},
+  {cat:'current',q:'What is the charge on one electron?',a:'<strong>e = 1.6 × 10⁻¹⁹ coulomb</strong>. Total charge Q = n × e, where n is the number of electrons.'},
+  {cat:'current',q:'What is conventional current direction?',a:'Conventional current flows in the direction <strong>opposite</strong> to the flow of electrons — from the positive terminal to the negative terminal in the external circuit.'},
+  {cat:'current',q:'How is an ammeter connected in a circuit?',a:'An ammeter is always connected in <strong>series</strong> with the component. It has very <strong>low resistance</strong> so it does not affect the current.'},
+  {cat:'current',q:'What is an electric circuit?',a:'A <strong>closed continuous path</strong> along which electric current flows. It requires a source (cell/battery), conductors, a switch, and a load.'},
+  {cat:'current',q:'How much charge flows when 2 A current flows for 5 minutes?',a:'Q = I × t = 2 × (5 × 60) = 2 × 300 = <strong>600 C</strong>.'},
+
+  // POTENTIAL DIFFERENCE (pd)
+  {cat:'pd',q:'What is potential difference?',a:'The <strong>work done to move a unit charge</strong> from one point to another.<br><strong>V = W/Q</strong>. SI unit: volt (V) = 1 joule/coulomb.'},
+  {cat:'pd',q:'Define one volt.',a:'The potential difference is 1 volt when <strong>1 joule</strong> of work is done to move <strong>1 coulomb</strong> of charge between two points. 1 V = 1 J/C.'},
+  {cat:'pd',q:'How is a voltmeter connected?',a:'A voltmeter is connected in <strong>parallel</strong> across the component whose potential difference is to be measured. It has very <strong>high resistance</strong>.'},
+  {cat:'pd',q:'What maintains the potential difference in a circuit?',a:'A <strong>cell or battery</strong> maintains the potential difference using chemical energy, which keeps the current flowing in the circuit.'},
+  {cat:'pd',q:'In which direction does current flow with respect to potential?',a:'Current flows from a point of <strong>higher potential to lower potential</strong> in the external circuit.'},
+  {cat:'pd',q:'How much work is done moving 5 C through a PD of 12 V?',a:'W = QV = 5 × 12 = <strong>60 J</strong>.'},
+
+  // OHM'S LAW (ohm)
+  {cat:'ohm',q:'State Ohm\'s Law.',a:'The current through a conductor is <strong>directly proportional</strong> to the potential difference across it, provided temperature remains constant.<br><strong>V = IR</strong>.'},
+  {cat:'ohm',q:'What does the slope of a V–I graph represent?',a:'For an ohmic conductor, the V–I graph is a <strong>straight line through the origin</strong>, and its slope equals the <strong>resistance R</strong>.'},
+  {cat:'ohm',q:'What is resistance?',a:'The property of a conductor that <strong>opposes the flow of current</strong>.<br><strong>R = V/I</strong>. SI unit: ohm (Ω), where 1 Ω = 1 V/A.'},
+  {cat:'ohm',q:'Define one ohm.',a:'A conductor has a resistance of 1 ohm if a potential difference of <strong>1 volt</strong> across it produces a current of <strong>1 ampere</strong>. 1 Ω = 1 V/A.'},
+  {cat:'ohm',q:'What is a rheostat?',a:'A <strong>variable resistor</strong> used to change the resistance (and hence the current) in a circuit without changing the source voltage.'},
+  {cat:'ohm',q:'Difference between ohmic and non-ohmic conductors?',a:'<strong>Ohmic:</strong> Obey Ohm\'s law; V–I graph is a straight line (e.g., metals).<br><strong>Non-ohmic:</strong> Do not obey Ohm\'s law; V–I graph is curved (e.g., diode, filament bulb).'},
+  {cat:'ohm',q:'A 6 V battery drives 2 A through a resistor. Find R.',a:'R = V/I = 6/2 = <strong>3 Ω</strong>.'},
+
+  // RESISTIVITY & FACTORS (resist)
+  {cat:'resist',q:'On what factors does the resistance of a conductor depend?',a:'1) <strong>Length</strong> (R ∝ L)<br>2) <strong>Area of cross-section</strong> (R ∝ 1/A)<br>3) <strong>Material</strong> (resistivity ρ)<br>4) <strong>Temperature</strong> (R increases with temperature for metals).'},
+  {cat:'resist',q:'Write the formula relating R to resistivity.',a:'<strong>R = ρL/A</strong>, where ρ = resistivity, L = length, A = area of cross-section.'},
+  {cat:'resist',q:'What is resistivity?',a:'<strong>ρ = RA/L</strong>. The resistance of a material of unit length and unit cross-sectional area. SI unit: <strong>ohm-metre (Ω·m)</strong>. It depends only on the material and temperature.'},
+  {cat:'resist',q:'How does resistance change if a wire is stretched to double its length?',a:'Volume stays constant, so area halves. R = ρL/A → length ×2, area ×½ → <strong>R becomes 4 times</strong>.'},
+  {cat:'resist',q:'Why is nichrome used in heating elements?',a:'Nichrome has <strong>high resistivity</strong> and a <strong>high melting point</strong>, and does not oxidise easily at high temperatures — ideal for heaters, toasters, and irons.'},
+  {cat:'resist',q:'Why is copper used for electrical wires?',a:'Copper has <strong>very low resistivity</strong> (good conductor), so it carries current with minimal energy loss.'},
+  {cat:'resist',q:'How does a thick wire compare to a thin wire in resistance?',a:'A <strong>thick wire</strong> (larger area A) has <strong>lower resistance</strong> since R ∝ 1/A.'},
+
+  // SERIES & PARALLEL (combo)
+  {cat:'combo',q:'What is the total resistance in a series combination?',a:'<strong>R = R₁ + R₂ + R₃ + …</strong><br>The total resistance is larger than the largest individual resistor.'},
+  {cat:'combo',q:'What is the total resistance in a parallel combination?',a:'<strong>1/R = 1/R₁ + 1/R₂ + 1/R₃ + …</strong><br>The total resistance is smaller than the smallest individual resistor.'},
+  {cat:'combo',q:'In a series circuit, what stays the same?',a:'The <strong>current</strong> is the same through all components. The voltage divides across each resistor.'},
+  {cat:'combo',q:'In a parallel circuit, what stays the same?',a:'The <strong>voltage (potential difference)</strong> is the same across all branches. The current divides among the branches.'},
+  {cat:'combo',q:'Why are household appliances connected in parallel?',a:'So each appliance gets the <strong>full 220 V</strong>, can be operated <strong>independently</strong>, and if one fails the others keep working.'},
+  {cat:'combo',q:'Two 4 Ω resistors are in parallel. Find total resistance.',a:'1/R = 1/4 + 1/4 = 2/4 = 1/2 → <strong>R = 2 Ω</strong>. (For n equal resistors in parallel, R = R/n.)'},
+  {cat:'combo',q:'Two 4 Ω resistors are in series. Find total resistance.',a:'R = 4 + 4 = <strong>8 Ω</strong>.'},
+
+  // HEATING & POWER (power)
+  {cat:'power',q:'State Joule\'s Law of Heating.',a:'The heat produced in a resistor is:<br><strong>H = I²Rt</strong><br>Proportional to the square of current (I²), resistance (R), and time (t).'},
+  {cat:'power',q:'What is electric power?',a:'The <strong>rate of consuming electrical energy</strong>.<br><strong>P = VI = I²R = V²/R</strong>. SI unit: watt (W) = 1 J/s.'},
+  {cat:'power',q:'What is the commercial unit of electrical energy?',a:'The <strong>kilowatt-hour (kWh)</strong>, also called a "unit".<br><strong>1 kWh = 3.6 × 10⁶ J</strong>.'},
+  {cat:'power',q:'What does a "60 W, 220 V" bulb rating mean?',a:'The bulb consumes <strong>60 watts</strong> of power when operated at <strong>220 volts</strong>. Its resistance R = V²/P = 220²/60 ≈ <strong>807 Ω</strong>.'},
+  {cat:'power',q:'Give some applications of the heating effect of current.',a:'Electric heater, iron, geyser, toaster, incandescent bulb, and the <strong>electric fuse</strong> (safety device).'},
+  {cat:'power',q:'How does an electric fuse work?',a:'A fuse is a short wire of <strong>low melting point</strong>. If current exceeds a safe limit, the heat produced (I²Rt) <strong>melts the fuse</strong>, breaking the circuit and preventing damage.'},
+  {cat:'power',q:'Calculate energy used by a 1000 W heater in 2 hours.',a:'E = P × t = 1 kW × 2 h = <strong>2 kWh</strong> = 2 units = 7.2 × 10⁶ J.'},
+  {cat:'power',q:'Why does the heating element get hot but the connecting wires do not?',a:'The heating element (nichrome) has <strong>high resistance</strong>, so more heat is produced (H ∝ R). The copper wires have very low resistance, producing negligible heat.'},
+];
+
+const CATS = [
+  {id:'all', label:'All'},
+  {id:'current', label:'Current & Circuit'},
+  {id:'pd', label:'Potential Diff.'},
+  {id:'ohm', label:'Ohm\'s Law'},
+  {id:'resist', label:'Resistivity'},
+  {id:'combo', label:'Series/Parallel'},
+  {id:'power', label:'Heating & Power'},
+];
+
+let activeCat = 'all', idx = 0, known = new Set();
+function filtered() { return activeCat === 'all' ? CARDS : CARDS.filter(c => c.cat === activeCat); }
+
+// Build filter buttons
+const filtersEl = document.getElementById('filters');
+CATS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'fbtn' + (c.id === 'all' ? ' active' : '');
+  b.textContent = c.label + (c.id === 'all' ? ` (${CARDS.length})` : ` (${CARDS.filter(x=>x.cat===c.id).length})`);
+  b.onclick = () => { activeCat = c.id; idx = 0; filtersEl.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); render(); };
+  filtersEl.appendChild(b);
+});
+
+const fc = document.getElementById('fc'), ff = document.getElementById('ff'), fb = document.getElementById('fb');
+const pfill = document.getElementById('pfill'), ptext = document.getElementById('ptext');
+
+function render() {
+  const deck = filtered();
+  if (!deck.length) { ff.innerHTML = '<div class="q">No cards in this category</div>'; fb.innerHTML = ''; return; }
+  if (idx >= deck.length) idx = deck.length - 1;
+  const c = deck[idx];
+  const catInfo = CATS.find(x=>x.id===c.cat);
+  fc.classList.remove('flipped');
+  ff.innerHTML = `<div class="card-num">${idx+1} / ${deck.length}</div><div class="cat" style="color:var(--blue)">${catInfo ? catInfo.label : c.cat}</div><div class="q">${c.q}</div><div class="flip-hint">Click or press Space to reveal answer</div>`;
+  fb.innerHTML = `<div class="card-num">${idx+1} / ${deck.length}</div><div class="a">${c.a}</div><div class="flip-hint">Click to flip back · K to mark known</div>`;
+  // progress
+  const knownInDeck = deck.filter((_,i) => known.has(CARDS.indexOf(deck[i]))).length;
+  const pct = deck.length ? (knownInDeck / deck.length * 100) : 0;
+  pfill.style.width = pct + '%';
+  ptext.textContent = `${knownInDeck} / ${deck.length} known`;
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx >= deck.length - 1;
+}
+
+function flip() { fc.classList.toggle('flipped'); }
+function next() { const d = filtered(); if (idx < d.length-1) { idx++; render(); } }
+function prev() { if (idx > 0) { idx--; render(); } }
+function shuffle() { CARDS.sort(() => Math.random() - .5); idx = 0; render(); }
+function markKnown() { const d = filtered(); const gi = CARDS.indexOf(d[idx]); known.add(gi); next(); if(idx===filtered().length-1) render(); }
+function resetAll() { known.clear(); idx = 0; render(); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') next();
+  else if (e.key === 'ArrowLeft') prev();
+  else if (e.key === ' ') { e.preventDefault(); flip(); }
+  else if (e.key === 'k' || e.key === 'K') markKnown();
+});
+
+render();
+</script>
+</body>
+</html>

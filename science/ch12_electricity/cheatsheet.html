@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet — Electricity</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#080f1e; --card:#111c2e; --card2:#162236; --border:#1a2d45; --text:#cce4ff; --muted:#4a6890; --blue:#38bdf8; --green:#22c55e; --amber:#f59e0b; --purple:#a78bfa; --pink:#f472b6; --teal:#2dd4bf; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+  header{text-align:center;padding:2.5rem 1rem 1.5rem;position:relative}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.1),transparent 70%);pointer-events:none}
+  header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;background:linear-gradient(135deg,#38bdf8,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.82rem;margin-top:.4rem}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.2rem;max-width:1120px;margin:auto;padding:0 1.2rem 3rem}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;position:relative;overflow:hidden}
+  .panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0}
+  .panel.blue::before{background:var(--blue)} .panel.green::before{background:var(--green)} .panel.amber::before{background:var(--amber)} .panel.purple::before{background:var(--purple)} .panel.pink::before{background:var(--pink)} .panel.teal::before{background:var(--teal)}
+  .panel h2{font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:.7rem}
+  .panel h3{font-size:.88rem;margin:.8rem 0 .4rem;color:var(--blue)}
+  .panel p,.panel li{font-size:.82rem;line-height:1.7;color:var(--muted)}
+  .panel ul{padding-left:1.1rem}
+  .panel li{margin-bottom:.25rem}
+  .f{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--amber);background:rgba(245,158,11,.08);padding:.35rem .7rem;border-radius:6px;margin:.4rem 0;display:inline-block}
+  .tbl{width:100%;border-collapse:collapse;margin:.5rem 0;font-size:.76rem}
+  .tbl th,.tbl td{border:1px solid var(--border);padding:.4rem .5rem;text-align:center}
+  .tbl th{background:var(--card2);color:var(--blue);font-weight:700}
+  .tbl td{color:var(--muted)}
+  .tip{background:rgba(56,189,248,.05);border-left:3px solid var(--blue);padding:.5rem .8rem;border-radius:0 6px 6px 0;margin:.6rem 0;font-size:.78rem;color:var(--text)}
+  .tip strong{color:var(--blue)}
+  .wide{grid-column:1/-1}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(8,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.5);position:relative;z-index:100}
+  .site-nav img{height:26px} .site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#64748b;text-decoration:none;transition:color .2s} .site-nav a.back:hover{color:#e2e8f0}
+  @media(max-width:600px){.grid{grid-template-columns:1fr;padding:0 .7rem 2rem} .wide{grid-column:1}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Electricity</h1>
+  <p>Cheat Sheet · CBSE Class X · Chapter 12</p>
+</header>
+<div class="grid">
+
+<!-- 1 -->
+<div class="panel blue">
+  <h2 style="color:var(--blue)">⚡ Electric Charge & Current</h2>
+  <ul>
+    <li><strong>Charge (Q):</strong> Fundamental property; SI unit <strong>coulomb (C)</strong>.</li>
+    <li>Charge is quantised: <span class="f">Q = n × e</span> where e = 1.6 × 10⁻¹⁹ C.</li>
+    <li><strong>Electric current (I):</strong> Rate of flow of charge.</li>
+    <li><span class="f">I = Q / t</span> · SI unit <strong>ampere (A)</strong> = 1 C/s.</li>
+    <li><strong>Conventional current</strong> flows opposite to electron flow.</li>
+    <li>Measured by an <strong>ammeter</strong> connected in <strong>series</strong>.</li>
+  </ul>
+</div>
+
+<!-- 2 -->
+<div class="panel green">
+  <h2 style="color:var(--green)">🔋 Potential Difference</h2>
+  <ul>
+    <li>Work done to move a <strong>unit charge</strong> between two points.</li>
+    <li><span class="f">V = W / Q</span> · SI unit <strong>volt (V)</strong> = 1 J/C.</li>
+    <li>A cell/battery maintains the potential difference that drives current.</li>
+    <li>Current flows from <strong>high to low</strong> potential.</li>
+    <li>Measured by a <strong>voltmeter</strong> connected in <strong>parallel</strong>.</li>
+  </ul>
+  <div class="tip"><strong>Remember:</strong> Ammeter → series (low resistance). Voltmeter → parallel (high resistance).</div>
+</div>
+
+<!-- 3 -->
+<div class="panel amber">
+  <h2 style="color:var(--amber)">📏 Ohm's Law</h2>
+  <div class="f" style="font-size:1rem">V = I R</div>
+  <ul>
+    <li>Current through a conductor ∝ potential difference across it, at <strong>constant temperature</strong>.</li>
+    <li>V–I graph is a <strong>straight line</strong> through the origin.</li>
+    <li>Slope of V–I graph = <strong>resistance R</strong>.</li>
+  </ul>
+  <div class="tip"><strong>Ohmic</strong> conductors obey Ohm's law (metals). <strong>Non-ohmic</strong> do not (diode, filament bulb).</div>
+</div>
+
+<!-- 4 -->
+<div class="panel amber">
+  <h2 style="color:var(--amber)">🔧 Resistance</h2>
+  <div class="f" style="font-size:1rem">R = V / I</div>
+  <ul>
+    <li>Property that <strong>opposes</strong> the flow of current.</li>
+    <li>SI unit: <strong>ohm (Ω)</strong>; 1 Ω = 1 V/A.</li>
+    <li>A <strong>rheostat</strong> is a variable resistor used to change current.</li>
+    <li>Good conductors → low R; insulators → very high R.</li>
+  </ul>
+</div>
+
+<!-- 5 -->
+<div class="panel purple">
+  <h2 style="color:var(--purple)">🧵 Resistivity & Factors</h2>
+  <div class="f" style="font-size:1rem">R = ρ L / A</div>
+  <ul>
+    <li>R ∝ length (L) — longer wire, more resistance.</li>
+    <li>R ∝ 1 / area (A) — thicker wire, less resistance.</li>
+    <li><strong>Resistivity ρ = RA/L</strong> · SI unit <strong>ohm-metre (Ω·m)</strong>.</li>
+    <li>ρ depends only on material & temperature, NOT on dimensions.</li>
+    <li>For metals, R increases with temperature.</li>
+  </ul>
+</div>
+
+<!-- 6 -->
+<div class="panel purple">
+  <h2 style="color:var(--purple)">Resistivity Values</h2>
+  <table class="tbl">
+    <tr><th>Material</th><th>ρ (Ω·m)</th><th>Type</th></tr>
+    <tr><td>Silver</td><td>1.6 × 10⁻⁸</td><td>Conductor</td></tr>
+    <tr><td>Copper</td><td>1.7 × 10⁻⁸</td><td>Conductor</td></tr>
+    <tr><td>Aluminium</td><td>2.7 × 10⁻⁸</td><td>Conductor</td></tr>
+    <tr><td>Nichrome</td><td>~100 × 10⁻⁸</td><td>Alloy</td></tr>
+    <tr><td>Rubber</td><td>10¹³ – 10¹⁶</td><td>Insulator</td></tr>
+  </table>
+  <div class="tip"><strong>Why Nichrome?</strong> High resistivity + high melting point → used in heaters & toasters. Copper/aluminium (low ρ) → used for wires.</div>
+</div>
+
+<!-- 7 -->
+<div class="panel teal wide">
+  <h2 style="color:var(--teal)">🔗 Series vs Parallel Combination</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:1.5rem">
+    <div style="flex:1;min-width:240px">
+      <h3>Series</h3>
+      <div class="f" style="font-size:1rem">R = R₁ + R₂ + R₃ + …</div>
+      <ul>
+        <li>Same <strong>current</strong> through all resistors.</li>
+        <li>Voltage <strong>divides</strong>: V = V₁ + V₂ + V₃.</li>
+        <li>Total R is <strong>larger</strong> than largest resistor.</li>
+        <li>One breaks → whole circuit stops.</li>
+      </ul>
+    </div>
+    <div style="flex:1;min-width:240px">
+      <h3>Parallel</h3>
+      <div class="f" style="font-size:1rem">1/R = 1/R₁ + 1/R₂ + 1/R₃</div>
+      <ul>
+        <li>Same <strong>voltage</strong> across all resistors.</li>
+        <li>Current <strong>divides</strong>: I = I₁ + I₂ + I₃.</li>
+        <li>Total R is <strong>smaller</strong> than smallest resistor.</li>
+        <li>One breaks → others keep working.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tip"><strong>Household wiring</strong> uses parallel so every appliance gets 220 V and can be switched independently.</div>
+</div>
+
+<!-- 8 -->
+<div class="panel blue">
+  <h2 style="color:var(--blue)">🔥 Heating Effect of Current</h2>
+  <p>When current flows through a resistor, electrical energy converts to heat — <strong>Joule's Law of Heating</strong>.</p>
+  <div class="f" style="font-size:1rem">H = I²Rt</div>
+  <ul>
+    <li>H ∝ I² (square of current).</li>
+    <li>H ∝ R (resistance).</li>
+    <li>H ∝ t (time).</li>
+  </ul>
+  <div class="tip"><strong>Applications:</strong> Electric heater, iron, geyser, toaster, incandescent bulb, and the <strong>fuse</strong> (safety).</div>
+</div>
+
+<!-- 9 -->
+<div class="panel green">
+  <h2 style="color:var(--green)">💡 Electric Power</h2>
+  <div class="f" style="font-size:1rem">P = V I = I²R = V²/R</div>
+  <ul>
+    <li>Rate of consuming electrical energy.</li>
+    <li>SI unit: <strong>watt (W)</strong> = 1 J/s.</li>
+    <li>1 kilowatt (kW) = 1000 W.</li>
+    <li>1 horsepower (hp) = 746 W.</li>
+  </ul>
+  <div class="tip"><strong>Bulb rating "60 W, 220 V":</strong> R = V²/P = 220²/60 ≈ 807 Ω.</div>
+</div>
+
+<!-- 10 -->
+<div class="panel green">
+  <h2 style="color:var(--green)">🔌 Electrical Energy</h2>
+  <div class="f" style="font-size:1rem">Energy = Power × time</div>
+  <ul>
+    <li>SI unit: <strong>joule (J)</strong>.</li>
+    <li>Commercial unit: <strong>kilowatt-hour (kWh)</strong> = 1 "unit".</li>
+    <li><span class="f">1 kWh = 3.6 × 10⁶ J</span></li>
+  </ul>
+  <div class="tip"><strong>Bill example:</strong> A 1000 W heater for 2 h = 2 kWh = 2 units of electricity.</div>
+</div>
+
+<!-- 11 -->
+<div class="panel pink wide">
+  <h2 style="color:var(--pink)">🧮 Key Formulas at a Glance</h2>
+  <table class="tbl">
+    <tr><th>Quantity</th><th>Formula</th><th>SI Unit</th></tr>
+    <tr><td>Current</td><td>I = Q/t</td><td>ampere (A)</td></tr>
+    <tr><td>Charge</td><td>Q = ne</td><td>coulomb (C)</td></tr>
+    <tr><td>Potential Difference</td><td>V = W/Q</td><td>volt (V)</td></tr>
+    <tr><td>Ohm's Law</td><td>V = IR</td><td>—</td></tr>
+    <tr><td>Resistance</td><td>R = ρL/A</td><td>ohm (Ω)</td></tr>
+    <tr><td>Series</td><td>R = R₁+R₂+…</td><td>ohm (Ω)</td></tr>
+    <tr><td>Parallel</td><td>1/R = Σ 1/Rᵢ</td><td>ohm (Ω)</td></tr>
+    <tr><td>Heat</td><td>H = I²Rt</td><td>joule (J)</td></tr>
+    <tr><td>Power</td><td>P = VI = I²R = V²/R</td><td>watt (W)</td></tr>
+    <tr><td>Energy</td><td>E = Pt</td><td>kWh / joule</td></tr>
+  </table>
+</div>
+
+<!-- 12 -->
+<div class="panel teal">
+  <h2 style="color:var(--teal)">🔣 Circuit Symbols</h2>
+  <table class="tbl">
+    <tr><th>Component</th><th>Symbol</th></tr>
+    <tr><td>Cell</td><td>┤├ (long +, short −)</td></tr>
+    <tr><td>Battery</td><td>┤├┤├</td></tr>
+    <tr><td>Switch (open)</td><td>─○ ○─</td></tr>
+    <tr><td>Resistor</td><td>▭ (box)</td></tr>
+    <tr><td>Variable resistor</td><td>▭ with arrow</td></tr>
+    <tr><td>Ammeter</td><td>—(A)—</td></tr>
+    <tr><td>Voltmeter</td><td>—(V)—</td></tr>
+    <tr><td>Bulb</td><td>—⊗—</td></tr>
+  </table>
+</div>
+
+<!-- 13 -->
+<div class="panel blue">
+  <h2 style="color:var(--blue)">🧠 Memory Tricks</h2>
+  <ul>
+    <li><strong>"V = IR"</strong> → "Volts Is Resistance" — Ohm's triangle: cover the unknown.</li>
+    <li><strong>Series adds, parallel reciprocates.</strong></li>
+    <li><strong>Ammeter = series</strong> ("A" comes before "series" alphabetically — low R). <strong>Voltmeter = parallel</strong> (high R).</li>
+    <li><strong>"PIVR":</strong> P = VI, and also I²R and V²/R.</li>
+    <li><strong>Heat "I²Rt"</strong> — "I squared RT" (RT like room temperature).</li>
+    <li><strong>1 unit = 1 kWh = 3.6 MJ.</strong></li>
+  </ul>
+</div>
+
+<!-- 14 -->
+<div class="panel amber">
+  <h2 style="color:var(--amber)">⚠️ Common Board Mistakes</h2>
+  <ul>
+    <li>❌ Connecting an ammeter in parallel or a voltmeter in series.</li>
+    <li>❌ Adding resistances directly in parallel (must use reciprocals).</li>
+    <li>❌ Forgetting to convert cm/minutes; use SI units.</li>
+    <li>❌ Writing power as P = V/I (correct: <strong>P = VI</strong>).</li>
+    <li>❌ Confusing kW and kWh (power vs energy).</li>
+    <li>❌ Thinking thicker wire = more resistance (it's <strong>less</strong>).</li>
+    <li>❌ Forgetting H ∝ I² — doubling current gives 4× heat.</li>
+  </ul>
+</div>
+
+<!-- 15 -->
+<div class="panel purple wide">
+  <h2 style="color:var(--purple)">🎯 Worked Numericals</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:1.5rem">
+    <div style="flex:1;min-width:260px">
+      <h3>Combination Problem</h3>
+      <p>Three resistors 2 Ω, 3 Ω, 6 Ω are connected in parallel across a 6 V battery. Find total R and total current.</p>
+      <p style="color:var(--text);margin-top:.4rem"><strong>Solution:</strong></p>
+      <div class="f">1/R = 1/2 + 1/3 + 1/6 = 6/6 = 1 ⟹ R = 1 Ω</div>
+      <p style="color:var(--text)">I = V/R = 6/1 = <strong>6 A</strong> total current.</p>
+    </div>
+    <div style="flex:1;min-width:260px">
+      <h3>Power & Energy Problem</h3>
+      <p>An electric iron of 750 W works for 2 hours daily. Find energy used in 30 days and cost at ₹5/unit.</p>
+      <p style="color:var(--text);margin-top:.4rem"><strong>Solution:</strong></p>
+      <div class="f">E = 0.75 kW × 2 h × 30 = 45 kWh</div>
+      <p style="color:var(--text)">Cost = 45 × ₹5 = <strong>₹225</strong>.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

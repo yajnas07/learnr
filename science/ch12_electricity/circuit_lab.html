@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circuit Lab Simulator · Electricity Ch.12 · LearnR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080f1e;--card:#111c2e;--card2:#162236;--border:#1a2d45;
+  --text:#cce4ff;--muted:#4a6890;--science:#10b981;
+  --green:#34d399;--amber:#f59e0b;--purple:#a855f7;--teal:#06b6d4;--blue:#60a5fa;--red:#f87171;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Lato,sans-serif;min-height:100vh}
+
+/* NAV */
+.top-nav{display:flex;align-items:center;gap:16px;padding:12px 24px;background:rgba(8,15,30,.95);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-logo img{height:28px}
+.nav-breadcrumb{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted)}
+.nav-breadcrumb a{color:var(--muted);text-decoration:none;transition:color .2s}.nav-breadcrumb a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-current{color:var(--science);font-weight:700}
+.nav-back{margin-left:auto;display:flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:20px;color:var(--science);font-size:.8rem;text-decoration:none;transition:all .2s}
+.nav-back:hover{background:rgba(16,185,129,.2)}
+
+/* PAGE HEADER */
+.page-header{padding:32px 24px 20px;text-align:center}
+.page-header h1{font-family:'Playfair Display',serif;font-size:2rem;color:#fff;margin-bottom:6px}
+.page-header p{color:var(--muted);font-size:.95rem}
+.badge{display:inline-block;padding:3px 10px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);border-radius:12px;color:var(--science);font-size:.75rem;font-weight:700;margin-bottom:10px}
+
+.bench-wrap{max-width:1100px;margin:0 auto;padding:0 16px 60px}
+
+/* MODE SELECTOR */
+.mode-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;justify-content:center}
+.mode-btn{padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:Lato,sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s}
+.mode-btn.active{border-color:var(--science);background:rgba(16,185,129,.12);color:var(--green)}
+
+/* CONTROLS */
+.controls-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:700px){.controls-row{grid-template-columns:1fr 1fr}}
+.ctrl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.ctrl-label{font-size:.75rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.ctrl-val{font-family:'DM Mono',monospace;color:var(--green);font-size:1rem;font-weight:500;margin-bottom:8px}
+.ctrl-range{width:100%;accent-color:var(--science);cursor:pointer}
+
+/* CANVAS */
+.canvas-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative;margin-bottom:16px}
+#bench{width:100%;display:block}
+.canvas-hint{position:absolute;bottom:10px;right:14px;font-size:.72rem;color:var(--muted)}
+
+/* DATA PANEL */
+.data-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:600px){.data-grid{grid-template-columns:repeat(2,1fr)}}
+.data-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.data-card .d-label{font-size:.72rem;color:var(--muted);margin-bottom:4px}
+.data-card .d-val{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;color:var(--blue)}
+.data-card.highlight .d-val{color:var(--amber)}
+
+/* EXPERIMENT */
+.exp-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+.exp-section h3{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.exp-actions{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.exp-btn{padding:6px 16px;border-radius:16px;border:1px solid rgba(16,185,129,.4);background:rgba(16,185,129,.1);color:var(--green);font-size:.8rem;cursor:pointer;transition:all .2s;font-family:Lato,sans-serif}
+.exp-btn:hover{background:rgba(16,185,129,.2)}
+.exp-btn.danger{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08);color:#f87171}
+.exp-btn.danger:hover{background:rgba(239,68,68,.15)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase}
+td{padding:8px 12px;border-bottom:1px solid rgba(26,45,69,.5);font-family:'DM Mono',monospace;color:var(--text)}
+tr:last-child td{border-bottom:none}
+.no-data{color:var(--muted);font-size:.85rem;text-align:center;padding:20px;font-family:Lato,sans-serif}
+
+.info-box{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.7;color:var(--muted)}
+.info-box strong{color:var(--text)}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <a class="nav-logo" href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="LearnR"></a>
+  <div class="nav-breadcrumb">
+    <a href="../../index.html">Home</a><span class="nav-sep">/</span>
+    <a href="../../index.html#science">Science</a><span class="nav-sep">/</span>
+    <a href="../../index.html#ch-elec">Ch.12 Electricity</a><span class="nav-sep">/</span>
+    <span class="nav-current">Circuit Lab</span>
+  </div>
+  <a class="nav-back" href="../../index.html#ch-elec">&#8592; Back</a>
+</nav>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="badge">🔬 Bonus Lab</div>
+  <h1>Circuit Lab Simulator</h1>
+  <p>Build circuits • Adjust voltage &amp; resistors • Read the meters • Verify Ohm's law</p>
+</div>
+
+<div class="bench-wrap">
+
+  <!-- MODE SELECTOR -->
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('single',this)">Single Resistor</button>
+    <button class="mode-btn" onclick="setMode('series',this)">Series</button>
+    <button class="mode-btn" onclick="setMode('parallel',this)">Parallel</button>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls-row">
+    <div class="ctrl-card">
+      <div class="ctrl-label">Battery Voltage</div>
+      <div class="ctrl-val" id="vVal">6.0 V</div>
+      <input type="range" class="ctrl-range" id="sV" min="1" max="24" value="6" step="0.5" oninput="update()">
+    </div>
+    <div class="ctrl-card">
+      <div class="ctrl-label">Resistor R₁</div>
+      <div class="ctrl-val" id="r1Val">4 Ω</div>
+      <input type="range" class="ctrl-range" id="sR1" min="1" max="20" value="4" oninput="update()">
+    </div>
+    <div class="ctrl-card" id="cardR2">
+      <div class="ctrl-label">Resistor R₂</div>
+      <div class="ctrl-val" id="r2Val">6 Ω</div>
+      <input type="range" class="ctrl-range" id="sR2" min="1" max="20" value="6" oninput="update()">
+    </div>
+    <div class="ctrl-card" id="cardR3">
+      <div class="ctrl-label">Resistor R₃</div>
+      <div class="ctrl-val" id="r3Val">12 Ω</div>
+      <input type="range" class="ctrl-range" id="sR3" min="1" max="20" value="12" oninput="update()">
+    </div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrap">
+    <canvas id="bench" width="1000" height="440"></canvas>
+    <div class="canvas-hint">Watch electrons flow • bulb glows with current</div>
+  </div>
+
+  <!-- DATA -->
+  <div class="data-grid">
+    <div class="data-card"><div class="d-label">Equivalent Resistance</div><div class="d-val" id="dReq">—</div></div>
+    <div class="data-card highlight"><div class="d-label">Total Current (I)</div><div class="d-val" id="dI">—</div></div>
+    <div class="data-card"><div class="d-label">Power (P = VI)</div><div class="d-val" id="dP">—</div></div>
+    <div class="data-card"><div class="d-label">Heat in 1 min</div><div class="d-val" id="dH">—</div></div>
+  </div>
+
+  <!-- FORMULA INFO -->
+  <div class="exp-section">
+    <h3>🧮 Live Calculation</h3>
+    <div class="info-box" id="calcBox"></div>
+  </div>
+
+  <!-- EXPERIMENT TABLE -->
+  <div class="exp-section">
+    <h3>📊 Observation Table — Verify Ohm's Law</h3>
+    <div class="exp-actions">
+      <button class="exp-btn" onclick="record()">＋ Record Reading</button>
+      <button class="exp-btn danger" onclick="clearTable()">🗑 Clear Table</button>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Voltage (V)</th><th>Current (I)</th><th>R = V/I (Ω)</th></tr></thead>
+      <tbody id="tbody"><tr><td colspan="4" class="no-data">Adjust voltage and click "Record Reading" to collect data points.</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="info-box">
+    <strong>Try this:</strong> Keep the resistor fixed, change the battery voltage, and record several readings.
+    Notice that V/I stays constant — that constant is the resistance R. This verifies <strong>Ohm's Law (V = IR)</strong>.
+    In <strong>series</strong>, resistances add up; in <strong>parallel</strong>, the equivalent resistance is smaller than the smallest resistor.
+  </div>
+
+</div>
+
+<script>
+let mode = 'single';
+const cv = document.getElementById('bench'), ctx = cv.getContext('2d');
+let rows = [], anim = 0;
+
+function setMode(m, btn){
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cardR2').style.opacity = (m==='single')?'.35':'1';
+  document.getElementById('cardR3').style.opacity = (m==='single')?'.35':'1';
+  update();
+}
+
+function getVals(){
+  const V = +document.getElementById('sV').value;
+  const R1 = +document.getElementById('sR1').value;
+  const R2 = +document.getElementById('sR2').value;
+  const R3 = +document.getElementById('sR3').value;
+  return {V,R1,R2,R3};
+}
+function equivR(){
+  const {R1,R2,R3} = getVals();
+  if(mode==='single') return R1;
+  if(mode==='series') return R1+R2+R3;
+  return 1/(1/R1+1/R2+1/R3);
+}
+
+function update(){
+  const {V,R1,R2,R3} = getVals();
+  document.getElementById('vVal').textContent = V.toFixed(1)+' V';
+  document.getElementById('r1Val').textContent = R1+' Ω';
+  document.getElementById('r2Val').textContent = R2+' Ω';
+  document.getElementById('r3Val').textContent = R3+' Ω';
+  const Req = equivR();
+  const I = V/Req;
+  const P = V*I;
+  document.getElementById('dReq').textContent = Req.toFixed(2)+' Ω';
+  document.getElementById('dI').textContent = I.toFixed(2)+' A';
+  document.getElementById('dP').textContent = P.toFixed(1)+' W';
+  document.getElementById('dH').textContent = (P*60).toFixed(0)+' J';
+
+  let calc='';
+  if(mode==='single'){
+    calc = `R = <strong>${R1} Ω</strong><br>I = V/R = ${V.toFixed(1)}/${R1} = <strong>${I.toFixed(2)} A</strong><br>P = VI = <strong>${P.toFixed(1)} W</strong>`;
+  } else if(mode==='series'){
+    calc = `R = R₁+R₂+R₃ = ${R1}+${R2}+${R3} = <strong>${Req.toFixed(1)} Ω</strong><br>I = V/R = ${V.toFixed(1)}/${Req.toFixed(1)} = <strong>${I.toFixed(2)} A</strong> (same through all)<br>V₁=${(I*R1).toFixed(1)}V · V₂=${(I*R2).toFixed(1)}V · V₃=${(I*R3).toFixed(1)}V`;
+  } else {
+    const I1=V/R1, I2=V/R2, I3=V/R3;
+    calc = `1/R = 1/${R1}+1/${R2}+1/${R3} → R = <strong>${Req.toFixed(2)} Ω</strong><br>Total I = V/R = <strong>${I.toFixed(2)} A</strong><br>I₁=${I1.toFixed(2)}A · I₂=${I2.toFixed(2)}A · I₃=${I3.toFixed(2)}A (voltage same)`;
+  }
+  document.getElementById('calcBox').innerHTML = calc;
+}
+
+function record(){
+  const {V} = getVals();
+  const I = V/equivR();
+  rows.push({V, I, R: V/I});
+  renderTable();
+}
+function clearTable(){ rows=[]; renderTable(); }
+function renderTable(){
+  const tb = document.getElementById('tbody');
+  if(!rows.length){ tb.innerHTML='<tr><td colspan="4" class="no-data">Adjust voltage and click "Record Reading" to collect data points.</td></tr>'; return; }
+  tb.innerHTML = rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.V.toFixed(1)}</td><td>${r.I.toFixed(2)}</td><td>${r.R.toFixed(2)}</td></tr>`).join('');
+}
+
+/* ─── DRAWING ─── */
+function drawArrow(x1,y1,x2,y2,col){
+  const a=Math.atan2(y2-y1,x2-x1), d=8, mx=(x1+x2)/2, my=(y1+y2)/2;
+  ctx.fillStyle=col; ctx.beginPath();
+  ctx.moveTo(mx+d*Math.cos(a),my+d*Math.sin(a));
+  ctx.lineTo(mx-d*Math.cos(a-Math.PI/6),my-d*Math.sin(a-Math.PI/6));
+  ctx.lineTo(mx-d*Math.cos(a+Math.PI/6),my-d*Math.sin(a+Math.PI/6));
+  ctx.fill();
+}
+function battery(x,y,V){
+  ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(x-2,y-18); ctx.lineTo(x-2,y+18); ctx.stroke(); // long +
+  ctx.lineWidth=7;
+  ctx.beginPath(); ctx.moveTo(x+10,y-9); ctx.lineTo(x+10,y+9); ctx.stroke(); // short -
+  ctx.fillStyle='#f59e0b'; ctx.font='700 13px "DM Mono"'; ctx.textAlign='center';
+  ctx.fillText(V.toFixed(1)+' V', x+4, y-26);
+  ctx.fillText('+', x-10, y+4); ctx.fillText('−', x+22, y+4);
+}
+function resistor(x,y,label,col,horizontal=true){
+  ctx.strokeStyle=col; ctx.lineWidth=2.5;
+  if(horizontal){ ctx.strokeRect(x-30,y-11,60,22); }
+  else { ctx.strokeRect(x-11,y-30,22,60); }
+  ctx.fillStyle=col; ctx.font='600 12px "DM Mono"'; ctx.textAlign='center';
+  if(horizontal) ctx.fillText(label, x, y-18); else ctx.fillText(label, x+30, y+4);
+}
+function bulb(x,y,glow){
+  const g=ctx.createRadialGradient(x,y,2,x,y,30);
+  g.addColorStop(0,`rgba(253,224,71,${.25+glow*.75})`); g.addColorStop(1,'transparent');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,30,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#fde047'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.arc(x,y,12,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x-6,y-6); ctx.lineTo(x+6,y+6); ctx.moveTo(x+6,y-6); ctx.lineTo(x-6,y+6); ctx.stroke();
+}
+function meter(x,y,letter,col){
+  ctx.fillStyle='#0b1120'; ctx.strokeStyle=col; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(x,y,15,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle=col; ctx.font='700 14px "DM Mono"'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(letter,x,y); ctx.textBaseline='alphabetic';
+}
+function electrons(pts, I){
+  ctx.fillStyle='#38bdf8';
+  const n = pts.length;
+  for(let i=0;i<n;i++){
+    const seg = pts[i];
+    const count = Math.max(2, Math.round(seg.len/40));
+    for(let k=0;k<count;k++){
+      let t = ((k/count) + anim*0.02*Math.min(3,I)) % 1;
+      const px = seg.x1 + (seg.x2-seg.x1)*t;
+      const py = seg.y1 + (seg.y2-seg.y1)*t;
+      ctx.beginPath(); ctx.arc(px,py,2.6,0,Math.PI*2); ctx.fill();
+    }
+  }
+}
+
+function draw(){
+  const {V,R1,R2,R3} = getVals();
+  const Req = equivR();
+  const I = V/Req;
+  const glow = Math.min(1, I/3);
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle='#4a6890'; ctx.lineWidth=3;
+
+  const L=120, R=880, T=90, B=360;
+
+  if(mode==='single' || mode==='series'){
+    // outer loop
+    ctx.beginPath();
+    ctx.moveTo(L,T); ctx.lineTo(R,T); ctx.lineTo(R,B); ctx.lineTo(L,B); ctx.lineTo(L,T);
+    ctx.stroke();
+    // battery on left side
+    battery(L, (T+B)/2, V);
+    // meter (ammeter) top-left
+    meter(260, T, 'A', '#34d399');
+    // bulb bottom middle
+    bulb((L+R)/2, B, glow);
+    // resistors on top
+    if(mode==='single'){
+      resistor(600, T, 'R₁='+R1+'Ω', '#a855f7');
+    } else {
+      resistor(420, T, 'R₁='+R1+'Ω', '#a855f7');
+      resistor(600, T, 'R₂='+R2+'Ω', '#60a5fa');
+      resistor(780, T, 'R₃='+R3+'Ω', '#f472b6');
+    }
+    drawArrow(700,T,740,T,'#22c55e');
+    // electrons around loop
+    electrons([
+      {x1:L,y1:T,x2:R,y2:T,len:R-L},
+      {x1:R,y1:T,x2:R,y2:B,len:B-T},
+      {x1:R,y1:B,x2:L,y2:B,len:R-L},
+      {x1:L,y1:B,x2:L,y2:T,len:B-T},
+    ], I);
+  } else {
+    // parallel: two vertical rails + three branches
+    const xL=260, xR=740;
+    // rails
+    ctx.beginPath(); ctx.moveTo(xL,T); ctx.lineTo(xL,B); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xR,T); ctx.lineTo(xR,B); ctx.stroke();
+    // top wire to battery
+    ctx.beginPath(); ctx.moveTo(L,140); ctx.lineTo(xL,140); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xR,140); ctx.lineTo(R,140); ctx.lineTo(R,300); ctx.lineTo(xR,300); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xL,300); ctx.lineTo(L,300); ctx.lineTo(L,140); ctx.stroke();
+    battery(L,220,V);
+    meter(190,140,'A','#34d399');
+    // three branches
+    const ys=[T,225,B];
+    const labels=['R₁='+R1+'Ω','R₂='+R2+'Ω','R₃='+R3+'Ω'];
+    const cols=['#a855f7','#60a5fa','#f472b6'];
+    for(let i=0;i<3;i++){
+      ctx.strokeStyle='#4a6890'; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(xL,ys[i]); ctx.lineTo(xR,ys[i]); ctx.stroke();
+      resistor((xL+xR)/2,ys[i],labels[i],cols[i]);
+    }
+    // bulb near battery output
+    bulb(L, 300, glow);
+    // electrons on each branch
+    electrons([
+      {x1:xL,y1:ys[0],x2:xR,y2:ys[0],len:xR-xL},
+      {x1:xL,y1:ys[1],x2:xR,y2:ys[1],len:xR-xL},
+      {x1:xL,y1:ys[2],x2:xR,y2:ys[2],len:xR-xL},
+    ], I);
+  }
+
+  // caption
+  ctx.fillStyle='#4a6890'; ctx.font='600 13px Lato'; ctx.textAlign='center';
+  const cap = mode==='single'?'Single resistor circuit':mode==='series'?'Series circuit — same current everywhere':'Parallel circuit — same voltage across branches';
+  ctx.fillText(cap, cv.width/2, 420);
+}
+
+function loop(){ anim++; draw(); requestAnimationFrame(loop); }
+update(); loop();
+</script>
+</body>
+</html>

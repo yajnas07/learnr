@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Bank — Electricity</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080f1e;--card:#111c2e;--card2:#162236;--border:#1a2d45;--text:#cce4ff;--muted:#4a6890;--blue:#38bdf8;--green:#22c55e;--amber:#f59e0b;--purple:#a78bfa;--pink:#f472b6;--teal:#2dd4bf;--red:#f87171}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh}
+header{text-align:center;padding:2.2rem 1rem 1rem;position:relative}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.1),transparent 70%);pointer-events:none}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4.5vw,2.5rem);font-weight:800;background:linear-gradient(135deg,#38bdf8,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;margin-top:.3rem}
+
+.container{max-width:900px;margin:auto;padding:0 1rem 3rem}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem;padding:1rem 0}
+.fbtn{font-family:'DM Mono',monospace;font-size:.72rem;padding:.3rem .8rem;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.fbtn:hover{border-color:#64748b;color:var(--text)}
+.fbtn.active{border-color:var(--blue);color:#fff;background:rgba(56,189,248,.12)}
+
+/* score bar */
+.score-bar{display:flex;align-items:center;gap:.8rem;padding:.6rem 0;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.score-bar .sbar{flex:1;height:6px;border-radius:3px;background:var(--card2);overflow:hidden}
+.score-bar .sfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--teal));transition:width .3s}
+
+/* question card */
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:1rem;overflow:hidden}
+.qcard .qhead{display:flex;align-items:flex-start;gap:.8rem;padding:1.2rem 1.2rem .8rem;cursor:pointer}
+.qcard .qnum{font-family:'Playfair Display',serif;font-weight:800;font-size:1rem;color:var(--blue);min-width:30px}
+.qcard .qtag{font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:1px;padding:.15rem .5rem;border-radius:99px;margin-left:auto;white-space:nowrap}
+.qcard .qbody{padding:0 1.2rem;font-size:.9rem;line-height:1.7}
+.qcard .qbody p{margin-bottom:.5rem}
+
+/* MCQ options */
+.opts{list-style:none;padding:.3rem 0 .8rem}
+.opts li{padding:.45rem .8rem;margin:.3rem 0;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:.85rem;transition:all .2s;display:flex;align-items:center;gap:.5rem}
+.opts li:hover{border-color:#64748b}
+.opts li.correct{border-color:var(--green);background:rgba(34,197,94,.08);color:var(--green)}
+.opts li.wrong{border-color:var(--red);background:rgba(248,113,113,.08);color:var(--red)}
+.opts li .ol{font-family:'DM Mono',monospace;font-weight:700;font-size:.78rem;min-width:20px}
+
+/* answer toggle */
+.ans-toggle{font-family:'DM Mono',monospace;font-size:.75rem;padding:.35rem 1rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;margin:.5rem 0 .8rem;display:inline-block;transition:all .2s}
+.ans-toggle:hover{border-color:var(--blue);color:var(--text)}
+.model-ans{display:none;padding:.8rem 1rem;margin:0 0 1rem;background:rgba(56,189,248,.04);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;font-size:.85rem;line-height:1.75;color:var(--text)}
+.model-ans.show{display:block}
+.model-ans strong{color:var(--blue)}
+.exam-tip{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--amber);margin-top:.4rem;display:block}
+
+/* strip colors */
+.strip-current{border-left:3px solid var(--blue)}.strip-pd{border-left:3px solid var(--green)}.strip-ohm{border-left:3px solid var(--amber)}.strip-resist{border-left:3px solid var(--purple)}.strip-combo{border-left:3px solid var(--teal)}.strip-power{border-left:3px solid var(--pink)}
+
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.5rem;background:rgba(8,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.5);position:relative;z-index:100}
+.site-nav img{height:26px}.site-nav a.back{font-family:'DM Mono',monospace;font-size:.72rem;color:#64748b;text-decoration:none;transition:color .2s}.site-nav a.back:hover{color:#e2e8f0}
+@media(max-width:600px){.container{padding:0 .6rem 2rem}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<header>
+  <h1>Electricity</h1>
+  <p>Question Bank · 30 Questions · CBSE Class X · Ch.12</p>
+</header>
+
+<div class="container">
+  <div class="filters" id="filters"></div>
+  <div class="score-bar"><span id="scoreText">0 / 0 correct</span><div class="sbar"><div class="sfill" id="sfill"></div></div></div>
+  <div id="qlist"></div>
+</div>
+
+<script>
+const QS = [
+  // ── MCQ (10) ──
+  {type:'mcq',cat:'current',strip:'strip-current',q:'The SI unit of electric current is:',ops:['Coulomb','Volt','Ampere','Ohm'],ans:2,explain:'Current is measured in amperes (A). 1 A = 1 coulomb/second.'},
+  {type:'mcq',cat:'current',strip:'strip-current',q:'If 20 C of charge flows through a wire in 4 s, the current is:',ops:['5 A','80 A','0.2 A','24 A'],ans:0,explain:'I = Q/t = 20/4 = 5 A.'},
+  {type:'mcq',cat:'pd',strip:'strip-pd',q:'A voltmeter is always connected:',ops:['In series with low resistance','In parallel with high resistance','In series with high resistance','In parallel with low resistance'],ans:1,explain:'A voltmeter is connected in parallel across the component and has very high resistance so it draws negligible current.'},
+  {type:'mcq',cat:'ohm',strip:'strip-ohm',q:'According to Ohm\'s law, the graph between V and I for a metallic conductor is:',ops:['A parabola','A straight line through the origin','A hyperbola','A horizontal line'],ans:1,explain:'V = IR, so V ∝ I gives a straight line through the origin. Slope = R.'},
+  {type:'mcq',cat:'ohm',strip:'strip-ohm',q:'The resistance of a conductor carrying 2 A under a PD of 10 V is:',ops:['20 Ω','5 Ω','0.2 Ω','12 Ω'],ans:1,explain:'R = V/I = 10/2 = 5 Ω.'},
+  {type:'mcq',cat:'resist',strip:'strip-resist',q:'The resistance of a wire is doubled when its:',ops:['Length is doubled','Area is doubled','Temperature is decreased','Radius is doubled'],ans:0,explain:'R = ρL/A. Doubling length doubles R. Doubling area halves R.'},
+  {type:'mcq',cat:'resist',strip:'strip-resist',q:'The SI unit of resistivity is:',ops:['Ω','Ω/m','Ω·m','Ω·m²'],ans:2,explain:'ρ = RA/L → unit = (Ω × m²)/m = Ω·m (ohm-metre).'},
+  {type:'mcq',cat:'combo',strip:'strip-combo',q:'Three resistors each of 3 Ω are connected in parallel. The equivalent resistance is:',ops:['9 Ω','3 Ω','1 Ω','6 Ω'],ans:2,explain:'For n equal resistors in parallel, R = R/n = 3/3 = 1 Ω.'},
+  {type:'mcq',cat:'power',strip:'strip-power',q:'The heat produced in a resistor is proportional to:',ops:['I','I²','1/I','1/I²'],ans:1,explain:'By Joule\'s law, H = I²Rt, so H ∝ I². Doubling current gives 4× heat.'},
+  {type:'mcq',cat:'power',strip:'strip-power',q:'One kilowatt-hour is equal to:',ops:['3.6 × 10³ J','3.6 × 10⁶ J','1000 J','3600 J'],ans:1,explain:'1 kWh = 1000 W × 3600 s = 3.6 × 10⁶ J.'},
+
+  // ── ASSERTION-REASON (4) ──
+  {type:'ar',cat:'combo',strip:'strip-combo',q:'<strong>Assertion:</strong> Household appliances are connected in parallel.<br><strong>Reason:</strong> A parallel connection provides the same voltage to each appliance and allows independent operation.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'Both are true and the reason correctly explains the assertion — parallel wiring gives full 220 V to each device and independent switching.'},
+  {type:'ar',cat:'resist',strip:'strip-resist',q:'<strong>Assertion:</strong> Nichrome is used as a heating element.<br><strong>Reason:</strong> Nichrome has a low resistivity and low melting point.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:2,explain:'A is true, but R is false — nichrome has HIGH resistivity and a HIGH melting point, which is why it is used in heaters.'},
+  {type:'ar',cat:'ohm',strip:'strip-ohm',q:'<strong>Assertion:</strong> A filament bulb is a non-ohmic conductor.<br><strong>Reason:</strong> Its resistance changes as it heats up, so the V–I graph is not a straight line.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'Both are true — as the filament heats, its resistance rises, so it does not obey Ohm\'s law and the V–I graph curves.'},
+  {type:'ar',cat:'power',strip:'strip-power',q:'<strong>Assertion:</strong> An electric fuse is connected in series with the appliance.<br><strong>Reason:</strong> The fuse melts and breaks the circuit when the current exceeds a safe value.',ops:['Both A and R are true and R is the correct explanation of A','Both A and R are true but R is NOT the correct explanation of A','A is true but R is false','A is false but R is true'],ans:0,explain:'Both are true and R explains A — a series fuse carries the full current and melts (H = I²Rt) when the current is too high, protecting the circuit.'},
+
+  // ── SHORT ANSWER (12) ──
+  {type:'short',cat:'current',strip:'strip-current',q:'Define electric current and state its SI unit.',
+   answer:'Electric current is the <strong>rate of flow of electric charge</strong> through a conductor: <strong>I = Q/t</strong>. Its SI unit is the <strong>ampere (A)</strong>, where 1 A = 1 coulomb/second.',tip:'Always give the defining formula and the unit relation 1 A = 1 C/s.'},
+  {type:'short',cat:'current',strip:'strip-current',q:'How many electrons flow per second in a wire carrying a current of 1 A?',
+   answer:'I = Q/t = ne/t.<br>n = It/e = (1 × 1)/(1.6 × 10⁻¹⁹) = <strong>6.25 × 10¹⁸ electrons</strong> per second.',tip:'Use e = 1.6 × 10⁻¹⁹ C. Very common numerical.'},
+  {type:'short',cat:'pd',strip:'strip-pd',q:'Define potential difference. What is 1 volt?',
+   answer:'Potential difference is the <strong>work done to move a unit charge</strong> between two points: <strong>V = W/Q</strong>. One volt is the PD when <strong>1 joule</strong> of work moves <strong>1 coulomb</strong> of charge. 1 V = 1 J/C.',tip:'State formula + definition of the unit.'},
+  {type:'short',cat:'ohm',strip:'strip-ohm',q:'State Ohm\'s law and represent it graphically.',
+   answer:'<strong>Ohm\'s Law:</strong> At constant temperature, the current through a conductor is directly proportional to the potential difference across it → <strong>V = IR</strong>.<br>The V–I graph is a <strong>straight line through the origin</strong>, and its slope gives the resistance R.',tip:'Mention "constant temperature" — examiners look for it.'},
+  {type:'short',cat:'ohm',strip:'strip-ohm',q:'Define resistance and one ohm.',
+   answer:'<strong>Resistance</strong> is the property of a conductor that opposes the flow of current: R = V/I. Its SI unit is the <strong>ohm (Ω)</strong>. A conductor has a resistance of <strong>1 ohm</strong> if a PD of 1 volt drives a current of 1 ampere through it.',tip:'1 Ω = 1 V/A.'},
+  {type:'short',cat:'resist',strip:'strip-resist',q:'List the factors on which the resistance of a conductor depends.',
+   answer:'Resistance depends on:<br>1) <strong>Length</strong> (R ∝ L)<br>2) <strong>Area of cross-section</strong> (R ∝ 1/A)<br>3) <strong>Nature of material</strong> (resistivity ρ)<br>4) <strong>Temperature</strong> (increases with temperature for metals).',tip:'Four factors — write each with the proportionality.'},
+  {type:'short',cat:'resist',strip:'strip-resist',q:'A wire is stretched so that its length becomes twice. How does its resistance change?',
+   answer:'On stretching, the volume stays constant, so if length doubles, the area of cross-section halves.<br>R = ρL/A → new R = ρ(2L)/(A/2) = <strong>4 × original R</strong>.',tip:'Key point: volume constant → A becomes half. R becomes 4 times.'},
+  {type:'short',cat:'resist',strip:'strip-resist',q:'Why is tungsten used for the filament of an electric bulb?',
+   answer:'Tungsten has a <strong>very high melting point (~3380 °C)</strong> and <strong>high resistivity</strong>. It can be heated to a high temperature to emit light without melting, making it ideal for bulb filaments.',tip:'Two properties: high melting point + high resistivity.'},
+  {type:'short',cat:'combo',strip:'strip-combo',q:'Two resistors of 6 Ω and 3 Ω are connected in parallel. Find the equivalent resistance.',
+   answer:'1/R = 1/6 + 1/3 = 1/6 + 2/6 = 3/6 = 1/2<br><strong>R = 2 Ω</strong>. (Note: less than the smallest resistor, 3 Ω.)',tip:'Always check: parallel R is smaller than the smallest resistor.'},
+  {type:'short',cat:'combo',strip:'strip-combo',q:'State two differences between series and parallel combinations of resistors.',
+   answer:'<strong>Series:</strong> Same current through all; total R = R₁ + R₂ + … (larger).<br><strong>Parallel:</strong> Same voltage across all; 1/R = 1/R₁ + 1/R₂ + … (smaller).',tip:'Compare current, voltage, and total resistance.'},
+  {type:'short',cat:'power',strip:'strip-power',q:'Define electric power and write its three formulas.',
+   answer:'Electric power is the <strong>rate of consuming electrical energy</strong>. SI unit: watt (W).<br><strong>P = VI = I²R = V²/R</strong>.',tip:'Know all three forms — used depending on given data.'},
+  {type:'short',cat:'power',strip:'strip-power',q:'An electric bulb is rated 100 W, 220 V. Calculate its resistance and the current drawn.',
+   answer:'R = V²/P = (220)²/100 = 48400/100 = <strong>484 Ω</strong>.<br>I = P/V = 100/220 = <strong>0.45 A</strong>.',tip:'Use R = V²/P and I = P/V for rating problems.'},
+
+  // ── LONG ANSWER (4) ──
+  {type:'long',cat:'combo',strip:'strip-combo',q:'Derive the expression for the equivalent resistance of three resistors connected (a) in series and (b) in parallel.',
+   answer:'<strong>(a) Series:</strong> Same current I flows through R₁, R₂, R₃. Total PD V = V₁ + V₂ + V₃ = IR₁ + IR₂ + IR₃ = I(R₁+R₂+R₃).<br>Since V = IR_s ⟹ <strong>R_s = R₁ + R₂ + R₃</strong>.<br><br><strong>(b) Parallel:</strong> Same PD V across each. Total current I = I₁ + I₂ + I₃ = V/R₁ + V/R₂ + V/R₃ = V(1/R₁ + 1/R₂ + 1/R₃).<br>Since I = V/R_p ⟹ <strong>1/R_p = 1/R₁ + 1/R₂ + 1/R₃</strong>.',tip:'A 5-mark derivation. State what stays constant (current in series, voltage in parallel) then use V=IR.'},
+  {type:'long',cat:'power',strip:'strip-power',q:'State Joule\'s law of heating and derive H = I²Rt. Give two applications of the heating effect of current.',
+   answer:'<strong>Joule\'s Law:</strong> The heat produced in a resistor is proportional to (i) the square of current, (ii) resistance, and (iii) time.<br><strong>Derivation:</strong> Work done to move charge Q through PD V is W = VQ = VIt (since Q = It). Using V = IR:<br>W = (IR)(I)(t) = <strong>I²Rt</strong>. This work appears as heat H, so <strong>H = I²Rt</strong>.<br><br><strong>Applications:</strong> Electric heater/iron, incandescent bulb, electric fuse (safety).',tip:'Start from W = VQ, substitute Q = It and V = IR. Give practical uses.'},
+  {type:'long',cat:'resist',strip:'strip-resist',q:'Explain how the resistance of a conductor depends on its length, area of cross-section, and material. Define resistivity and state its SI unit.',
+   answer:'For a given conductor:<br>• R ∝ <strong>length L</strong> — longer wire, more collisions, higher resistance.<br>• R ∝ <strong>1/area A</strong> — thicker wire, more room for electrons, lower resistance.<br>• Depends on the <strong>material</strong> through its resistivity ρ.<br>Combining: <strong>R = ρL/A</strong>.<br><strong>Resistivity ρ = RA/L</strong> is the resistance of a material of unit length and unit cross-sectional area. SI unit: <strong>ohm-metre (Ω·m)</strong>. It depends only on the material and temperature, not on dimensions.',tip:'Give the proportionalities, combine into R = ρL/A, then define ρ and its unit.'},
+  {type:'long',cat:'power',strip:'strip-power',q:'An electric heater of resistance 8 Ω draws a current of 15 A from the mains. (a) Find the rate at which heat is developed. (b) Calculate the energy consumed in 2 hours and the cost at ₹6 per unit.',
+   answer:'<strong>(a)</strong> Rate of heat = Power P = I²R = (15)² × 8 = 225 × 8 = <strong>1800 W = 1.8 kW</strong>.<br><br><strong>(b)</strong> Energy = P × t = 1.8 kW × 2 h = <strong>3.6 kWh</strong> (units).<br>Cost = 3.6 × ₹6 = <strong>₹21.60</strong>.',tip:'Use P = I²R. Convert to kW and hours for kWh. Multiply by rate for cost.'},
+];
+
+const CATS = [
+  {id:'all',label:'All'},{id:'mcq',label:'MCQ'},{id:'ar',label:'Assert-Reason'},
+  {id:'short',label:'Short Answer'},{id:'long',label:'Long Answer'}
+];
+const TOPIC_COLORS = {current:'var(--blue)',pd:'var(--green)',ohm:'var(--amber)',resist:'var(--purple)',combo:'var(--teal)',power:'var(--pink)'};
+
+let activeCat = 'all', score = 0, attempted = 0;
+
+// filters
+const filtersEl = document.getElementById('filters');
+CATS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'fbtn' + (c.id==='all'?' active':'');
+  const cnt = c.id==='all' ? QS.length : QS.filter(q => q.type === c.id).length;
+  b.textContent = c.label + ` (${cnt})`;
+  b.onclick = () => { activeCat = c.id; filtersEl.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderAll(); };
+  filtersEl.appendChild(b);
+});
+
+function renderAll() {
+  const list = document.getElementById('qlist');
+  list.innerHTML = '';
+  const qs = activeCat === 'all' ? QS : QS.filter(q => q.type === activeCat);
+  qs.forEach((q, qi) => {
+    const gi = QS.indexOf(q);
+    const div = document.createElement('div');
+    div.className = 'qcard ' + (q.strip || '');
+    const typeLabel = q.type === 'mcq' ? 'MCQ' : q.type === 'ar' ? 'Assertion-Reason' : q.type === 'short' ? 'Short Answer' : 'Long Answer';
+    const tagColor = TOPIC_COLORS[q.cat] || 'var(--muted)';
+    let html = `<div class="qhead" onclick="this.parentElement.querySelector('.qbody').style.display=this.parentElement.querySelector('.qbody').style.display==='none'?'block':'block'">
+      <span class="qnum">Q${qi+1}</span>
+      <span style="flex:1;font-size:.9rem;line-height:1.6">${q.q}</span>
+      <span class="qtag" style="border:1px solid ${tagColor};color:${tagColor}">${typeLabel}</span>
+    </div><div class="qbody">`;
+
+    if (q.type === 'mcq' || q.type === 'ar') {
+      html += '<ul class="opts">';
+      q.ops.forEach((op, oi) => {
+        html += `<li onclick="checkMCQ(this,${gi},${oi})" data-qi="${gi}" data-oi="${oi}"><span class="ol">${String.fromCharCode(65+oi)}.</span> ${op}</li>`;
+      });
+      html += '</ul>';
+      html += `<div class="model-ans" id="exp-${gi}"><strong>Explanation:</strong> ${q.explain}</div>`;
+    } else {
+      html += `<button class="ans-toggle" onclick="toggleAns(${gi})">Show Model Answer</button>`;
+      html += `<div class="model-ans" id="ans-${gi}">${q.answer}`;
+      if (q.tip) html += `<span class="exam-tip">📝 Exam Tip: ${q.tip}</span>`;
+      html += '</div>';
+    }
+    html += '</div>';
+    div.innerHTML = html;
+    list.appendChild(div);
+  });
+  updateScore();
+}
+
+function checkMCQ(el, qi, oi) {
+  const q = QS[qi];
+  const parent = el.parentElement;
+  if (parent.dataset.done) return;
+  parent.dataset.done = '1';
+  attempted++;
+  if (oi === q.ans) { el.classList.add('correct'); score++; }
+  else {
+    el.classList.add('wrong');
+    parent.children[q.ans].classList.add('correct');
+  }
+  document.getElementById('exp-' + qi).classList.add('show');
+  updateScore();
+}
+
+function toggleAns(qi) {
+  const el = document.getElementById('ans-' + qi);
+  el.classList.toggle('show');
+}
+
+function updateScore() {
+  const total = QS.filter(q => q.type==='mcq'||q.type==='ar').length;
+  document.getElementById('scoreText').textContent = `${score} / ${attempted} correct (${total} MCQ+AR total)`;
+  document.getElementById('sfill').style.width = (total ? score/total*100 : 0) + '%';
+}
+
+renderAll();
+</script>
+</body>
+</html>

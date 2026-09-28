@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Diagrams — Electricity</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --card2: #263148;
+    --text: #e2e8f0; --muted: #94a3b8; --border: #334155;
+    --blue: #38bdf8; --green: #22c55e; --amber: #f59e0b;
+    --purple: #a78bfa; --pink: #f472b6; --teal: #2dd4bf;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  header { text-align: center; padding: 2.5rem 1rem 1rem; position: relative; }
+  header::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(56,189,248,.12) 0%,transparent 70%); pointer-events:none; }
+  header h1 { font-family:'Syne',sans-serif; font-size:clamp(1.6rem,4.5vw,2.6rem); font-weight:800; letter-spacing:-1px; background:linear-gradient(135deg,#38bdf8,#a78bfa,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  header p { color:var(--muted); font-size:.9rem; margin-top:.4rem; font-family:'DM Mono',monospace; }
+
+  .tabs { display:flex; justify-content:center; flex-wrap:wrap; gap:.5rem; padding:1.5rem 1rem .5rem; }
+  .tabs button { font-family:'Syne',sans-serif; font-weight:700; font-size:.82rem; padding:.5rem 1.2rem; border-radius:99px; border:2px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .25s; }
+  .tabs button:hover { border-color:#64748b; color:var(--text); }
+  .tabs button.active { border-color:var(--blue); color:#fff; background:rgba(56,189,248,.12); }
+
+  .panel { display:none; max-width:960px; margin:auto; padding:1.5rem; }
+  .panel.active { display:block; animation:fadeIn .35s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.5rem; margin-bottom:1.2rem; }
+  .card h2 { font-family:'Syne',sans-serif; font-size:1.15rem; margin-bottom:.8rem; }
+  .card h3 { font-size:.95rem; margin:1rem 0 .5rem; color:var(--blue); }
+  .card p, .card li { font-size:.88rem; line-height:1.7; color:var(--muted); }
+  .card ul { padding-left:1.2rem; }
+  .card li { margin-bottom:.3rem; }
+  .formula { font-family:'DM Mono',monospace; font-size:.95rem; color:var(--amber); background:rgba(245,158,11,.08); padding:.5rem .8rem; border-radius:8px; margin:.6rem 0; display:inline-block; }
+
+  .canvas-wrap { position:relative; width:100%; max-width:700px; margin:1rem auto; background:#0b1120; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .canvas-wrap canvas { width:100%; display:block; }
+
+  .slider-row { display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:center; margin:1rem 0; }
+  .slider-row label { font-family:'DM Mono',monospace; font-size:.78rem; color:var(--muted); }
+  .slider-row input[type=range] { width:160px; accent-color:var(--blue); }
+  .slider-row .val { font-family:'DM Mono',monospace; font-size:.82rem; color:var(--blue); min-width:52px; }
+
+  .tip { background:rgba(56,189,248,.06); border-left:3px solid var(--blue); padding:.6rem 1rem; border-radius:0 8px 8px 0; margin:.8rem 0; font-size:.82rem; color:var(--text); }
+  .tip strong { color:var(--blue); }
+
+  .tbl { width:100%; border-collapse:collapse; margin:.8rem 0; font-size:.82rem; }
+  .tbl th, .tbl td { border:1px solid var(--border); padding:.5rem .7rem; text-align:center; }
+  .tbl th { background:var(--card2); color:var(--blue); font-family:'Syne',sans-serif; font-weight:700; }
+  .tbl td { color:var(--muted); }
+  .inp { width:70px; background:var(--card2); border:1px solid var(--border); color:var(--text); padding:.3rem; border-radius:6px; font-family:'DM Mono',monospace; }
+  .btn { font-family:'Syne',sans-serif; font-weight:700; padding:.4rem 1.2rem; border-radius:99px; border:2px solid var(--teal); background:rgba(45,212,191,.12); color:var(--teal); cursor:pointer; font-size:.82rem; }
+  .pill-toggle { display:flex; gap:.5rem; justify-content:center; margin:1rem 0; }
+  .pill-toggle button { font-size:.78rem; padding:.35rem .9rem; border-radius:99px; border:2px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; font-family:'Syne',sans-serif; font-weight:700; }
+  .pill-toggle button.active { border-color:var(--amber); background:rgba(245,158,11,.12); color:#fbbf24; }
+
+  .site-nav { display:flex; align-items:center; justify-content:space-between; padding:.55rem 1.5rem; background:rgba(8,15,30,.92); backdrop-filter:blur(14px); border-bottom:1px solid rgba(51,65,85,.5); position:relative; z-index:100; }
+  .site-nav img { height:26px; }
+  .site-nav a.back { font-family:'DM Mono',monospace; font-size:.72rem; color:#64748b; text-decoration:none; transition:color .2s; }
+  .site-nav a.back:hover { color:#e2e8f0; }
+
+  @media(max-width:600px) { .panel { padding:1rem .6rem; } .tbl { font-size:.72rem; } }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+
+<header>
+  <h1>Electricity — Interactive Diagrams</h1>
+  <p>CBSE Class X · Chapter 12 · Explore &amp; Experiment</p>
+</header>
+
+<div class="tabs">
+  <button class="active" onclick="show(0,this)">⚡ Circuit &amp; Current</button>
+  <button onclick="show(1,this)">📏 Ohm's Law</button>
+  <button onclick="show(2,this)">🔗 Series &amp; Parallel</button>
+  <button onclick="show(3,this)">🧵 Resistance Factors</button>
+  <button onclick="show(4,this)">🔥 Heating &amp; Power</button>
+  <button onclick="show(5,this)">🧮 Calculator</button>
+</div>
+
+<!-- ═══ TAB 0: CIRCUIT & CURRENT ═══ -->
+<div class="panel active" id="p0">
+  <div class="card">
+    <h2 style="color:var(--blue)">Electric Circuit — Electron Flow</h2>
+    <p>A cell drives charge around a closed loop. Increase the voltage to see the current (electron flow) speed up. The bulb glows brighter with more current.</p>
+    <div class="canvas-wrap"><canvas id="cCirc" width="700" height="360"></canvas></div>
+    <div class="slider-row">
+      <label>Battery Voltage:</label>
+      <input type="range" id="slV0" min="1" max="12" value="6">
+      <span class="val" id="vV0">6 V</span>
+    </div>
+    <div class="slider-row">
+      <label>Resistance:</label>
+      <input type="range" id="slR0" min="1" max="12" value="3">
+      <span class="val" id="vR0">3 Ω</span>
+    </div>
+    <div class="tip"><strong>Key Concept:</strong> Conventional current flows from + to − outside the cell, opposite to the electron flow. I = V/R.</div>
+  </div>
+</div>
+
+<!-- ═══ TAB 1: OHM'S LAW ═══ -->
+<div class="panel" id="p1">
+  <div class="card">
+    <h2 style="color:var(--amber)">Ohm's Law — V = IR</h2>
+    <p>For an ohmic conductor, V and I are directly proportional. Drag the sliders and watch the V–I graph. The slope of the line is the resistance R.</p>
+    <div class="canvas-wrap"><canvas id="cOhm" width="700" height="380"></canvas></div>
+    <div class="slider-row">
+      <label>Voltage (V):</label>
+      <input type="range" id="slVo" min="0" max="20" value="10" step="0.5">
+      <span class="val" id="vVo">10 V</span>
+    </div>
+    <div class="slider-row">
+      <label>Resistance (R):</label>
+      <input type="range" id="slRo" min="1" max="10" value="5" step="0.5">
+      <span class="val" id="vRo">5 Ω</span>
+    </div>
+    <div class="tip"><strong>Reading:</strong> <span id="ohmRead" style="color:var(--green)"></span></div>
+  </div>
+</div>
+
+<!-- ═══ TAB 2: SERIES & PARALLEL ═══ -->
+<div class="panel" id="p2">
+  <div class="card">
+    <h2 style="color:var(--teal)">Series vs Parallel Combination</h2>
+    <div class="pill-toggle">
+      <button id="btnSer" class="active" onclick="setCombo('series')">Series</button>
+      <button id="btnPar" onclick="setCombo('parallel')">Parallel</button>
+    </div>
+    <div class="canvas-wrap"><canvas id="cComb" width="700" height="300"></canvas></div>
+    <div class="slider-row">
+      <label>R₁:</label><input type="number" class="inp" id="cR1" value="2"> Ω
+      <label>R₂:</label><input type="number" class="inp" id="cR2" value="3"> Ω
+      <label>R₃:</label><input type="number" class="inp" id="cR3" value="6"> Ω
+      <button class="btn" onclick="drawCombo()">Calculate</button>
+    </div>
+    <div class="tip"><strong>Result:</strong> <span id="comboRead" style="color:var(--green)"></span></div>
+  </div>
+</div>
+
+<!-- ═══ TAB 3: RESISTANCE FACTORS ═══ -->
+<div class="panel" id="p3">
+  <div class="card">
+    <h2 style="color:var(--purple)">Factors Affecting Resistance — R = ρL/A</h2>
+    <p>Change the length and thickness of the wire. Longer &amp; thinner wires have higher resistance.</p>
+    <div class="canvas-wrap"><canvas id="cRes" width="700" height="280"></canvas></div>
+    <div class="slider-row">
+      <label>Length (L):</label>
+      <input type="range" id="slL" min="1" max="10" value="4">
+      <span class="val" id="vL">4 m</span>
+    </div>
+    <div class="slider-row">
+      <label>Area (A):</label>
+      <input type="range" id="slA" min="1" max="10" value="5">
+      <span class="val" id="vA">5 mm²</span>
+    </div>
+    <div class="tip"><strong>Resistance:</strong> <span id="resRead" style="color:var(--green)"></span> &nbsp; (using ρ = 1.7×10⁻⁸ Ω·m, copper)</div>
+  </div>
+</div>
+
+<!-- ═══ TAB 4: HEATING & POWER ═══ -->
+<div class="panel" id="p4">
+  <div class="card">
+    <h2 style="color:var(--pink)">Heating Effect &amp; Power — H = I²Rt, P = VI</h2>
+    <p>More current or resistance produces more heat. Watch the element glow and the power meter respond.</p>
+    <div class="canvas-wrap"><canvas id="cHeat" width="700" height="300"></canvas></div>
+    <div class="slider-row">
+      <label>Current (I):</label>
+      <input type="range" id="slI" min="1" max="10" value="4" step="0.5">
+      <span class="val" id="vI">4 A</span>
+    </div>
+    <div class="slider-row">
+      <label>Resistance (R):</label>
+      <input type="range" id="slRh" min="1" max="20" value="8">
+      <span class="val" id="vRh">8 Ω</span>
+    </div>
+    <div class="tip"><strong>Output:</strong> <span id="heatRead" style="color:var(--green)"></span></div>
+  </div>
+</div>
+
+<!-- ═══ TAB 5: CALCULATOR ═══ -->
+<div class="panel" id="p5">
+  <div class="card">
+    <h2 style="color:var(--green)">Ohm's Law &amp; Power Calculator</h2>
+    <p>Enter any two known values and calculate the rest.</p>
+    <div class="slider-row" style="justify-content:flex-start">
+      <label>Voltage V: <input class="inp" id="calcV" placeholder="volts"></label>
+      <label>Current I: <input class="inp" id="calcI" placeholder="amps"></label>
+      <label>Resistance R: <input class="inp" id="calcR" placeholder="ohms"></label>
+      <button class="btn" onclick="calcOhm()">Compute</button>
+    </div>
+    <div id="calcResult" style="font-family:'DM Mono',monospace;font-size:.9rem;color:var(--text);margin-top:.6rem;line-height:1.9"></div>
+  </div>
+  <div class="card">
+    <h2 style="color:var(--amber)">Energy &amp; Cost Calculator</h2>
+    <div class="slider-row" style="justify-content:flex-start">
+      <label>Power P: <input class="inp" id="enP" value="1000"> W</label>
+      <label>Time t: <input class="inp" id="enT" value="2"> h/day</label>
+      <label>Days: <input class="inp" id="enD" value="30"></label>
+      <label>Rate: ₹<input class="inp" id="enRate" value="6"> /unit</label>
+      <button class="btn" onclick="calcEnergy()">Compute</button>
+    </div>
+    <div id="enResult" style="font-family:'DM Mono',monospace;font-size:.9rem;color:var(--text);margin-top:.6rem;line-height:1.9"></div>
+  </div>
+  <div class="card">
+    <h2 style="color:var(--blue)">Quick Reference</h2>
+    <table class="tbl">
+      <tr><th>Quantity</th><th>Formula</th><th>Unit</th></tr>
+      <tr><td>Current</td><td>I = Q/t</td><td>A</td></tr>
+      <tr><td>Ohm's Law</td><td>V = IR</td><td>—</td></tr>
+      <tr><td>Resistance</td><td>R = ρL/A</td><td>Ω</td></tr>
+      <tr><td>Power</td><td>P = VI = I²R = V²/R</td><td>W</td></tr>
+      <tr><td>Heat</td><td>H = I²Rt</td><td>J</td></tr>
+      <tr><td>Energy</td><td>E = Pt (1 kWh = 3.6 MJ)</td><td>kWh</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+/* ─── Tab switching ─── */
+function show(i, btn) {
+  document.querySelectorAll('.panel').forEach((p,j) => p.classList.toggle('active', j===i));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function drawArrow(ctx, x1, y1, x2, y2, col) {
+  const a = Math.atan2(y2-y1, x2-x1), d = 9;
+  const mx = (x1+x2)/2, my2 = (y1+y2)/2;
+  ctx.fillStyle = col; ctx.beginPath();
+  ctx.moveTo(mx + d*Math.cos(a), my2 + d*Math.sin(a));
+  ctx.lineTo(mx - d*Math.cos(a-Math.PI/6), my2 - d*Math.sin(a-Math.PI/6));
+  ctx.lineTo(mx - d*Math.cos(a+Math.PI/6), my2 - d*Math.sin(a+Math.PI/6));
+  ctx.fill();
+}
+
+/* ─── TAB 0: CIRCUIT ANIMATION ─── */
+const cC = document.getElementById('cCirc'), xC = cC.getContext('2d');
+const slV0 = document.getElementById('slV0'), slR0 = document.getElementById('slR0');
+const vV0 = document.getElementById('vV0'), vR0 = document.getElementById('vR0');
+let electrons = [];
+const loop = { x:120, y:70, w:460, h:220 }; // rectangle path
+function perimeterPoint(t) {
+  // t in [0,1) travels clockwise around rectangle
+  const {x,y,w,h} = loop;
+  const P = 2*(w+h);
+  let d = t*P;
+  if (d < w) return {x:x+d, y:y};
+  d -= w;
+  if (d < h) return {x:x+w, y:y+d};
+  d -= h;
+  if (d < w) return {x:x+w-d, y:y+h};
+  d -= w;
+  return {x:x, y:y+h-d};
+}
+for (let i=0;i<24;i++) electrons.push(i/24);
+
+function drawCircuit() {
+  const V = +slV0.value, R = +slR0.value;
+  const I = V/R;
+  vV0.textContent = V + ' V'; vR0.textContent = R + ' Ω';
+  const w = cC.width, h = cC.height;
+  xC.clearRect(0,0,w,h);
+
+  // wire
+  const {x,y} = loop;
+  xC.strokeStyle = '#64748b'; xC.lineWidth = 4;
+  xC.strokeRect(loop.x, loop.y, loop.w, loop.h);
+
+  // battery (top middle)
+  const bx = loop.x + loop.w/2;
+  xC.clearRect(bx-26, loop.y-14, 52, 28);
+  xC.strokeStyle = '#f59e0b'; xC.lineWidth = 3;
+  xC.beginPath(); xC.moveTo(bx-12, loop.y-14); xC.lineTo(bx-12, loop.y+14); xC.stroke(); // long +
+  xC.lineWidth = 6;
+  xC.beginPath(); xC.moveTo(bx+8, loop.y-8); xC.lineTo(bx+8, loop.y+8); xC.stroke(); // short -
+  xC.fillStyle = '#f59e0b'; xC.font = '700 13px DM Mono'; xC.textAlign = 'center';
+  xC.fillText('+', bx-20, loop.y-18); xC.fillText('−', bx+16, loop.y-18);
+  xC.fillText(V+' V', bx, loop.y-24);
+
+  // resistor (right side)
+  const rx = loop.x + loop.w, ry = loop.y + loop.h/2;
+  xC.clearRect(rx-8, ry-30, 16, 60);
+  xC.strokeStyle = '#a78bfa'; xC.lineWidth = 3;
+  xC.strokeRect(rx-9, ry-28, 18, 56);
+  xC.fillStyle = '#a78bfa'; xC.fillText(R+' Ω', rx+28, ry);
+
+  // bulb (bottom middle) glow ∝ current
+  const lx = loop.x + loop.w/2, ly = loop.y + loop.h;
+  const glow = Math.min(1, I/4);
+  const g = xC.createRadialGradient(lx, ly, 2, lx, ly, 34);
+  g.addColorStop(0, `rgba(253,224,71,${.3+glow*.7})`); g.addColorStop(1, 'transparent');
+  xC.fillStyle = g; xC.beginPath(); xC.arc(lx, ly, 34, 0, Math.PI*2); xC.fill();
+  xC.strokeStyle = '#fde047'; xC.lineWidth = 2.5;
+  xC.beginPath(); xC.arc(lx, ly, 13, 0, Math.PI*2); xC.stroke();
+  xC.beginPath(); xC.moveTo(lx-7, ly-7); xC.lineTo(lx+7, ly+7); xC.moveTo(lx+7, ly-7); xC.lineTo(lx-7, ly+7); xC.stroke();
+
+  // electrons (flow speed ∝ I). Move counterclockwise (electrons) but show conventional arrow
+  electrons.forEach((t, i) => {
+    const p = perimeterPoint(t);
+    xC.fillStyle = '#38bdf8';
+    xC.beginPath(); xC.arc(p.x, p.y, 3.5, 0, Math.PI*2); xC.fill();
+    electrons[i] = (t + 0.0015 * I + 0.0006) % 1;
+  });
+
+  // conventional current arrows
+  xC.fillStyle = '#22c55e';
+  [0.12,0.62].forEach(t=>{ const p=perimeterPoint(t); const p2=perimeterPoint(t+0.02); drawArrow(xC, p.x,p.y,p2.x,p2.y,'#22c55e'); });
+
+  xC.fillStyle = '#94a3b8'; xC.font = '600 12px Nunito'; xC.textAlign = 'center';
+  xC.fillText('Current I = V/R = ' + I.toFixed(2) + ' A', w/2, h-14);
+  xC.fillStyle = '#38bdf8'; xC.fillText('● electrons', 70, 24);
+  xC.fillStyle = '#22c55e'; xC.fillText('→ conventional current', 200, 24);
+}
+slV0.addEventListener('input', drawCircuit);
+slR0.addEventListener('input', drawCircuit);
+setInterval(drawCircuit, 30);
+
+/* ─── TAB 1: OHM'S LAW GRAPH ─── */
+const cO = document.getElementById('cOhm'), xO = cO.getContext('2d');
+const slVo = document.getElementById('slVo'), slRo = document.getElementById('slRo');
+const vVo = document.getElementById('vVo'), vRo = document.getElementById('vRo');
+function drawOhm() {
+  const V = +slVo.value, R = +slRo.value, I = V/R;
+  vVo.textContent = V.toFixed(1) + ' V'; vRo.textContent = R.toFixed(1) + ' Ω';
+  document.getElementById('ohmRead').innerHTML = `I = V/R = ${V.toFixed(1)}/${R.toFixed(1)} = <strong>${I.toFixed(2)} A</strong> &nbsp;|&nbsp; Slope of line = R = ${R.toFixed(1)} Ω`;
+  const w = cO.width, h = cO.height;
+  xO.clearRect(0,0,w,h);
+  const ox = 60, oy = h-50, gw = w-100, gh = h-90;
+  const maxI = 20, maxV = 20;
+  // axes
+  xO.strokeStyle = '#475569'; xO.lineWidth = 1.5;
+  xO.beginPath(); xO.moveTo(ox, oy-gh); xO.lineTo(ox, oy); xO.lineTo(ox+gw, oy); xO.stroke();
+  // grid
+  xO.strokeStyle = '#1e293b'; xO.lineWidth = 1; xO.font='10px DM Mono'; xO.fillStyle='#64748b'; xO.textAlign='center';
+  for (let i=1;i<=4;i++){ const gx=ox+gw*i/4; xO.beginPath(); xO.moveTo(gx,oy); xO.lineTo(gx,oy-gh); xO.stroke(); xO.fillText((maxI*i/4).toFixed(0), gx, oy+16); }
+  for (let i=1;i<=4;i++){ const gy=oy-gh*i/4; xO.beginPath(); xO.moveTo(ox,gy); xO.lineTo(ox+gw,gy); xO.stroke(); xO.textAlign='right'; xO.fillText((maxV*i/4).toFixed(0), ox-6, gy+3); xO.textAlign='center'; }
+  // labels
+  xO.fillStyle='#94a3b8'; xO.font='600 12px Nunito';
+  xO.fillText('Current I (A) →', ox+gw/2, oy+34);
+  xO.save(); xO.translate(20, oy-gh/2); xO.rotate(-Math.PI/2); xO.fillText('Voltage V (V) →', 0, 0); xO.restore();
+  // line: V = IR, slope R. Draw from origin
+  const iEnd = maxV / R; // I when V = maxV
+  const iMax = Math.min(iEnd, maxI);
+  const vAtIMax = iMax * R;
+  xO.strokeStyle = '#38bdf8'; xO.lineWidth = 2.5;
+  xO.beginPath(); xO.moveTo(ox, oy);
+  xO.lineTo(ox + gw*iMax/maxI, oy - gh*vAtIMax/maxV); xO.stroke();
+  // current point
+  const px = ox + gw*I/maxI, py = oy - gh*V/maxV;
+  xO.fillStyle = '#22c55e'; xO.beginPath(); xO.arc(px, py, 6, 0, Math.PI*2); xO.fill();
+  xO.setLineDash([4,4]); xO.strokeStyle = '#22c55e88';
+  xO.beginPath(); xO.moveTo(px, oy); xO.lineTo(px, py); xO.lineTo(ox, py); xO.stroke(); xO.setLineDash([]);
+  xO.fillStyle = '#e2e8f0'; xO.font = '700 12px DM Mono'; xO.textAlign='left';
+  xO.fillText(`(${I.toFixed(1)} A, ${V.toFixed(1)} V)`, px+8, py-8);
+}
+slVo.addEventListener('input', drawOhm); slRo.addEventListener('input', drawOhm);
+drawOhm();
+
+/* ─── TAB 2: SERIES & PARALLEL ─── */
+let comboMode = 'series';
+const cCb = document.getElementById('cComb'), xCb = cCb.getContext('2d');
+function setCombo(m){ comboMode=m; document.getElementById('btnSer').classList.toggle('active',m==='series'); document.getElementById('btnPar').classList.toggle('active',m==='parallel'); drawCombo(); }
+function resBox(ctx,x,y,label,col){ ctx.strokeStyle=col; ctx.lineWidth=2.5; ctx.strokeRect(x,y,46,22); ctx.fillStyle=col; ctx.font='600 11px DM Mono'; ctx.textAlign='center'; ctx.fillText(label, x+23, y-6); }
+function drawCombo(){
+  const R1=+document.getElementById('cR1').value, R2=+document.getElementById('cR2').value, R3=+document.getElementById('cR3').value;
+  const w=cCb.width, h=cCb.height; xCb.clearRect(0,0,w,h);
+  xCb.strokeStyle='#64748b'; xCb.lineWidth=3;
+  const cols=['#38bdf8','#a78bfa','#f472b6'];
+  let R;
+  if(comboMode==='series'){
+    R = R1+R2+R3;
+    const y=h/2;
+    xCb.beginPath(); xCb.moveTo(60,y); xCb.lineTo(w-60,y); xCb.stroke();
+    const xs=[130,300,470];
+    [R1,R2,R3].forEach((r,i)=>{ xCb.clearRect(xs[i]-2,y-13,50,26); resBox(xCb,xs[i],y-11,'R'+(i+1)+'='+r+'Ω',cols[i]); });
+    // battery left
+    xCb.strokeStyle='#f59e0b'; xCb.lineWidth=3; xCb.beginPath(); xCb.moveTo(60,y-16); xCb.lineTo(60,y+16); xCb.stroke();
+    drawArrow(xCb,200,y,230,y,'#22c55e');
+    xCb.fillStyle='#94a3b8'; xCb.font='600 12px Nunito'; xCb.textAlign='center';
+    xCb.fillText('Same current through all — voltage divides', w/2, h-18);
+    document.getElementById('comboRead').innerHTML = `R = R₁+R₂+R₃ = ${R1}+${R2}+${R3} = <strong>${R} Ω</strong>`;
+  } else {
+    R = 1/(1/R1+1/R2+1/R3);
+    const xL=140, xR=560;
+    const ys=[70,150,230];
+    // side rails
+    xCb.strokeStyle='#64748b'; xCb.lineWidth=3;
+    xCb.beginPath(); xCb.moveTo(xL,50); xCb.lineTo(xL,250); xCb.stroke();
+    xCb.beginPath(); xCb.moveTo(xR,50); xCb.lineTo(xR,250); xCb.stroke();
+    [R1,R2,R3].forEach((r,i)=>{
+      xCb.strokeStyle='#64748b'; xCb.lineWidth=3;
+      xCb.beginPath(); xCb.moveTo(xL,ys[i]); xCb.lineTo(xR,ys[i]); xCb.stroke();
+      xCb.clearRect(330,ys[i]-13,50,26); resBox(xCb,330,ys[i]-11,'R'+(i+1)+'='+r+'Ω',cols[i]);
+    });
+    // battery across
+    xCb.strokeStyle='#f59e0b'; xCb.lineWidth=3;
+    xCb.beginPath(); xCb.moveTo(xL-40,150); xCb.lineTo(xL,150); xCb.stroke();
+    xCb.beginPath(); xCb.moveTo(xR,150); xCb.lineTo(xR+40,150); xCb.stroke();
+    xCb.fillStyle='#94a3b8'; xCb.font='600 12px Nunito'; xCb.textAlign='center';
+    xCb.fillText('Same voltage across all — current divides', w/2, h-8);
+    document.getElementById('comboRead').innerHTML = `1/R = 1/${R1}+1/${R2}+1/${R3} → <strong>R = ${R.toFixed(2)} Ω</strong>`;
+  }
+}
+drawCombo();
+
+/* ─── TAB 3: RESISTANCE FACTORS ─── */
+const cRs = document.getElementById('cRes'), xRs = cRs.getContext('2d');
+const slL=document.getElementById('slL'), slA=document.getElementById('slA');
+const vL=document.getElementById('vL'), vA=document.getElementById('vA');
+function drawRes(){
+  const L=+slL.value, A=+slA.value;
+  vL.textContent=L+' m'; vA.textContent=A+' mm²';
+  const rho=1.7e-8;
+  const R = rho*L / (A*1e-6);
+  document.getElementById('resRead').innerHTML = `R = ρL/A = <strong>${(R*1000).toFixed(2)} mΩ</strong> (${R.toExponential(2)} Ω)`;
+  const w=cRs.width, h=cRs.height; xRs.clearRect(0,0,w,h);
+  const cy=h/2;
+  const wireLen = 100 + L*45; // visual length
+  const wireTh = 6 + A*4; // visual thickness
+  const startX = (w - wireLen)/2;
+  // terminals
+  xRs.strokeStyle='#64748b'; xRs.lineWidth=3;
+  xRs.beginPath(); xRs.moveTo(40,cy); xRs.lineTo(startX,cy); xRs.stroke();
+  xRs.beginPath(); xRs.moveTo(startX+wireLen,cy); xRs.lineTo(w-40,cy); xRs.stroke();
+  // wire
+  const grad=xRs.createLinearGradient(0,cy-wireTh/2,0,cy+wireTh/2);
+  grad.addColorStop(0,'#c084fc'); grad.addColorStop(.5,'#a78bfa'); grad.addColorStop(1,'#7c3aed');
+  xRs.fillStyle=grad; xRs.fillRect(startX,cy-wireTh/2,wireLen,wireTh);
+  // dims
+  xRs.strokeStyle='#38bdf8'; xRs.lineWidth=1; xRs.setLineDash([4,3]);
+  xRs.beginPath(); xRs.moveTo(startX,cy+wireTh/2+16); xRs.lineTo(startX+wireLen,cy+wireTh/2+16); xRs.stroke(); xRs.setLineDash([]);
+  xRs.fillStyle='#38bdf8'; xRs.font='600 12px Nunito'; xRs.textAlign='center';
+  xRs.fillText('L = '+L+' m', startX+wireLen/2, cy+wireTh/2+34);
+  xRs.fillStyle='#a78bfa'; xRs.fillText('A = '+A+' mm²', startX+wireLen/2, cy-wireTh/2-14);
+  xRs.fillStyle='#94a3b8'; xRs.fillText('Longer → more R  ·  Thicker → less R', w/2, 28);
+}
+slL.addEventListener('input',drawRes); slA.addEventListener('input',drawRes);
+drawRes();
+
+/* ─── TAB 4: HEATING & POWER ─── */
+const cH = document.getElementById('cHeat'), xH = cH.getContext('2d');
+const slI=document.getElementById('slI'), slRh=document.getElementById('slRh');
+const vI=document.getElementById('vI'), vRh=document.getElementById('vRh');
+let hb=0;
+function drawHeat(){
+  const I=+slI.value, R=+slRh.value;
+  const P=I*I*R; const V=I*R;
+  vI.textContent=I.toFixed(1)+' A'; vRh.textContent=R+' Ω';
+  document.getElementById('heatRead').innerHTML = `P = I²R = <strong>${P.toFixed(0)} W</strong> &nbsp;|&nbsp; V = IR = ${V.toFixed(1)} V &nbsp;|&nbsp; Heat in 1 min = <strong>${(P*60).toFixed(0)} J</strong>`;
+  const w=cH.width, h=cH.height; xH.clearRect(0,0,w,h);
+  const cy=h/2-10;
+  // leads
+  xH.strokeStyle='#64748b'; xH.lineWidth=3;
+  xH.beginPath(); xH.moveTo(60,cy); xH.lineTo(180,cy); xH.stroke();
+  xH.beginPath(); xH.moveTo(520,cy); xH.lineTo(640,cy); xH.stroke();
+  // heating coil, glow ∝ P
+  const glow=Math.min(1,P/400);
+  xH.lineWidth=5;
+  for(let seg=0;seg<8;seg++){
+    const x0=180+seg*42.5;
+    const r = 60+glow*180;
+    const gg=Math.min(255,80+glow*175);
+    xH.strokeStyle=`rgb(255,${Math.round(200-glow*120)},${Math.round(60-glow*60)})`;
+    xH.beginPath(); xH.arc(x0+21, cy, 21, Math.PI, 0, seg%2===0); xH.stroke();
+  }
+  // glow halo
+  const g=xH.createRadialGradient(350,cy,10,350,cy,200);
+  g.addColorStop(0,`rgba(255,120,40,${glow*.35})`); g.addColorStop(1,'transparent');
+  xH.fillStyle=g; xH.fillRect(150,cy-120,400,240);
+  // power bar
+  xH.fillStyle='#263148'; xH.fillRect(180,h-34,340,14);
+  xH.fillStyle='#f472b6'; xH.fillRect(180,h-34,340*Math.min(1,P/500),14);
+  xH.fillStyle='#94a3b8'; xH.font='600 12px Nunito'; xH.textAlign='center';
+  xH.fillText('Power '+P.toFixed(0)+' W', 350, h-40);
+  xH.fillStyle='#fbbf24'; xH.font='700 13px DM Mono';
+  xH.fillText(P<80?'Cool':P<250?'Warm':'Glowing hot!', 350, 40);
+}
+slI.addEventListener('input',drawHeat); slRh.addEventListener('input',drawHeat);
+drawHeat();
+
+/* ─── TAB 5: CALCULATORS ─── */
+function calcOhm(){
+  let V=parseFloat(document.getElementById('calcV').value);
+  let I=parseFloat(document.getElementById('calcI').value);
+  let R=parseFloat(document.getElementById('calcR').value);
+  const has=[!isNaN(V),!isNaN(I),!isNaN(R)].filter(Boolean).length;
+  const out=document.getElementById('calcResult');
+  if(has<2){ out.innerHTML='<span style="color:var(--pink)">Enter at least two values.</span>'; return; }
+  if(isNaN(V)) V=I*R;
+  else if(isNaN(I)) I=V/R;
+  else if(isNaN(R)) R=V/I;
+  const P=V*I;
+  out.innerHTML = `V = <strong style="color:var(--blue)">${V.toFixed(2)} V</strong><br>`+
+    `I = <strong style="color:var(--green)">${I.toFixed(2)} A</strong><br>`+
+    `R = <strong style="color:var(--purple)">${R.toFixed(2)} Ω</strong><br>`+
+    `P = VI = <strong style="color:var(--amber)">${P.toFixed(2)} W</strong>`;
+}
+function calcEnergy(){
+  const P=+document.getElementById('enP').value, t=+document.getElementById('enT').value, d=+document.getElementById('enD').value, rate=+document.getElementById('enRate').value;
+  const units=(P/1000)*t*d;
+  const cost=units*rate;
+  document.getElementById('enResult').innerHTML =
+    `Energy per day = ${(P/1000*t).toFixed(2)} kWh<br>`+
+    `Total = <strong style="color:var(--green)">${units.toFixed(2)} units (kWh)</strong> in ${d} days<br>`+
+    `In joules = ${(units*3.6e6).toExponential(2)} J<br>`+
+    `Cost = <strong style="color:var(--amber)">₹${cost.toFixed(2)}</strong>`;
+}
+</script>
+</body>
+</html>

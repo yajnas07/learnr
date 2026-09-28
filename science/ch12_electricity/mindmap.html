@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mind Map — Electricity</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #080f1e; font-family: 'Nunito', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+canvas { position: absolute; inset: 0; }
+
+#ui {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.2rem; z-index: 10; pointer-events: none;
+}
+#ui h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg,#38bdf8,#a78bfa,#f59e0b);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+#ui p { font-family: 'DM Mono', monospace; font-size: .68rem; color: #475569; margin-top: .1rem; }
+
+.ctrl-bar {
+  position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 10;
+}
+.ctrl-btn {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  padding: .4rem 1rem; border-radius: 99px;
+  border: 1.5px solid #334155; background: rgba(30,41,59,.9);
+  color: #94a3b8; cursor: pointer; transition: all .2s; pointer-events: all;
+}
+.ctrl-btn:hover { border-color: #64748b; color: #e2e8f0; }
+
+#tooltip {
+  position: absolute; z-index: 20; pointer-events: none;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 12px; padding: .7rem 1rem;
+  max-width: 260px; font-size: .82rem; color: #e2e8f0;
+  line-height: 1.6; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+#tooltip strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: .3rem; }
+
+  .site-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.55rem 1.5rem;
+    background:rgba(8,15,30,.92); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(51,65,85,.5);
+    position:relative; z-index:100;
+  }
+  .site-nav img { height:26px; }
+  .site-nav a.back {
+    font-family:'DM Mono',monospace; font-size:.72rem; color:#64748b;
+    text-decoration:none; transition:color .2s;
+  }
+  .site-nav a.back:hover { color:#e2e8f0; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="../../index.html"><img src="../../logos/learnr-colored-dark.svg" alt="learnr"></a>
+  <a class="back" href="../../index.html">&larr; Back to Portal</a>
+</nav>
+<div id="ui"><div><h1>Electricity</h1><p>Mind Map · Hover nodes for details · Drag to pan · Scroll to zoom</p></div></div>
+<div id="tooltip"></div>
+<canvas id="c"></canvas>
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="resetView()">Reset View</button>
+  <button class="ctrl-btn" onclick="toggleLabels()">Toggle Labels</button>
+</div>
+
+<script>
+const C = document.getElementById('c'), X = C.getContext('2d'), tip = document.getElementById('tooltip');
+let W, H, ox = 0, oy = 0, sc = 1, drag = false, lx, ly, showLbl = true;
+
+function resize() { W = C.width = innerWidth; H = C.height = innerHeight; draw(); }
+addEventListener('resize', resize);
+
+/* ── DATA — absolute positions like other mind maps ── */
+const CENTER = { id:'c', label:'Electricity', x:0, y:0, r:58, color:'#1e3a5f', stroke:'#38bdf8', textColor:'#bae6fd', fontSize:15 };
+
+const BRANCHES = [
+  {
+    id:'curr', label:'Electric Current\n& Circuit', x:0, y:-220, r:42, color:'#312e81', stroke:'#818cf8', textColor:'#c7d2fe',
+    info:'Electric current is the rate of flow of electric charge through a conductor. I = Q/t. SI unit: ampere (A).',
+    children:[
+      { id:'c1', label:'I = Q / t', x:-150, y:-360, r:34, color:'#312e81', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'<strong>Electric Current</strong>I = Q/t, where Q is charge (coulombs) and t is time (seconds).\n1 ampere = 1 coulomb/second.\nMeasured by an ammeter connected in series.' },
+      { id:'c2', label:'Charge\nQ = ne', x:0, y:-380, r:34, color:'#312e81', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'<strong>Electric Charge</strong>Q = n × e, where e = 1.6 × 10⁻¹⁹ C (charge on one electron).\nSI unit: coulomb (C). Conventional current flows opposite to electron flow.' },
+      { id:'c3', label:'Circuit &\nSymbols', x:150, y:-360, r:34, color:'#312e81', stroke:'#a5b4fc', textColor:'#e0e7ff',
+        info:'<strong>Electric Circuit</strong>A closed continuous path for current. Needs a source (cell/battery), conductors, switch, and load.\nStandard symbols: cell, battery, resistor, bulb, ammeter, voltmeter.' },
+    ]
+  },
+  {
+    id:'pd', label:'Potential\nDifference', x:280, y:-120, r:42, color:'#14532d', stroke:'#22c55e', textColor:'#86efac',
+    info:'Work done to move a unit charge between two points. V = W/Q. SI unit: volt (V).',
+    children:[
+      { id:'p1', label:'V = W / Q', x:480, y:-240, r:34, color:'#14532d', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'<strong>Potential Difference</strong>V = W/Q, work done per unit charge.\n1 volt = 1 joule/coulomb.\nCurrent flows from high to low potential.' },
+      { id:'p2', label:'Volt &\nVoltmeter', x:500, y:-120, r:34, color:'#14532d', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'<strong>Measuring PD</strong>A voltmeter measures potential difference and is always connected in parallel across the component.\nIdeal voltmeter has very high resistance.' },
+      { id:'p3', label:'Cell &\nBattery', x:480, y:0, r:34, color:'#14532d', stroke:'#4ade80', textColor:'#bbf7d0',
+        info:'<strong>Source of PD</strong>A cell or battery maintains the potential difference that keeps current flowing in a circuit through chemical energy.' },
+    ]
+  },
+  {
+    id:'ohm', label:'Ohm\'s Law\n& Resistance', x:280, y:140, r:42, color:'#78350f', stroke:'#f59e0b', textColor:'#fde68a',
+    info:'V = IR at constant temperature. Resistance opposes the flow of current. SI unit: ohm (Ω).',
+    children:[
+      { id:'o1', label:'V = I R', x:500, y:70, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'<strong>Ohm\'s Law</strong>V = IR — the current through a conductor is directly proportional to the potential difference across it, at constant temperature.' },
+      { id:'o2', label:'Resistance\nR = V/I', x:530, y:170, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'<strong>Resistance</strong>R = V/I. The property of a conductor that opposes current flow.\nSI unit: ohm (Ω). 1 Ω = 1 V/A.' },
+      { id:'o3', label:'V–I Graph\n(straight line)', x:500, y:270, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'<strong>V–I Graph</strong>For an ohmic conductor, the V–I graph is a straight line through the origin. Slope = resistance R.' },
+      { id:'o4', label:'Rheostat', x:380, y:330, r:34, color:'#78350f', stroke:'#fbbf24', textColor:'#fef3c7',
+        info:'<strong>Rheostat</strong>A variable resistance used to change the current in a circuit without changing the source voltage.' },
+    ]
+  },
+  {
+    id:'resv', label:'Resistivity\n& Factors', x:-280, y:140, r:42, color:'#4c1d95', stroke:'#e879f9', textColor:'#f0abfc',
+    info:'Resistance depends on length, area, material and temperature. R = ρL/A. Resistivity ρ is a material property.',
+    children:[
+      { id:'v1', label:'R = ρ L / A', x:-500, y:70, r:34, color:'#4c1d95', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'<strong>Resistance Formula</strong>R = ρL/A.\nR ∝ L (length), R ∝ 1/A (area of cross-section).\nρ = resistivity of the material.' },
+      { id:'v2', label:'Resistivity\nρ (Ω·m)', x:-530, y:170, r:34, color:'#4c1d95', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'<strong>Resistivity</strong>ρ = RA/L. SI unit: ohm-metre (Ω·m).\nA property of the material, independent of dimensions.\nMetals: low ρ. Insulators: very high ρ.' },
+      { id:'v3', label:'Factors\nAffecting R', x:-500, y:270, r:34, color:'#4c1d95', stroke:'#d946ef', textColor:'#f0abfc',
+        info:'<strong>Factors Affecting Resistance</strong>• Length (R ∝ L)\n• Area (R ∝ 1/A)\n• Material (resistivity ρ)\n• Temperature (R increases with temperature for metals).' },
+    ]
+  },
+  {
+    id:'comb', label:'Series &\nParallel', x:-280, y:-120, r:42, color:'#134e4a', stroke:'#2dd4bf', textColor:'#99f6e4',
+    info:'Resistors can be combined in series (add) or parallel (reciprocals add). Determines total resistance.',
+    children:[
+      { id:'s1', label:'Series\nR = R₁+R₂+…', x:-500, y:-240, r:34, color:'#134e4a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'<strong>Series Combination</strong>R_s = R₁ + R₂ + R₃ + …\nSame current through all resistors.\nVoltage divides. Total R is larger than the largest resistor.' },
+      { id:'s2', label:'Parallel\n1/R=Σ1/Rᵢ', x:-500, y:-120, r:34, color:'#134e4a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'<strong>Parallel Combination</strong>1/R_p = 1/R₁ + 1/R₂ + …\nSame voltage across all resistors.\nCurrent divides. Total R is smaller than the smallest resistor.' },
+      { id:'s3', label:'Household\nWiring', x:-500, y:0, r:34, color:'#134e4a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'<strong>Domestic Wiring</strong>Appliances are connected in parallel so each gets the full 220 V and can be switched independently.' },
+      { id:'s4', label:'Current\nDivides', x:-380, y:-330, r:34, color:'#134e4a', stroke:'#5eead4', textColor:'#ccfbf1',
+        info:'<strong>Distribution</strong>Series: current same, voltage divides.\nParallel: voltage same, current divides.' },
+    ]
+  },
+  {
+    id:'heat', label:'Heating Effect\n& Power', x:0, y:260, r:42, color:'#7c2d12', stroke:'#fb923c', textColor:'#fed7aa',
+    info:'Current produces heat in a resistor: H = I²Rt (Joule\'s law). Electric power P = VI. Energy in kWh.',
+    children:[
+      { id:'h1', label:'H = I²Rt', x:-160, y:390, r:34, color:'#7c2d12', stroke:'#fdba74', textColor:'#ffedd5',
+        info:'<strong>Joule\'s Law of Heating</strong>H = I²Rt.\nHeat produced is proportional to I², R and time.\nUsed in electric heaters, irons, geysers, bulbs.' },
+      { id:'h2', label:'Power\nP = VI', x:0, y:420, r:34, color:'#7c2d12', stroke:'#fdba74', textColor:'#ffedd5',
+        info:'<strong>Electric Power</strong>P = VI = I²R = V²/R.\nSI unit: watt (W). 1 W = 1 J/s.\n1 horsepower = 746 W.' },
+      { id:'h3', label:'Energy\nkWh', x:160, y:390, r:34, color:'#7c2d12', stroke:'#fdba74', textColor:'#ffedd5',
+        info:'<strong>Electrical Energy</strong>Commercial unit = kilowatt-hour (kWh) = 1 "unit".\n1 kWh = 3.6 × 10⁶ J.\nEnergy = Power × time.' },
+    ]
+  }
+];
+
+/* Build flat node list and edges */
+const allN = [CENTER];
+const allEdges = [];
+BRANCHES.forEach(b => {
+  allN.push(b);
+  allEdges.push({ from: 'c', to: b.id });
+  (b.children || []).forEach(ch => {
+    ch.color = b.color; ch.stroke = b.stroke || b.color; ch.textColor = ch.textColor || b.textColor;
+    allN.push(ch);
+    allEdges.push({ from: b.id, to: ch.id });
+  });
+});
+function getNode(id) { return allN.find(n => n.id === id); }
+function allNodes() { return allN; }
+
+/* Drawing */
+function draw() {
+  X.setTransform(1,0,0,1,0,0); X.clearRect(0,0,W,H);
+  X.setTransform(sc,0,0,sc, W/2+ox, H/2+oy);
+
+  // edges
+  allEdges.forEach(e => {
+    const a = getNode(e.from), b = getNode(e.to);
+    const lw = e.from === 'c' ? 3 : 1.8;
+    X.beginPath(); X.moveTo(a.x, a.y);
+    const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
+    X.quadraticCurveTo(mx, my, b.x, b.y);
+    X.strokeStyle = (b.stroke || b.color) + '55'; X.lineWidth = lw; X.stroke();
+  });
+
+  // nodes
+  allN.forEach(n => {
+    const isCenter = n === CENTER;
+    const isBranch = BRANCHES.includes(n);
+    const alpha = isCenter ? 1 : isBranch ? .85 : .7;
+    const col = n.stroke || n.color;
+
+    // glow
+    const g = X.createRadialGradient(n.x, n.y, n.r*.3, n.x, n.y, n.r*1.8);
+    g.addColorStop(0, col + '30'); g.addColorStop(1, 'transparent');
+    X.fillStyle = g; X.beginPath(); X.arc(n.x, n.y, n.r*1.8, 0, Math.PI*2); X.fill();
+
+    // circle
+    X.beginPath(); X.arc(n.x, n.y, n.r, 0, Math.PI*2);
+    X.fillStyle = n.color; X.fill();
+    X.strokeStyle = col; X.lineWidth = 2.5; X.globalAlpha = alpha; X.stroke(); X.globalAlpha = 1;
+
+    // label
+    if (showLbl) {
+      X.fillStyle = n.textColor || '#e2e8f0'; X.textAlign = 'center'; X.textBaseline = 'middle';
+      const fs = n.fontSize || (n.r < 38 ? 9.5 : 12);
+      X.font = `${isCenter ? 700 : 600} ${fs}px Nunito`;
+      const lines = n.label.split('\n');
+      const lh = n.r < 38 ? 12 : 15;
+      lines.forEach((l, i) => X.fillText(l, n.x, n.y + (i - (lines.length-1)/2) * lh));
+    }
+  });
+}
+
+/* Interaction */
+function toWorld(ex, ey) {
+  return { x: (ex - W/2 - ox) / sc, y: (ey - H/2 - oy) / sc };
+}
+function hitTest(ex, ey) {
+  const p = toWorld(ex, ey);
+  for (const n of allNodes()) {
+    if (Math.hypot(p.x - n.x, p.y - n.y) < n.r) return n;
+  }
+  return null;
+}
+
+C.addEventListener('mousemove', e => {
+  if (drag) { ox += e.clientX - lx; oy += e.clientY - ly; lx = e.clientX; ly = e.clientY; draw(); return; }
+  const n = hitTest(e.clientX, e.clientY);
+  if (n && n.info) {
+    tip.innerHTML = n.info;
+    tip.style.display = 'block';
+    tip.style.left = Math.min(e.clientX + 14, W - 270) + 'px';
+    tip.style.top = (e.clientY + 14) + 'px';
+  } else if (n && n.children) {
+    tip.innerHTML = `<strong>${n.label.replace(/\n/g,' ')}</strong>${n.children.length} sub-topics — hover children for details`;
+    tip.style.display = 'block';
+    tip.style.left = Math.min(e.clientX + 14, W - 270) + 'px';
+    tip.style.top = (e.clientY + 14) + 'px';
+  } else {
+    tip.style.display = 'none';
+  }
+});
+
+C.addEventListener('mousedown', e => { drag = true; lx = e.clientX; ly = e.clientY; C.style.cursor = 'grabbing'; });
+addEventListener('mouseup', () => { drag = false; C.style.cursor = 'default'; });
+C.addEventListener('wheel', e => { e.preventDefault(); const z = e.deltaY < 0 ? 1.08 : 1/1.08; sc *= z; sc = Math.max(.3, Math.min(4, sc)); draw(); }, {passive:false});
+
+/* Touch */
+let lastDist = 0;
+C.addEventListener('touchstart', e => { if(e.touches.length===1){drag=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;} if(e.touches.length===2){lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);} });
+C.addEventListener('touchmove', e => { e.preventDefault(); if(e.touches.length===1&&drag){ox+=e.touches[0].clientX-lx;oy+=e.touches[0].clientY-ly;lx=e.touches[0].clientX;ly=e.touches[0].clientY;draw();} if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);sc*=d/lastDist;sc=Math.max(.3,Math.min(4,sc));lastDist=d;draw();} }, {passive:false});
+C.addEventListener('touchend', () => { drag = false; });
+
+function resetView() { ox = 0; oy = 0; sc = 1; draw(); }
+function toggleLabels() { showLbl = !showLbl; draw(); }
+
+resize();
+</script>
+</body>
+</html>
